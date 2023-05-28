@@ -255,7 +255,7 @@ call plug#begin(pe_runtimepath . '/plugged')
 
     Plug 'Yggdroot/indentLine'
     Plug 'mhinz/vim-startify'
-    nnoremap <space>r :Startify<CR> " Most Recent File MRF
+    nnoremap <space>st :Startify<CR> " Most Recent File MRF
    " Plug 'ap/vim-buftabline'
 
 " Locale
