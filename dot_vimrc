@@ -237,7 +237,8 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
     Plug 'laher/fuzzymenu.vim'
-    noremap <silent> <space>f <Plug>(Fzm)
+    noremap <silent> <leader>ff <Plug>(Fzm)
+    vnoremap <silent> <leader>ff <Plug>(FzmVisual)
     " if has('autocmd')
     "     autocmd filetype fzf
     " else
@@ -255,7 +256,7 @@ call plug#begin(pe_runtimepath . '/plugged')
 
     Plug 'Yggdroot/indentLine'
     Plug 'mhinz/vim-startify'
-    nnoremap <space>st :Startify<CR> " Most Recent File MRF
+    nnoremap <leader>st :Startify<CR> " Most Recent File MRF
    " Plug 'ap/vim-buftabline'
 
 " Locale
@@ -279,9 +280,8 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:EasyMotion_space_jump_first = 1
         let g:EasyMotion_use_upper = 1
         noremap /              <Plug>(easymotion-sn)
-        map     <space><space> <Plug>(easymotion-s)
+        map     <space><space> <Plug>(easymotion-s2)
         " nunmap ds
-        nmap    s              <Plug>(easymotion-s)
 
 
     Plug 'mg979/vim-visual-multi', {'branch': 'master'}
