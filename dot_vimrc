@@ -282,7 +282,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:EasyMotion_use_upper = 1
         
         nmap /              <Plug>(easymotion-sn)
-        map     <space><space> <Plug>(easymotion-s2)
+        map     <space><space> <Plug>(easymotion-s)
         " nunmap ds
 
 
