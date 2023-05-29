@@ -3,7 +3,10 @@
 #
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
-# source ~/.config/pe/bash/fzf.bash
+
+# Include Other File
+source ~/.config/pem/shell/fzf/fzf-ff.sh
+source ~/.config/pem/shell/vless/vless.sh
 # source ~/.config/pe/bash/git-prompt.sh
 # PS1 Setting
 parse_git_branch() {

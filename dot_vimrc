@@ -11,7 +11,7 @@ let g:startify_custom_header = [
 " File: .vimrc
 " Author: PEMessage
 " Description: This is my VIM8+/NeoVIM configuration
-" Last Modified:    2023-05-25 Thu 03:48 PM
+" Last Modified:  2023-05-29 Mon 03:01 PM
 " +++++++++++++++++++++++++++++++++++++++++++
 
 " 1. Configure List
@@ -177,7 +177,8 @@ let g:startify_custom_header = [
     inoremap <RightMouse>       <C-o>"+p
 
 " KeyBinding Setting Zone ( Better Mouse )
-    nnoremap <leader>rc  :w<CR> :source %<CR> " Re:Configuration
+    nnoremap <leader>rcs  :w<CR> :source %<CR> " Re:Configuration
+    nnoremap <leader>rcc  :w<CR> :e ~/.vimrc <CR> :tab ball<CR>
 
     nnoremap <leader>``   :nohlsearch<CR>
     nnoremap <leader>wp  :set nowrap!<CR>
@@ -279,12 +280,16 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:EasyMotion_enter_jump_first= 1
         let g:EasyMotion_space_jump_first = 1
         let g:EasyMotion_use_upper = 1
-        noremap /              <Plug>(easymotion-sn)
+        
+        nmap /              <Plug>(easymotion-sn)
         map     <space><space> <Plug>(easymotion-s2)
         " nunmap ds
 
 
     Plug 'mg979/vim-visual-multi', {'branch': 'master'}
+    Plug 'NickLaMuro/vimux'
+    nmap <Leader>vl :VimuxRunLastCommand<CR>
+    nmap <Leader>vp :VimuxPromptCommand<CR>
 
 
 
