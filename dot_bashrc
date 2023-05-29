@@ -3,8 +3,8 @@
 #
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
-source ~/.config/pe/bash/fzf.bash
-source ~/.config/pe/bash/git-prompt.sh
+# source ~/.config/pe/bash/fzf.bash
+# source ~/.config/pe/bash/git-prompt.sh
 # PS1 Setting
 parse_git_branch() {
     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
