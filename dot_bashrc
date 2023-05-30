@@ -47,6 +47,8 @@ pe_prompt
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 
+alias cnl='LC_ALL=zh_CN.UTF-8'
+
 
 # pe_prompt
 
