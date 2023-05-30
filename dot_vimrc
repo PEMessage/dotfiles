@@ -130,7 +130,15 @@ let g:startify_custom_header = [
     endif
 
     " Tab Line Setting Zone
-    set nohidden
+    set hidden
+
+" -------------------------------------------
+" 3.5 Window Setting
+" -------------------------------------------
+    autocmd FileType help wincmd L
+    autocmd FileType man wincmd L
+	runtime ftplugin/man.vim
+    set linebreak
 
 
 "  Mark A
@@ -166,8 +174,11 @@ let g:startify_custom_header = [
     nnoremap <silent><C-N> :bnext<CR>
     nnoremap <silent><C-P> :bprev<CR>
 
-    nnoremap <silent><C-H> :tabp<CR>
-    nnoremap <silent><C-L> :tabn<CR>
+    nnoremap <silent><C-H> :wincmd h<CR>
+    nnoremap <silent><C-L> :wincmd l<CR>
+
+    nnoremap <silent> j gj
+    nnoremap <silent> k gk
 
 " KeyBinding Setting Zone ( Better Mouse )
     nnoremap <silent><C-S-TAB> :tabp<CR>
@@ -179,8 +190,8 @@ let g:startify_custom_header = [
     inoremap <RightMouse>       <C-o>"+p
 
 " KeyBinding Setting Zone ( Better Mouse )
-    nnoremap <leader>rcs  :w<CR> :source %<CR> " Re:Configuration
-    nnoremap <leader>rcc  :w<CR> :e ~/.vimrc <CR> :tab ball<CR>
+    nnoremap <leader>rcc  :w<CR> :source %<CR> " Re:Configuration
+    nnoremap <leader>rce  :w<CR> :e ~/.vimrc <CR> :tab ball<CR>
 
     nnoremap <leader>``   :nohlsearch<CR>
     nnoremap <leader>wp  :set nowrap!<CR>
@@ -200,14 +211,30 @@ let g:startify_custom_header = [
 
     let g:netrw_preview = 1                     " 指针保留于Netrw
     let g:netrw_winsize = 25                    " %25的窗口大小
-    let g:netrw_liststyle = 3                   " 设置目录列表的样式：树形
+    let g:netrw_liststyle = 2                   " 设置目录列表的样式：树形
     let g:netrw_sort_sequence = '[\/]$,*'
+    let g:netrw_hide = 1
 
-    if &ft ==# "netrw"
-        " your code here
-        nmap <MiddleMouse>   t 
+    autocmd FileType netrw call s:RemoveNetrwMap()
+    function s:RemoveNetrwMap()
+        if hasmapto('<Plug>NetrwRefresh')
+            " Unmap Netrw Keybind
+            unmap <buffer> <C-I>
+            unmap <buffer> <C-O>
+            unmap <buffer> <C-l>
 
-    endif
+            " map Netrw Keybind
+            nmap <buffer> <C-I> U
+            nmap <buffer> <C-O> u
+            nmap <buffer> <C-l> <C-W>l
+
+            " New Map 
+            nmap <buffer> H -
+            nmap <buffer> <C-0> echo b
+            nmap <buffer> L <C-M>
+        endif
+    endfunction
+
     nnoremap <silent><leader>b  :Lexplore<CR>
 
 
@@ -225,7 +252,9 @@ let g:startify_custom_header = [
     set statusline+=\ %F                            " 文件名
     set statusline+=\ [%1*%M%*%n%R%H]               " buffer 编号和状态
     set statusline+=%=                              " 向右对齐
+    set statusline+=%{!getcwd()}
     set statusline+=\ %y                            " 文件类型
+    nnoremap <silent> <leader>wd :echo getcwd()<CR>
 
     " 最右边显示文件编码和行号等信息，并且固定在一个 group 中，优先占位
     set statusline+=\ %0(%{&fileformat}\ [%{(&fenc==\"\"?&enc:&fenc).(&bomb?\",BOM\":\"\")}]\ %v:%l/%L%)
@@ -259,7 +288,8 @@ call plug#begin(pe_runtimepath . '/plugged')
 
     Plug 'Yggdroot/indentLine'
     Plug 'mhinz/vim-startify'
-    nnoremap <leader>st :Startify<CR> " Most Recent File MRF
+    nnoremap <leader>st :tab new<CR>:Startify<CR> " Most Recent File MRF
+    nnoremap <leader>sb :Startify<CR> " Most Recent File MRF
    " Plug 'ap/vim-buftabline'
 
 " Locale
@@ -289,6 +319,10 @@ call plug#begin(pe_runtimepath . '/plugged')
 
 
     Plug 'mg979/vim-visual-multi', {'branch': 'master'}
+    let g:VM_maps = {}
+    let g:VM_maps['Find Under']         = '<C-d>'
+    let g:VM_maps['Find Subword Under'] = '<C-d>'
+
     Plug 'NickLaMuro/vimux'
     nmap <Leader>vl :VimuxRunLastCommand<CR>
     nmap <Leader>vp :VimuxPromptCommand<CR>
