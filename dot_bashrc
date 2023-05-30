@@ -37,7 +37,7 @@ function pe_prompt(){
     esac
 
     if [ "$color_prompt" = yes ]; then
-        PS1="[$blueF\u@\h$colorEnd:$greenF\w$colorEnd]$(__git_ps1 " (%s)")\$ "
+        PS1="[$blueF\u@\h$colorEnd:$greenF\w$colorEnd]\$ "
     else
         PS1="[\u@\h \w]\$ "
     fi
