@@ -1,0 +1,54 @@
+
+# exit for non-interactive shell
+[[ $- != *i* ]] && return
+
+# Ubuntu / Debian temp fix for snap format package
+if [ -f "/etc/profile.d/apps-bin-path.sh" ] ; then
+    source /etc/profile.d/apps-bin-path.sh
+fi
+
+
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+[ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
+[ ! -d $ZINIT_HOME/.git ] && git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+source "${ZINIT_HOME}/zinit.zsh"
+
+
+
+# Complete and Prompt 
+autoload -U compinit 
+zstyle ':completion:*' menu select=long
+zstyle ':completion:*' matcher-list '' \
+  'm:{a-z\-}={A-Z\_}' \
+  'r:[^[:alpha:]]||[[:alpha:]]=** r:|=* m:{a-z\-}={A-Z\_}' \
+  'r:|?=** m:{a-z\-}={A-Z\_}'
+
+
+# 设置 walters 主题的默认命令行提示符
+export PS1="[%n@%m:%~]%# "
+
+
+zinit wait lucid light-mode for \
+  atinit"zicompinit; zicdreplay" \
+  atload"_zsh_autosuggest_start" \
+      zsh-users/zsh-autosuggestions \
+  blockf atpull'zinit creinstall -q .' \
+      zsh-users/zsh-completions
+
+
+zinit ice as"command" from"gh-r" \
+          atclone"./starship init zsh > init.zsh; ./starship completions zsh > _starship" \
+          atpull"%atclone" src"init.zsh"
+zinit light starship/starship
+
+
+
+
+# source ~/.config/pem/shell/fzf/fzf-ff.sh
+# source ~/.config/pem/shell/vless/vless.sh
+source ~/.config/pem/shell/init-sh.sh
+source ~/.config/chezmoi/chezmoi.zsh
+
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+alias cnl='LC_ALL=zh_CN.UTF-8'
