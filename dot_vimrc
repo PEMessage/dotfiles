@@ -140,6 +140,36 @@ let g:startify_custom_header = [
 	runtime ftplugin/man.vim
     set linebreak
 
+" -------------------------------------------
+" 3.6 Meta Setting
+" -------------------------------------------
+    if $TMUX != ''
+        set ttimeoutlen=30
+    elseif &ttimeoutlen > 80 || &ttimeoutlen <= 0
+        set ttimeoutlen=80
+    endif
+    " 终端下允许 ALT，详见：http://www.skywind.me/blog/archives/2021
+    " 记得设置 ttimeout （见 init-basic.vim） 和 ttimeoutlen （上面）
+    "----------------------------------------------------------------------
+    if has('nvim') == 0 && has('gui_running') == 0
+        function! s:metacode(key)
+            exec "set <M-".a:key.">=\e".a:key
+        endfunc
+        for i in range(10)
+            call s:metacode(nr2char(char2nr('0') + i))
+        endfor
+        for i in range(26)
+            call s:metacode(nr2char(char2nr('a') + i))
+            call s:metacode(nr2char(char2nr('A') + i))
+        endfor
+        for c in [',', '.', '/', ';', '{', '}']
+            call s:metacode(c)
+        endfor
+        for c in ['?', ':', '-', '_', '+', '=', "'"]
+            call s:metacode(c)
+        endfor
+    endif
+
 
 "  Mark A
 " Difference Map | Norm | Ins | Cmd | Vis | Sel | Opr | Term | Lang | 
@@ -165,17 +195,28 @@ let g:startify_custom_header = [
     noremap! <C-E> <end>
     noremap! <C-_> <C-K> " 插入 digraph（见 :h digraph），快速输入日文或符号等
     noremap! <C-Y> <C-R>
-    noremap! <M-F> <S-Right>
-    noremap! <M-B> <S-Left>
     
 
+    
+    
 
 " KeyBinding Setting Zone ( Normal Mode  )
     nnoremap <silent><C-N> :bnext<CR>
     nnoremap <silent><C-P> :bprev<CR>
 
-    nnoremap <silent><C-H> :wincmd h<CR>
-    nnoremap <silent><C-L> :wincmd l<CR>
+    "    CTRL-H 同 `<BS>` 一样功能，我们都是直接用 `<BS>` 没人CTRL-H的，直接覆盖掉
+    "    CTRL-J 同回车（有两个码 0x0d 或 0x0a），C-J是0x0d，硬回车是0x0a，没人按这个，覆盖。
+    "    CTRL-K 输入 digraph，比如可以用来输入欧洲文字，不需要，实在需要可以把这个功能挪给 INSERT模式下的 CTRL-B （空闲），或者 <c-x><c-k> ，完全可以覆盖。
+    "    CTRL-L 重绘，很少用，自己可以把他挪到 <leader>r 之类的键去多干净，覆盖。
+    nnoremap <silent><M-S-H> :wincmd h<CR>
+    nnoremap <silent><M-S-L> :wincmd l<CR>
+    nnoremap <silent><M-S-J> :wincmd j<CR>
+    nnoremap <silent><M-S-K> :wincmd k<CR>
+
+    nnoremap <silent><M-S-Left> :wincmd H<CR>
+    nnoremap <silent><M-S-Down> :wincmd J<CR>
+    nnoremap <silent><M-S-Up> :wincmd K<CR>
+    nnoremap <silent><M-S-Right> :wincmd L<CR>
 
     nnoremap <silent> j gj
     nnoremap <silent> k gk
@@ -221,17 +262,20 @@ let g:startify_custom_header = [
             " Unmap Netrw Keybind
             unmap <buffer> <C-I>
             unmap <buffer> <C-O>
-            unmap <buffer> <C-l>
 
             " map Netrw Keybind
-            nmap <buffer> <C-I> U
-            nmap <buffer> <C-O> u
-            nmap <buffer> <C-l> <C-W>l
+                " Forward dir
+                nmap <buffer> <C-I> U
+                " Backword dir
+                nmap <buffer> <C-O> u
+                " ctrl-l for left pannel
 
             " New Map 
-            nmap <buffer> H -
-            nmap <buffer> <C-0> echo b
-            nmap <buffer> L <C-M>
+                " Back to parent dir
+                nmap <buffer> H -           
+                nmap <buffer> <C-0> echo b
+                " Enter next dir
+                nmap <buffer> L <C-M>
         endif
     endfunction
 
@@ -477,7 +521,7 @@ call plug#end()
         endwhile
     endfunction
     command! PEWinMode :call PEWinMode()
-    nnoremap <silent><leader>wi :PEWinMode<CR>
+    nnoremap <silent><leader>wm :PEWinMode<CR>
 
     " TimeStamp in english or locale language 
     function PEDate(lang)

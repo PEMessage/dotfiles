@@ -1,0 +1,26 @@
+
+*visual-multi.txt*    Version 0.3.0    Last change: June 11 2019
+
+KEY MAP
+===============================================================================
+							
+;/,			重复上次的 f、t、F 或者 T 命令 [count] 次
+
+							
+
+CREDITS                                                            *vm-credits*
+===============================================================================
+
+Bram Moolenaar for Vim
+Tim Pope for |vim-abolish|                 https://github.com/tpope/vim-abolish
+
+
+
+
+
+LICENSE                                                            *vm-license*
+===============================================================================
+
+MIT
+
+ vim: ft=help et sw=2 ts=2 sts=2 tw=79
