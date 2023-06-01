@@ -1,27 +1,47 @@
+#! /usr/bin/zsh
+# -----------------------------------------
+# Init Process
+# -----------------------------------------
+    
+    # Prvent loading twice
+    if [ -z "$_DOTZSHRC_LOADED" ]; then
+        _DOTZSHRC_LOADED=1
+    else
+        return
+    fi
+    # Exit for non-interactive shell
+    [[ $- != *i* ]] && return
 
-# exit for non-interactive shell
-[[ $- != *i* ]] && return
+    # Ubuntu temp fix for snap format package
+    if [ -f "/etc/profile.d/apps-bin-path.sh" ] ; then
+        source /etc/profile.d/apps-bin-path.sh
+    fi
 
-# Ubuntu / Debian temp fix for snap format package
-if [ -f "/etc/profile.d/apps-bin-path.sh" ] ; then
-    source /etc/profile.d/apps-bin-path.sh
-fi
+    # Auto Install zinit
+    ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+    [ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
+    [ ! -d $ZINIT_HOME/.git ] && git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+    source "${ZINIT_HOME}/zinit.zsh"
 
+# -----------------------------------------
+# Option Setting Zone
+# -----------------------------------------
+    # emulate -lLR zsh  -> list all opt
+    # setopt -> list opt differnt to default
+    setopt AUTO_CD #No exec -> cd to it
+    bindkey -e
 
-ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
-[ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
-[ ! -d $ZINIT_HOME/.git ] && git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
-source "${ZINIT_HOME}/zinit.zsh"
+# -----------------------------------------
+# History Setting Zone
+# -----------------------------------------
+    
+    
 
-
-
+# -----------------------------------------
+# Complete Setting Zone
+# -----------------------------------------
 # Complete and Prompt 
-autoload -U compinit 
-zstyle ':completion:*' menu select=long
-zstyle ':completion:*' matcher-list '' \
-  'm:{a-z\-}={A-Z\_}' \
-  'r:[^[:alpha:]]||[[:alpha:]]=** r:|=* m:{a-z\-}={A-Z\_}' \
-  'r:|?=** m:{a-z\-}={A-Z\_}'
+autoload -Uz compinit 
 
 
 # 设置 walters 主题的默认命令行提示符
@@ -42,6 +62,9 @@ zinit ice as"command" from"gh-r" \
 zinit light starship/starship
 
 
+bindkey '^F' autosuggest-accept
+
+
 
 
 # source ~/.config/pem/shell/fzf/fzf-ff.sh
@@ -49,6 +72,3 @@ zinit light starship/starship
 source ~/.config/pem/shell/init-sh.sh
 source ~/.config/chezmoi/chezmoi.zsh
 
-alias ls='ls --color=auto'
-alias grep='grep --color=auto'
-alias cnl='LC_ALL=zh_CN.UTF-8'

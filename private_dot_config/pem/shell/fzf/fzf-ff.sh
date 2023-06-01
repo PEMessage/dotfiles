@@ -62,37 +62,33 @@
 # ----------------------------------------- 
 # fxf: take dir as parameter to search
 # ----------------------------------------- 
-    fpf(){ 
-        if [ -z "$1" ]; then
-            local temp='.'
-        else
-            local temp="$1"
-        fi
-
-        while [ '1' = '1' ]
-        do
-            
-        done
-
-
-
-        local cmd="find $1 -type f"
-        eval "$cmd" | fzf --preview 'cat {}' 
-    }
-    # fxf(){ 
-    #     local f_type d_type all_type  all_name dot_name others_name dir_path 
-    #     f_type='-type f'
-    #     d_type='-type d'
-    #     all_type='-type f,d'
-    #     all_name
+    # fpf(){ 
     #     if [ -z "$1" ]; then
-    #         local dir_path='.'
+    #         local temp='.'
     #     else
-    #         local dir_path="$1"
+    #         local temp="$1"
     #     fi
+
+    #     while [ '1' = '1' ]
+    #     do
+            
+    #     done
+
+
+
     #     local cmd="find $1 -type f"
     #     eval "$cmd" | fzf --preview 'cat {}' 
     # }
+    fxf(){ 
+        all_name
+        if [ -z "$1" ]; then
+            local dir_path='.'
+        else
+            local dir_path="$1"
+        fi
+        local cmd="find $1 -type f"
+        eval "$cmd" | fzf --preview 'cat {}' 
+    }
     alias f-fxf='fxf'
     fvim(){
         local temp=`fxf $1`
@@ -102,14 +98,35 @@
             vim "$temp"
         fi
     }
+
+    __fzf_rg(){
+        local rg_res file_name line_num
+
+        rg_res=$(   RG_PREFIX="rg --column --line-number --no-heading --color=always --smart-case "
+                    INITIAL_QUERY="${*:-}"
+                    : | fzf --ansi --disabled --query "$INITIAL_QUERY" \
+                        --bind "change:reload:sleep 0.1; $RG_PREFIX {q} || true" \
+                        --delimiter : \
+                        --preview 'batcat --color=always {1} --highlight-line {2}' \
+                        --preview-window 'up,60%,border-bottom,+{2}+3/3,~3'  )
+        if [ "$?" -ne 0 ];then
+            return 0
+        fi
+        # echo "$rg_res"
+        file_name=$( echo "$rg_res" | cut -d ':' -f '1' )
+        line_num=$( echo "$rg_res" | cut -d ':' -f '2' )
+        vim "$file_name" +"$line_num"
+    }
+
 # ----------------------------------------- 
 # ff: other fzf base tools
 # ----------------------------------------- 
     ff(){
         if [ "$1" = "apt" ]; then
-            apt-cache search '' | sort | cut --delimiter ' ' --fields 1 | fzf --multi --cycle --reverse --preview 'apt-cache show {1}' | xargs -r sudo apt install -y
-        fi
-        if [ "$1" = "ps" ]; then
+            apt-cache search '' | sort | cut --delimiter ' ' --fields 1 |
+                fzf --multi --cycle --reverse --preview 'apt-cache show {1}' |
+                xargs -r sudo apt install -y
+        elif [ "$1" = "ps" ]; then
             # 1. ps:   Feed the list of processes to fzf
             # 2. fzf:  Interactively select a process using fuzzy matching algorithm
             # 3. awk:  Take the PID from the selected line
@@ -119,21 +136,13 @@
                 --header=$'Press CTRL-R to reload\n\n' --header-lines=2 \
                 --preview='echo {}' --preview-window=down,3,wrap \
                 --layout=reverse --height=80% | awk '{print $2}' | xargs kill -9
-        fi
-        if [ "$1" = "rg" ]; then
-            RG_PREFIX="rg --column --line-number --no-heading --color=always --smart-case "
-            INITIAL_QUERY="${*:-}"
-            : | fzf --ansi --disabled --query "$INITIAL_QUERY" \
-                --bind "change:reload:sleep 0.1; $RG_PREFIX {q} || true" \
-                --delimiter : \
-                --preview 'batcat --color=always {1} --highlight-line {2}' \
-                --preview-window 'up,60%,border-bottom,+{2}+3/3,~3' \
-
-        fi
-        if [ "$1" = "-h" ]; then
+        elif [ "$1" = "rg" ]; then
+            __fzf_rg
+        else 
             echo -e '
-            ff ps: ps select for ff
-            ff apt: apt select for ff
+            ff ps: process show, select and kill 
+            ff apt: apt package serach, select and install 
+            ff rg: rg search pattern, open in vim
 
             fxf: find $1(path), search filename, and return filenaem
             fcd: find $1(path), search filename, cd to it

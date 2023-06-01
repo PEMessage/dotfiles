@@ -1,8 +1,9 @@
+#! /usr/bin/sh
 # -----------------------------------------
 # prvent load twice
 # -----------------------------------------
     # prevent loading twice
-    if [ -z "$_INIT_SH_LOADED" ]; then
+    if [ -z "$_INIT_SH_SH_LOADED" ]; then
         _INIT_SH_LOADED=1
     else
         return
@@ -15,25 +16,14 @@
     esac
 
 
-# -----------------------------------------
-# Alias Zone
-# -----------------------------------------
 
-    case "$OSTYPE" in
-        *gnu*|*linux*|*msys*|*cygwin*) alias ls='ls --color=auto' ;;
-        *freebsd*|*darwin*) alias ls='ls -G' ;;
-    esac
-
-    export EDITOR=vim
-
-
-    if [ -d "$HOME/.config/pem" ]; then
-        export PEMHOME="$HOME/.config/pem"
-    fi
 
 # -----------------------------------------
 # Path Zone
 # -----------------------------------------
+    if [ -d "$HOME/.config/pem" ]; then
+        export PEMHOME="$HOME/.config/pem"
+    fi
 
     # set PATH so it includes user's private bin if it exists
     if [ -d "$PEMHOME/bin" ]; then
@@ -56,6 +46,19 @@
     fi
 
     export PATH
+
+# -----------------------------------------
+# Alias and Path Config Zone
+# -----------------------------------------
+
+    case "$OSTYPE" in
+        *gnu*|*linux*|*msys*|*cygwin*) alias ls='ls --color=auto' ;;
+        *freebsd*|*darwin*) alias ls='ls -G' ;;
+    esac
+    alias grep='grep --color=auto'
+    alias cnl='LC_ALL=zh_CN.UTF-8'
+
+    export EDITOR=vim
 
 
 # -----------------------------------------

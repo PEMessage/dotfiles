@@ -5,9 +5,11 @@
 [[ $- != *i* ]] && return
 
 # Include Other File
-source ~/.config/pem/shell/fzf/fzf-ff.sh
-source ~/.config/pem/shell/vless/vless.sh
+# source ~/.config/pem/shell/fzf/fzf-ff.sh
+# source ~/.config/pem/shell/vless/vless.sh
 # source ~/.config/pe/bash/git-prompt.sh
+
+source ~/.config/pem/shell/init-sh.sh
 # PS1 Setting
 parse_git_branch() {
     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
