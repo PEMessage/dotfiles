@@ -60,6 +60,8 @@
 
     export EDITOR=vim
 
+    alias nvim-pe='NVIM_APPNAME=penvim nvim'
+
 
 # -----------------------------------------
 # Function Zone

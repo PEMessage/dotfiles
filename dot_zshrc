@@ -34,41 +34,54 @@
 # -----------------------------------------
 # History Setting Zone
 # -----------------------------------------
-    
-    
+    HISTFILE=$HOME/.local/share/zsh/zsh_history
+    HISTSIZE=1000
+    SAVEHIST=1000
+    [ -e "$HISTFILE" ] || mkdir -p `dirname $HISTFILE` ; touch "$HISTFILE"
+        
 
+    setopt SHARE_HISTORY          # 多个会话共享历史记录文件
+    setopt APPEND_HISTORY         # 添加历史记录，而非覆盖
+    setopt INC_APPEND_HISTORY     # 立即更新历史记录
+    setopt HIST_EXPIRE_DUPS_FIRST # 去除第一个重复记录
+    setopt HIST_IGNORE_DUPS       # 去除重复记录
+    setopt HIST_REDUCE_BLANKS     # 去除空白记录
+    setopt HIST_FIND_NO_DUPS      # 浏览时跳过重复记录
+    
 # -----------------------------------------
 # Complete Setting Zone
 # -----------------------------------------
-# Complete and Prompt 
-autoload -Uz compinit 
+    # Complete and Prompt 
+    autoload -Uz compinit 
 
 
-# 设置 walters 主题的默认命令行提示符
-export PS1="[%n@%m:%~]%# "
+    # 设置 walters 主题的默认命令行提示符
+    export PS1="[%n@%m:%~]%# "
 
 
-zinit wait lucid light-mode for \
-  atinit"zicompinit; zicdreplay" \
-  atload"_zsh_autosuggest_start" \
-      zsh-users/zsh-autosuggestions \
-  blockf atpull'zinit creinstall -q .' \
-      zsh-users/zsh-completions
+    zinit wait lucid light-mode for \
+      atinit"zicompinit; zicdreplay" \
+      atload"_zsh_autosuggest_start" \
+          zsh-users/zsh-autosuggestions \
+      blockf atpull'zinit creinstall -q .' \
+          zsh-users/zsh-completions
 
 
-zinit ice as"command" from"gh-r" \
-          atclone"./starship init zsh > init.zsh; ./starship completions zsh > _starship" \
-          atpull"%atclone" src"init.zsh"
-zinit light starship/starship
+    zinit ice as"command" from"gh-r" \
+              atclone"./starship init zsh > init.zsh; ./starship completions zsh > _starship" \
+              atpull"%atclone" src"init.zsh"
+    zinit light starship/starship
 
 
-bindkey '^F' autosuggest-accept
+    bindkey '^F' autosuggest-accept
 
 
+# -----------------------------------------
+# Function Setting Zone
+# -----------------------------------------
 
-
-# source ~/.config/pem/shell/fzf/fzf-ff.sh
-# source ~/.config/pem/shell/vless/vless.sh
-source ~/.config/pem/shell/init-sh.sh
-source ~/.config/chezmoi/chezmoi.zsh
+    # source ~/.config/pem/shell/fzf/fzf-ff.sh
+    # source ~/.config/pem/shell/vless/vless.sh
+    source ~/.config/pem/shell/init-sh.sh
+    source ~/.config/chezmoi/chezmoi.zsh
 
