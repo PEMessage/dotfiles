@@ -35,20 +35,20 @@
         local new_editor 
         if [ -z "$1" ]; then
             if [ "$PEMEDITOR" = "vim" ];then
-                new_editor = "nvim"
+                new_editor="nvim"
             elif [ "$PEMEDITOR" = "nvim" ];then
-                new_editor = "vim"
+                new_editor="vim"
             else
-                new_editor = "vim"
+                new_editor="vim"
             fi
         else
-            new_editor = $1
+            new_editor="$1"
         fi
 
 
         # Switch Editor
         echo "Origin: $PEMEDITOR -> Now: $new_editor "
-        PEMEDITOR = $1
+        PEMEDITOR="$new_editor"
         return 0
     }
 
@@ -68,6 +68,8 @@
     fi
 
     export PATH
+
+    
 
 # -----------------------------------------
 # Alias and Path Config Zone
