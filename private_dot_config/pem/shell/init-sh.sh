@@ -31,14 +31,25 @@
     fi
 
     export PEMEDITOR="vim"
-    pe-togglevim()
-    {
-        if [ "$PEMEDITOR" = "vim" ];then
-            echo "Origin:l vim -> Now: "
-            PEMEDITOR = "nvim"
-                
-        
+    pe-togglevim(){
+        local new_editor 
+        if [ -z "$1" ]; then
+            if [ "$PEMEDITOR" = "vim" ];then
+                new_editor = "nvim"
+            elif [ "$PEMEDITOR" = "nvim" ];then
+                new_editor = "vim"
+            else
+                new_editor = "vim"
+            fi
+        else
+            new_editor = $1
+        fi
 
+
+        # Switch Editor
+        echo "Origin: $PEMEDITOR -> Now: $new_editor "
+        PEMEDITOR = $1
+        return 0
     }
 
     # remove duplicate path
