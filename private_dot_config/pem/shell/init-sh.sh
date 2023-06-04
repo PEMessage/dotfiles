@@ -30,6 +30,17 @@
         export PATH="$PEMHOME/bin:$PATH"
     fi
 
+    export PEMEDITOR="vim"
+    pe-togglevim()
+    {
+        if [ "$PEMEDITOR" = "vim" ];then
+            echo "Origin:l vim -> Now: "
+            PEMEDITOR = "nvim"
+                
+        
+
+    }
+
     # remove duplicate path
     if [ -n "$PATH" ]; then
         old_PATH=$PATH:; PATH=
@@ -61,6 +72,7 @@
     export EDITOR=vim
 
     alias nvim-pe='NVIM_APPNAME=penvim nvim'
+    alias mv='mv -i'
 
 
 # -----------------------------------------

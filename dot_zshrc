@@ -53,6 +53,17 @@
 # -----------------------------------------
     # Complete and Prompt 
     autoload -Uz compinit 
+    autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
+
+    add-zsh-hook chpwd chpwd_recent_dirs
+    zstyle ':completion:*:*:cdr:*:*' menu selection
+    cdd(){
+       local temp=` cdr -l | fzf | cut -d ' ' -f 1 `
+       [ -z "$?" ] && return
+       cdr "$temp"
+       
+    }
+
 
 
     # 设置 walters 主题的默认命令行提示符
