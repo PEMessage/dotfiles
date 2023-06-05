@@ -9,6 +9,10 @@
 -- ===========================================
     PE = {}  -- Global Options Var
     
+    
+    
+    
+    
 
 -- 2. LazyNvim Auto Install
 -- ===========================================
@@ -31,6 +35,11 @@
 
 -- 3. Gernal Setting 
 -- ===========================================
+
+
+    
+    
+
 -- -------------------------------------------
 -- 3.1 Basic Setting Zone
 -- -------------------------------------------
@@ -84,28 +93,30 @@
 require("lazy").setup({ --Start Quote
 -- -------------------------------------------
 
--- -------------------------------------------
--- 5.1 Style Plugin
--- -------------------------------------------
---{
---    'olimorris/onedarkpro.nvim',
---    lazy = false,
---    priority = 1000,
---    config = function(_,opts)
---        require("onedarkpro").setup()
---       -- vim.cmd("colorscheme onedark")
---    end,
---},
+    -- -------------------------------------------
+    -- 5.1 Style Plugin
+    -- -------------------------------------------
+    --{
+    --    'olimorris/onedarkpro.nvim',
+    --    lazy = false,
+    --    priority = 1000,
+    --    config = function(_,opts)
+    --        require("onedarkpro").setup()
+    --       -- vim.cmd("colorscheme onedark")
+    --    end,
+    --},
 {
     'navarasu/onedark.nvim',
     config = function(_,opts)
         require('onedark').setup {
             style = 'deep',
             colors = {
-                new_gray = "#7c8dab",    -- define a new color
+                pe_gray = "#7c8dab",    -- define a new color
+                pe_blue = "#499cff",    -- define a new color
             },
             highlights = {
-                 Comment = {fg = '$new_gray'},
+                Comment = {fg = '$pe_gray'},
+                ['@comment'] = {fg = '$pe_gray'},
             },
 
             code_style = {
@@ -116,7 +127,7 @@ require("lazy").setup({ --Start Quote
                 variables = 'none'
             },
         }
-         require('onedark').load()
+        require('onedark').load()
     end,
 
 },
@@ -154,17 +165,17 @@ require("lazy").setup({ --Start Quote
         -- refer to the configuration section below
     },
     config = function(_, opts)
-      local wk = require("which-key")
-      wk.setup(opts)
-      wk.register(opts.defaults)
-      
+        local wk = require("which-key")
+        wk.setup(opts)
+        wk.register(opts.defaults)
+
     end,
 },
 {
     'nvim-lualine/lualine.nvim',
     dependencies = { 
-        'nvim-tree/nvim-web-devicons', 
-        opt = true
+        -- 'nvim-tree/nvim-web-devicons', 
+        -- opt = true
     },
     config = function(_,opts) 
         require('lualine').setup({
@@ -178,11 +189,24 @@ require("lazy").setup({ --Start Quote
     end
 },
 {
+    "utilyre/barbecue.nvim",
+    name = "barbecue",
+    version = "*",
+    dependencies = {
+        "SmiteshP/nvim-navic",
+        -- "nvim-tree/nvim-web-devicons", -- optional dependency
+    },
+    opts = {
+        -- configurations go here
+    },
+    
+},
+{
     "nvim-neo-tree/neo-tree.nvim",
     branch = "v2.x",
     dependencies = { 
         "nvim-lua/plenary.nvim",
-        "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+        -- "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
         "MunifTanjim/nui.nvim",
     },
     keys = {
@@ -211,24 +235,24 @@ require("lazy").setup({ --Start Quote
                 ["<space>"] = 'none',
             },
         },
-        git_status = {
-            window = {
-                position = "float",
-                mappings = {
-                    ["A"]  = "git_add_all",
-                    ["gu"] = "git_unstage_file",
-                    ["ga"] = "git_add_file",
-                    ["gr"] = "git_revert_file",
-                    ["gc"] = "git_commit",
-                    ["gp"] = "git_push",
-                    ["gg"] = "git_commit_and_push",
-                }
-            }
-        }
+        -- git_status = {
+        --     window = {
+        --         position = "float",
+        --         mappings = {
+        --             ["A"]  = "git_add_all",
+        --             ["gu"] = "git_unstage_file",
+        --             ["ga"] = "git_add_file",
+        --             ["gr"] = "git_revert_file",
+        --             ["gc"] = "git_commit",
+        --             ["gp"] = "git_push",
+        --             ["gg"] = "git_commit_and_push",
+        --         }
+        --     }
+        -- }
 
     },
     deactivate = function()
-      vim.cmd([[Neotree close]])
+        vim.cmd([[Neotree close]])
     end,
 
     config = function(_,opts)
@@ -247,16 +271,13 @@ require("lazy").setup({ --Start Quote
         require('mini.pairs').setup()
     end,
 },
-
-
-
 {
     -- active indent guide and indent text objects
     "echasnovski/mini.indentscope",
     version = false, -- wait till new 0.7.0 release to put it back on semver
     event = { "BufReadPre", "BufNewFile" },
     config = function(_,opts)
-       vim.api.nvim_create_autocmd("FileType", {
+        vim.api.nvim_create_autocmd("FileType", {
             pattern = { "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy", "mason", "notify" },
             callback = function()
                 vim.b.miniindentscope_disable = true
@@ -299,7 +320,7 @@ require("lazy").setup({ --Start Quote
         { "<leader>/", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "Search " },
 
         { "<leader>fok", "<cmd>Telescope keymaps<cr>", desc = "(O)ption (K)ey Maps" },
-        { "<leader>foc", "<cmd>Telescope help_tags<cr>", desc = "(O)ption (C)olor Highlight" },
+        { "<leader>foc", "<cmd>Telescope highlights<cr>", desc = "(O)ption (C)olor Highlight" },
         { "<leader>fot", "<cmd>Telescope colorscheme<cr>", desc = "(O)ption (T)heme"},
 
         { "<leader>fb", "<cmd>Telescope buffers show_all_buffers=true<cr>", desc = "(B)uffer" },
@@ -314,7 +335,7 @@ require("lazy").setup({ --Start Quote
     -- ------ -- 
     opts = {
         defaults = {
- 
+
             mappings = {
                 i = {
                     ["<c-t>"] = function(...)
@@ -369,13 +390,13 @@ require("lazy").setup({ --Start Quote
     init = function()
         local wk = require('which-key')
         wk.register({
-		["<leader>f"] = { name = "Fuzzy Find (Telescope)" }
-	})
+            ["<leader>f"] = { name = "Fuzzy Find (Telescope)" }
+        })
     end
 },
 
 -- -------------------------------------------
--- 5.2 Editing Plugin
+-- 5.4 Editing Plugin
 -- -------------------------------------------
 {
     'numToStr/Comment.nvim',
@@ -436,14 +457,14 @@ require("lazy").setup({ --Start Quote
 
 
 -- -------------------------------------------
--- 5.3 Leagcy Plugin
+-- 5.5 Leagcy Plugin
 -- -------------------------------------------
 {
     "mg979/vim-visual-multi",
     event = 'VeryLazy',
     init  = function()
-    vim.g.M_default_mappings = 0
-    vim.g.VM_mouse_mappings  = 1
+        vim.g.M_default_mappings = 0
+        vim.g.VM_mouse_mappings  = 1
         vim.g.VM_maps = {
             ['Find Under']          = '<C-d>',	
             ['Find Subword Under']  = '<C-d>',
@@ -455,7 +476,7 @@ require("lazy").setup({ --Start Quote
             -- Multi-Mode
             ["Align"]               = '<C-A>',
             ["Enlarge"]             = "+",
-            ["Shrink"]             = "-",
+            ["Shrink"]              = "-",
         }
     end,
 },
@@ -463,23 +484,113 @@ require("lazy").setup({ --Start Quote
     'easymotion/vim-easymotion',
     event = 'VeryLazy',
     init = function()
-        vim.g.EasyMotion_smartcase = 1
-        vim.g.EasyMotion_do_mapping = 0
+        vim.g.EasyMotion_smartcase        = 1
+        vim.g.EasyMotion_do_mapping       = 0
         vim.g.EasyMotion_enter_jump_first = 1
         vim.g.EasyMotion_space_jump_first = 1
-        vim.g.EasyMotion_use_upper = 1
+        vim.g.EasyMotion_use_upper        = 1
         vim.keymap.set(
-        'n',
-        '/','<Plug>(easymotion-sn)',
-        { remap = true }
+            'n',
+            '/','<Plug>(easymotion-sn)',
+            { remap = true }
 
         )
     end,
 },
-{ 'junegunn/vim-easy-align' },
-{ "tpope/vim-repeat", event = "VeryLazy" },
+{ 'junegunn/vim-easy-align', event = 'VeryLazy' },
+{ 'tpope/vim-repeat', event = 'VeryLazy' },
 
- 
+-- -------------------------------------------
+-- 5.6 Treesitter Plugin
+-- -------------------------------------------
+{
+    "nvim-treesitter/nvim-treesitter",
+    version = false, -- last release is way too old and doesn't work on Windows
+    build = ":TSUpdate",
+    event = { "BufReadPost", "BufNewFile" },
+    opts = {
+        highlight = {
+            enable = true,
+            additional_vim_regex_highlighting = false,
+        },
+        -- indent = { enable = true },
+        ensure_installed = {
+            'json',
+            'css',
+            'vim',
+            'lua',
+        },
+    },
+    config = function(_,opts)
+        require("nvim-treesitter.configs").setup(opts)
+    end
+
+},
+
+-- -------------------------------------------
+-- 5.7 Completion Plugin
+-- -------------------------------------------
+{
+    "hrsh7th/nvim-cmp",
+    version = false, -- last release is way too old
+    event = "InsertEnter",
+    dependencies = {
+        'hrsh7th/cmp-nvim-lsp',
+        'hrsh7th/cmp-buffer',
+        'hrsh7th/cmp-path',
+        'hrsh7th/cmp-cmdline',
+        'saadparwaiz1/cmp_luasnip',
+    },
+    opts = function()
+        local cmp = require('cmp')
+        return {
+            completion = {
+                completeopt = "menu,menuone,noinsert",
+            },
+            mapping = cmp.mapping.preset.insert({
+                ['<C-n>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
+                ['<C-p>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+                ['<Tab>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
+                ['<S-Tab>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+       
+                ['<C-e>'] = cmp.mapping.abort(),
+                ['<CR>'] = cmp.mapping.confirm({ select = true }), 
+                -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+                ['<S-CR>'] = cmp.mapping.confirm({
+                    behavior = cmp.ConfirmBehavior.Replace,
+                    select = true,
+                }), 
+                -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+            }),
+            sources = cmp.config.sources({
+                { name = 'buffer' },
+                { name = 'path' },
+            }),
+        }
+    end,
+    config = function(_,opts)
+        local cmp = require('cmp')
+        cmp.setup(opts)
+        cmp.setup.cmdline(':', {
+            mapping = cmp.mapping.preset.cmdline(),
+            sources = cmp.config.sources({
+                { name = 'path' }
+            }, {
+                { name = 'cmdline' }
+            })
+        })
+
+        cmp.setup.cmdline({ '/', '?' }, {
+            mapping = cmp.mapping.preset.cmdline(),
+            sources = {
+                { name = 'buffer' }
+            }
+        })
+
+    end
+    
+},
+
 -- -------------------------------------------
 }) --End Lazy.nvim Quote
 -- ===========================================

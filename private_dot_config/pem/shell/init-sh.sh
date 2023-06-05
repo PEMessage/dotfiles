@@ -84,8 +84,9 @@
 
     export EDITOR=vim
 
-    alias nvim-pe='NVIM_APPNAME=penvim nvim'
+    alias nvim-lazy='NVIM_APPNAME=lazynvim nvim'
     alias mv='mv -i'
+    alias rm='rm -i'
 
 
 # -----------------------------------------
