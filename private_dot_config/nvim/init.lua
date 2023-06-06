@@ -7,9 +7,11 @@
 
 -- 1. Global Options
 -- ===========================================
+--
+--
     PE = {}  -- Global Options Var
     
-    
+
     
     
     
@@ -86,8 +88,6 @@
     vim.o.showtabline = 2  -- 总是显示标签栏
     vim.o.splitright = true      -- 水平切割窗口时，默认在右边显示新窗口
 
-
-
 -- 5. LazyNvim Auto Install
 -- ===========================================
 require("lazy").setup({ --Start Quote
@@ -106,6 +106,25 @@ require("lazy").setup({ --Start Quote
     --    end,
     --},
 {
+    'keaising/im-select.nvim',
+    cond = function()
+        if not vim.fn.has('wsl') then
+            return false
+        end
+        if not vim.fn.has('neovide') then
+            return false
+        end
+        return true
+    end,
+    opts = {
+        default_im_select  = "2052-0",
+        default_command = 'im-select-imm.exe'
+    },
+    config = function(_,opts)
+        require('im_select').setup(opts)
+    end,
+},
+{
     'navarasu/onedark.nvim',
     config = function(_,opts)
         require('onedark').setup {
@@ -117,6 +136,7 @@ require("lazy").setup({ --Start Quote
             highlights = {
                 Comment = {fg = '$pe_gray'},
                 ['@comment'] = {fg = '$pe_gray'},
+                ['@lsp.type.comment'] = {fg = '$pe_gray'},
             },
 
             code_style = {
@@ -171,6 +191,7 @@ require("lazy").setup({ --Start Quote
 
     end,
 },
+
 {
     'nvim-lualine/lualine.nvim',
     dependencies = { 
@@ -197,6 +218,16 @@ require("lazy").setup({ --Start Quote
         -- "nvim-tree/nvim-web-devicons", -- optional dependency
     },
     opts = {
+        symbols = {
+     
+            ---@type string
+            modified = "●",
+            ---@type string
+            ellipsis = "…",
+            ---@type string
+            separator = ">",
+        },
+        kinds = false
         -- configurations go here
     },
     
@@ -326,6 +357,7 @@ require("lazy").setup({ --Start Quote
         { "<leader>fb", "<cmd>Telescope buffers show_all_buffers=true<cr>", desc = "(B)uffer" },
         { "<leader>fm", "<cmd>Telescope man_pages<cr>", desc = "(M)an Pages" },
         { "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "(H)elp Pages" },
+        { "<leader>ff", "<cmd>Telescope live_grep<cr>", desc = "Live Grep" },
 
         { "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "MRU" },
 
@@ -530,6 +562,65 @@ require("lazy").setup({ --Start Quote
 -- -------------------------------------------
 -- 5.7 Completion Plugin
 -- -------------------------------------------
+
+{
+
+    "williamboman/mason.nvim",
+    cmd = "Mason",
+
+    config = function(_, opts)
+        require("mason").setup(opts)
+    end,
+},
+{
+    'williamboman/mason-lspconfig.nvim',
+    dependencies = {
+        'williamboman/mason.nvim',
+    },
+    opts = {
+        ensure_installed = { "lua_ls" },
+    },
+    config = function(_,opts)
+        require("mason-lspconfig").setup(opts)
+    end,
+
+},
+
+{
+    "neovim/nvim-lspconfig",
+    event = { "BufReadPre", "BufNewFile" },
+    dependencies = {
+        'williamboman/mason.nvim',
+        'williamboman/mason-lspconfig.nvim',
+    },
+    config = function(_,opts)
+
+        local lspconfig = require('lspconfig')
+        require("mason-lspconfig").setup_handlers({
+            function (server_name)
+                require("lspconfig")[server_name].setup{}
+            end,
+            -- Next, you can provide targeted overrides for specific servers.
+            ["lua_ls"] = function ()
+                lspconfig.lua_ls.setup {
+                    settings = {
+                        Lua = {
+                            diagnostics = {
+                                globals = { "vim" }
+                            }
+                        }
+                    }
+                }
+
+            end,
+        })
+        vim.diagnostic.disable()
+
+    end,
+
+},
+
+
 {
     "hrsh7th/nvim-cmp",
     version = false, -- last release is way too old
@@ -539,15 +630,29 @@ require("lazy").setup({ --Start Quote
         'hrsh7th/cmp-buffer',
         'hrsh7th/cmp-path',
         'hrsh7th/cmp-cmdline',
-        'saadparwaiz1/cmp_luasnip',
+        'hrsh7th/cmp-vsnip',
+        'hrsh7th/vim-vsnip'
+        -- 'saadparwaiz1/cmp_luasnip',
     },
+    
     opts = function()
         local cmp = require('cmp')
         return {
+            snippet = {
+                expand = function(args)
+                    vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+                    -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+                    -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
+                    -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
+                end,
+            },
             completion = {
                 completeopt = "menu,menuone,noinsert",
             },
             mapping = cmp.mapping.preset.insert({
+                ['<C-d>'] = cmp.mapping.scroll_docs(-4),
+                ['<C-u>'] = cmp.mapping.scroll_docs(4),
+
                 ['<C-n>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
                 ['<C-p>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
                 ['<Tab>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
@@ -565,6 +670,7 @@ require("lazy").setup({ --Start Quote
             sources = cmp.config.sources({
                 { name = 'buffer' },
                 { name = 'path' },
+                { name = 'nvim_lsp' },
             }),
         }
     end,
@@ -604,6 +710,9 @@ require("lazy").setup({ --Start Quote
 -- 6.1 Basic I / N Mode
 -- -------------------------------------------
 
+    -- Emacs-like Keymap
+    vim.keymap.set('!','<C-a>','<home>')
+    vim.keymap.set('!','<C-e>','<end>')
     
     -- better up/down
     vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })

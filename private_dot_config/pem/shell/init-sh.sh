@@ -3,11 +3,11 @@
 # prvent load twice
 # -----------------------------------------
     # prevent loading twice
-    if [ -z "$_INIT_SH_SH_LOADED" ]; then
-        _INIT_SH_LOADED=1
-    else
-        return
-    fi
+    # if [ -z "$_INIT_SH_SH_LOADED" ]; then
+    #     _INIT_SH_LOADED=1
+    # else
+    #     return
+    # fi
 
     # skip if in non-interactive mode
     case "$-" in
@@ -79,6 +79,26 @@
         *gnu*|*linux*|*msys*|*cygwin*) alias ls='ls --color=auto' ;;
         *freebsd*|*darwin*) alias ls='ls -G' ;;
     esac
+
+    unameOut=$(uname -a)
+    case "$unameOut" in
+        *Microsoft*)     PEMOS="WSL";; #wls must be first since it will have Linux in the name too
+        *WSL2*)     PEMOS="WSL2";; 
+        Linux*)     PEMOS="Linux";;
+        Darwin*)    PEMOS="Mac";;
+        CYGWIN*)    PEMOS="Cygwin";;
+        MINGW*)     PEMOS="Windows";; 
+        *Msys)     PEMOS="Windows";;
+        *)          PEMOS="UNKNOWN:${unameOut}"
+    esac
+
+    if [ "$PEMOS" = "WSL2" ]; then
+        alias neovide="neovide.exe --wsl"
+    fi
+
+
+
+
     alias grep='grep --color=auto'
     alias cnl='LC_ALL=zh_CN.UTF-8'
 

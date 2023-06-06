@@ -3,6 +3,8 @@
 # Init Process
 # -----------------------------------------
     
+
+
     # Prvent loading twice
     if [ -z "$_DOTZSHRC_LOADED" ]; then
         _DOTZSHRC_LOADED=1
