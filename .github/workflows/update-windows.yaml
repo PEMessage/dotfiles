@@ -1,0 +1,19 @@
+
+on:
+  workflow_dispatch:
+
+name: Update Windows
+jobs:
+  exec:
+    runs-on: ubuntu-latest
+    step:
+      - name: Checkout windows branch
+        uses: actions/checkout@v3
+        with:
+          ref: windows
+          path: windows
+      - name: Checkout linux branch
+        uses: actions/checkout@v3
+        with:
+          ref: main
+          path: main
