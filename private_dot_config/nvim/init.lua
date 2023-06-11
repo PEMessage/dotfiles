@@ -7,14 +7,17 @@
 
 -- 1. Global Options
 -- ===========================================
---
---
-    PE = {}  -- Global Options Var
-    
+PE = {}  -- Global Options Var
+PE.logo = {
+'   ██████╗ ███████╗███╗   ███╗███████╗███████╗███████╗ █████╗  ██████╗ ███████╗ ',
+'   ██╔══██╗██╔════╝████╗ ████║██╔════╝██╔════╝██╔════╝██╔══██╗██╔════╝ ██╔════╝ ',
+'   ██████╔╝█████╗  ██╔████╔██║█████╗  ███████╗███████╗███████║██║  ███╗█████╗   ',
+'   ██╔═══╝ ██╔══╝  ██║╚██╔╝██║██╔══╝  ╚════██║╚════██║██╔══██║██║   ██║██╔══╝   ',
+'   ██║     ███████╗██║ ╚═╝ ██║███████╗███████║███████║██║  ██║╚██████╔╝███████╗ ',
+'   ╚═╝     ╚══════╝╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝ ',
+}
 
-    
-    
-    
+
 
 -- 2. LazyNvim Auto Install
 -- ===========================================
@@ -35,12 +38,11 @@
 
     vim.keymap.set('i', 'jj', '<C-[>')
 
--- 3. Gernal Setting 
+-- 3. Gernal Setting
 -- ===========================================
 
 
-    
-    
+
 
 -- -------------------------------------------
 -- 3.1 Basic Setting Zone
@@ -93,9 +95,9 @@
 require("lazy").setup({ --Start Quote
 -- -------------------------------------------
 
-    -- -------------------------------------------
-    -- 5.1 Style Plugin
-    -- -------------------------------------------
+-- -------------------------------------------
+-- 5.1 Style Plugin
+-- -------------------------------------------
     --{
     --    'olimorris/onedarkpro.nvim',
     --    lazy = false,
@@ -151,20 +153,54 @@ require("lazy").setup({ --Start Quote
     end,
 
 },
-
 {
-    'mhinz/vim-startify',
-    event = 'VimEnter',
-    config = function()
-        local pokemon = require('pokemon')
-        pokemon.setup({
-            number = 'random',
-            size = 'auto',
-        })
-        vim.g.startify_custom_header = pokemon.header()
-    end,
-    dependencies = { { 'ColaMint/pokemon.nvim' } }
+   'goolord/alpha-nvim',
+   event = "VimEnter",
+   dependencies = { 'nvim-tree/nvim-web-devicons' },
+   config = function ()
+       local startify = require('alpha.themes.startify')
+       startify.nvim_web_devicons.enabled = false
+       startify.section.header.val = PE.logo
+       startify.section.header.opts.hl = "String"
+       require'alpha'.setup(startify.config)
+   end
+
+
+
 },
+-- {
+    -- 'glepnir/dashboard-nvim',
+    -- event = 'VimEnter',
+    -- config = function()
+    --     require('dashboard').setup {
+    --         -- config
+    --         shortcut_type = 'number',
+    --
+    --     }
+    -- end,
+    -- dependencies = {'nvim-tree/nvim-web-devicons'}
+-- },
+-- {
+--     "startup-nvim/startup.nvim",
+--     dependencies = { 'nvim-lua/plenary.nvim' },
+--     config = function()
+--         require('startup').setup()
+--     end
+-- },
+--
+-- {
+--     'mhinz/vim-startify',
+--     event = 'VimEnter',
+--     config = function()
+--         local pokemon = require('pokemon')
+--         pokemon.setup({
+--             number = 'random',
+--             size = 'auto',
+--         })
+--         vim.g.startify_custom_header = pokemon.header()
+--     end,
+--     dependencies = { { 'ColaMint/pokemon.nvim' } }
+-- },
 
 {
     "folke/which-key.nvim",
@@ -191,14 +227,20 @@ require("lazy").setup({ --Start Quote
 
     end,
 },
+{
+    'akinsho/toggleterm.nvim',
+    opts = {
+        open_mapping = [[<M-`>]],
+    }
+},
 
 {
     'nvim-lualine/lualine.nvim',
-    dependencies = { 
-        -- 'nvim-tree/nvim-web-devicons', 
+    dependencies = {
+        -- 'nvim-tree/nvim-web-devicons',
         -- opt = true
     },
-    config = function(_,opts) 
+    config = function(_,opts)
         require('lualine').setup({
             options = {
                 theme = 'auto',
@@ -219,7 +261,7 @@ require("lazy").setup({ --Start Quote
     },
     opts = {
         symbols = {
-     
+
             ---@type string
             modified = "●",
             ---@type string
@@ -230,12 +272,12 @@ require("lazy").setup({ --Start Quote
         kinds = false
         -- configurations go here
     },
-    
+
 },
 {
     "nvim-neo-tree/neo-tree.nvim",
     branch = "v2.x",
-    dependencies = { 
+    dependencies = {
         "nvim-lua/plenary.nvim",
         -- "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
         "MunifTanjim/nui.nvim",
@@ -294,7 +336,7 @@ require("lazy").setup({ --Start Quote
 -- -------------------------------------------
 -- 5.2 Mini.nvim Plugin
 -- -------------------------------------------
-{ 
+{
     'echasnovski/mini.pairs',
     event = "VeryLazy",
     version = false,
@@ -362,9 +404,9 @@ require("lazy").setup({ --Start Quote
         { "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "MRU" },
 
     },
-    -- ------ -- 
-    -- Option -- 
-    -- ------ -- 
+    -- ------ --
+    -- Option --
+    -- ------ --
     opts = {
         defaults = {
 
@@ -492,13 +534,16 @@ require("lazy").setup({ --Start Quote
 -- 5.5 Leagcy Plugin
 -- -------------------------------------------
 {
+    'yianwillis/vimcdoc'
+},
+{
     "mg979/vim-visual-multi",
     event = 'VeryLazy',
     init  = function()
         vim.g.M_default_mappings = 0
         vim.g.VM_mouse_mappings  = 1
         vim.g.VM_maps = {
-            ['Find Under']          = '<C-d>',	
+            ['Find Under']          = '<C-d>',
             ['Find Subword Under']  = '<C-d>',
             -- Arrow Key
             ["Add Cursor Up"]       = '<M-C-Up>',
@@ -578,7 +623,11 @@ require("lazy").setup({ --Start Quote
         'williamboman/mason.nvim',
     },
     opts = {
-        ensure_installed = { "lua_ls" },
+        ensure_installed = {
+            'pylsp',
+            'lua_ls',
+
+        },
     },
     config = function(_,opts)
         require("mason-lspconfig").setup(opts)
@@ -602,19 +651,24 @@ require("lazy").setup({ --Start Quote
             end,
             -- Next, you can provide targeted overrides for specific servers.
             ["lua_ls"] = function ()
-                lspconfig.lua_ls.setup {
+                lspconfig.lua_ls.setup({
                     settings = {
                         Lua = {
                             diagnostics = {
-                                globals = { "vim" }
+                                globals = { "vim" },
+                                neededFileStatus = {
+                                    ['codestyle-check'] = 'None!',
+                                    ["unused-local"] = 'None!',
+                                    ["empty-block"] = "None!",
+                                }
                             }
                         }
                     }
-                }
+                })
 
             end,
         })
-        vim.diagnostic.disable()
+        -- vim.diagnostic.disable()
 
     end,
 
@@ -634,10 +688,15 @@ require("lazy").setup({ --Start Quote
         'hrsh7th/vim-vsnip'
         -- 'saadparwaiz1/cmp_luasnip',
     },
-    
+
     opts = function()
         local cmp = require('cmp')
         return {
+            -- view = {
+            --     entries = {
+            --         {name = 'native'}
+            --     }
+            -- },
             snippet = {
                 expand = function(args)
                     vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
@@ -647,7 +706,7 @@ require("lazy").setup({ --Start Quote
                 end,
             },
             completion = {
-                completeopt = "menu,menuone,noinsert",
+                completeopt = "menu,menunone,noinsert",
             },
             mapping = cmp.mapping.preset.insert({
                 ['<C-d>'] = cmp.mapping.scroll_docs(-4),
@@ -657,14 +716,14 @@ require("lazy").setup({ --Start Quote
                 ['<C-p>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
                 ['<Tab>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
                 ['<S-Tab>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
-       
+
                 ['<C-e>'] = cmp.mapping.abort(),
-                ['<CR>'] = cmp.mapping.confirm({ select = true }), 
+                ['<CR>'] = cmp.mapping.confirm({ select = true }),
                 -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
                 ['<S-CR>'] = cmp.mapping.confirm({
                     behavior = cmp.ConfirmBehavior.Replace,
                     select = true,
-                }), 
+                }),
                 -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
             }),
             sources = cmp.config.sources({
@@ -679,6 +738,9 @@ require("lazy").setup({ --Start Quote
         cmp.setup(opts)
         cmp.setup.cmdline(':', {
             mapping = cmp.mapping.preset.cmdline(),
+            -- view = {
+            --     entries = {name = 'wildmenu', separator = '|' }
+            -- },
             sources = cmp.config.sources({
                 { name = 'path' }
             }, {
@@ -688,20 +750,21 @@ require("lazy").setup({ --Start Quote
 
         cmp.setup.cmdline({ '/', '?' }, {
             mapping = cmp.mapping.preset.cmdline(),
+
             sources = {
                 { name = 'buffer' }
             }
         })
 
     end
-    
+
 },
 
 -- -------------------------------------------
 }) --End Lazy.nvim Quote
 -- ===========================================
 
- 
+
 
 -- 6. KeyMap Zone
 -- ===========================================
@@ -713,7 +776,7 @@ require("lazy").setup({ --Start Quote
     -- Emacs-like Keymap
     vim.keymap.set('!','<C-a>','<home>')
     vim.keymap.set('!','<C-e>','<end>')
-    
+
     -- better up/down
     vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
     vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
@@ -727,7 +790,7 @@ require("lazy").setup({ --Start Quote
     -- Switch Buffer using <meta>+<shift>+pn
     vim.keymap.set("n", "<M-S-N>", "<cmd>bn<CR>", { desc = "Go to right window", remap = true })
     vim.keymap.set("n", "<M-S-P>", "<cmd>bp<CR>", { desc = "Go to right window", remap = true })
-    
+
     -- Switch Tabe using [t or ]t
     vim.keymap.set("n", "]t", "<cmd>tabn<CR>", { desc = "Go to Next Tab", remap = true })
     vim.keymap.set("n", "[t", "<cmd>tabp<CR>", { desc = "Go to Previous Tab", remap = true })
@@ -757,7 +820,7 @@ require("lazy").setup({ --Start Quote
         function() PE.ToggleOpts("wrap") end,
         { desc = "Toggle Word Wrap" })
 
-       
+
     -- Also see @Line-Number
     vim.keymap.set("n", "<leader>nu",
         function() PE.ToggleOpts("number") end,
@@ -766,13 +829,14 @@ require("lazy").setup({ --Start Quote
         function() PE.ToggleOpts("number") end,
         { desc = "Toggle Relative Numbers" })
 
+    vim.keymap.set("n", "<leader>o/",'/', { noremap = true, desc = "Origin VIM /" })
 -- 7. Function Zone
 -- ===========================================
 
 
 function PE.ToggleOpts(option, silent, values)
     local echo = function(str)
-        return vim.api.nvim_echo( 
+        return vim.api.nvim_echo(
             { {str , "Question"} }, -- {chunks}: A list of [text, hl_group]
             false,                -- {history}:if true, add to |message-history|.
             {}  -- {opts}: Optional parameters.
@@ -818,7 +882,7 @@ function PE.PrintTbl(tb)
                 RecuPrint(v, level + 1)
             else
                 local content = string.format("%s%s = %s", indent .. "  ",tostring(k), tostring(v))
-                print(content)  
+                print(content)
             end
         end
         print(indent .. "}")

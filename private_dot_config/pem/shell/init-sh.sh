@@ -23,34 +23,15 @@
 # -----------------------------------------
     if [ -d "$HOME/.config/pem" ]; then
         export PEMHOME="$HOME/.config/pem"
+    else
+        echo 'Error: init-sh.sh postion in wrong dir'
+        return 
     fi
 
     # set PATH so it includes user's private bin if it exists
     if [ -d "$PEMHOME/bin" ]; then
         export PATH="$PEMHOME/bin:$PATH"
     fi
-
-    export PEMEDITOR="vim"
-    pe-togglevim(){
-        local new_editor 
-        if [ -z "$1" ]; then
-            if [ "$PEMEDITOR" = "vim" ];then
-                new_editor="nvim"
-            elif [ "$PEMEDITOR" = "nvim" ];then
-                new_editor="vim"
-            else
-                new_editor="vim"
-            fi
-        else
-            new_editor="$1"
-        fi
-
-
-        # Switch Editor
-        echo "Origin: $PEMEDITOR -> Now: $new_editor "
-        PEMEDITOR="$new_editor"
-        return 0
-    }
 
     # remove duplicate path
     if [ -n "$PATH" ]; then
@@ -69,17 +50,7 @@
 
     export PATH
 
-    
-
-# -----------------------------------------
-# Alias and Path Config Zone
-# -----------------------------------------
-
-    case "$OSTYPE" in
-        *gnu*|*linux*|*msys*|*cygwin*) alias ls='ls --color=auto' ;;
-        *freebsd*|*darwin*) alias ls='ls -G' ;;
-    esac
-
+    # OS Check
     unameOut=$(uname -a)
     case "$unameOut" in
         *Microsoft*)     PEMOS="WSL";; #wls must be first since it will have Linux in the name too
@@ -91,6 +62,60 @@
         *Msys)     PEMOS="Windows";;
         *)          PEMOS="UNKNOWN:${unameOut}"
     esac
+# -----------------------------------------
+# Editor Zone
+# -----------------------------------------
+    export PEMEDITOR='nvim' # MARK:PEMEDITOR
+    pe-editor-toggle(){
+        local new_editor 
+        if [ -z "$1" ]; then
+            if [ "$PEMEDITOR" = "vim" ];then
+                new_editor="nvim"
+            elif [ "$PEMEDITOR" = "nvim" ];then
+                new_editor="vim"
+            else
+                new_editor="vim"
+            fi
+        else
+            new_editor="$1"
+        fi
+
+        # Switch Editor
+        echo "Origin: $PEMEDITOR -> Now: $new_editor "
+        PEMEDITOR="$new_editor"
+        return 0
+    }
+    pe-editor-save(){
+        local current_file="${PEMHOME}/shell/init-sh.sh"
+        local line_number=$(grep 'MARK:PEMEDITOR$' $current_file -n | cut -d ':' -f 1) # 
+
+        # Test 
+        # echo $line_number
+        # echo $line_content | sed --quiet -e "s@'.*'@'${PEMEDITOR}'@1p"
+
+        # Sub 
+        #
+        # !!! -i will do in-place replace highly damgerous !!!
+        local res=`sed --in-place -e "${line_number}s@'.*'@'${PEMEDITOR}'@" "$current_file"`
+        local line_content=$(grep 'MARK:PEMEDITOR$' $current_file -n | cut -d ':' -f 2) #
+
+        echo -e "Save the Config to $current_file with: \n $line_content"
+    }
+
+
+
+    
+
+# -----------------------------------------
+# Alias and Path Config Zone
+# -----------------------------------------
+
+    case "$OSTYPE" in
+        *gnu*|*linux*|*msys*|*cygwin*) alias ls='ls --color=auto' ;;
+        *freebsd*|*darwin*) alias ls='ls -G' ;;
+    esac
+
+
 
     if [ "$PEMOS" = "WSL2" ]; then
         alias neovide="neovide.exe --wsl"
