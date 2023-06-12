@@ -4,7 +4,7 @@ on:
 
 name: Update Windows
 jobs:
-  exec:
+  sync:
     runs-on: ubuntu-latest
     steps:
       # First
@@ -17,5 +17,17 @@ jobs:
       - name: Checkout linux branch
         uses: actions/checkout@v3
         with:
-          ref: main
-          path: main
+          ref: linux
+          path: linux
+      # Third
+      - name: Checkout action branch
+        uses: actions/checkout@v3
+        with:
+          ref: action
+          path: action
+      # 
+      - name: List files in the repository
+        run: |
+          ls -al ${{ github.workspace }}
+
+
