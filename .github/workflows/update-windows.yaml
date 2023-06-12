@@ -6,12 +6,14 @@ name: Update Windows
 jobs:
   exec:
     runs-on: ubuntu-latest
-    step:
+    steps:
+      # First
       - name: Checkout windows branch
         uses: actions/checkout@v3
         with:
           ref: windows
           path: windows
+      # Second
       - name: Checkout linux branch
         uses: actions/checkout@v3
         with:
