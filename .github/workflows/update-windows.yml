@@ -29,9 +29,12 @@ jobs:
       - name: List files in the repository
         run: |
           ls -al ${{ github.workspace }}
+          chmod
       - name: Run script
-        run: ./action/run.sh
         shell: bash
+        run: |
+        chmod a+x ./action/run.sh
+        ./action/run.sh
           
 
 
