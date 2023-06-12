@@ -29,5 +29,9 @@ jobs:
       - name: List files in the repository
         run: |
           ls -al ${{ github.workspace }}
+      - name: Run script
+        run: ./action/run.sh
+        shell: bash
+          
 
 
