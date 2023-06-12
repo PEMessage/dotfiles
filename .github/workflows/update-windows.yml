@@ -31,9 +31,10 @@ jobs:
           ls -al ${{ github.workspace }}
           chmod
       - name: Run script
-        run: chmod a+x ./action/run.sh
-        run: ./action/run.sh
         shell: bash
+        run: |
+          chmod a+x ./action/run.sh
+          ./action/run.sh
           
 
 
