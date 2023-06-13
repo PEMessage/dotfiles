@@ -6,7 +6,9 @@
 -- +++++++++++++++++++++++++++++++++++++++++++
 
 -- 1. Global Options
+--
 -- ===========================================
+
 PE = {}  -- Global Options Var
 PE.logo = {
 '   ██████╗ ███████╗███╗   ███╗███████╗███████╗███████╗ █████╗  ██████╗ ███████╗ ',
@@ -16,6 +18,8 @@ PE.logo = {
 '   ██║     ███████╗██║ ╚═╝ ██║███████╗███████║███████║██║  ██║╚██████╔╝███████╗ ',
 '   ╚═╝     ╚══════╝╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝ ',
 }
+
+
 
 
 
@@ -262,11 +266,11 @@ require("lazy").setup({ --Start Quote
     opts = {
         symbols = {
 
-            ---@type string
+            -- @type string
             modified = "●",
-            ---@type string
+            -- @type string
             ellipsis = "…",
-            ---@type string
+            -- @type string
             separator = ">",
         },
         kinds = false
@@ -384,24 +388,73 @@ require("lazy").setup({ --Start Quote
 {
     'nvim-telescope/telescope.nvim', tag = '0.1.1',
     dependencies = { 'nvim-lua/plenary.nvim' },
+    cmd = "Telescope",
 
     -- ------ --
     -- Keymap --
     -- ------ --
     keys = {
         { "<leader><leader>", "<cmd>Telescope <cr>", desc = "Telescope All" },
-        { "<leader>/", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "Search " },
+        { "<leader>/", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "Search Buffer" },
 
-        { "<leader>fok", "<cmd>Telescope keymaps<cr>", desc = "(O)ption (K)ey Maps" },
-        { "<leader>foc", "<cmd>Telescope highlights<cr>", desc = "(O)ption (C)olor Highlight" },
-        { "<leader>fot", "<cmd>Telescope colorscheme<cr>", desc = "(O)ption (T)heme"},
+        {
+            "<leader>fk",
+            function ()
+                require('telescope.builtin').keymaps({
+                    modes = {'n'},
+                    show_plug = false,
+                    only_buf = false,
+                })
+            end,
+            desc = "Option Key Maps"
+        },
+        { "<leader>foc", "<cmd>Telescope highlights<cr>", desc = "Option Color Highlight" },
+        { "<leader>fot", "<cmd>Telescope colorscheme<cr>", desc = "Option Theme"},
 
-        { "<leader>fb", "<cmd>Telescope buffers show_all_buffers=true<cr>", desc = "(B)uffer" },
-        { "<leader>fm", "<cmd>Telescope man_pages<cr>", desc = "(M)an Pages" },
-        { "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "(H)elp Pages" },
+        -- { "<leader>fb", "<cmd>Telescope buffers show_all_buffers=true<cr>", desc = "Buffer" },
+        {
+            "<C-p>",
+            function()
+                require('telescope.builtin').buffers(
+                    require('telescope.themes').get_dropdown{
+                        previewer = false,
+                        attach_mappings = function (_,map)
+                            map( {'i','n'}, '<C-p>',
+                                function(...)
+                                    return require("telescope.actions").close(...)
+                                end
+                            )
+                            return true
+                        end,
+                    }
+                )
+            end,
+            desc = "Buffers"
+        },
+        {
+            "<C-r>",
+            function()
+                require('telescope.builtin').oldfiles(
+                    require('telescope.themes').get_dropdown({
+                        previewer = false,
+                        attach_mappings = function (_,map)
+                            map( {'i','n'}, '<C-r>',
+                                function(...)
+                                    return require("telescope.actions").close(...)
+                                end
+                            )
+                            return true
+                        end,
+                    })
+                )
+            end,
+            desc = "MRU"
+        },
+
+        { "<leader>fm", "<cmd>Telescope man_pages<cr>", desc = "Man Pages" },
+        { "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "Help Pages" },
         { "<leader>ff", "<cmd>Telescope live_grep<cr>", desc = "Live Grep" },
 
-        { "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "MRU" },
 
     },
     -- ------ --
@@ -434,10 +487,10 @@ require("lazy").setup({ --Start Quote
                     --
                     -- History like command mode
                     --
-                    ["<Down>"] = function(...)
+                    ["<C-Down>"] = function(...)
                         return require("telescope.actions").cycle_history_next(...)
                     end,
-                    ["<Up>"] = function(...)
+                    ["<C-Up>"] = function(...)
                         return require("telescope.actions").cycle_history_prev(...)
                     end,
                     ["<C-f>"] = function(...)
@@ -459,6 +512,17 @@ require("lazy").setup({ --Start Quote
                     end,
                 },
             },
+        },
+        pickers = {
+            -- buffers = {
+            --     mappings = {
+            --         i = {
+            --             ["<C-p>"] = function(...)
+            --                 return require("telescope.actions").close(...)
+            --             end,
+            --         },
+            --     },
+            -- },
         },
     },
     init = function()
@@ -684,13 +748,28 @@ require("lazy").setup({ --Start Quote
         'hrsh7th/cmp-buffer',
         'hrsh7th/cmp-path',
         'hrsh7th/cmp-cmdline',
+        'rafamadriz/friendly-snippets',
         'hrsh7th/cmp-vsnip',
-        'hrsh7th/vim-vsnip'
+        'hrsh7th/vim-vsnip',
         -- 'saadparwaiz1/cmp_luasnip',
     },
+    init = function ()
+        vim.keymap.set('i','<C-l>','<Plug>(vsnip-expand-or-jump)')
+    end,
 
     opts = function()
         local cmp = require('cmp')
+
+        local has_words_before = function()
+            unpack = unpack or table.unpack
+            local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+            return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+        end
+
+        local feedkey = function(key, mode)
+            vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(key, true, true, true), mode, true)
+        end
+
         return {
             -- view = {
             --     entries = {
@@ -706,7 +785,7 @@ require("lazy").setup({ --Start Quote
                 end,
             },
             completion = {
-                completeopt = "menu,menunone,noinsert",
+                completeopt = "menu,menunone,noinsert,noselect",
             },
             mapping = cmp.mapping.preset.insert({
                 ['<C-d>'] = cmp.mapping.scroll_docs(-4),
@@ -714,10 +793,11 @@ require("lazy").setup({ --Start Quote
 
                 ['<C-n>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
                 ['<C-p>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
-                ['<Tab>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
-                ['<S-Tab>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+                -- ['<Tab>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
+                -- ['<S-Tab>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
 
                 ['<C-e>'] = cmp.mapping.abort(),
+                ['<C-y>'] = cmp.mapping.complete(),
                 ['<CR>'] = cmp.mapping.confirm({ select = true }),
                 -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
                 ['<S-CR>'] = cmp.mapping.confirm({
@@ -725,12 +805,42 @@ require("lazy").setup({ --Start Quote
                     select = true,
                 }),
                 -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+
+
+                -- Super Tab(vim-vsnip)
+                ["<Tab>"] = cmp.mapping(function(fallback)
+                    if cmp.visible() then
+                        cmp.select_next_item()
+                    elseif vim.fn["vsnip#available"](1) == 1 then
+                        feedkey("<Plug>(vsnip-expand-or-jump)", "")
+                    elseif has_words_before() then
+                        cmp.complete()
+                    else
+                        fallback() -- The fallback function sends a already mapped key. In this case, it's probably `<Tab>`.
+                    end
+                end, { "i", "s" }),
+
+                ["<S-Tab>"] = cmp.mapping(function()
+                    if cmp.visible() then
+                        cmp.select_prev_item()
+                    elseif vim.fn["vsnip#jumpable"](-1) == 1 then
+                        feedkey("<Plug>(vsnip-jump-prev)", "")
+                    end
+                end, { "i", "s" }),
             }),
             sources = cmp.config.sources({
                 { name = 'buffer' },
                 { name = 'path' },
                 { name = 'nvim_lsp' },
+                { name = 'vsnip'}
             }),
+            formatting = {
+                format = function(entry, vim_item)
+                    vim_item.abbr = string.sub(vim_item.abbr, 1, 20)
+                    return vim_item
+                end
+            },
+
         }
     end,
     config = function(_,opts)
@@ -822,12 +932,21 @@ require("lazy").setup({ --Start Quote
 
 
     -- Also see @Line-Number
+        local wk = require('which-key')
+        wk.register({
+            ["<leader>n"] = { name = "+Number Options" }
+        })
     vim.keymap.set("n", "<leader>nu",
         function() PE.ToggleOpts("number") end,
         { desc = "Toggle Line Numbers" })
     vim.keymap.set("n", "<leader>nr",
-        function() PE.ToggleOpts("number") end,
+        function() PE.ToggleOpts("relativenumber") end,
         { desc = "Toggle Relative Numbers" })
+
+    vim.keymap.set("n", "<leader>tb", '<cmd>tab ball<cr>',
+        { desc = "Tab Ball buffers" })
+    vim.keymap.set("n", "<leader>al", '<cmd>tab new<cr><cmd>Alpha<cr>',
+        { desc = "Alpha" })
 
     vim.keymap.set("n", "<leader>o/",'/', { noremap = true, desc = "Origin VIM /" })
 -- 7. Function Zone
@@ -858,6 +977,24 @@ function PE.ToggleOpts(option, silent, values)
             echo("Disabled " .. option)
         end
     end
+end
+
+function PE.man()
+    require("telescope.builtin").man_pages({
+        sections={"ALL"},
+        attach_mappings = function(_, map)
+            map(
+                {'i'},
+                '<Enter>',
+                function(...)
+                    return require("telescope.actions").select_tab(...)
+                end
+            )
+            return true
+        end,
+    })
+    -- vim.cmd [[ wincmd w]]
+    -- vim.cmd [[ wincmd x]]
 end
 
 function PE.PrintTbl(tb)
