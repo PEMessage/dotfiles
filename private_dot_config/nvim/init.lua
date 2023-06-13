@@ -395,31 +395,66 @@ require("lazy").setup({ --Start Quote
     -- ------ --
     keys = {
         { "<leader><leader>", "<cmd>Telescope <cr>", desc = "Telescope All" },
-        { "<leader>/", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "Search " },
+        { "<leader>/", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "Search Buffer" },
 
-        { "<leader>fok", "<cmd>Telescope keymaps<cr>", desc = "(O)ption (K)ey Maps" },
-        { "<leader>foc", "<cmd>Telescope highlights<cr>", desc = "(O)ption (C)olor Highlight" },
-        { "<leader>fot", "<cmd>Telescope colorscheme<cr>", desc = "(O)ption (T)heme"},
+        {
+            "<leader>fk",
+            function ()
+                require('telescope.builtin').keymaps({
+                    modes = {'n'},
+                    show_plug = false,
+                    only_buf = false,
+                })
+            end,
+            desc = "Option Key Maps"
+        },
+        { "<leader>foc", "<cmd>Telescope highlights<cr>", desc = "Option Color Highlight" },
+        { "<leader>fot", "<cmd>Telescope colorscheme<cr>", desc = "Option Theme"},
 
-        { "<leader>fb", "<cmd>Telescope buffers show_all_buffers=true<cr>", desc = "(B)uffer" },
+        -- { "<leader>fb", "<cmd>Telescope buffers show_all_buffers=true<cr>", desc = "Buffer" },
         {
             "<C-p>",
             function()
                 require('telescope.builtin').buffers(
                     require('telescope.themes').get_dropdown{
-                        previewer = false
+                        previewer = false,
+                        attach_mappings = function (_,map)
+                            map( {'i','n'}, '<C-p>',
+                                function(...)
+                                    return require("telescope.actions").close(...)
+                                end
+                            )
+                            return true
+                        end,
                     }
                 )
-
             end,
-            desc = "(B)uffer"
+            desc = "Buffers"
+        },
+        {
+            "<C-r>",
+            function()
+                require('telescope.builtin').oldfiles(
+                    require('telescope.themes').get_dropdown({
+                        previewer = false,
+                        attach_mappings = function (_,map)
+                            map( {'i','n'}, '<C-r>',
+                                function(...)
+                                    return require("telescope.actions").close(...)
+                                end
+                            )
+                            return true
+                        end,
+                    })
+                )
+            end,
+            desc = "MRU"
         },
 
-        { "<leader>fm", "<cmd>Telescope man_pages<cr>", desc = "(M)an Pages" },
-        { "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "(H)elp Pages" },
+        { "<leader>fm", "<cmd>Telescope man_pages<cr>", desc = "Man Pages" },
+        { "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "Help Pages" },
         { "<leader>ff", "<cmd>Telescope live_grep<cr>", desc = "Live Grep" },
 
-        { "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "MRU" },
 
     },
     -- ------ --
@@ -479,15 +514,15 @@ require("lazy").setup({ --Start Quote
             },
         },
         pickers = {
-            buffers = {
-                mappings = {
-                    i = {
-                        ["<C-p>"] = function(...)
-                            return require("telescope.actions").close(...)
-                        end,
-                    },
-                },
-            },
+            -- buffers = {
+            --     mappings = {
+            --         i = {
+            --             ["<C-p>"] = function(...)
+            --                 return require("telescope.actions").close(...)
+            --             end,
+            --         },
+            --     },
+            -- },
         },
     },
     init = function()
