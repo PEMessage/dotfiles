@@ -1,0 +1,21 @@
+#! /bin/sh
+
+temp="
+
+   require('telescope.builtin').man_pages({
+     sections={'ALL'},
+     attach_mappings = function(_, map)
+        map(
+          {'i'},
+          '<Enter>',
+          function(...)
+            return require('telescope.actions').select_tab(...)
+          end
+        )
+        return true
+     end,
+   })
+
+"
+
+ nvim -c "lua $temp "
