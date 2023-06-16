@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+if which batcat &> /dev/null ; [ "$?" -eq '0' ] ; then
+    preview_cmd='batcat'
+elif which bat &> /dev/null ; [ "$?" -eq '0' ] ; then
+    preview_cmd='bat'
+else
+    echo "No Bat or Batcat"
+    return 1
+fi
+
+if which rg &> /dev/null ; [ "$?" -ne 0 ] ; then
+    echo "No Ripgrep"
+    return 1
+fi
+
+declare preview="$preview_cmd --color=always --style=header,numbers -H {2} {1} | grep -C3 {q}"
+while getopts ':l' x; do
+  case "$x" in
+    l) list_files=1
+      preview="$preview_cmd --color=always --style=header,numbers {1} | grep -C3 {q}"
+      ;;
+  esac
+done
+shift $(( OPTIND - 1 ))
+unset x OPTARG OPTIND
+
+rg --color=always -n ${list_files:+-l} "$1" 2> /dev/null |
+fzf -d: \
+--ansi \
+--query="$1" \
+--phony \
+--bind="change:reload:rg -n ${list_files:+-l} --color=always {q}" \
+--bind="enter:execute:${PEMEDITOR:-vim} {1}" \
+--preview="[[ -n {1} ]] && $preview"
+# ${VAR:-Default value}

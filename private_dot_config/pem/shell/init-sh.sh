@@ -51,8 +51,9 @@
     export PATH
 
     # OS Check
-    unameOut=$(uname -a)
-    case "$unameOut" in
+    # unameOut=$(uname -a)
+    case $(uname -a) in
+    # case "$unameOut" in
         *Microsoft*)     PEMOS="WSL";; #wls must be first since it will have Linux in the name too
         *WSL2*)     PEMOS="WSL2";; 
         Linux*)     PEMOS="Linux";;

@@ -359,8 +359,9 @@ require("lazy").setup({ --Start Quote
             api.config.mappings.default_on_attach(bufnr)
 
             -- custom mappings
-            vim.keymap.set('n', '<C-t>', api.tree.change_root_to_parent,        opts('Up'))
-            vim.keymap.set('n', '?',     api.tree.toggle_help,                  opts('Help'))
+            -- vim.keymap.set('n', '<C-t>', api.tree.change_root_to_parent,        opts('Up'))
+            vim.keymap.set('n', '?',     api.tree.toggle_help,          opts('Help'))
+            vim.keymap.set('n', '.',     api.tree.change_root_to_node,  opts('CD'))
         end
 
     },
@@ -704,10 +705,25 @@ require("lazy").setup({ --Start Quote
             'css',
             'vim',
             'lua',
+            'c',
+            'cpp',
+            'python',
+            'bash',
         },
+        incremental_selection = {
+            enable = true,
+            keymaps = {
+                init_selection = '<CR>',
+                node_incremental = '<CR>',
+                node_decremental = '<BS>',
+                scope_incremental = '<TAB>',
+            }
+        },
+
     },
     config = function(_,opts)
         require("nvim-treesitter.configs").setup(opts)
+        vim.keymap.set('n','<leader>ts','<cmd>TSBufToggle highlight<CR>', { desc = 'Toggle Treesitter Highlight' })
     end
 
 },
