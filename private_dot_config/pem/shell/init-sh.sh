@@ -138,10 +138,15 @@
 # Source Zone
 # -----------------------------------------
 
-    # PEMHOME=$(find ${PEMHOME}/shell -type d -not -path ${PEMHOME}/shell -exec find {} -type f \;)
+    PEMFUNCLIST=$(find ${PEMHOME}/shell -type d -not -path ${PEMHOME}/shell -exec find {} -type f -name '*.sh' \; )
+    for i in `echo $PEMFUNCLIST | tr '\n' ' ' ` ;
+    do
+        source "$i"
+    done
+    
 
-    source "$PEMHOME"/shell/fzf/fzf-ff.sh
-    source "$PEMHOME"/shell/vless/vless.sh
-    source "$PEMHOME"/shell/fff/fff-conf.sh
-    source "$PEMHOME"/shell/z-sh/z.sh
+    # source "$PEMHOME"/shell/fzf/fzf-ff.sh
+    # source "$PEMHOME"/shell/vless/vless.sh
+    # source "$PEMHOME"/shell/fff/fff-conf.sh
+    # source "$PEMHOME"/shell/z-sh/z.sh
 
