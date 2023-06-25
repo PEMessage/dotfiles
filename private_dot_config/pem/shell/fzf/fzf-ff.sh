@@ -37,7 +37,8 @@
     
     # Implement
     fcd(){
-        __fzf_cd "fcd" "$1"
+        # __fzf_cd "fcd" "$1"
+        fxf | bcd -
     }
     alias f-fcd="fcd"
     
@@ -80,7 +81,7 @@
     #     eval "$cmd" | fzf --preview 'cat {}' 
     # }
     fxf(){ 
-        all_name
+        # all_name
         if [ -z "$1" ]; then
             local dir_path='.'
         else

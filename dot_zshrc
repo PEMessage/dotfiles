@@ -1,4 +1,3 @@
-#! /usr/bin/zsh
 # -----------------------------------------
 # Init Process
 # -----------------------------------------
@@ -6,11 +5,11 @@
 
 
     # Prvent loading twice
-    if [ -z "$_DOTZSHRC_LOADED" ]; then
-        _DOTZSHRC_LOADED=1
-    else
-        return
-    fi
+    # if [ -z "$_DOTZSHRC_LOADED" ]; then
+    #     _DOTZSHRC_LOADED=1
+    # else
+    #     return
+    # fi
     # Exit for non-interactive shell
     [[ $- != *i* ]] && return
 
@@ -61,9 +60,11 @@
     zstyle ':completion:*:*:cdr:*:*' menu selection
     zstyle ':chpwd:*' recent-dirs-max 50
     cdd(){
-       local temp=` cdr -l | fzf | cut -d ' ' -f 1 `
-       [ -z "$?" ] && return
-       cdr "$temp"
+       # local temp=` cdr -l | fzf | awk '{print \$2}' | sed -e 's@^[[:space:]]*@@g' -e 's@[[:space:]]*$@@g' `
+       local temp=` cdr -l | fzf | awk '{print $2}' | sed -e "s@^~@${HOME}@g" `
+       # [ -z "$?" ] && return
+       # echo $temp
+       cd $temp
        
     }
 

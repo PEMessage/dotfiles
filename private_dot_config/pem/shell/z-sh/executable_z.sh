@@ -156,7 +156,7 @@ _z() {
                     if( common ) {
                         printf "%-10s %s\n", "common:", common > "/dev/stderr"
                     }
-                    cmd = "sort -n >&2"
+                    cmd = "sort -n -r >&2"
                     for( x in matches ) {
                         if( matches[x] ) {
                             printf "%-10s %s\n", matches[x], x | cmd
@@ -265,3 +265,10 @@ elif type complete >/dev/null 2>&1; then
         }
     }
 fi
+
+# Personal Alias Command
+
+zz(){
+    local temp=` _z -l 2>&1 | fzf | awk '{print $2}' | sed -e "s@^~@${HOME}@g" `
+    cd "$temp"
+}
