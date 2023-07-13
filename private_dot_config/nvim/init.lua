@@ -112,11 +112,11 @@ require("lazy").setup({ --Start Quote
     --},
 {
     'keaising/im-select.nvim',
-    cond = function()
-        if not vim.fn.has('wsl') then
+    enabled = function()
+        if ( vim.fn.has('wsl') == 0 ) then
             return false
         end
-        if not vim.fn.has('neovide') then
+        if ( vim.fn.has('neovide') == 0 ) then
             return false
         end
         return true
@@ -474,6 +474,25 @@ require("lazy").setup({ --Start Quote
             desc = "Buffers"
         },
         {
+            "<leader>fs",
+            function()
+                require('telescope.builtin').lsp_document_symbols(
+                    require('telescope.themes').get_dropdown{
+                        previewer = false,
+                        -- attach_mappings = function (_,map)
+                        --     map( {'i','n'}, '<C-p>',
+                        --         function(...)
+                        --             return require("telescope.actions").close(...)
+                        --         end
+                        --     )
+                        --     return true
+                        -- end,
+                    }
+                )
+            end,
+            desc = "Buffers"
+        },
+        {
             "<C-r>",
             function()
                 require('telescope.builtin').oldfiles(
@@ -768,7 +787,9 @@ require("lazy").setup({ --Start Quote
         'williamboman/mason-lspconfig.nvim',
     },
     config = function(_,opts)
-
+        -- --------------------------------
+        -- mason-lspconfig Config Zone
+        -- --------------------------------
         local lspconfig = require('lspconfig')
         require("mason-lspconfig").setup_handlers({
             function (server_name)
@@ -793,12 +814,53 @@ require("lazy").setup({ --Start Quote
 
             end,
         })
+
+
+        -- --------------------------------
+        -- lspconfig Config Zone
+        -- --------------------------------
         -- vim.diagnostic.disable()
+        vim.api.nvim_create_autocmd('LspAttach', {
+            group = vim.api.nvim_create_augroup('UserLspConfig', {}),
+            callback = function(ev)
+                -- Enable completion triggered by <c-x><c-o>
+                vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
+
+                -- Buffer local mappings.
+                -- See `:help vim.lsp.*` for documentation on any of the below functions
+                local local_opt = { buffer = ev.buf }
+                vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, local_opt)
+                vim.keymap.set('n', 'gd', vim.lsp.buf.definition, local_opt)
+                vim.keymap.set('n', 'K', vim.lsp.buf.hover, local_opt)
+                vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, local_opt)
+                vim.keymap.set({ 'n', 'v' }, 'gla', vim.lsp.buf.code_action, local_opt)
+                vim.keymap.set('n', 'gr', vim.lsp.buf.references, local_opt)
+            end,
+        })
 
     end,
 
 },
-
+{
+    'stevearc/aerial.nvim',
+    opts = {},
+    -- Optional dependencies
+    dependencies = {
+        "nvim-treesitter/nvim-treesitter",
+        -- "nvim-tree/nvim-web-devicons"
+    },
+    config = function()
+        require('aerial').setup({
+            -- optionally use on_attach to set keymaps when aerial has attached to a buffer
+            on_attach = function(bufnr)
+                -- Jump forwards/backwards with '{' and '}'
+                vim.keymap.set('n', '{', '<cmd>AerialPrev<CR>', {buffer = bufnr})
+                vim.keymap.set('n', '}', '<cmd>AerialNext<CR>', {buffer = bufnr})
+            end
+        })
+        vim.keymap.set('n', '<leader>a', '<cmd>AerialToggle!<CR>')
+    end,
+},
 
 {
     "hrsh7th/nvim-cmp",
