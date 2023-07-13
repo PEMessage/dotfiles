@@ -59,14 +59,14 @@
     add-zsh-hook chpwd chpwd_recent_dirs
     zstyle ':completion:*:*:cdr:*:*' menu selection
     zstyle ':chpwd:*' recent-dirs-max 50
-    cdd(){
-       # local temp=` cdr -l | fzf | awk '{print \$2}' | sed -e 's@^[[:space:]]*@@g' -e 's@[[:space:]]*$@@g' `
-       local temp=` cdr -l | fzf | awk '{print $2}' | sed -e "s@^~@${HOME}@g" `
-       # [ -z "$?" ] && return
-       # echo $temp
-       cd $temp
-       
-    }
+    # cdd(){
+    #    # local temp=` cdr -l | fzf | awk '{print \$2}' | sed -e 's@^[[:space:]]*@@g' -e 's@[[:space:]]*$@@g' `
+    #    local temp=` cdr -l | fzf | awk '{print $2}' | sed -e "s@^~@${HOME}@g" `
+    #    # [ -z "$?" ] && return
+    #    # echo $temp
+    #    cd $temp
+    #    
+    # }
 
 
 
@@ -95,8 +95,9 @@
 # Function Setting Zone
 # -----------------------------------------
 
+    source ~/.config/pem/shell/init-sh.sh
+
+    # source ~/.config/chezmoi/chezmoi.zsh
     # source ~/.config/pem/shell/fzf/fzf-ff.sh
     # source ~/.config/pem/shell/vless/vless.sh
-    source ~/.config/pem/shell/init-sh.sh
-    source ~/.config/chezmoi/chezmoi.zsh
 

@@ -54,5 +54,5 @@ alias cnl='LC_ALL=zh_CN.UTF-8'
 
 # pe_prompt
 
-export AM_HOME=/home/pem/learn-ics/abstract-machine
-export NEMU_HOME=/home/pem/learn-ics/nemu
+# export AM_HOME=/home/pem/learn-ics/abstract-machine
+# export NEMU_HOME=/home/pem/learn-ics/nemu

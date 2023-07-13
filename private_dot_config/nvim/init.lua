@@ -750,6 +750,7 @@ require("lazy").setup({ --Start Quote
         ensure_installed = {
             'pylsp',
             'lua_ls',
+            -- 'clangd',
 
         },
     },

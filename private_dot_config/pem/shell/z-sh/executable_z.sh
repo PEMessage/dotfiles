@@ -272,3 +272,4 @@ zz(){
     local temp=` _z -l 2>&1 | fzf | awk '{print $2}' | sed -e "s@^~@${HOME}@g" `
     cd "$temp"
 }
+alias cdd zz
