@@ -5,47 +5,59 @@
 # fff: fzf ranger like 
 # ----------------------------------------- 
     # internal use cd
-    __fzf_cd(){
-        local fd_dir fd_t fd_cmd fzf_opt fzf_res
-        # File Or Dir Check
-        if [ "$1" = 'fcd' ]; then 
-            fd_t=' -type f '
-        else 
-            fd_t=' -type d '
-        fi
-
-        # Path Check
-        if [ "$2" = '.' ]; then 
-            fd_dir=' . '
-        elif [ \( "$2" = '*' \) -o \( -z "$2" \) ]; then
-            fd_dir=' * '
-        else 
-            fd_dir="$2" 
-        fi
-
-        # Get FzF result
-        fd_cmd='find '"$fd_dir $fd_t"
-        fzf_opt="--height ${FZF_TMUX_HEIGHT:-40%} --bind=ctrl-z:ignore --reverse"
-        fzf_res=$( eval $fd_cmd 2>/dev/null | eval "fzf $fzf_opt"  )
-        # If File , Get dirname
-        if [ "$1" = 'fcd' ]; then 
-            fzf_res=$(dirname $fzf_res) 
-        fi 
-        # CD to dir
-        cd "$fzf_res"
-    }
+    #
+    # LEGECY: USE `fzf | bcd` 
+    #
+    # 
+    # __fzf_cd(){
+    #     local fd_dir fd_t fd_cmd fzf_opt fzf_res
+    #     # File Or Dir Check
+    #     if [ "$1" = 'fcd' ]; then 
+    #         fd_t=' -type f '
+    #     else 
+    #         fd_t=' -type d '
+    #     fi
+    #
+    #     # Path Check
+    #     if [ "$2" = '.' ]; then 
+    #         fd_dir=' . '
+    #     elif [ \( "$2" = '*' \) -o \( -z "$2" \) ]; then
+    #         fd_dir=' * '
+    #     else 
+    #         fd_dir="$2" 
+    #     fi
+    #
+    #     # Get FzF result
+    #     fd_cmd='find '"$fd_dir $fd_t"
+    #     fzf_opt="--height ${FZF_TMUX_HEIGHT:-40%} --bind=ctrl-z:ignore --reverse"
+    #     fzf_res=$( eval $fd_cmd 2>/dev/null | eval "fzf $fzf_opt"  )
+    #     # If File , Get dirname
+    #     if [ "$1" = 'fcd' ]; then 
+    #         fzf_res=$(dirname $fzf_res) 
+    #     fi 
+    #     # CD to dir
+    #     cd "$fzf_res"
+    # }
     
     # Implement
     fcd(){
         # __fzf_cd "fcd" "$1"
         fxf | bcd -
     }
-    alias f-fcd="fcd"
-    
     dcd(){
-        __fzf_cd "dcd" "$1"
+        if [ -z "$1" ];then
+            local dir='.'
+        else
+            local dir="$1"
+        fi
+
+        find "$dir" -type d | fzf | bcd -
     }
-    alias f-dcd="dcd"
+    
+    # dcd(){
+    #     __fzf_cd "dcd" "$1"
+    # }
+    # alias f-dcd="dcd"
 
     f-ranger(){
         local res
@@ -89,15 +101,6 @@
         fi
         local cmd="find $1 -type f"
         eval "$cmd" | fzf --preview 'cat {}' 
-    }
-    alias f-fxf='fxf'
-    fvim(){
-        local temp=`fxf $1`
-        if [ -z "$temp" ]; then
-            return
-        else
-            vim "$temp"
-        fi
     }
 
     __fzf_rg(){
@@ -148,7 +151,6 @@
             fxf: find $1(path), search filename, and return filenaem
             fcd: find $1(path), search filename, cd to it
             dcd: find $1(path), search path,cd to it
-            f-ranger: ranger-like file manager
             '
         fi
     }
