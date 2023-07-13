@@ -1,11 +1,20 @@
 #! /bin/sh
 cd ~
 chezmoi re-add
-echo "Add File to source"
+GREEN='\e[092m'
+STOP='\e[0m'
+echo -e "${GREEN}INFO${STOP}: ""Add File to source"
 temp=$(chezmoi source-path)
 cd $temp
 git add .
-git commit -m 'Update'
+
+
+if [ -z "$1" ]; then
+    MEG="Update time: "`date -u '+%Y-%m-%d %H:%M'`
+else
+    MEG="$1"
+fi
+git commit -m "$MEG"
 git push 
-echo "Push to git"
+echo "${GREEN}INFO${STOP}: ""Push to git"
 cd ~
