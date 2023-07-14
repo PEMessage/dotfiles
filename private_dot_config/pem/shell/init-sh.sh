@@ -55,14 +55,23 @@
     case $(uname -a) in
     # case "$unameOut" in
         *Microsoft*)     PEMOS="WSL";; #wls must be first since it will have Linux in the name too
-        *WSL2*)     PEMOS="WSL2";; 
-        Linux*)     PEMOS="Linux";;
-        Darwin*)    PEMOS="Mac";;
-        CYGWIN*)    PEMOS="Cygwin";;
-        MINGW*)     PEMOS="Windows";; 
-        *Msys)     PEMOS="Windows";;
-        *)          PEMOS="UNKNOWN:${unameOut}"
+        *WSL2*)          PEMOS="WSL2";; 
+        Linux*)          PEMOS="Linux";;
+        Darwin*)         PEMOS="Mac";;
+        CYGWIN*)         PEMOS="Cygwin";;
+        MINGW*)          PEMOS="Windows";; 
+        *Msys)           PEMOS="Windows";;
+        *)               PEMOS="UNKNOWN:${unameOut}"
     esac
+
+    case $(uname -m) in 
+        *x86_64*)   PEMARCH=x86_64;;
+        *amd64*)    PEMARCH=x86_64;;
+        *arm64*)    PEMARCH=arm64;;
+        *aarch64*)  PEMARCH=arm64;;
+        *armv8l*)   PEMARCH=arm64;;
+    esac
+
 # -----------------------------------------
 # Editor Zone
 # -----------------------------------------
@@ -138,6 +147,9 @@
 # -----------------------------------------
 # Source Zone
 # -----------------------------------------
+    if [ -f "${PEMHOME}/arch/${PEMARCH}/init-sh.sh"  ]; then
+        source "${PEMHOME}/arch/${PEMARCH}/init-sh.sh" 
+    fi
 
     PEMFUNCLIST=$(find ${PEMHOME}/shell -type d -not -path ${PEMHOME}/shell -exec find {} -type f -name '*.sh' \; )
     for i in `echo $PEMFUNCLIST | tr '\n' ' ' ` ;

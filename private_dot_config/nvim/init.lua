@@ -490,7 +490,7 @@ require("lazy").setup({ --Start Quote
                     }
                 )
             end,
-            desc = "Buffers"
+            desc = "Symbols(LSP)"
         },
         {
             "<C-r>",
