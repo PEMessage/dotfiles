@@ -2,11 +2,11 @@
 
 ## Requirement
 
-* Linux： `unixutils` `findutils` `nvim/vim`
+* Linux： `unixutils` `findutils` `nvim/vim` `tmux`
 
 ## Recommand 
 
-* `bat` `fd` `ripgrep` `fzf` `jq` 
+* `bat` `fd` `ripgrep` `fzf` `jq` `zsh` 
 * See [modern unix](https://github.com/ibraheemdev/modern-unix) for more
 
 ## Usage
@@ -23,14 +23,9 @@ then you could sync dotfiles across branch
 
 ## Reference 
 
-[@skywind/vim/etc](https://github.com/skywind3000/vim) 
-
-[skywind/vim-init](https://github.com/skywind3000/vim-init)
-
-[LazyVim/LazyVim](https://github.com/LazyVim/LazyVim)
-
-[rupa/z.sh](https://github.com/rupa/z)
-
-[fzf](https://github.com/junegunn/fzf/wiki/Related-projects)
-
-...
+- [@skywind/vim/etc](https://github.com/skywind3000/vim) 
+- [skywind/vim-init](https://github.com/skywind3000/vim-init)
+- [LazyVim/LazyVim](https://github.com/LazyVim/LazyVim)
+- [rupa/z.sh](https://github.com/rupa/z)
+- [fzf](https://github.com/junegunn/fzf/wiki/Related-projects)
+- ...
