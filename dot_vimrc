@@ -328,9 +328,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'PEMessage/vim-fixkey'
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
-    Plug 'laher/fuzzymenu.vim'
-    noremap <silent> <leader>ff <Plug>(Fzm)
-    vnoremap <silent> <leader>ff <Plug>(FzmVisual)
+    noremap <silent> <C-r> :History<CR>
     " if has('autocmd')
     "     autocmd filetype fzf
     " else

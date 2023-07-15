@@ -157,7 +157,7 @@ require("lazy").setup({ --Start Quote
 
 },
 {
-    'goolord/alpha-nvim',
+    'PEMessage/alpha-nvim',
     event = "VimEnter",
     -- dependencies = { 'nvim-tree/nvim-web-devicons' },
     config = function ()
@@ -165,6 +165,22 @@ require("lazy").setup({ --Start Quote
         startify.nvim_web_devicons.enabled = false
         startify.section.header.val = PE.logo
         startify.section.header.opts.hl = "String"
+
+        startify.mru_opts.mru_start = 0
+        startify.mru_opts.mru_cwd_start = 10
+
+
+        startify.config.layout = {
+            { type = "padding", val = 1 },
+            startify.section.header,
+            { type = "padding", val = 2 },
+            startify.section.top_buttons,
+            startify.section.mru,
+            startify.section.mru_cwd,
+            { type = "padding", val = 1 },
+            startify.section.bottom_buttons,
+            startify.section.footer,
+        }
         require'alpha'.setup(startify.config)
     end
 },
