@@ -237,7 +237,7 @@ let g:startify_custom_header = [
     inoremap <silent><C-S-TAB> <C-o>:tabp<CR>
     nnoremap <silent><C-TAB>   :tabn<CR>
     inoremap <silent><C-TAB>   <C-o>:tabn<CR>
-    nnoremap <MiddleMouse>     :tabclose<CR>
+    " nnoremap <MiddleMouse>     :tabclose<CR>
     vnoremap <RightMouse>            "+y
     inoremap <RightMouse>       <C-o>"+p
 
@@ -356,6 +356,8 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
     Plug 'skywind3000/vim-terminal-help'
         let g:terminal_key = '<M-`>'
+    " Plug 'kvngvikram/rightclick-macros'
+    Plug 'skywind3000/vim-quickui'
    
   
 
@@ -424,7 +426,12 @@ call plug#begin(pe_runtimepath . '/plugged')
             let g:gutentags_modules += ['gtags_cscope']
         endif
         " 将自动生成的 ctags/gtags 文件全部放入 ~/.cache/tags 目录中，避免污染工程目录
-        let g:gutentags_cache_dir = expand('~/.cache/tags')
+        let s:vim_tags = expand('~/.cache/tags')
+        let g:gutentags_cache_dir = s:vim_tags
+        if !isdirectory(s:vim_tags)
+            silent! call mkdir(s:vim_tags, 'p')
+        endif
+
         " 配置 ctags 的参数，老的 Exuberant-ctags 不能有 --extra=+q，注意
         let g:gutentags_ctags_extra_args = ['--fields=+niazS', '--extra=+q']
         let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
@@ -433,17 +440,24 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:gutentags_ctags_extra_args += ['--output-format=e-ctags']
         " 禁用 gutentags 自动加载 gtags 数据库的行为
         let g:gutentags_auto_add_gtags_cscope = 0
+        let g:gutentags_define_advanced_commands = 1
 
     Plug 'skywind3000/gutentags_plus'
         let g:gutentags_plus_nomap = 1
         " Symbol
-        noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr> 
+        noremap <silent> gs :GscopeFind s <C-R><C-W><cr> 
         " Defintion
-        noremap <silent> <leader>gd :GscopeFind g <C-R><C-W><cr> 
+        noremap <silent> gd :GscopeFind g <C-R><C-W><cr> 
         " Reference
-        noremap <silent> <leader>gr :GscopeFind c <C-R><C-W><cr> 
+        noremap <silent> gr :GscopeFind c <C-R><C-W><cr> 
         " File
-        noremap <silent> <leader>gf :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
+        noremap <silent> gi :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
+        " noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
+    Plug 'skywind3000/vim-preview'
+        autocmd FileType qf nnoremap <silent><buffer> p :PreviewQuickfix<cr>
+        autocmd FileType qf nnoremap <silent><buffer> P :PreviewClose<cr>
+        autocmd FileType qf nnoremap <silent><buffer> <MiddleMouse> :PreviewQuickfix<cr>
+
 
 
 
@@ -471,7 +485,7 @@ call plug#end()
     colorscheme onedark
 
   " Quick UI Register
-  "  let g:quickui_color_scheme = 'gruvbox'
+   let g:quickui_color_scheme = 'system'
   "  " 安装一个 File 目录，使用 [名称，命令] 的格式表示各个选项。
   "  call quickui#menu#install('&File', [
   "              \ [ "&New File\tCtrl+n", 'echo 0' ],
@@ -538,21 +552,17 @@ call plug#end()
   "  noremap <space>a :call quickui#tools#list_buffer('e')<cr>
   "  
 
-  "  let rightmouse_content = [
-  "              \ ["&Help Keyword\t\\ch", 'echo 100' ],
-  "              \ ["&Signature\t\\cs", 'echo 101'],
-  "              \ ['-'],
-  "              \ ["Find in &File\t\\cx", 'echo 200' ],
-  "              \ ["Find in &Project\t\\cp", 'echo 300' ],
-  "              \ ["Find in &Defintion\t\\cd", 'echo 400' ],
-  "              \ ["Search &References\t\\cr", 'echo 500'],
-  "              \ ['-'],
-  "              \ ["&Documentation\t\\cm", 'echo 600'],
-  "              \ ]
-  "  " set cursor to the last position
-  "  let opts = {'index':g:quickui#context#cursor}
-  "  nnoremap <RightMouse> :call quickui#context#open(content, opts)<CR>
+   let n_rightmouse_content = [
+               \ ["Paste", "exec 'normal" . '"' . "+p'" ],
+               \ ['-'],
+               \ ["Find File(Tags)", 'exec "normal gi"' ],
+               \ ]
+  
+   " set cursor to the last position
+   let n_rightmouse_opts = {'index':g:quickui#context#cursor}
+   nnoremap <RightMouse> :call quickui#context#open(n_rightmouse_content, n_rightmouse_opts)<CR>
 
+  
 
 " NeoVide Zone
 " ===========================================
