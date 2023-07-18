@@ -42,21 +42,22 @@
     # Implement
 
     fcd(){
-        if [ -z "$1" ];then
-            local path='.'
+        if [ "$#" -eq 0 ];then
+            local path_arg='.'
         else
-            local path="$1"
+            local path_arg="$1"
         fi
-        cd `fxf "$path" | bcd --print`
+   
+        cd `find "$path_arg" -type f | fzf | bcd --print`
     }
     dcd(){
-        if [ -z "$1" ];then
-            local dir='.'
+        if [ "$#" -eq 0 ];then
+            local path_arg='.'
         else
-            local dir="$1"
+            local path_arg="$1"
         fi
 
-        cd `find "$dir" -type d | fzf | bcd --print`
+        cd `find "$path_arg" -type d | fzf | bcd --print`
     }
     
     # dcd(){
@@ -99,14 +100,14 @@
     # }
     fxf(){ 
         # all_name
-        if [ -z "$1" ]; then
+        if [ "$#" -eq 0 ]; then
             local dir_path='.'
         else
             local dir_path="$1"
         fi
         local cmd="find $1 -type f"
-        local path=`eval $cmd | fzf --preview 'cat {}' `
-        echo "$path"
+        eval $cmd | fzf --preview 'cat'
+      
     }
 
     __fzf_rg(){
