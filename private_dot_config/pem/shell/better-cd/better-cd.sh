@@ -4,7 +4,8 @@
 bcd()
 {
     local location_path
-    if [ "$1" = '-' ]; then
+    # if [ "$1" = '-' -o "$#" = 0 ]; then
+    if [   "$#" = 0 -o "$1" = '--print'  ]; then
         location_path=$(</dev/stdin)
     else
         location_path="$1"
@@ -15,12 +16,14 @@ bcd()
 
     # echo $pathtype
     
-    if [ "$pathtype" = "directory" ] ; then
-        cd "$location_path"
-        return 0
-    else
+    if [ "$pathtype" != "directory" ] ; then
         location_path=`dirname "$location_path"`
-        cd "$location_path" > /dev/null 2&>1 
-        return 0
     fi
+
+    if [ "$1" = '--print' ] ; then
+        echo "$location_path"
+    else
+        cd "$location_path" > /dev/null 2&>1 
+    fi
+    return 0
 }

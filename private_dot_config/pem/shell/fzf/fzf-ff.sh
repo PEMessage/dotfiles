@@ -40,9 +40,14 @@
     # }
     
     # Implement
+
     fcd(){
-        # __fzf_cd "fcd" "$1"
-        fxf | bcd -
+        if [ -z "$1" ];then
+            local path='.'
+        else
+            local path="$1"
+        fi
+        cd `fxf "$path" | bcd --print`
     }
     dcd(){
         if [ -z "$1" ];then
@@ -51,7 +56,7 @@
             local dir="$1"
         fi
 
-        find "$dir" -type d | fzf | bcd -
+        cd `find "$dir" -type d | fzf | bcd --print`
     }
     
     # dcd(){
@@ -100,7 +105,8 @@
             local dir_path="$1"
         fi
         local cmd="find $1 -type f"
-        eval "$cmd" | fzf --preview 'cat {}' 
+        local path=`eval $cmd | fzf --preview 'cat {}' `
+        echo "$path"
     }
 
     __fzf_rg(){
