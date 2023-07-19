@@ -26,4 +26,4 @@ tar pcfz ./build/offline-mini.tar.gz \
     ./.config/starship.toml \
     ./.config/vim 
 echo -e '\e[092m INFO: \e[0m done'
-echo -e '\e[092m INFO: \e[0m use "tar zxvf ./build/offline-mini.tar.gz -C ~"'
+echo -e '\e[092m INFO: \e[0m use "tar pzxvf ./build/offline-mini.tar.gz -C ~"'
