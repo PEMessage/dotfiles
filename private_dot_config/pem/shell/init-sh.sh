@@ -177,9 +177,9 @@
 # -----------------------------------------
 # Source Zone
 # -----------------------------------------
-    # if [ -f "${PEMHOME}/arch/${PEMARCH}/init-sh.sh"  ]; then
-    #     source "${PEMHOME}/arch/${PEMARCH}/init-sh.sh" 
-    # fi
+    if [ -f "${PEMHOME}/arch/${PEMARCH}/init-sh.sh"  ]; then
+        source "${PEMHOME}/arch/${PEMARCH}/init-sh.sh" 
+    fi
 
     # PEMFUNCLIST=$(find ${PEMHOME}/shell -type d -not -path ${PEMHOME}/shell -exec find {} -type f -name '*.sh' \; )
     # for i in `echo $PEMFUNCLIST | tr '\n' ' ' ` ;
