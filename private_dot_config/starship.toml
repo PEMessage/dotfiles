@@ -211,3 +211,7 @@ symbol = "terraform "
 
 [zig]
 symbol = "zig "
+
+[[battery.display]]
+threshold = 0
+
