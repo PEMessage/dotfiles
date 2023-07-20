@@ -26,6 +26,10 @@
 #     * z -c foo  # restrict matches to subdirs of $PWD
 #     * z -x      # remove the current directory from the datafile
 #     * z -h      # show a brief help message
+[ -d "$HOME/.cache/z-sh" ] || {
+    mkdir -p "$HOME/.cache/z-sh"
+}
+_Z_DATA="$HOME/.cache/z-sh/z-sh.history"
 
 [ -d "${_Z_DATA:-$HOME/.z}" ] && {
     echo "ERROR: z.sh's datafile (${_Z_DATA:-$HOME/.z}) is a directory."
