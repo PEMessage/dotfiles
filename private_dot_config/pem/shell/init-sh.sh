@@ -16,13 +16,42 @@
     esac
 
 
+    if [ -n "$BASH_VERSION" ]; then
+        export PEMSHELL="bash"
+    elif [ -n "$ZSH_VERSION" ]; then
+        export PEMSHELL="zsh"
+    else
+        echo "Error: No support shell,Only support bash/zsh"
+        return 
+    fi
+
+    function pe-parent_path() {
+        echo $( dirname  "$(readlink -f "$1")" );
+    }
+
+    # From andorid envsetup.sh
+    case "$PEMSHELL" in
+        *bash*)
+            function pe-check_type() { type -t "$1"; }
+         
+            ;;
+
+        *zsh*)
+            function pe-check_type() { type "$1"; }
+            ;;
+    esac
+
+
+
 
 
 # -----------------------------------------
 # Path Zone
 # -----------------------------------------
-    if [ -d "$HOME/.config/pem" ]; then
-        export PEMHOME="$HOME/.config/pem"
+    if [ -d $(pe-parent_path "$(pe-parent_path "${BASH_SOURCE[0]-$0}")")  ] ; then 
+        export PEMHOME=$(pe-parent_path "$(pe-parent_path "${BASH_SOURCE[0]-$0}")")
+    # elif [ -d "$HOME/.config/pem" ]; then
+        # export PEMHOME="$HOME/.config/pem"
     else
         echo 'Error: init-sh.sh postion in wrong dir'
         return 
@@ -34,6 +63,7 @@
     fi
 
     # remove duplicate path
+    # From skywind3000/vim/etc init.sh
     if [ -n "$PATH" ]; then
         old_PATH=$PATH:; PATH=
         while [ -n "$old_PATH" ]; do
@@ -147,14 +177,23 @@
 # -----------------------------------------
 # Source Zone
 # -----------------------------------------
-    if [ -f "${PEMHOME}/arch/${PEMARCH}/init-sh.sh"  ]; then
-        source "${PEMHOME}/arch/${PEMARCH}/init-sh.sh" 
-    fi
+    # if [ -f "${PEMHOME}/arch/${PEMARCH}/init-sh.sh"  ]; then
+    #     source "${PEMHOME}/arch/${PEMARCH}/init-sh.sh" 
+    # fi
 
-    PEMFUNCLIST=$(find ${PEMHOME}/shell -type d -not -path ${PEMHOME}/shell -exec find {} -type f -name '*.sh' \; )
-    for i in `echo $PEMFUNCLIST | tr '\n' ' ' ` ;
-    do
-        source "$i"
+    # PEMFUNCLIST=$(find ${PEMHOME}/shell -type d -not -path ${PEMHOME}/shell -exec find {} -type f -name '*.sh' \; )
+    # for i in `echo $PEMFUNCLIST | tr '\n' ' ' ` ;
+    # do
+    #     source "$i"
+    # done
+
+    for d in "${PEMHOME}"/shell/* ; do 
+        if [ -d "$d" ] ; then
+            # echo "$d"
+            for f in "$d"/*.sh ; do 
+                source "$f"
+            done
+        fi 
     done
     
 
