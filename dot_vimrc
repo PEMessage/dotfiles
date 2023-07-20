@@ -385,6 +385,12 @@ call plug#begin(pe_runtimepath . '/plugged')
         map     <space><space> <Plug>(easymotion-s)
         " nunmap ds
     Plug 'vim-scripts/YankRing.vim'
+    let vimd_path = expand('~/.cache/vim.d')
+    if !isdirectory(vimd_path)
+        call mkdir(vimd_path, "p")
+    endif
+
+    let g:yankring_history_dir = expand('~/.cache/vim.d')
     nnoremap <silent> <leader>yr :YRShow<CR>
     inoremap <silent> <leader>yr :YRShow<CR>
     nnoremap <silent> <F11> :YRShow<CR>
