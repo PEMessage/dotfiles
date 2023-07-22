@@ -470,9 +470,9 @@ call plug#begin(pe_runtimepath . '/plugged')
         noremap <silent> go :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
         " noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
     Plug 'preservim/tagbar'
-        nnoremap <leader>aa :TagbarToggle<CR>
+        " nnoremap <leader>aa :TagbarToggle<CR>
     Plug 'liuchengxu/vista.vim'
-        nnoremap <leader>a1 :Vista!!<CR>
+        nnoremap <leader>a :Vista!!<CR>
     Plug 'skywind3000/vim-preview'
         autocmd FileType qf nnoremap <silent><buffer> p :PreviewQuickfix<cr>
         autocmd FileType qf nnoremap <silent><buffer> P :PreviewClose<cr>
