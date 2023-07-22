@@ -288,10 +288,10 @@ z-fz(){
 
         return
     elif [ ! -z $cmd ]; then
-        local temp=` _z -l"$cmd" 2>&1 | awk '{print $2}' | fzf | sed -e "s@^~@${HOME}@g" `
+        local temp=` _z -l"$cmd" 2>&1 | awk '{print $2}' | fzf  --no-sort | sed -e "s@^~@${HOME}@g" `
         cd "$temp"
     else
-        local temp=` _z -lt 2>&1 | awk '{print $2}' | fzf | sed -e "s@^~@${HOME}@g" `
+        local temp=` _z -lt 2>&1 | awk '{print $2}' | fzf --no-sort | sed -e "s@^~@${HOME}@g" `
         cd "$temp"
     fi
 }
@@ -305,17 +305,3 @@ alias cdd='z-fz -t '
 alias cdr='z-fz -r '
 
 
-      # local echo fnd last list opt typ
-      #   while [ "$1" ]; do case "$1" in
-      #       --) while [ "$1" ]; do shift; fnd="$fnd${fnd:+ }$1";done;;
-      #       -*) opt=${1:1}; while [ "$opt" ]; do case ${opt:0:1} in
-      #               c) fnd="^$PWD $fnd";;
-      #               e) echo=1;;
-      #               h) echo "${_Z_CMD:-z} [-cehlrtx] args" >&2; return;;
-      #               l) list=1;;
-      #               r) typ="rank";;
-      #               t) typ="recent";;
-      #               x) sed -i -e "\:^${PWD}|.*:d" "$datafile";;
-      #           esac; opt=${opt:1}; done;;
-      #        *) fnd="$fnd${fnd:+ }$1";;
-      #   esac; last=$1; [ "$#" -gt 0 ] && shift; done

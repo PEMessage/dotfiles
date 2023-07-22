@@ -128,6 +128,15 @@
         line_num=$( echo "$rg_res" | cut -d ':' -f '2' )
         vim "$file_name" +"$line_num"
     }
+    # __fzf_history()
+    # {
+    #     local out=`cat $HISTFILE | fzf`
+    #     READLINE_LINE=${out#*$'\t'}
+    #     echo "$temp"
+    # }
+
+
+
 
 # ----------------------------------------- 
 # ff: other fzf base tools
