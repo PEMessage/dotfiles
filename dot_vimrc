@@ -291,11 +291,11 @@ let g:startify_custom_header = [
         endif
     endfunction
 
-    nnoremap <silent><leader>b  :Lexplore<CR>
+    " nnoremap <silent><leader>b  :Lexplore<CR>
 
 
-    nnoremap + 4kzz
-    nnoremap _ 5jzz
+    nnoremap _ 4kzz
+    nnoremap + 5jzz
 " Command Zone
     command! PEWrite w! sudo tee % 
 
@@ -329,6 +329,9 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
     noremap <silent> <C-r> :History<CR>
+    noremap <silent> <C-p> :Buffer<CR>
+    noremap <leader>ft :Tags<CR>
+    noremap <leader>fbt :BTags<CR>
     " if has('autocmd')
     "     autocmd filetype fzf
     " else
@@ -354,8 +357,12 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
     Plug 'skywind3000/vim-terminal-help'
         let g:terminal_key = '<M-`>'
+    " Plug 'voldikss/vim-floaterm'
+        " nnoremap <M-`> :FloatermToggle! Default<CR>
+        " nnoremap <leader>ft :FloatermToggle! Default<CR>
+
     " Plug 'kvngvikram/rightclick-macros'
-    Plug 'skywind3000/vim-quickui'
+    " Plug 'skywind3000/vim-quickui'
    
   
 
@@ -417,8 +424,9 @@ call plug#begin(pe_runtimepath . '/plugged')
 
     Plug 'skywind3000/vim-auto-popmenu'
     Plug 'skywind3000/vim-dict'
+    set tags=./.tags;,.tags
     Plug 'ludovicchabant/vim-gutentags'
-        let g:gutentags_project_root = ['.root', '.svn', '.git', '.hg', '.project']
+        let g:gutentags_project_root = ['.root']
         " 所生成的数据文件的名称
         let g:gutentags_ctags_tagfile = '.tags'
         " 同时开启 ctags 和 gtags 支持：
@@ -444,19 +452,27 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:gutentags_ctags_extra_args += ['--output-format=e-ctags']
         " 禁用 gutentags 自动加载 gtags 数据库的行为
         let g:gutentags_auto_add_gtags_cscope = 0
+        let g:gutentags_auto_add_cscope = 1
         let g:gutentags_define_advanced_commands = 1
 
     Plug 'skywind3000/gutentags_plus'
         let g:gutentags_plus_nomap = 1
-        " Symbol
+        " Go Symbol
         noremap <silent> gs :GscopeFind s <C-R><C-W><cr> 
-        " Defintion
+        " Go Defintion
         noremap <silent> gd :GscopeFind g <C-R><C-W><cr> 
-        " Reference
-        noremap <silent> gr :GscopeFind c <C-R><C-W><cr> 
+
+        " Go Ref by this function
+        noremap <silent> gr :GscopeFind d <C-R><C-W><cr> 
+        " Go Reference Being Called
+        noremap <silent> gk :GscopeFind c <C-R><C-W><cr> 
         " File
-        noremap <silent> gi :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
+        noremap <silent> go :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
         " noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
+    Plug 'preservim/tagbar'
+        nnoremap <leader>aa :TagbarToggle<CR>
+    Plug 'liuchengxu/vista.vim'
+        nnoremap <leader>a1 :Vista!!<CR>
     Plug 'skywind3000/vim-preview'
         autocmd FileType qf nnoremap <silent><buffer> p :PreviewQuickfix<cr>
         autocmd FileType qf nnoremap <silent><buffer> P :PreviewClose<cr>
@@ -489,7 +505,7 @@ call plug#end()
     colorscheme onedark
 
   " Quick UI Register
-   let g:quickui_color_scheme = 'system'
+   " let g:quickui_color_scheme = 'system'
   "  " 安装一个 File 目录，使用 [名称，命令] 的格式表示各个选项。
   "  call quickui#menu#install('&File', [
   "              \ [ "&New File\tCtrl+n", 'echo 0' ],
@@ -556,15 +572,15 @@ call plug#end()
   "  noremap <space>a :call quickui#tools#list_buffer('e')<cr>
   "  
 
-   let n_rightmouse_content = [
-               \ ["Paste", "exec 'normal" . '"' . "+p'" ],
-               \ ['-'],
-               \ ["Find File(Tags)", 'exec "normal gi"' ],
-               \ ]
+   " let n_rightmouse_content = [
+   "             \ ["Paste", "exec 'normal" . '"' . "+p'" ],
+   "             \ ['-'],
+   "             \ ["Find File(Tags)", 'exec "normal gi"' ],
+   "             \ ]
   
-   " set cursor to the last position
-   let n_rightmouse_opts = {'index':g:quickui#context#cursor}
-   nnoremap <RightMouse> :call quickui#context#open(n_rightmouse_content, n_rightmouse_opts)<CR>
+   " " set cursor to the last position
+   " let n_rightmouse_opts = {'index':g:quickui#context#cursor}
+   " nnoremap <RightMouse> :call quickui#context#open(n_rightmouse_content, n_rightmouse_opts)<CR>
 
   
 

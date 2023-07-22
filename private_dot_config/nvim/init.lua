@@ -101,15 +101,36 @@ require("lazy").setup({ --Start Quote
 -- -------------------------------------------
 -- 5.1 Style Plugin
 -- -------------------------------------------
-    --{
-    --    'olimorris/onedarkpro.nvim',
-    --    lazy = false,
-    --    priority = 1000,
-    --    config = function(_,opts)
-    --        require("onedarkpro").setup()
-    --       -- vim.cmd("colorscheme onedark")
-    --    end,
-    --},
+
+-- {
+--     'olimorris/onedarkpro.nvim',
+--     -- 'navarasu/onedark.nvim',
+--     config = function(_,opts)
+--         require('onedarkpro').setup {
+--             style = 'deep',
+--             colors = {
+--                 pe_gray = "#7c8dab",    -- define a new color
+--                 pe_blue = "#499cff",    -- define a new color
+--             },
+--             highlights = {
+--                 Comment = {fg = '${pe_gray}'},
+--                 ['@comment'] = {fg = '${pe_gray}'},
+--                 ['@lsp.type.comment'] = {fg = '${pe_gray}'},
+--             },
+--
+--             code_style = {
+--                 comments = 'none',
+--                 keywords = 'none',
+--                 functions = 'none',
+--                 strings = 'none',
+--                 variables = 'none'
+--             },
+--         }
+--         -- require('onedarkpro').load()
+--         vim.cmd("colorscheme onedark")
+--     end,
+--
+-- },
 {
     'keaising/im-select.nvim',
     enabled = function()
@@ -131,6 +152,8 @@ require("lazy").setup({ --Start Quote
 },
 {
     'navarasu/onedark.nvim',
+    lazy = false,
+    priority = 900,
     config = function(_,opts)
         require('onedark').setup {
             style = 'deep',
@@ -155,6 +178,15 @@ require("lazy").setup({ --Start Quote
         require('onedark').load()
     end,
 
+},
+{
+    'olimorris/onedarkpro.nvim',
+    lazy = true,
+    priority = 900,
+    config = function(_,opts)
+        require("onedarkpro").setup()
+        -- vim.cmd("colorscheme onedark")
+    end,
 },
 {
     'PEMessage/alpha-nvim',
@@ -246,7 +278,7 @@ require("lazy").setup({ --Start Quote
 {
     'akinsho/toggleterm.nvim',
     opts = {
-        open_mapping = [[<M-`>]],
+        open_mapping = [[<C-`>]],
     }
 },
 
@@ -475,7 +507,7 @@ require("lazy").setup({ --Start Quote
             function()
                 require('telescope.builtin').buffers(
                     require('telescope.themes').get_dropdown{
-                        previewer = false,
+                        -- previewer = false,
                         attach_mappings = function (_,map)
                             map( {'i','n'}, '<C-p>',
                                 function(...)
@@ -1064,6 +1096,7 @@ require("lazy").setup({ --Start Quote
 -- -------------------------------------------
 -- 6.2 Leader Keymap
 -- -------------------------------------------
+    vim.keymap.set('n', '<leader>rce' , '<cmd>tabe $MYVIMRC<CR>' , { desc = ' Edit MYVIMRC ' } )
     vim.keymap.set('n', '<leader>``' , '<cmd>nohlsearch<CR>' , { desc = ' Close Highlight ' } )
 
     vim.keymap.set("n", "<leader>wp",

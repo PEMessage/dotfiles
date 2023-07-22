@@ -10,3 +10,5 @@ done
 
 export PATH
 
+# export GTAGSCONF="$HOME"/.globalrc
+# export GTAGSLABEL='native-newctags'
