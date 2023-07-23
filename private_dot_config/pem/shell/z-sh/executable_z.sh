@@ -301,7 +301,6 @@ z-fz(){
 # }
 
 alias cdd='z-fz -t '
-
 alias cdr='z-fz -r '
 
 

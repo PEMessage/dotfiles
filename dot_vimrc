@@ -36,6 +36,13 @@ let g:startify_custom_header = [
     " let s:PECompleteSys  = "apt"
     let g:lightline = {
                 \ 'colorscheme': 'selenized_black',
+                \ 'active': {
+                    \   'left': [ [ 'mode', 'paste' ],
+                    \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+                    \ },
+                \ 'component_function': {
+                    \   'gitbranch': 'FugitiveHead'
+                    \ },
                 \ }
     nnoremap <leader>tt :call lightline#toggle()<CR>
     
@@ -141,6 +148,16 @@ let g:startify_custom_header = [
     autocmd FileType man wincmd L
 	runtime ftplugin/man.vim
     set linebreak
+    " augroup previewWindowPosition
+    "     au!
+    "     autocmd BufWinEnter * call PreviewWindowPosition()
+    " augroup END
+    " function! PreviewWindowPosition()
+    "     if &previewwindow
+    "         wincmd L
+    "     endif
+    " endfunction
+    " hi
 
 " -------------------------------------------
 " 3.6 Meta Setting
@@ -328,10 +345,20 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'PEMessage/vim-fixkey'
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
+    Plug 'linrongbin16/fzfx.vim'
     noremap <silent> <C-r> :History<CR>
     noremap <silent> <C-p> :Buffer<CR>
+
     noremap <leader>ft :Tags<CR>
     noremap <leader>fbt :BTags<CR>
+    nnoremap <leader>fbr :\<C-U>FzfxBranches<CR>
+
+    nnoremap <leader>fg :\<C-U>FzfxLiveGrep<CR>
+    nnoremap <leader>fwg :\<C-U>FzfxLiveGrepW<CR>
+
+    nnoremap <leader>ff :\<C-U>FzfxFiles<CR>
+    nnoremap <leader>fwf :\<C-U>FzfxFilesW<CR>
+    " nnoremap <space>fw :\<C-U>FzfxLiveGrep<CR>
     " if has('autocmd')
     "     autocmd filetype fzf
     " else
@@ -381,6 +408,8 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-commentary'
     Plug 'tpope/vim-repeat'
+    Plug 'tpope/vim-fugitive'
+    Plug 'airblade/vim-gitgutter'
 
     Plug 'easymotion/vim-easymotion'
         let g:EasyMotion_smartcase = 1
@@ -420,6 +449,7 @@ call plug#begin(pe_runtimepath . '/plugged')
 		    \		setlocal omnifunc=syntaxcomplete#Complete |
 		    \	endif
     endif
+    
 
 
     Plug 'skywind3000/vim-auto-popmenu'
@@ -470,9 +500,9 @@ call plug#begin(pe_runtimepath . '/plugged')
         noremap <silent> go :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
         " noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
     Plug 'preservim/tagbar'
-        " nnoremap <leader>aa :TagbarToggle<CR>
+        nnoremap <leader>at :TagbarToggle<CR>
     Plug 'liuchengxu/vista.vim'
-        nnoremap <leader>a :Vista!!<CR>
+        nnoremap <leader>av :Vista!!<CR>
     Plug 'skywind3000/vim-preview'
         autocmd FileType qf nnoremap <silent><buffer> p :PreviewQuickfix<cr>
         autocmd FileType qf nnoremap <silent><buffer> P :PreviewClose<cr>

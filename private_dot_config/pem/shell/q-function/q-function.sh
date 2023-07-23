@@ -123,6 +123,20 @@ function q-ansicolors
 	echo "# echo -e '\033[1;5;33;44mTJEENARE\033[0m'"
 	echo "#"
 	echo "# Sedika Signing off for now ;->"
+
+     # awk -v term_cols="${width:-$(tput cols || echo 80)}" 'BEGIN{
+     # s="/\\";
+     # for (colnum = 0; colnum<term_cols; colnum++) {
+     #     r = 255-(colnum*255/term_cols);
+     #     g = (colnum*510/term_cols);
+     #     b = (colnum*255/term_cols);
+     #     if (g>255) g = 510-g;
+     #         printf "\033[48;2;%d;%d;%dm", r,g,b;
+     #         printf "\033[38;2;%d;%d;%dm", 255-r,255-g,255-b;
+     #         printf "%s\033[0m", substr(s,colnum%2+1,1);
+     #     }
+     #     printf "\n";
+     # }'
 }
 
 
@@ -133,6 +147,37 @@ function q-server () {
 	# Set the default Content-Type to `text/plain` instead of `application/octet-stream`
 	# And serve everything as UTF-8 (although not technically correct, this doesn’t break anything for binary files)
 	python -c $'import SimpleHTTPServer;\nmap = SimpleHTTPServer.SimpleHTTPRequestHandler.extensions_map;\nmap[""] = "text/plain";\nfor key, value in map.items():\n\tmap[key] = value + ";charset=UTF-8";\nSimpleHTTPServer.test();' "$port"
+}
+function q-ansicolors 
+{
+    esc="\033["
+    echo -e "\t  40\t   41\t   42\t    43\t      44       45\t46\t 47"
+    for fore in 30 31 32 33 34 35 36 37; do
+        line1="$fore  "
+        line2="    "
+        for back in 40 41 42 43 44 45 46 47; do
+            line1="${line1}${esc}${back};${fore}m Normal  ${esc}0m"
+            line2="${line2}${esc}${back};${fore};1m Bold    ${esc}0m"
+        done
+        echo -e "$line1\n$line2"
+    done
+
+    echo ""
+    echo "# Example:"
+    echo "#"
+    echo "# Type a Blinkin TJEENARE in Swedens colours (Yellow on Blue)"
+    echo "#"
+    echo "#           ESC"
+    echo "#            |  CD"
+    echo "#            |  | CD2"
+    echo "#            |  | | FG"
+    echo "#            |  | | |  BG + m"
+    echo "#            |  | | |  |         END-CD"
+    echo "#            |  | | |  |            |"
+    echo "# echo -e '\033[1;5;33;44mTJEENARE\033[0m'"
+    echo "#"
+    echo "# Sedika Signing off for now ;->"
+    
 }
 
 # whois a domain or a URL (by paulirish)
