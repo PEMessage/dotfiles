@@ -278,7 +278,7 @@ require("lazy").setup({ --Start Quote
 {
     'akinsho/toggleterm.nvim',
     opts = {
-        open_mapping = [[<C-`>]],
+        open_mapping = [[<M-`>]],
     }
 },
 
@@ -473,7 +473,7 @@ require("lazy").setup({ --Start Quote
     -- ------ --
     keys = {
         { "<leader><leader>", "<cmd>Telescope <cr>", desc = "Telescope All" },
-        { "<leader>/", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "Search Buffer" },
+        -- { "<leader>/", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "Search Buffer" },
 
         {
             "<leader>fk",
@@ -559,6 +559,25 @@ require("lazy").setup({ --Start Quote
             end,
             desc = "MRU"
         },
+        -- {
+        --     "<C-f>",
+        --     function()
+        --         require('telescope.builtin').current_buffer_fuzzy_find(
+        --             require('telescope.themes').get_dropdown({
+        --                 previewer = true,
+        --                 attach_mappings = function (_,map)
+        --                     map( {'i','n'}, '<C-f>',
+        --                         function(...)
+        --                             return require("telescope.actions").close(...)
+        --                         end
+        --                     )
+        --                     return true
+        --                 end,
+        --             })
+        --         )
+        --     end,
+        --     desc = "MRU"
+        -- },
 
         { "<leader>fm", "<cmd>Telescope man_pages<cr>", desc = "Man Pages" },
         { "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "Help Pages" },
@@ -700,8 +719,22 @@ require("lazy").setup({ --Start Quote
         vim.keymap.set('', '<leader>hp', function()
             hop.hint_patterns()
         end, {remap=true, desc='Hop Pattern'})
+        -- vim.api.nvim_command('highlight default link HopPreview HopNextKey' )
     end
 },
+-- {
+--     "folke/flash.nvim",
+--     event = "VeryLazy",
+--     opts = {},
+--     -- stylua: ignore
+--     keys = {
+--         { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+--         { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+--         -- { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
+--         -- { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+--         { "<c-s>", mode = { "n","c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
+--     },
+-- },
 
 
 
@@ -903,8 +936,8 @@ require("lazy").setup({ --Start Quote
             -- optionally use on_attach to set keymaps when aerial has attached to a buffer
             on_attach = function(bufnr)
                 -- Jump forwards/backwards with '{' and '}'
-                vim.keymap.set('n', '{', '<cmd>AerialPrev<CR>', {buffer = bufnr})
-                vim.keymap.set('n', '}', '<cmd>AerialNext<CR>', {buffer = bufnr})
+                -- vim.keymap.set('n', '{', '<cmd>AerialPrev<CR>', {buffer = bufnr})
+                -- vim.keymap.set('n', '}', '<cmd>AerialNext<CR>', {buffer = bufnr})
             end
         })
         vim.keymap.set('n', '<leader>a', '<cmd>AerialToggle!<CR>')
@@ -1213,5 +1246,8 @@ end
 -- end, {remap=true, desc='Hop to char'})
 
 -- end, {remap=true, desc='Hop to char'})
+
+
+
 
 

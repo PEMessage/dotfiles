@@ -272,6 +272,8 @@ let g:startify_custom_header = [
     nnoremap <leader>tb  :tab ball<CR>
     nnoremap gp  `[v`]
 
+    vnoremap <cr> iwoiwo
+
     let g:netrw_banner = 0                      " 设置是否显示横幅
     if argv(0) ==# '.'
         let g:netrw_browse_split = 0
@@ -349,15 +351,12 @@ call plug#begin(pe_runtimepath . '/plugged')
     noremap <silent> <C-r> :History<CR>
     noremap <silent> <C-p> :Buffer<CR>
 
-    noremap <leader>ft :Tags<CR>
-    noremap <leader>fbt :BTags<CR>
+    noremap <leader>ft :BTags<CR>
+    noremap <leader>fgt :BTags<CR>
     nnoremap <leader>fbr :\<C-U>FzfxBranches<CR>
 
     nnoremap <leader>fg :\<C-U>FzfxLiveGrep<CR>
-    nnoremap <leader>fwg :\<C-U>FzfxLiveGrepW<CR>
-
     nnoremap <leader>ff :\<C-U>FzfxFiles<CR>
-    nnoremap <leader>fwf :\<C-U>FzfxFilesW<CR>
     " nnoremap <space>fw :\<C-U>FzfxLiveGrep<CR>
     " if has('autocmd')
     "     autocmd filetype fzf
@@ -409,6 +408,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'tpope/vim-commentary'
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-fugitive'
+    Plug 'tpope/vim-vinegar'
     Plug 'airblade/vim-gitgutter'
 
     Plug 'easymotion/vim-easymotion'

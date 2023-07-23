@@ -1,4 +1,5 @@
-#! /usr/bin/sh
+#! /usr/bin/sh 
+# Shoud be by ~/.bashrc or ~/.zshrc
 # -----------------------------------------
 # prvent load twice
 # -----------------------------------------
@@ -80,6 +81,10 @@
 
     export PATH
 
+# -----------------------------------------
+# Global Var Zone
+# -----------------------------------------
+
     # OS Check
     # unameOut=$(uname -a)
     case $(uname -a) in
@@ -101,6 +106,18 @@
         *aarch64*)  PEMARCH=arm64;;
         *armv8l*)   PEMARCH=arm64;;
     esac
+
+    # if xdg_cache_home didn't exist use ~/.cache
+    export PEM_CACHE_HOME=${XDG_CACHE_HOME:-${HOME}/.cache}/pem
+
+    if [  -f $PEM_CACHE_HOME ]; then
+        PEM_CACHE_HOME=''
+        echo "Warning: cache_home: $PEM_CACHE_HOME is a file"
+    fi
+    # dir not exist create it 
+    if [ ! -d $PEM_CACHE_HOME ]; then
+        mkdir -p $PEM_CACHE_HOME
+    fi
 
 # -----------------------------------------
 # Editor Zone
@@ -169,10 +186,15 @@
 
     export EDITOR=vim
 
+
     alias nvim-lazy='NVIM_APPNAME=lazynvim nvim'
     alias mv='mv -i'
     alias rm='rm -i'
     alias cp='cp -i'
+
+    # Default to human readable figures
+    alias df='df -h'
+    alias du='du -h'
 
 
 # -----------------------------------------
@@ -182,12 +204,15 @@
         source "${PEMHOME}/arch/${PEMARCH}/init-sh.sh" 
     fi
 
+    # Method 1: use findutils
+    #
     # PEMFUNCLIST=$(find ${PEMHOME}/shell -type d -not -path ${PEMHOME}/shell -exec find {} -type f -name '*.sh' \; )
     # for i in `echo $PEMFUNCLIST | tr '\n' ' ' ` ;
     # do
     #     source "$i"
     # done
 
+    # Method 2: use bash/zsh style 
     for d in "${PEMHOME}"/shell/* ; do 
         if [ -d "$d" ] ; then
             # echo "$d"
@@ -198,6 +223,7 @@
     done
     
 
+    # Method 3: Manualy source
     # source "$PEMHOME"/shell/fzf/fzf-ff.sh
     # source "$PEMHOME"/shell/vless/vless.sh
     # source "$PEMHOME"/shell/fff/fff-conf.sh
