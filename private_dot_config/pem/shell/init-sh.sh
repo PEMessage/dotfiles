@@ -110,13 +110,15 @@
     # if xdg_cache_home didn't exist use ~/.cache
     export PEM_CACHE_HOME=${XDG_CACHE_HOME:-${HOME}/.cache}/pem
 
-    if [  -f $PEM_CACHE_HOME ]; then
-        PEM_CACHE_HOME=''
-        echo "Warning: cache_home: $PEM_CACHE_HOME is a file"
-    fi
-    # dir not exist create it 
-    if [ ! -d $PEM_CACHE_HOME ]; then
-        mkdir -p $PEM_CACHE_HOME
+    # dir not exist
+    if [ ! -d "$PEM_CACHE_HOME" ]; then
+        # is a file
+        if [  -f "$PEM_CACHE_HOME" ]; then
+            PEM_CACHE_HOME=''
+            echo "Warning: cache_home: $PEM_CACHE_HOME is a file"
+        else
+            mkdir -p "$PEM_CACHE_HOME"
+        fi
     fi
 
 # -----------------------------------------
@@ -142,7 +144,8 @@
         PEMEDITOR="$new_editor"
         return 0
     }
-    pe-editor-save(){
+    pe-editor-save()
+    {
         local current_file="${PEMHOME}/shell/init-sh.sh"
         local line_number=$(grep 'MARK:PEMEDITOR$' $current_file -n | cut -d ':' -f 1) # 
 

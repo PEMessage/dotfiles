@@ -383,6 +383,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
     Plug 'skywind3000/vim-terminal-help'
         let g:terminal_key = '<M-`>'
+        let g:terminal_key = '<M-`>'
     " Plug 'voldikss/vim-floaterm'
         " nnoremap <M-`> :FloatermToggle! Default<CR>
         " nnoremap <leader>ft :FloatermToggle! Default<CR>

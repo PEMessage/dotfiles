@@ -1,0 +1,95 @@
+#! /usr/bin/bash
+
+target_dir="${PEM_CACHE_HOME}/shell/pe-editor"
+target_file="${target_dir}/pe-editor.sh"
+
+if [ ! -d $PEM_CACHE_HOME ] ; then
+    echo "Not PEM_CACHE_HOME not exist"
+else
+    # Create dir
+    if [ ! -d "$target_dir" ]; then
+        mkdir -p "$target_dir" 
+        echo "Init Editor Dir in $target_dir"
+    fi
+    # Create config file
+    if [ ! -f "$target_file" ]; then
+        echo "
+        PME_EDITOR='vim'
+        "  > "$target_file"
+        echo "Init Editor File in $target_file"
+    fi
+fi
+
+# $1 file
+# $1 key
+# $2 value
+
+save-config()
+{
+    local file="$1"
+    local key="$2"
+    local value="$3"
+
+    local line_number=$(grep "${key}=" "$file" -n | cut -d ':' -f 1) # 
+    
+
+ 
+    # !!! -i will do in-place replace highly damgerous !!!
+    local res=`sed --in-place -e "${line_number}s@'.*'@'${value}'@" "$file"`
+
+    local line_content=$(grep "${key}=" "$file" -n | cut -d ':' -f 2) #
+
+}
+
+read-config()
+{
+    local file="$1"
+    local key="$2"
+
+    # local line_number=$(grep "${key}=" "$file" -n | cut -d ':' -f 1) # 
+
+    # Sub 
+    #
+    # !!! -i will do in-place replace highly damgerous !!!
+    # local res=`sed --in-place -e "${line_number}s@'.*'@'${value}'@" "$file"`
+    local line_content=$(grep "${key}=" "$file" -n | cut -d ':' -f 2) #
+
+    if [[ $line_content =~ \'(.*)\' ]]; then
+        line_value=${BASH_REMATCH[1]}
+    fi
+
+    echo -e "$line_value"
+}
+
+# if [ $# -le 1 ] ; then 
+#     exit 0
+# fi
+
+if [ "$1" = 'read' ] ; then
+    read-config "$target_file" "PME_EDITOR" 
+elif [ "$1" = 'toggle' ] ; then
+    old_editor=$(read-config "$target_file" "PME_EDITOR" )
+    new_editor='' 
+    if [ -z "$2" ]; then
+        if [ "$old_editor" = "vim" ];then
+            new_editor="nvim"
+        elif [ "$old_editor" = "nvim" ];then
+            new_editor="vim"
+        else
+            new_editor="vim"
+        fi
+    else
+        new_editor="$2"
+    fi
+
+    save-config "$target_file" "PME_EDITOR" "$new_editor"
+
+
+    # Switch Editor
+    echo "Origin: $old_editor -> Now: $new_editor "
+else
+    echo "
+    pe-editor toggle [editor] : toggle the editor between nvim or vim or [editor](if given) 
+    pe-editor read            : check current editor
+    "
+fi    
