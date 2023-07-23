@@ -3,7 +3,7 @@ cd ~
 chezmoi re-add
 GREEN='\e[092m'
 STOP='\e[0m'
-echo -e "${GREEN}INFO${STOP}: ""Add File to source"
+echo "${GREEN}INFO${STOP}: ""Add File to source"
 temp=$(chezmoi source-path)
 cd $temp
 git add .
