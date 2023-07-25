@@ -60,7 +60,9 @@
 
     # set PATH so it includes user's private bin if it exists
     if [ -d "$PEMHOME/bin" ]; then
-        export PATH="$PEMHOME/bin:$PATH"
+        for d in "$PEMHOME"/bin/*.d; do 
+            [ -d $d ] &&  export PATH="$PATH:$d"
+        done
     fi
 
     # remove duplicate path
