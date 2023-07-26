@@ -13,8 +13,8 @@ let g:startify_custom_header = [
 " Description: This is my VIM8+/NeoVIM configuration
 " Last Modified:  2023-05-29 Mon 03:01 PM
 " +++++++++++++++++++++++++++++++++++++++++++
-
-
+ 
+ 
 
 " 1. Configure List
 " ===========================================
@@ -222,10 +222,10 @@ let g:startify_custom_header = [
     noremap! <C-A> <home> 
     noremap! <C-E> <end>
     noremap! <C-_> <C-K> " 插入 digraph（见 :h digraph），快速输入日文或符号等
-    noremap! <C-Y> <C-R>
+    inoremap <M-f> <S-Right> 
+    inoremap <M-b> <S-Left> 
     
 
-    
     
 
 " KeyBinding Setting Zone ( Normal Mode  )
@@ -310,7 +310,7 @@ let g:startify_custom_header = [
         endif
     endfunction
 
-    " nnoremap <silent><leader>b  :Lexplore<CR>
+    nnoremap <silent><leader>b  :Lexplore<CR>
 
 
     nnoremap _ 4kzz
@@ -381,9 +381,24 @@ call plug#begin(pe_runtimepath . '/plugged')
     " Plug 'ap/vim-buftabline'
    
     Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
+
+
+    " ALT + =: toggle terminal below.
+    " ALT + SHIFT + h: move to the window on the left.
+    " ALT + SHIFT + l: move to the window on the right.
+    " ALT + SHIFT + j: move to the window below.
+    " ALT + SHIFT + k: move to the window above.
+    " ALT + SHIFT + n: move to the previous window.
+    " ALT + -: paste register 0 to terminal.
+    " ALT + q: switch to terminal normal mode.
+    " Use drop to drop file to vim
+    "
+    " 另外从 vim 寄存器到 终端粘贴内容的操作因为 vim/nvim 不一样
+    " vim 的终端粘贴是在终端 insert 模式下按 termkey + " + 寄存器 ，termkey 在这个脚本里是 <c-_>
     Plug 'skywind3000/vim-terminal-help'
-        let g:terminal_key = '<M-`>'
-        let g:terminal_key = '<M-`>'
+        tnoremap <m-[> <c-\><c-n>
+        " let g:terminal_key = '<m-q>'
+        " let g:terminal_key = '<M-`>'
     " Plug 'voldikss/vim-floaterm'
         " nnoremap <M-`> :FloatermToggle! Default<CR>
         " nnoremap <leader>ft :FloatermToggle! Default<CR>
@@ -421,16 +436,17 @@ call plug#begin(pe_runtimepath . '/plugged')
         nmap /              <Plug>(easymotion-sn)
         map     <space><space> <Plug>(easymotion-s)
         " nunmap ds
+    " <leader>yr
     Plug 'vim-scripts/YankRing.vim'
-    let vimd_path = expand('~/.cache/vim.d')
-    if !isdirectory(vimd_path)
-        call mkdir(vimd_path, "p")
-    endif
+        let vimd_path = expand('~/.cache/vim.d')
+        if !isdirectory(vimd_path)
+            call mkdir(vimd_path, "p")
+        endif
 
-    let g:yankring_history_dir = expand('~/.cache/vim.d')
-    nnoremap <silent> <leader>yr :YRShow<CR>
-    inoremap <silent> <leader>yr :YRShow<CR>
-    nnoremap <silent> <F11> :YRShow<CR>
+        let g:yankring_history_dir = expand('~/.cache/vim.d')
+        nnoremap <silent> <leader>yr :YRShow<CR>
+        inoremap <silent> <leader>yr :YRShow<CR>
+        nnoremap <silent> <F11> :YRShow<CR>
 
 
     Plug 'mg979/vim-visual-multi', {'branch': 'master'}
@@ -508,6 +524,15 @@ call plug#begin(pe_runtimepath . '/plugged')
         autocmd FileType qf nnoremap <silent><buffer> p :PreviewQuickfix<cr>
         autocmd FileType qf nnoremap <silent><buffer> P :PreviewClose<cr>
         autocmd FileType qf nnoremap <silent><buffer> <MiddleMouse> :PreviewQuickfix<cr>
+        function! ToggleQuickfix()
+            if empty(filter(getwininfo(), 'v:val.quickfix'))
+                copen
+            else
+                cclose
+            endif
+        endfunction
+
+        nnoremap <leader>q  :call ToggleQuickfix()<CR>
 
 
 

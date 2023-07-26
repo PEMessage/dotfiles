@@ -278,7 +278,7 @@ require("lazy").setup({ --Start Quote
 {
     'akinsho/toggleterm.nvim',
     opts = {
-        open_mapping = [[<M-`>]],
+        open_mapping = [[<M-=>]],
     }
 },
 
