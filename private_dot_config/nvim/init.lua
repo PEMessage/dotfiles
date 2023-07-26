@@ -415,6 +415,13 @@ require("lazy").setup({ --Start Quote
     },
 
 },
+
+{
+    "gioele/vim-autoswap",
+    config = function()
+        vim.g.autoswap_detect_tmux = 1
+    end
+},
 -- -------------------------------------------
 -- 5.2 Mini.nvim Plugin
 -- -------------------------------------------

@@ -381,6 +381,9 @@ call plug#begin(pe_runtimepath . '/plugged')
     " Plug 'ap/vim-buftabline'
    
     Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
+    Plug 'gioele/vim-autoswap' 
+        set title titlestring=
+        let g:autoswap_detect_tmux = 1
 
 
     " ALT + =: toggle terminal below.
