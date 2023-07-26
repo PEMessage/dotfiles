@@ -476,7 +476,8 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'skywind3000/vim-dict'
     set tags=./.tags;,.tags
     Plug 'ludovicchabant/vim-gutentags'
-        let g:gutentags_project_root = ['.root']
+        let g:gutentags_project_root = ['.root','.project']
+        let g:gutentags_add_default_project_roots = 0
         " 所生成的数据文件的名称
         let g:gutentags_ctags_tagfile = '.tags'
         " 同时开启 ctags 和 gtags 支持：
@@ -523,6 +524,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         nnoremap <leader>at :TagbarToggle<CR>
     Plug 'liuchengxu/vista.vim'
         nnoremap <leader>av :Vista!!<CR>
+    " Plug 'vim-scripts/taglist.vim'
     Plug 'skywind3000/vim-preview'
         autocmd FileType qf nnoremap <silent><buffer> p :PreviewQuickfix<cr>
         autocmd FileType qf nnoremap <silent><buffer> P :PreviewClose<cr>
