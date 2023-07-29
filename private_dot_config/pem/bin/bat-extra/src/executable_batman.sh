@@ -9,7 +9,12 @@
 SELF_NC="${BASH_SOURCE:-$0}"
 SELF="$(cd "$(dirname "${SELF_NC}")" && cd "$(dirname "$(readlink "${SELF_NC}" || echo ".")")" && pwd)/$(basename "$(readlink "${SELF_NC}" || echo "${SELF_NC}")")"
 LIB="$(cd "$(dirname "${SELF_NC}")" && cd "$(dirname "$(readlink "${SELF_NC}" || echo ".")")/../lib" && pwd)"
-if [[ -n "${MANPAGER}" ]]; then BAT_PAGER="$MANPAGER"; fi
+
+if [[ -n "${MANPAGER}" ]]; then
+    export BAT_PAGER="$MANPAGER"; 
+else
+    export BAT_PAGER="less -RF --mouse"
+fi
 source "${LIB}/constants.sh"
 source "${LIB}/pager.sh"
 source "${LIB}/print.sh"

@@ -1,0 +1,7 @@
+# DIR1=$(printf '%q' "$1"); shift
+# DIR2=$(printf '%q' "$1"); shift
+vim $@ -c "DirDiff $1 $2"
+#
+
+# printf '%q' "$1"
+

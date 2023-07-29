@@ -14,6 +14,8 @@ let g:startify_custom_header = [
 " Last Modified:  2023-05-29 Mon 03:01 PM
 " +++++++++++++++++++++++++++++++++++++++++++
  
+
+
  
 
 " 1. Configure List
@@ -30,6 +32,7 @@ let g:startify_custom_header = [
     set termguicolors
     set nocompatible
 
+    
     " Comment Color
     let s:PECommentColor = {"gui": "#00af87", "cterm": "246", "cterm16": "7"}
     " let s:PECompleteSys  = "asyncomplete"
@@ -258,6 +261,8 @@ let g:startify_custom_header = [
     vnoremap <RightMouse>            "+y
     inoremap <RightMouse>       <C-o>"+p
 
+    nnoremap ZA :confirm qall<CR> 
+
 " KeyBinding Setting Zone ( Better Mouse )
     nnoremap <leader>rcc  :w<CR> :source %<CR> " Re:Configuration
     nnoremap <leader>rce  :w<CR> :tabe ~/.vimrc <CR> 
@@ -351,6 +356,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     noremap <silent> <C-r> :History<CR>
     noremap <silent> <C-p> :Buffer<CR>
 
+
     noremap <leader>ft :BTags<CR>
     noremap <leader>fgt :BTags<CR>
     nnoremap <leader>fbr :\<C-U>FzfxBranches<CR>
@@ -429,6 +435,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'tpope/vim-fugitive'
     Plug 'tpope/vim-vinegar'
     Plug 'airblade/vim-gitgutter'
+    Plug 'will133/vim-dirdiff'
 
     Plug 'easymotion/vim-easymotion'
         let g:EasyMotion_smartcase = 1
@@ -450,6 +457,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         nnoremap <silent> <leader>yr :YRShow<CR>
         inoremap <silent> <leader>yr :YRShow<CR>
         nnoremap <silent> <F11> :YRShow<CR>
+        let g:yankring_replace_n_pkey = ""
 
 
     Plug 'mg979/vim-visual-multi', {'branch': 'master'}
@@ -727,6 +735,15 @@ call plug#end()
         exec "normal `>la".follow . "\<esc>"
     endfunction
     noremap <silent><leader>sr :call PESurroundViusalZone()<CR>
+
+    " function PEToggleReadonly()
+    "     set readonly!
+    "     set modifiable
+    " endfunction
+
+    nnoremap <silent><leader>ro :set readonly!<CR>:set modifiable<CR>
+
+
 
 
 
