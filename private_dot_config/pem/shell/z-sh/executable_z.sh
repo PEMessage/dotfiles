@@ -78,8 +78,9 @@ _z() {
             BEGIN {
                 rank[path] = 1
                 time[path] = now
+                mark[path] = ""
             }
-            $2 >= 1 {
+            $2 >= 1 || $4 != "" {
                 # drop ranks below 1
                 if( $1 == path ) {
                     rank[$1] = $2 + 1
@@ -88,13 +89,14 @@ _z() {
                     rank[$1] = $2
                     time[$1] = $3
                 }
+                mark[$1] = $4
                 count += $2
             }
             END {
                 if( count > score ) {
                     # aging
-                    for( x in rank ) print x "|" 0.99*rank[x] "|" time[x]
-                } else for( x in rank ) print x "|" rank[x] "|" time[x]
+                    for( x in rank ) print x "|" 0.99*rank[x] "|" time[x] "|" mark[x]
+                } else for( x in rank ) print x "|" rank[x] "|" time[x] "|" mark[x]
             }
         ' 2>/dev/null >| "$tempfile"
         # do our best to avoid clobbering the datafile in a race condition.
@@ -104,6 +106,41 @@ _z() {
             [ "$_Z_OWNER" ] && chown $_Z_OWNER:"$(id -ng $_Z_OWNER)" "$tempfile"
             env mv -f "$tempfile" "$datafile" || env rm -f "$tempfile"
         fi
+
+    elif [ "$1" = '--mark' ] ; then
+        shift
+        local mark_name="$1"
+        shift
+
+        local tempfile="$datafile.$RANDOM"
+        local score=${_Z_MAX_SCORE:-9000}
+        _z_dirs | awk -v path="$*" -v mark_name="$mark_name" -F"|" '
+            {
+                if( $1 == path ) {
+                    rank[$1] = $2
+                    time[$1] = $3
+                    mark[$1] = mark_name
+                } else {
+                    rank[$1] = $2
+                    time[$1] = $3
+                    mark[$1] = $4
+                }
+            }
+            END {
+                if( count > score ) {
+                    # aging
+                    for( x in rank ) print x "|" 0.99*rank[x] "|" time[x] "|" mark[x]
+                } else for( x in rank ) print x "|" rank[x] "|" time[x] "|" mark[x]
+            } 
+        ' 2>/dev/null >| "$tempfile"
+        # do our best to avoid clobbering the datafile in a race condition.
+        if [ $? -ne 0 -a -f "$datafile" ]; then
+            env rm -f "$tempfile"
+        else
+            [ "$_Z_OWNER" ] && chown $_Z_OWNER:"$(id -ng $_Z_OWNER)" "$tempfile"
+            env mv -f "$tempfile" "$datafile" || env rm -f "$tempfile"
+        fi
+
 
     # tab completion
     elif [ "$1" = "--complete" -a -s "$datafile" ]; then
@@ -119,6 +156,8 @@ _z() {
                 } else if( $1 ~ q ) print $1
             }
         ' 2>/dev/null
+
+
 
     else
         # list/go
@@ -187,8 +226,13 @@ _z() {
             BEGIN {
                 gsub(" ", ".*", q)
                 hi_rank = ihi_rank = -9999999999
+                match_mark = ""
             }
             {
+                if ( q == $4 && $4 != "" ) {
+                    is_match_mark = $1
+                    next
+                }
                 if( typ == "rank" ) {
                     rank = $2
                 } else if( typ == "recent" ) {
@@ -207,7 +251,10 @@ _z() {
             }
             END {
                 # prefer case sensitive
-                if( best_match ) {
+                if ( is_match_mark != "" ) {
+                    print is_match_mark
+                    exit
+                } else if( best_match ) {
                     output(matches, best_match, common(matches))
                     exit
                 } else if( ibest_match ) {
@@ -284,7 +331,7 @@ z-fz(){
     esac; last=$1; [ "$#" -gt 0 ] && shift; done
 
     if [ ! -z $fnd ] ; then
-        _z $fnd
+        _z -"$cmd" $fnd
 
         return
     elif [ ! -z $cmd ]; then
@@ -300,6 +347,9 @@ z-fz(){
 #     cd "$temp"
 # }
 
+mark(){
+    echo $PWD
+}
 alias cdd='z-fz -t '
 alias cdr='z-fz -r '
 

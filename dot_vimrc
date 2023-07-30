@@ -388,7 +388,7 @@ call plug#begin(pe_runtimepath . '/plugged')
    
     Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
     Plug 'gioele/vim-autoswap' 
-        set title titlestring=
+        " set title titlestring=
         let g:autoswap_detect_tmux = 1
 
 
