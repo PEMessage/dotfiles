@@ -15,9 +15,7 @@ let g:startify_custom_header = [
 " +++++++++++++++++++++++++++++++++++++++++++
  
 
-
  
-
 " 1. Configure List
 " ===========================================
     
@@ -225,8 +223,8 @@ let g:startify_custom_header = [
     noremap! <C-A> <home> 
     noremap! <C-E> <end>
     noremap! <C-_> <C-K> " 插入 digraph（见 :h digraph），快速输入日文或符号等
-    inoremap <M-f> <S-Right> 
-    inoremap <M-b> <S-Left> 
+    inoremap <m-f> <S-Right> 
+    inoremap <m-b> <S-Left> 
     
 
     
@@ -405,8 +403,8 @@ call plug#begin(pe_runtimepath . '/plugged')
     " 另外从 vim 寄存器到 终端粘贴内容的操作因为 vim/nvim 不一样
     " vim 的终端粘贴是在终端 insert 模式下按 termkey + " + 寄存器 ，termkey 在这个脚本里是 <c-_>
     Plug 'skywind3000/vim-terminal-help'
-        tnoremap <m-[> <c-\><c-n>
-        " let g:terminal_key = '<m-q>'
+        tnoremap <C-[><C-[> <c-\><c-n>:bdelete! %<CR>
+        let g:terminal_key = '<leader>='
         " let g:terminal_key = '<M-`>'
     " Plug 'voldikss/vim-floaterm'
         " nnoremap <M-`> :FloatermToggle! Default<CR>

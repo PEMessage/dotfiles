@@ -1,22 +1,21 @@
-#! bin/bash
+#! /bin/bash
 
-if [ "$1" == "--gitconfig" ] then ;
+if [ "$1" = "--gitconfig" ] ; then
     echo '
-[user]
-	name = youUserName
-	email = example@mail.com
-[alias]
-    lg = log --color --graph --oneline --name-status
-    st = status --short --branch  
-    ddf = difftool --ignore-submodules --dir-diff --no-symlinks --tool=dirdiff
-[core]
-    editor = vim
-    pager = less --mouse
-[diff]
-    tool = vimdiff
-[difftool "dirdiff"]
-    cmd = dirdiff $LOCAL $REMOTE
-    '
+    [user]
+         name = youUserName
+         email = example@mail.com
+    [alias]
+        lg = log --color --graph --oneline --name-status
+        st = status --short --branch  
+        ddf = difftool --ignore-submodules --dir-diff --no-symlinks --tool=dirdiff
+    [core]
+        editor = vim
+        pager = less --mouse
+    [diff]
+        tool = vimdiff
+    [difftool "dirdiff"]
+        cmd = dirdiff $LOCAL $REMOTE '
 fi
 
 vim $@ -c "DirDiff $1 $2"

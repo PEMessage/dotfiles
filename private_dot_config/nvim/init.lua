@@ -735,14 +735,29 @@ require("lazy").setup({ --Start Quote
 --     opts = {},
 --     -- stylua: ignore
 --     keys = {
---         { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
---         { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
 --         -- { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
 --         -- { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
---         { "<c-s>", mode = { "n","c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
+--         { "<leader>sf", mode = { "n","c" },
+--         function()
+--             require("flash").jump({continue = true})
+--         end,
+--         desc = "Toggle Flash Search" },
 --     },
 -- },
-
+--
+-- {
+--     'woosaaahh/sj.nvim',
+--     config = function ()
+--         local sj = require("sj")
+--         sj.setup()
+--
+--         vim.keymap.set("n", "s", sj.run)
+--         vim.keymap.set("n", "<A-,>", sj.prev_match)
+--         vim.keymap.set("n", "<A-;>", sj.next_match)
+--         vim.keymap.set("n", "<localleader>s", sj.redo)
+--     end
+--
+-- },
 
 
 
@@ -1191,6 +1206,7 @@ function PE.ToggleOpts(option, silent, values)
         end
     end
 end
+
 
 function PE.man()
     require("telescope.builtin").man_pages({
