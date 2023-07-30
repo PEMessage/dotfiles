@@ -140,7 +140,23 @@ _z() {
             [ "$_Z_OWNER" ] && chown $_Z_OWNER:"$(id -ng $_Z_OWNER)" "$tempfile"
             env mv -f "$tempfile" "$datafile" || env rm -f "$tempfile"
         fi
+    elif [ "$1" = '--read-mark' ] ; then
+        shift
+        [ -z "$*" ] && return 0
 
+        _z_dirs | awk -v path_or_mark="$*" -F"|" '
+            {
+                if ( $1 == path_or_mark ) {
+                    print "Mark:" $4
+                    exit
+
+                } 
+                if ( $4 == path_or_mark ) {
+                    print "Path:" $1
+                    exit
+                }
+            }
+        ' 2>/dev/null     
 
     # tab completion
     elif [ "$1" = "--complete" -a -s "$datafile" ]; then
@@ -288,10 +304,16 @@ if type compctl >/dev/null 2>&1; then
                 (_z --add "${PWD:a}" &)
                 : $RANDOM
             }
+            _z_curdir() {
+                echo "${PWD:a}"
+            }
         else
             _z_precmd() {
                 (_z --add "${PWD:A}" &)
                 : $RANDOM
+            }
+            _z_curdir() {
+                echo "${PWD:A}"
             }
         fi
         [[ -n "${precmd_functions[(r)_z_precmd]}" ]] || {
@@ -314,43 +336,98 @@ elif type complete >/dev/null 2>&1; then
         grep "_z --add" <<< "$PROMPT_COMMAND" >/dev/null || {
             PROMPT_COMMAND="$PROMPT_COMMAND"$'\n''(_z --add "$(command pwd '$_Z_RESOLVE_SYMLINKS' 2>/dev/null)" 2>/dev/null &);'
         }
+        _z_curdir(){
+            echo "$(command pwd '$_Z_RESOLVE_SYMLINKS' 2>/dev/null)"
+        }
     }
 fi
 
 # Personal Alias Command
 
 z-fz(){ 
+
+    _z_dirs(){
+        [ -f "$datafile" ] || return
+
+        local line
+        while read line; do
+            # only count directories
+            [ -d "${line%%\|*}" ] && echo "$line"
+        done < "$datafile"
+        return 0
+    }
+    local datafile="${_Z_DATA:-$HOME/.z}"
     local fnd opt cmd
     while [ "$1" ]; do case "$1" in
         --) while [ "$1" ]; do shift; fnd="$fnd${fnd:+ }$1";done;;
         -*) opt=${1:1}; while [ "$opt" ]; do case ${opt:0:1} in
                 t)cmd='t';;
                 r)cmd='r';;
+                m)cmd='m';;
+                d)cmd='d';;
             esac; opt=${opt:1}; done;;
          *) fnd="$fnd${fnd:+ }$1";;
     esac; last=$1; [ "$#" -gt 0 ] && shift; done
 
-    if [ ! -z $fnd ] ; then
-        _z -"$cmd" $fnd
-
-        return
-    elif [ ! -z $cmd ]; then
+    if [ "$cmd" = d ] ; then
+        [ -n "$fnd" ] &&  _z  "$fnd" && return
+        local temp=` _z -l 2>&1 | awk '{print $2}' | fzf  --no-sort | sed -e "s@^~@${HOME}@g" `
+        cd "$temp"
+    elif [ "$cmd" = t -o "$cmd" = r ] ; then
+        [ -n "$fnd" ] &&  _z -"$cmd" "$fnd" && return
         local temp=` _z -l"$cmd" 2>&1 | awk '{print $2}' | fzf  --no-sort | sed -e "s@^~@${HOME}@g" `
         cd "$temp"
-    else
-        local temp=` _z -lt 2>&1 | awk '{print $2}' | fzf --no-sort | sed -e "s@^~@${HOME}@g" `
+    elif [ "$cmd" = 'm' ] ; then
+        local temp 
+        _z_dirs | awk -F"|" '
+            $4 != "" {
+                print  "Mark:" $4 "   |" $1
+            }
+        ' | fzf --no-sort | awk -F'|' '{print $2}' | sed -e "s@^~@${HOME}@g" | read temp
         cd "$temp"
+    else
+        return 1 
     fi
+
+
+
+    # if [ -n "$fnd" ] ; then
+    #     _z -"$cmd" "$fnd"
+    #
+    #     return
+    # elif [ ! -z "$cmd" ]; then
+    #     local temp=` _z -l"$cmd" 2>&1 | awk '{print $2}' | fzf  --no-sort | sed -e "s@^~@${HOME}@g" `
+    #     cd "$temp"
+    # else
+    #     local temp=` _z -lt 2>&1 | awk '{print $2}' | fzf --no-sort | sed -e "s@^~@${HOME}@g" `
+    #     cd "$temp"
+    # fi
 }
 # zr(){
 #     local temp=` _z -lt 2>&1 | fzf | awk '{print $2}' | sed -e "s@^~@${HOME}@g" `
 #     cd "$temp"
 # }
 
-mark(){
-    echo $PWD
+z-mark(){
+    local mark_name
+    local prompt_message
+    local local_dir=`_z_curdir`
+    if [ -z $1 ] ; then
+        mark_nane=''
+        prompt_message='Clean the mark'
+    else
+        mark_name="$1"
+        prompt_message="Mark to $mark_name"
+    fi
+    # echo $local_dir
+    _z --mark "$mark_name" "$local_dir"
+    echo "$local_dir -> $prompt_message "
+
 }
-alias cdd='z-fz -t '
+alias cdt='z-fz -t '
 alias cdr='z-fz -r '
+alias cdd='z-fz -d '
+alias cdm='z-fz -m '
+alias dm='z-mark '
 
 
