@@ -434,6 +434,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'tpope/vim-vinegar'
     Plug 'airblade/vim-gitgutter'
     Plug 'will133/vim-dirdiff'
+        let g:DirDiffWindowSize = 7
 
     Plug 'easymotion/vim-easymotion'
         let g:EasyMotion_smartcase = 1
