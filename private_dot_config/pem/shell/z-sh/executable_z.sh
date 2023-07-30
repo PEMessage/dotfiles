@@ -373,18 +373,20 @@ z-fz(){
         [ -n "$fnd" ] &&  _z  "$fnd" && return
         local temp=` _z -l 2>&1 | awk '{print $2}' | fzf  --no-sort | sed -e "s@^~@${HOME}@g" `
         cd "$temp"
+
     elif [ "$cmd" = t -o "$cmd" = r ] ; then
         [ -n "$fnd" ] &&  _z -"$cmd" "$fnd" && return
         local temp=` _z -l"$cmd" 2>&1 | awk '{print $2}' | fzf  --no-sort | sed -e "s@^~@${HOME}@g" `
         cd "$temp"
+
     elif [ "$cmd" = 'm' ] ; then
-        local temp 
-        _z_dirs | awk -F"|" '
+        local temp=` _z_dirs | awk -F"|" '
             $4 != "" {
                 print  "Mark:" $4 "   |" $1
             }
-        ' | fzf --no-sort | awk -F'|' '{print $2}' | sed -e "s@^~@${HOME}@g" | read temp
+        ' | fzf --no-sort | awk -F'|' '{print $2}' | sed -e "s@^~@${HOME}@g" `
         cd "$temp"
+
     else
         return 1 
     fi
