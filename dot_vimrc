@@ -353,6 +353,8 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'linrongbin16/fzfx.vim'
     noremap <silent> <C-r> :History<CR>
     noremap <silent> <C-p> :Buffer<CR>
+    nnoremap <leader>cm :\<C-U>FzfxCommands<CR>
+    nnoremap <C-S-p> :\<C-U>FzfxCommands<CR>
 
 
     noremap <leader>ft :BTags<CR>
@@ -360,6 +362,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     nnoremap <leader>fbr :\<C-U>FzfxBranches<CR>
 
     nnoremap <leader>fg :\<C-U>FzfxLiveGrep<CR>
+    nnoremap <leader>fhg :\<C-U>FzfxLiveGrepW<CR>
     nnoremap <leader>ff :\<C-U>FzfxFiles<CR>
     " nnoremap <space>fw :\<C-U>FzfxLiveGrep<CR>
     " if has('autocmd')
@@ -470,6 +473,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'NickLaMuro/vimux'
     nmap <Leader>vl :VimuxRunLastCommand<CR>
     nmap <Leader>vp :VimuxPromptCommand<CR>
+    " nmap <Leader>vo :VimuxOpenRunner<CR>
 
 
     filetype plugin on
@@ -484,16 +488,48 @@ call plug#begin(pe_runtimepath . '/plugged')
 
     Plug 'skywind3000/vim-auto-popmenu'
     Plug 'skywind3000/vim-dict'
-    set tags=./.tags;,.tags
+    Plug 'skywind3000/asyncrun.vim'
+        " $VIM_FILEPATH  - File name of current buffer with full path
+        " $VIM_FILENAME  - File name of current buffer without path
+        " $VIM_FILEDIR   - Full path of current buffer without the file name
+        " $VIM_FILEEXT   - File extension of current buffer
+        " $VIM_FILENOEXT - File name of current buffer without path and extension
+        " $VIM_CWD       - Current directory
+        " $VIM_RELDIR    - File path relativize to current directory
+        " $VIM_RELNAME   - File name relativize to current directory 
+        " $VIM_ROOT      - Project root directory
+        " $VIM_CWORD     - Current word under cursor
+        " $VIM_CFILE     - Current filename under cursor
+        " $VIM_GUI       - Is running under gui ?
+        " $VIM_VERSION   - Value of v:version
+        " $VIM_COLUMNS   - How many columns in vim's screen
+        " $VIM_LINES     - How many lines in vim's screen
+        " $VIM_SVRNAME   - Value of v:servername for +clientserver usage 
+        let g:asyncrun_open = 7
+        nnoremap <leader>ar :AsyncRun! 
+        " Compile current file
+        nnoremap <silent> <leader>aq1 :AsyncRun gcc -Wall -O2 "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
+        " Run it !
+        nnoremap <silent> <leader>aq2 :AsyncRun -raw -cwd=$(VIM_FILEDIR) "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
+        if has('win32') || has('win64')
+            noremap <silent><leader><aqe> :AsyncRun! -cwd=<root> findstr /n /s /C:"<C-R><C-W>" 
+                        \ "\%CD\%\*.h" "\%CD\%\*.c*" <cr>
+        else
+            noremap <silent><leader>aqe :AsyncRun! -cwd=<root> grep -n -s -R <C-R><C-W> 
+                        \ --include='*.h' --include='*.c*' '<root>' <cr>
+        endif
+
+
     Plug 'ludovicchabant/vim-gutentags'
+        set tags=./.tags;,.tags
         let g:gutentags_project_root = ['.root','.project']
-        let g:gutentags_add_default_project_roots = 0
+        let g:gutentags_add_default_project_roots = 1
         " 所生成的数据文件的名称
         let g:gutentags_ctags_tagfile = '.tags'
         " 同时开启 ctags 和 gtags 支持：
         let g:gutentags_modules = []
         if executable('ctags')
-            let g:gutentags_modules += ['ctags']
+            let g:gutentags_modules += [ 'ctags' ]
         endif
         if executable('gtags-cscope') && executable('gtags')
             let g:gutentags_modules += ['gtags_cscope']
@@ -513,23 +549,67 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:gutentags_ctags_extra_args += ['--output-format=e-ctags']
         " 禁用 gutentags 自动加载 gtags 数据库的行为
         let g:gutentags_auto_add_gtags_cscope = 0
-        let g:gutentags_auto_add_cscope = 1
+        let g:gutentags_auto_add_cscope = 0
         let g:gutentags_define_advanced_commands = 1
+        set cscopetag 
+        " set cscopequickfix=s-,c-,d-,i-,t-,e-
+
+        " Plug 'Kadiryanik/cs-in-qf.vim'
+        " nmap <leader>cs :Qcs i<CR>
+        " Plug 'vim-scripts/cscope-quickfix'
+        " Plug 'ronakg/quickr-cscope.vim'
+        " nmap <C-s> <plug>(quickr_cscope_symbols)
+        " Plug 'chazy/cscope_maps'
+            " nnoremap <leader>cs yiw:cs find s <C-R>=expand("<cword>")<CR><CR>:bd<CR>:cwindow<CR>/<C-R>0<CR>
+            " endif
+
+            " cnoreabbrev csa cs add
+            " cnoreabbrev csf cs find
+            " cnoreabbrev csk cs kill
+            " cnoreabbrev csr cs reset
+            " cnoreabbrev css cs show
+            " cnoreabbrev csh cs help
+
+            " command -nargs=0 Cscope cs add $VIMSRC/src/cscope.out $VIMSRC/src
+        " endif
+
 
     Plug 'skywind3000/gutentags_plus'
         let g:gutentags_plus_nomap = 1
-        " Go Symbol
-        noremap <silent> gs :GscopeFind s <C-R><C-W><cr> 
-        " Go Defintion
-        noremap <silent> gd :GscopeFind g <C-R><C-W><cr> 
+        " 0 or s: Find this symbol
+        " 1 or g: Find this definition
+        " 2 or d: Find functions called by this function
+        " 3 or c: Find functions calling this function
+        " 4 or t: Find this text string
+        " 6 or e: Find this egrep pattern
+        " 7 or f: Find this file
+        " 8 or i: Find files #including this file
+        " 9 or a: Find places where this symbol is assigned a value
+        noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr>
+        noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
 
-        " Go Ref by this function
-        noremap <silent> gr :GscopeFind d <C-R><C-W><cr> 
-        " Go Reference Being Called
-        noremap <silent> gk :GscopeFind c <C-R><C-W><cr> 
-        " File
-        noremap <silent> go :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
-        " noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
+        noremap <silent> <leader>gc :GscopeFind c <C-R><C-W><cr>
+        noremap <silent> <leader>gd :GscopeFind d <C-R><C-W><cr>
+
+        noremap <silent> <leader>gt :GscopeFind t <C-R><C-W><cr>
+        noremap <silent> <leader>ge :GscopeFind e <C-R><C-W><cr>
+
+        noremap <silent> <leader>gf :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
+        noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
+
+        noremap <silent> <leader>ga :GscopeFind a <C-R><C-W><cr>
+        " " Go Symbol
+        " noremap <silent> gs :GscopeFind s <C-R><C-W><cr> 
+        " " Go Defintion
+        " noremap <silent> gd :GscopeFind g <C-R><C-W><cr> 
+
+        " " Go Ref by this function
+        " noremap <silent> gr :GscopeFind d <C-R><C-W><cr> 
+        " " Go Reference Being Called
+        " noremap <silent> gk :GscopeFind c <C-R><C-W><cr> 
+        " " File
+        " noremap <silent> go :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
+        " " noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
     Plug 'preservim/tagbar'
         nnoremap <leader>at :TagbarToggle<CR>
     Plug 'liuchengxu/vista.vim'
@@ -547,7 +627,7 @@ call plug#begin(pe_runtimepath . '/plugged')
             endif
         endfunction
 
-        nnoremap <leader>q  :call ToggleQuickfix()<CR>
+        nnoremap <leader>cc  :call ToggleQuickfix()<CR>
 
 
 
@@ -689,6 +769,7 @@ call plug#end()
     endfunction
     command! PEWinMode :call PEWinMode()
     nnoremap <silent><leader>wm :PEWinMode<CR>
+    " nnoremap <silent><C-w> :PEWinMode<CR>
 
     " TimeStamp in english or locale language 
     function PEDate(lang)
@@ -744,6 +825,7 @@ call plug#end()
     " endfunction
 
     nnoremap <silent><leader>ro :set readonly!<CR>:set modifiable<CR>
+    
 
 
 

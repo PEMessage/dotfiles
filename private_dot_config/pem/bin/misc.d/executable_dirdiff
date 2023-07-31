@@ -12,6 +12,7 @@ if [ "$1" = "--gitconfig" ] ; then
     [core]
         editor = vim
         pager = less --mouse
+        autocrlf = input
     [diff]
         tool = vimdiff
     [difftool "dirdiff"]
@@ -20,5 +21,6 @@ if [ "$1" = "--gitconfig" ] ; then
 fi
 
 vim $@ -c "DirDiff $1 $2"
+
 
 
