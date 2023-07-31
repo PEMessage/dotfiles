@@ -16,6 +16,7 @@ if [ "$1" = "--gitconfig" ] ; then
         tool = vimdiff
     [difftool "dirdiff"]
         cmd = dirdiff $LOCAL $REMOTE '
+    exit
 fi
 
 vim $@ -c "DirDiff $1 $2"
