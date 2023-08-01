@@ -316,8 +316,8 @@ let g:startify_custom_header = [
     nnoremap <silent><leader>b  :Lexplore<CR>
 
 
-    nnoremap _ 4kzz
-    nnoremap + 5jzz
+    " nnoremap _ 4kzz
+    " nnoremap + 5jzz
 " Command Zone
     command! PEWrite w! sudo tee % 
 
@@ -354,7 +354,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     noremap <silent> <C-r> :History<CR>
     noremap <silent> <C-p> :Buffer<CR>
     nnoremap <leader>cm :\<C-U>FzfxCommands<CR>
-    nnoremap <C-S-p> :\<C-U>FzfxCommands<CR>
+    " nnoremap <C-S-p> :\<C-U>FzfxCommands<CR>
 
 
     noremap <leader>ft :BTags<CR>
@@ -512,7 +512,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         " Run it !
         nnoremap <silent> <leader>aq2 :AsyncRun -raw -cwd=$(VIM_FILEDIR) "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
         if has('win32') || has('win64')
-            noremap <silent><leader><aqe> :AsyncRun! -cwd=<root> findstr /n /s /C:"<C-R><C-W>" 
+            noremap <silent><leader>aqe :AsyncRun! -cwd=<root> findstr /n /s /C:"<C-R><C-W>" 
                         \ "\%CD\%\*.h" "\%CD\%\*.c*" <cr>
         else
             noremap <silent><leader>aqe :AsyncRun! -cwd=<root> grep -n -s -R <C-R><C-W> 
@@ -573,9 +573,6 @@ call plug#begin(pe_runtimepath . '/plugged')
             " command -nargs=0 Cscope cs add $VIMSRC/src/cscope.out $VIMSRC/src
         " endif
 
-
-    Plug 'skywind3000/gutentags_plus'
-        let g:gutentags_plus_nomap = 1
         " 0 or s: Find this symbol
         " 1 or g: Find this definition
         " 2 or d: Find functions called by this function
@@ -585,6 +582,9 @@ call plug#begin(pe_runtimepath . '/plugged')
         " 7 or f: Find this file
         " 8 or i: Find files #including this file
         " 9 or a: Find places where this symbol is assigned a value
+    Plug 'skywind3000/gutentags_plus'
+        let g:gutentags_plus_nomap = 1
+
         noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr>
         noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
 
@@ -601,14 +601,13 @@ call plug#begin(pe_runtimepath . '/plugged')
         " " Go Symbol
         " noremap <silent> gs :GscopeFind s <C-R><C-W><cr> 
         " " Go Defintion
-        " noremap <silent> gd :GscopeFind g <C-R><C-W><cr> 
+        noremap <silent> gd :GscopeFind g <C-R><C-W><cr> 
 
         " " Go Ref by this function
         " noremap <silent> gr :GscopeFind d <C-R><C-W><cr> 
         " " Go Reference Being Called
         " noremap <silent> gk :GscopeFind c <C-R><C-W><cr> 
         " " File
-        " noremap <silent> go :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
         " " noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
     Plug 'preservim/tagbar'
         nnoremap <leader>at :TagbarToggle<CR>
@@ -627,7 +626,44 @@ call plug#begin(pe_runtimepath . '/plugged')
             endif
         endfunction
 
+        function! FocusQuickfix()
+            " Check if quickfix window is open
+            let winnr = winnr('$')
+            let i = 1
+            while i <= winnr
+                if getwinvar(i, '&buftype') == 'quickfix'
+                    " Quickfix window is open, so just move the cursor to it
+                    execute i . 'wincmd w'
+                    return
+                endif
+                let i += 1
+            endwhile
+
+            " Quickfix window is not open, so open it
+            copen
+        endfunction
+        function! HighlightQuickfixLine()
+            " Define a group for the quickfix line highlight
+            highlight QuickfixLine cterm=bold ctermbg=yellow ctermfg=black guibg=yellow guifg=black
+
+            " Remove existing autocmds in the group
+            augroup QuickfixHighlight
+                autocmd!
+            augroup END
+
+            " Add autocmd to update the quickfix line highlight on CursorMoved event in quickfix window
+            autocmd QuickfixHighlight CursorMoved * if &buftype == 'quickfix' | execute 'match QuickfixLine /\%'.line('.').'l/' | endif
+        endfunction
+
+        " Call the function to setup the autocmd
+        call HighlightQuickfixLine()
+
+        noremap <silent> go :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
         nnoremap <leader>cc  :call ToggleQuickfix()<CR>
+        " nnoremap _ :call FocusQuickfix()<CR>k:PreviewQuickfix<CR>:wincmd w<CR>
+        " nnoremap + :call FocusQuickfix()<CR>j:PreviewQuickfix<CR>:wincmd w<CR>
+        nnoremap _ :cpervious<CR>
+        nnoremap + :cnext<CR>
 
 
 
