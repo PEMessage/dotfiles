@@ -75,8 +75,8 @@ let g:startify_custom_header = [
     set nowrap           " 关闭自动换行
     set ruler            " 显示光标位置
     set ffs=unix,dos,mac " 文件换行符，默认使用 unix 换行符
-    set clipboard=       " 关闭系统剪贴板共享
-    set clipboard=       " 关闭系统剪贴板共享
+    " set clipboard=       " 关闭系统剪贴板共享
+    " set clipboard=       " 关闭系统剪贴板共享
 
 " -------------------------------------------
 " 3.2 Coding Zone
@@ -219,6 +219,7 @@ let g:startify_custom_header = [
 " ===========================================
 " KeyBinding Setting Zone ( Input Mode  )
     inoremap jj <ESC>
+    nnoremap <C-c> <ESC>
     "Emacs Like ShortCut
     noremap! <C-A> <home> 
     noremap! <C-E> <end>
@@ -351,28 +352,27 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
     Plug 'linrongbin16/fzfx.vim'
-    noremap <silent> <C-r> :History<CR>
-    noremap <silent> <C-p> :Buffer<CR>
-    nnoremap <leader>cm :\<C-U>FzfxCommands<CR>
-    " nnoremap <C-S-p> :\<C-U>FzfxCommands<CR>
+        noremap <silent> <C-r> :History<CR>
+        noremap <silent> <C-p> :Buffer<CR>
+        nnoremap <leader>cm :\<C-U>FzfxCommands<CR>
+        " nnoremap <C-S-p> :\<C-U>FzfxCommands<CR>
 
 
-    noremap <leader>ft :BTags<CR>
-    noremap <leader>fgt :BTags<CR>
-    nnoremap <leader>fbr :\<C-U>FzfxBranches<CR>
+        noremap <leader>ft :BTags<CR>
+        noremap <leader>fgt :BTags<CR>
+        nnoremap <leader>fbr :\<C-U>FzfxBranches<CR>
 
-    nnoremap <leader>fg :\<C-U>FzfxLiveGrep<CR>
-    nnoremap <leader>fhg :\<C-U>FzfxLiveGrepW<CR>
-    nnoremap <leader>ff :\<C-U>FzfxFiles<CR>
-    " nnoremap <space>fw :\<C-U>FzfxLiveGrep<CR>
-    " if has('autocmd')
-    "     autocmd filetype fzf
-    " else
-    " augroup PE_FZF_GROUP
-    "     autocmd!
-    "     autocmd filetype fzf tnoremap  <buffer> <C-o> <enter>
-    " augroup END 
-    " JUST USE <C-M> AS ENTER
+        nnoremap <leader>fg :\<C-U>FzfxLiveGrep<CR>
+        nnoremap <leader>ff :\<C-U>FzfxFiles<CR>
+        " nnoremap <space>fw :\<C-U>FzfxLiveGrep<CR>
+        " if has('autocmd')
+        "     autocmd filetype fzf
+        " else
+        " augroup PE_FZF_GROUP
+        "     autocmd!
+        "     autocmd filetype fzf tnoremap  <buffer> <C-o> <enter>
+        " augroup END 
+        " JUST USE <C-M> AS ENTER
 
 " Style PlugIn
     Plug 'itchyny/lightline.vim'
@@ -383,8 +383,8 @@ call plug#begin(pe_runtimepath . '/plugged')
 
     Plug 'Yggdroot/indentLine'
     Plug 'mhinz/vim-startify'
-    nnoremap <leader>st :tab new<CR>:Startify<CR> " Most Recent File MRF
-    nnoremap <leader>sb :Startify<CR> " Most Recent File MRF
+        nnoremap <leader>st :tab new<CR>:Startify<CR> " Most Recent File MRF
+        nnoremap <leader>sb :Startify<CR> " Most Recent File MRF
     " Plug 'ap/vim-buftabline'
    
     Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
@@ -393,18 +393,18 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:autoswap_detect_tmux = 1
 
 
-    " ALT + =: toggle terminal below.
-    " ALT + SHIFT + h: move to the window on the left.
-    " ALT + SHIFT + l: move to the window on the right.
-    " ALT + SHIFT + j: move to the window below.
-    " ALT + SHIFT + k: move to the window above.
-    " ALT + SHIFT + n: move to the previous window.
-    " ALT + -: paste register 0 to terminal.
-    " ALT + q: switch to terminal normal mode.
-    " Use drop to drop file to vim
-    "
-    " 另外从 vim 寄存器到 终端粘贴内容的操作因为 vim/nvim 不一样
-    " vim 的终端粘贴是在终端 insert 模式下按 termkey + " + 寄存器 ，termkey 在这个脚本里是 <c-_>
+        " ALT + =: toggle terminal below.
+        " ALT + SHIFT + h: move to the window on the left.
+        " ALT + SHIFT + l: move to the window on the right.
+        " ALT + SHIFT + j: move to the window below.
+        " ALT + SHIFT + k: move to the window above.
+        " ALT + SHIFT + n: move to the previous window.
+        " ALT + -: paste register 0 to terminal.
+        " ALT + q: switch to terminal normal mode.
+        " Use drop to drop file to vim
+        "
+        " 另外从 vim 寄存器到 终端粘贴内容的操作因为 vim/nvim 不一样
+        " vim 的终端粘贴是在终端 insert 模式下按 termkey + " + 寄存器 ，termkey 在这个脚本里是 <c-_>
     Plug 'skywind3000/vim-terminal-help'
         tnoremap <C-[><C-[> <c-\><c-n>:bdelete! %<CR>
         let g:terminal_key = '<leader>='
@@ -428,8 +428,8 @@ call plug#begin(pe_runtimepath . '/plugged')
    
 " Edit Experinece
     Plug 'junegunn/vim-easy-align'
-    nmap ga <Plug>(EasyAlign)
-    xmap ga <Plug>(EasyAlign)
+        nmap ga <Plug>(EasyAlign)
+        xmap ga <Plug>(EasyAlign)
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-commentary'
     Plug 'tpope/vim-repeat'
@@ -466,28 +466,27 @@ call plug#begin(pe_runtimepath . '/plugged')
 
 
     Plug 'mg979/vim-visual-multi', {'branch': 'master'}
-    let g:VM_maps = {}
-    let g:VM_maps['Find Under']         = '<C-d>'
-    let g:VM_maps['Find Subword Under'] = '<C-d>'
+        let g:M_default_mappings = 0
+        let g:VM_mouse_mappings  = 1
+        let g:VM_maps = {}
+        let g:VM_maps['Find Under']          = '<C-d>'
+        let g:VM_maps['Find Subword Under']  = '<C-d>'
+        let g:VM_maps["Exit"]                = '<C-c>'   " quit VM
+        let g:VM_maps["Mouse Cursor"]        = '<C-LeftMouse>'
+        let g:VM_maps["Align"]               = '<C-a>'
+        let g:VM_maps["Enlarge"]             = "+"
+        let g:VM_maps["Shrink"]              = "-"
 
     Plug 'NickLaMuro/vimux'
-    nmap <Leader>vl :VimuxRunLastCommand<CR>
-    nmap <Leader>vp :VimuxPromptCommand<CR>
+        nmap <Leader>vl :VimuxRunLastCommand<CR>
+        nmap <Leader>vp :VimuxPromptCommand<CR>
     " nmap <Leader>vo :VimuxOpenRunner<CR>
 
 
-    filetype plugin on
-    if has("autocmd") && exists("+omnifunc")
-	autocmd Filetype *
-		    \	if &omnifunc == "" |
-		    \		setlocal omnifunc=syntaxcomplete#Complete |
-		    \	endif
-    endif
+
     
 
 
-    Plug 'skywind3000/vim-auto-popmenu'
-    Plug 'skywind3000/vim-dict'
     Plug 'skywind3000/asyncrun.vim'
         " $VIM_FILEPATH  - File name of current buffer with full path
         " $VIM_FILENAME  - File name of current buffer without path
@@ -552,26 +551,8 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:gutentags_auto_add_cscope = 0
         let g:gutentags_define_advanced_commands = 1
         set cscopetag 
-        " set cscopequickfix=s-,c-,d-,i-,t-,e-
 
-        " Plug 'Kadiryanik/cs-in-qf.vim'
-        " nmap <leader>cs :Qcs i<CR>
-        " Plug 'vim-scripts/cscope-quickfix'
-        " Plug 'ronakg/quickr-cscope.vim'
-        " nmap <C-s> <plug>(quickr_cscope_symbols)
-        " Plug 'chazy/cscope_maps'
-            " nnoremap <leader>cs yiw:cs find s <C-R>=expand("<cword>")<CR><CR>:bd<CR>:cwindow<CR>/<C-R>0<CR>
-            " endif
 
-            " cnoreabbrev csa cs add
-            " cnoreabbrev csf cs find
-            " cnoreabbrev csk cs kill
-            " cnoreabbrev csr cs reset
-            " cnoreabbrev css cs show
-            " cnoreabbrev csh cs help
-
-            " command -nargs=0 Cscope cs add $VIMSRC/src/cscope.out $VIMSRC/src
-        " endif
 
         " 0 or s: Find this symbol
         " 1 or g: Find this definition
@@ -587,6 +568,7 @@ call plug#begin(pe_runtimepath . '/plugged')
 
         noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr>
         noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
+        noremap <silent> zg         :GscopeFind g <C-R><C-W><cr>
 
         noremap <silent> <leader>gc :GscopeFind c <C-R><C-W><cr>
         noremap <silent> <leader>gd :GscopeFind d <C-R><C-W><cr>
@@ -601,7 +583,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         " " Go Symbol
         " noremap <silent> gs :GscopeFind s <C-R><C-W><cr> 
         " " Go Defintion
-        noremap <silent> gd :GscopeFind g <C-R><C-W><cr> 
+        " noremap <silent> gd :GscopeFind g <C-R><C-W><cr> 
 
         " " Go Ref by this function
         " noremap <silent> gr :GscopeFind d <C-R><C-W><cr> 
@@ -610,79 +592,84 @@ call plug#begin(pe_runtimepath . '/plugged')
         " " File
         " " noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
     Plug 'preservim/tagbar'
-        nnoremap <leader>at :TagbarToggle<CR>
     Plug 'liuchengxu/vista.vim'
+        nnoremap <leader>at :TagbarToggle<CR>
         nnoremap <leader>av :Vista!!<CR>
     " Plug 'vim-scripts/taglist.vim'
+
+
+
+" Quickfix Config
     Plug 'skywind3000/vim-preview'
         autocmd FileType qf nnoremap <silent><buffer> p :PreviewQuickfix<cr>
         autocmd FileType qf nnoremap <silent><buffer> P :PreviewClose<cr>
         autocmd FileType qf nnoremap <silent><buffer> <MiddleMouse> :PreviewQuickfix<cr>
-        function! ToggleQuickfix()
-            if empty(filter(getwininfo(), 'v:val.quickfix'))
-                copen
-            else
-                cclose
-            endif
-        endfunction
 
-        function! FocusQuickfix()
+    " -------------------------------------------
+    " Quicktoggle
+    " -------------------------------------------
+            function! ToggleQuickfix()
+                if empty(filter(getwininfo(), 'v:val.quickfix'))
+                    copen
+                else
+                    cclose
+                endif
+            endfunction
+    " -------------------------------------------
+    " Better Preview
+    " -------------------------------------------
+        function! HighlightQuickfixLine()
+            highlight link QuickfixLine Search
+        endfunction
+        call HighlightQuickfixLine()
+        function! QuickfixArrowPreview(direction)
             " Check if quickfix window is open
+            let winnow = winnr()
             let winnr = winnr('$')
             let i = 1
             while i <= winnr
                 if getwinvar(i, '&buftype') == 'quickfix'
                     " Quickfix window is open, so just move the cursor to it
                     execute i . 'wincmd w'
+                    execute 'normal ' . a:direction
+                    execute 'match QuickfixLine /\%'.line('.').'l/'
+                    execute 'PreviewQuickfix'
+                    execute winnow . 'wincmd w'
                     return
                 endif
                 let i += 1
             endwhile
-
-            " Quickfix window is not open, so open it
-            copen
+            copen   " Quickfix window is not open, so open it
         endfunction
-        function! HighlightQuickfixLine()
-            " Define a group for the quickfix line highlight
-            highlight QuickfixLine cterm=bold ctermbg=yellow ctermfg=black guibg=yellow guifg=black
-
-            " Remove existing autocmds in the group
-            augroup QuickfixHighlight
-                autocmd!
-            augroup END
-
-            " Add autocmd to update the quickfix line highlight on CursorMoved event in quickfix window
-            autocmd QuickfixHighlight CursorMoved * if &buftype == 'quickfix' | execute 'match QuickfixLine /\%'.line('.').'l/' | endif
-        endfunction
-
         " Call the function to setup the autocmd
-        call HighlightQuickfixLine()
-
+    " -------------------------------------------
+    " Quicktoggle
+    " -------------------------------------------
         noremap <silent> go :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
         nnoremap <leader>cc  :call ToggleQuickfix()<CR>
-        " nnoremap _ :call FocusQuickfix()<CR>k:PreviewQuickfix<CR>:wincmd w<CR>
-        " nnoremap + :call FocusQuickfix()<CR>j:PreviewQuickfix<CR>:wincmd w<CR>
-        nnoremap _ :cpervious<CR>
-        nnoremap + :cnext<CR>
+        nnoremap <S-F11> :call QuickfixArrowPreview('j')<CR>
+        nnoremap <S-F12> :call QuickfixArrowPreview('k')<CR>
 
-
-
-
-
-    " enable this plugin for filetypes, '*' for all files.
-    let g:apc_enable_ft = {'*':1}
-    let g:apc_trigger = "\<c-x>\<c-n>"
-    let g:apc_cr_confirm = 1
-    set cpt=.,k,w,b
-
-    " source for dictionary, current or other loaded buffers, see ':help cpt'
-
-    " don't select the first item.
-    set completeopt=menu,menuone,noselect
-
-    " suppress annoy messages.
-    set shortmess+=c
-
+" Auto Popup
+    Plug 'skywind3000/vim-auto-popmenu'
+    Plug 'skywind3000/vim-dict'
+        " enable this plugin for filetypes, '*' for all files.
+        let g:apc_enable_ft = {'*':1}
+        let g:apc_trigger = "\<c-x>\<c-n>"
+        let g:apc_cr_confirm = 1
+        set cpt=.,k,w,b
+        " source for dictionary, current or other loaded buffers, see ':help cpt'
+        " don't select the first item.
+        set completeopt=menu,menuone,noselect
+        " suppress annoy messages.
+        set shortmess+=c
+        filetype plugin on
+        if has("autocmd") && exists("+omnifunc")
+        autocmd Filetype *
+                \	if &omnifunc == "" |
+                \		setlocal omnifunc=syntaxcomplete#Complete |
+                \	endif
+        endif
 
 
 
@@ -771,13 +758,6 @@ call plug#end()
 
   
 
-" NeoVide Zone
-" ===========================================
-    " if exists('g:neovide')
-    "     " do neovide specific config
-    "     let g:neovide_cursor_vfx_mode = "railgun"
-    "     let g:im_select_enable_focus_events = 0
-    " endif
 
 " Self Funtion Zone
 " ===========================================

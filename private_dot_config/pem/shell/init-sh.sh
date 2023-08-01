@@ -117,9 +117,25 @@
         # is a file
         if [  -f "$PEM_CACHE_HOME" ]; then
             PEM_CACHE_HOME=''
-            echo "Warning: cache_home: $PEM_CACHE_HOME is a file"
+            echo "Warning: cache home: $PEM_CACHE_HOME is a file"
         else
             mkdir -p "$PEM_CACHE_HOME"
+            mkdir -p "$PEM_CACHE_HOME/shell"
+            touch "$PEM_CACHE_HOME/shell/init-sh.sh"
+        fi
+    fi
+
+    export PEM_DATA_HOME=${XDG_DATA_HOME:-${HOME}/.local}/pem
+    # dir not exist
+    if [ ! -d "$PEM_DATA_HOME" ]; then
+        # is a file
+        if [  -f "$PEM_DATA_HOME" ]; then
+            PEM_DATA_HOME=''
+            echo "Warning: data home: $PEM_DATA_HOME is a file"
+        else
+            mkdir -p "$PEM_DATA_HOME"
+            mkdir -p "$PEM_DATA_HOME/shell"
+            touch "$PEM_DATA_HOME/shell/init-sh.sh"
         fi
     fi
 
@@ -227,6 +243,13 @@
         fi 
     done
     
+    if [ -f "${PEM_CACHE_HOME}/shell/init-sh.sh" ] ; then
+        source "${PEM_CACHE_HOME}/shell/init-sh.sh"
+    fi
+     if [ -f "${PEM_DATA_HOME}/shell/init-sh.sh" ] ; then
+        source "${PEM_DATA_HOME}/shell/init-sh.sh"
+    fi
+     
 
     # Method 3: Manualy source
     # source "$PEMHOME"/shell/fzf/fzf-ff.sh
