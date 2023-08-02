@@ -430,6 +430,6 @@ alias cdt='z-fz -t '
 alias cdr='z-fz -r '
 alias cdd='z-fz -d '
 alias cdm='z-fz -m '
-alias dm='z-mark '
+alias md='z-mark '
 
 

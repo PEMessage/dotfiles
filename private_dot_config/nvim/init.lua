@@ -66,7 +66,7 @@ PE.logo = {
 -- -------------------------------------------
 -- 3.4 Tab and Indent Setting
 -- -------------------------------------------
-    vim.o.tabstop     = 5                          -- Tab 长度，默认为8
+    vim.o.tabstop     = 4                          -- Tab 长度，默认为8
     vim.o.smarttab    = true                       -- 根据文件中其他地方的缩进空格个数来确定一个tab是多少个空格
     vim.o.expandtab   = true                       -- 展开Tab
 
@@ -588,7 +588,8 @@ require("lazy").setup({ --Start Quote
 
         { "<leader>fm", "<cmd>Telescope man_pages<cr>", desc = "Man Pages" },
         { "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "Help Pages" },
-        { "<leader>ff", "<cmd>Telescope live_grep<cr>", desc = "Live Grep" },
+        { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find Files" },
+        { "<leader>fg", "<cmd>Telescope live_grep<cr>", desc = "Live Grep" },
 
 
     },
@@ -923,7 +924,9 @@ require("lazy").setup({ --Start Quote
         -- lspconfig Config Zone
         -- --------------------------------
         -- vim.diagnostic.disable()
-        require'lspconfig'.ccls.setup{}
+        require'lspconfig'.ccls.setup{
+            -- filetypes = { "c", "cpp", "objc", "objcpp", "asm" },
+        }
         vim.api.nvim_create_autocmd('LspAttach', {
             group = vim.api.nvim_create_augroup('UserLspConfig', {}),
             callback = function(ev)
@@ -960,7 +963,15 @@ require("lazy").setup({ --Start Quote
                 -- Jump forwards/backwards with '{' and '}'
                 -- vim.keymap.set('n', '{', '<cmd>AerialPrev<CR>', {buffer = bufnr})
                 -- vim.keymap.set('n', '}', '<cmd>AerialNext<CR>', {buffer = bufnr})
-            end
+            end,
+            filter_kind = {
+                "Variable",
+                "Constructor",
+                "Enum",
+                "Function",
+                "Method",
+                "Struct",
+            },
         })
         vim.keymap.set('n', '<leader>a', '<cmd>AerialToggle!<CR>')
     end,
@@ -1113,6 +1124,7 @@ require("lazy").setup({ --Start Quote
     -- Emacs-like Keymap
     vim.keymap.set('!','<C-a>','<home>')
     vim.keymap.set('!','<C-e>','<end>')
+    vim.keymap.set('n','ZA','<cmd>confirm quitall<CR>', { desc = "Quit All" })
 
     -- better up/down
     vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })

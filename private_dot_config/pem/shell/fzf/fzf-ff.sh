@@ -48,7 +48,11 @@
             local path_arg="$1"
         fi
    
-        cd `find "$path_arg" -type f | fzf | bcd --print`
+        local temp=`find "$path_arg" -type f | fzf`
+        if [ $? != '0' ]; then
+            return 
+        fi
+        cd `echo "$temp" | bcd --print`
     }
     dcd(){
         if [ "$#" -eq 0 ];then
@@ -57,7 +61,11 @@
             local path_arg="$1"
         fi
 
-        cd `find "$path_arg" -type d | fzf | bcd --print`
+        local temp=`find "$path_arg" -type d | fzf | bcd --print`  
+        if [ $? != '0' ]; then
+            return 
+        fi
+        cd `echo "$temp" | bcd --print`
     }
     
     # dcd(){
