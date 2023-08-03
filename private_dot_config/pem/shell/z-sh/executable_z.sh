@@ -321,7 +321,7 @@ _z() {
                 if ( is_match_mark != "" ) {
                     print is_match_mark
                     exit
-                } else if ( 0 ) {
+                } else if ( lbest_match ) {
                     output(lmatches, lbest_match, 0)
                     exit
                 } else if( best_match ) {
