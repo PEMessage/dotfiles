@@ -26,6 +26,17 @@
 #     * z -c foo  # restrict matches to subdirs of $PWD
 #     * z -x      # remove the current directory from the datafile
 #     * z -h      # show a brief help message
+
+# EXTRA USAGE (z.sh-bookmark)
+#     * z -m                                  # show all bookmark (notice: it will overwrite others option)
+#                                             # example : `z -mlt` will equal to `z -m` looking forward to improve in futrue
+#     * z --read-mark [path or bookmark name] # if given a path return its bookmark name , given bookmark name return path
+#     * z --mark [bookmark name] [path]       # show all bookmark 
+#     * z [bookmark]                          # jump to bookmark, NOTICE: your will need to type full bookmark name
+# HANDY FUNCTION (z-mark)
+#     * z-mark [bookmark name]                # mark $PWD with [bookmark name]
+#     * z-mark                                # clean $PWD bookmark
+
 [ -d "$HOME/.cache/z-sh" ] || {
     mkdir -p "$HOME/.cache/z-sh"
 }
@@ -187,6 +198,7 @@ _z() {
                     l) list=1;;
                     r) typ="rank";;
                     t) typ="recent";;
+                    m) typ="mark";;
                     x) sed -i -e "\:^${PWD}|.*:d" "$datafile";;
                 esac; opt=${opt:1}; done;;
              *) fnd="$fnd${fnd:+ }$1";;
@@ -202,12 +214,26 @@ _z() {
         # no file yet
         [ -f "$datafile" ] || return
 
+        if [ "$typ" = "mark" ]; then
+           local temp=` _z_dirs | awk -F"|" '
+                $4 != "" {
+                    print  "Mark:" $4 "   |" $1
+                }
+            ' `
+            echo $temp
+            return 0
+
+        fi
+
         local cd
         cd="$( < <( _z_dirs ) awk -v t="$(date +%s)" -v list="$list" -v typ="$typ" -v q="$fnd" -F"|" '
             function frecent(rank, time) {
-              # relate frequency and time
-              dx = t - time
-              return int(10000 * rank * (3.75/((0.0001 * dx + 1) + 0.25)))
+                # relate frequency and time
+                dx = t - time
+                if( dx < 3600 ) return rank * 4
+                if( dx < 86400 ) return rank * 2
+                if( dx < 604800 ) return rank / 2
+                return rank / 4
             }
             function output(matches, best_match, common) {
                 # list or return the desired directory
@@ -226,6 +252,16 @@ _z() {
                     print best_match
                 }
             }
+            function matchpast(str, ere, thresh) {
+                n = match(str, ere)
+                if ( n <= 1 ) {
+                    return 0
+                }
+                if (n + RLENGTH > thresh)
+                    return 1
+                return 0
+            }
+            
             function common(matches) {
                 # find the common root of a list of matches, if it exists
                 for( x in matches ) {
@@ -241,7 +277,7 @@ _z() {
             }
             BEGIN {
                 gsub(" ", ".*", q)
-                hi_rank = ihi_rank = -9999999999
+                lhi_rank = hi_rank = ihi_rank = -9999999999
                 match_mark = ""
             }
             {
@@ -249,15 +285,30 @@ _z() {
                     is_match_mark = $1
                     next
                 }
+                n = split($1, broken, "/")
+                # if (n == 1)
+                #     threshhold = 0
+                threshhold = length($1) - length(broken[n])
+
                 if( typ == "rank" ) {
                     rank = $2
                 } else if( typ == "recent" ) {
                     rank = $3 - t
                 } else rank = frecent($2, $3)
-                if( $1 ~ q ) {
+
+                if ( matchpast($1,q,threshhold) ) {
+                    # Last Match
+                    lmatches[$1] = rank
+                } else if( $1 ~ q ) {
                     matches[$1] = rank
-                } else if( tolower($1) ~ tolower(q) ) imatches[$1] = rank
-                if( matches[$1] && matches[$1] > hi_rank ) {
+                } else if( tolower($1) ~ tolower(q) ) {
+                    imatches[$1] = rank
+                }
+
+                if( lmatches[$1] && lmatches[$1] > lhi_rank ) {
+                    lbest_match = $1 
+                    lhi_rank = lmatches[$1]
+                } else if( matches[$1] && matches[$1] > hi_rank ) {
                     best_match = $1
                     hi_rank = matches[$1]
                 } else if( imatches[$1] && imatches[$1] > ihi_rank ) {
@@ -269,6 +320,9 @@ _z() {
                 # prefer case sensitive
                 if ( is_match_mark != "" ) {
                     print is_match_mark
+                    exit
+                } else if ( 0 ) {
+                    output(lmatches, lbest_match, 0)
                     exit
                 } else if( best_match ) {
                     output(matches, best_match, common(matches))
@@ -344,7 +398,7 @@ fi
 
 # Personal Alias Command
 
-z-fz(){ 
+z-fzf(){ 
 
     _z_dirs(){
         [ -f "$datafile" ] || return
@@ -380,11 +434,7 @@ z-fz(){
         cd "$temp"
 
     elif [ "$cmd" = 'm' ] ; then
-        local temp=` _z_dirs | awk -F"|" '
-            $4 != "" {
-                print  "Mark:" $4 "   |" $1
-            }
-        ' | fzf --no-sort | awk -F'|' '{print $2}' | sed -e "s@^~@${HOME}@g" `
+        local temp=` _z -lm 2>&1 | fzf --no-sort | awk -F'|' '{print $2}' | sed -e "s@^~@${HOME}@g" `
         cd "$temp"
 
     else
@@ -426,10 +476,10 @@ z-mark(){
     echo "$local_dir -> $prompt_message "
 
 }
-alias cdt='z-fz -t '
-alias cdr='z-fz -r '
-alias cdd='z-fz -d '
-alias cdm='z-fz -m '
+alias cdt='z-fzf -t '
+alias cdr='z-fzf -r '
+alias cdd='z-fzf -d '
+alias cdm='z-fzf -m '
 alias md='z-mark '
 
 
