@@ -294,23 +294,23 @@ let g:startify_custom_header = [
     autocmd FileType netrw call s:RemoveNetrwMap()
     function s:RemoveNetrwMap()
         if hasmapto('<Plug>NetrwRefresh')
-            " Unmap Netrw Keybind
+        " Unmap Netrw Keybind
             unmap <buffer> <C-I>
             unmap <buffer> <C-O>
 
-            " map Netrw Keybind
-                " Forward dir
-                nmap <buffer> <C-I> U
-                " Backword dir
-                nmap <buffer> <C-O> u
-                " ctrl-l for left pannel
+        " map Netrw Keybind
+            " Forward dir
+            nmap <buffer> <C-I> U
+            " Backword dir
+            nmap <buffer> <C-O> u
+            " ctrl-l for left pannel
 
-            " New Map 
-                " Back to parent dir
-                nmap <buffer> H -           
-                nmap <buffer> <C-0> echo b
-                " Enter next dir
-                nmap <buffer> L <C-M>
+        " New Map 
+            " Back to parent dir
+            nmap <buffer> H -           
+            nmap <buffer> <C-0> echo b
+            " Enter next dir
+            nmap <buffer> L <C-M>
         endif
     endfunction
 
@@ -387,9 +387,11 @@ call plug#begin(pe_runtimepath . '/plugged')
     " Plug 'ap/vim-buftabline'
    
     Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
-    Plug 'gioele/vim-autoswap' 
-        " set title titlestring=
-        let g:autoswap_detect_tmux = 1
+    Plug 'itchyny/vim-cursorword'
+    Plug 'luochen1990/rainbow'
+        let g:rainbow_active = 0 "0 if you want to enable it later via :RainbowToggle
+        let g:cursorword_delay = 1000
+
 
     " vi 1976
     " | \      more 1978
@@ -399,28 +401,10 @@ call plug#begin(pe_runtimepath . '/plugged')
     " |   less 1983
     " v
     " vim 1991
-    Plug 'rkitover/vimpager'
+    " Plug 'rkitover/vimpager'
 
 
-        " ALT + =: toggle terminal below.
-        " ALT + SHIFT + h: move to the window on the left.
-        " ALT + SHIFT + l: move to the window on the right.
-        " ALT + SHIFT + j: move to the window below.
-        " ALT + SHIFT + k: move to the window above.
-        " ALT + SHIFT + n: move to the previous window.
-        " ALT + -: paste register 0 to terminal.
-        " ALT + q: switch to terminal normal mode.
-        " Use drop to drop file to vim
-        "
-        " 另外从 vim 寄存器到 终端粘贴内容的操作因为 vim/nvim 不一样
-        " vim 的终端粘贴是在终端 insert 模式下按 termkey + " + 寄存器 ，termkey 在这个脚本里是 <c-_>
-    Plug 'skywind3000/vim-terminal-help'
-        tnoremap <C-[><C-[> <c-\><c-n>:bdelete! %<CR>
-        let g:terminal_key = '<leader>='
-        " let g:terminal_key = '<M-`>'
-    " Plug 'voldikss/vim-floaterm'
-        " nnoremap <M-`> :FloatermToggle! Default<CR>
-        " nnoremap <leader>ft :FloatermToggle! Default<CR>
+
 
     " Plug 'kvngvikram/rightclick-macros'
     " Plug 'skywind3000/vim-quickui'
@@ -486,48 +470,35 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:VM_maps["Enlarge"]             = "+"
         let g:VM_maps["Shrink"]              = "-"
 
+" Tmux and Terminal
     Plug 'NickLaMuro/vimux'
         nmap <Leader>vl :VimuxRunLastCommand<CR>
         nmap <Leader>vp :VimuxPromptCommand<CR>
-    " nmap <Leader>vo :VimuxOpenRunner<CR>
+        " nmap <Leader>vo :VimuxOpenRunner<CR>
+    Plug 'gioele/vim-autoswap' 
+        let g:autoswap_detect_tmux = 1
+        " set title titlestring=
+        " ALT + =: toggle terminal below.
+        " ALT + SHIFT + h: move to the window on the left.
+        " ALT + SHIFT + l: move to the window on the right.
+        " ALT + SHIFT + j: move to the window below.
+        " ALT + SHIFT + k: move to the window above.
+        " ALT + SHIFT + n: move to the previous window.
+        " ALT + -: paste register 0 to terminal.
+        " ALT + q: switch to terminal normal mode.
+        " Use drop to drop file to vim
+        "
+        " 另外从 vim 寄存器到 终端粘贴内容的操作因为 vim/nvim 不一样
+        " vim 的终端粘贴是在终端 insert 模式下按 termkey + " + 寄存器 ，termkey 在这个脚本里是 <c-_>
+    Plug 'skywind3000/vim-terminal-help'
+        tnoremap <C-[><C-[> <c-\><c-n>:bdelete! %<CR>
+        let g:terminal_key = '<leader>='
+        " let g:terminal_key = '<M-`>'
+    " Plug 'voldikss/vim-floaterm'
+        " nnoremap <M-`> :FloatermToggle! Default<CR>
+        " nnoremap <leader>ft :FloatermToggle! Default<CR>
 
-
-
-    
-
-
-    Plug 'skywind3000/asyncrun.vim'
-        " $VIM_FILEPATH  - File name of current buffer with full path
-        " $VIM_FILENAME  - File name of current buffer without path
-        " $VIM_FILEDIR   - Full path of current buffer without the file name
-        " $VIM_FILEEXT   - File extension of current buffer
-        " $VIM_FILENOEXT - File name of current buffer without path and extension
-        " $VIM_CWD       - Current directory
-        " $VIM_RELDIR    - File path relativize to current directory
-        " $VIM_RELNAME   - File name relativize to current directory 
-        " $VIM_ROOT      - Project root directory
-        " $VIM_CWORD     - Current word under cursor
-        " $VIM_CFILE     - Current filename under cursor
-        " $VIM_GUI       - Is running under gui ?
-        " $VIM_VERSION   - Value of v:version
-        " $VIM_COLUMNS   - How many columns in vim's screen
-        " $VIM_LINES     - How many lines in vim's screen
-        " $VIM_SVRNAME   - Value of v:servername for +clientserver usage 
-        let g:asyncrun_open = 7
-        nnoremap <leader>ar :AsyncRun! 
-        " Compile current file
-        nnoremap <silent> <leader>aq1 :AsyncRun gcc -Wall -O2 "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
-        " Run it !
-        nnoremap <silent> <leader>aq2 :AsyncRun -raw -cwd=$(VIM_FILEDIR) "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
-        if has('win32') || has('win64')
-            noremap <silent><leader>aqe :AsyncRun! -cwd=<root> findstr /n /s /C:"<C-R><C-W>" 
-                        \ "\%CD\%\*.h" "\%CD\%\*.c*" <cr>
-        else
-            noremap <silent><leader>aqe :AsyncRun! -cwd=<root> grep -n -s -R <C-R><C-W> 
-                        \ --include='*.h' --include='*.c*' '<root>' <cr>
-        endif
-
-
+" Tag and Quickfix
     Plug 'ludovicchabant/vim-gutentags'
         set tags=./.tags;,.tags
         let g:gutentags_project_root = ['.root','.project']
@@ -605,6 +576,37 @@ call plug#begin(pe_runtimepath . '/plugged')
         nnoremap <leader>at :TagbarToggle<CR>
         nnoremap <leader>av :Vista!!<CR>
     " Plug 'vim-scripts/taglist.vim'
+
+    Plug 'skywind3000/asyncrun.vim'
+        " $VIM_FILEPATH  - File name of current buffer with full path
+        " $VIM_FILENAME  - File name of current buffer without path
+        " $VIM_FILEDIR   - Full path of current buffer without the file name
+        " $VIM_FILEEXT   - File extension of current buffer
+        " $VIM_FILENOEXT - File name of current buffer without path and extension
+        " $VIM_CWD       - Current directory
+        " $VIM_RELDIR    - File path relativize to current directory
+        " $VIM_RELNAME   - File name relativize to current directory 
+        " $VIM_ROOT      - Project root directory
+        " $VIM_CWORD     - Current word under cursor
+        " $VIM_CFILE     - Current filename under cursor
+        " $VIM_GUI       - Is running under gui ?
+        " $VIM_VERSION   - Value of v:version
+        " $VIM_COLUMNS   - How many columns in vim's screen
+        " $VIM_LINES     - How many lines in vim's screen
+        " $VIM_SVRNAME   - Value of v:servername for +clientserver usage 
+        let g:asyncrun_open = 7
+        nnoremap <leader>ar :AsyncRun! 
+        " Compile current file
+        nnoremap <silent> <leader>aq1 :AsyncRun gcc -Wall -O2 "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
+        " Run it !
+        nnoremap <silent> <leader>aq2 :AsyncRun -raw -cwd=$(VIM_FILEDIR) "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
+        if has('win32') || has('win64')
+            noremap <silent><leader>aqe :AsyncRun! -cwd=<root> findstr /n /s /C:"<C-R><C-W>" 
+                        \ "\%CD\%\*.h" "\%CD\%\*.c*" <cr>
+        else
+            noremap <silent><leader>aqe :AsyncRun! -cwd=<root> grep -n -s -R <C-R><C-W> 
+                        \ --include='*.h' --include='*.c*' '<root>' <cr>
+        endif
 
 
 
