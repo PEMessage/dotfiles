@@ -359,7 +359,6 @@ call plug#begin(pe_runtimepath . '/plugged')
 
 
         noremap <leader>ft :BTags<CR>
-        noremap <leader>fgt :BTags<CR>
         nnoremap <leader>fbr :\<C-U>FzfxBranches<CR>
 
         nnoremap <leader>fg :\<C-U>FzfxLiveGrep<CR>
@@ -391,6 +390,16 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'gioele/vim-autoswap' 
         " set title titlestring=
         let g:autoswap_detect_tmux = 1
+
+    " vi 1976
+    " | \      more 1978
+    " |  \     /
+    " |   \   /
+    " |     v
+    " |   less 1983
+    " v
+    " vim 1991
+    Plug 'rkitover/vimpager'
 
 
         " ALT + =: toggle terminal below.
@@ -427,9 +436,9 @@ call plug#begin(pe_runtimepath . '/plugged')
     endif
    
 " Edit Experinece
-    Plug 'junegunn/vim-easy-align'
-        nmap ga <Plug>(EasyAlign)
-        xmap ga <Plug>(EasyAlign)
+    " Plug 'junegunn/vim-easy-align'
+    "     nmap ga <Plug>(EasyAlign)
+    "     xmap ga <Plug>(EasyAlign)
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-commentary'
     Plug 'tpope/vim-repeat'
@@ -451,7 +460,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         nmap / <Plug>(easymotion-sn)
         map <space> <Plug>(easymotion-s)
         " nunmap ds
-    " <leader>yr
+        " <leader>yr
     Plug 'vim-scripts/YankRing.vim'
         let vimd_path = expand('~/.cache/vim.d')
         if !isdirectory(vimd_path)
