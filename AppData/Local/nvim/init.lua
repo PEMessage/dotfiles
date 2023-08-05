@@ -66,7 +66,7 @@ PE.logo = {
 -- -------------------------------------------
 -- 3.4 Tab and Indent Setting
 -- -------------------------------------------
-    vim.o.tabstop     = 5                          -- Tab 长度，默认为8
+    vim.o.tabstop     = 4                          -- Tab 长度，默认为8
     vim.o.smarttab    = true                       -- 根据文件中其他地方的缩进空格个数来确定一个tab是多少个空格
     vim.o.expandtab   = true                       -- 展开Tab
 
@@ -101,15 +101,36 @@ require("lazy").setup({ --Start Quote
 -- -------------------------------------------
 -- 5.1 Style Plugin
 -- -------------------------------------------
-    --{
-    --    'olimorris/onedarkpro.nvim',
-    --    lazy = false,
-    --    priority = 1000,
-    --    config = function(_,opts)
-    --        require("onedarkpro").setup()
-    --       -- vim.cmd("colorscheme onedark")
-    --    end,
-    --},
+
+-- {
+--     'olimorris/onedarkpro.nvim',
+--     -- 'navarasu/onedark.nvim',
+--     config = function(_,opts)
+--         require('onedarkpro').setup {
+--             style = 'deep',
+--             colors = {
+--                 pe_gray = "#7c8dab",    -- define a new color
+--                 pe_blue = "#499cff",    -- define a new color
+--             },
+--             highlights = {
+--                 Comment = {fg = '${pe_gray}'},
+--                 ['@comment'] = {fg = '${pe_gray}'},
+--                 ['@lsp.type.comment'] = {fg = '${pe_gray}'},
+--             },
+--
+--             code_style = {
+--                 comments = 'none',
+--                 keywords = 'none',
+--                 functions = 'none',
+--                 strings = 'none',
+--                 variables = 'none'
+--             },
+--         }
+--         -- require('onedarkpro').load()
+--         vim.cmd("colorscheme onedark")
+--     end,
+--
+-- },
 {
     'keaising/im-select.nvim',
     enabled = function()
@@ -131,6 +152,8 @@ require("lazy").setup({ --Start Quote
 },
 {
     'navarasu/onedark.nvim',
+    lazy = false,
+    priority = 900,
     config = function(_,opts)
         require('onedark').setup {
             style = 'deep',
@@ -155,6 +178,15 @@ require("lazy").setup({ --Start Quote
         require('onedark').load()
     end,
 
+},
+{
+    'olimorris/onedarkpro.nvim',
+    lazy = true,
+    priority = 900,
+    config = function(_,opts)
+        require("onedarkpro").setup()
+        -- vim.cmd("colorscheme onedark")
+    end,
 },
 {
     'PEMessage/alpha-nvim',
@@ -246,7 +278,7 @@ require("lazy").setup({ --Start Quote
 {
     'akinsho/toggleterm.nvim',
     opts = {
-        open_mapping = [[<M-`>]],
+        open_mapping = [[<M-=>]],
     }
 },
 
@@ -383,6 +415,13 @@ require("lazy").setup({ --Start Quote
     },
 
 },
+
+-- {
+--     "gioele/vim-autoswap",
+--     config = function()
+--         vim.g.autoswap_detect_tmux = 1
+--     end
+-- },
 -- -------------------------------------------
 -- 5.2 Mini.nvim Plugin
 -- -------------------------------------------
@@ -441,7 +480,7 @@ require("lazy").setup({ --Start Quote
     -- ------ --
     keys = {
         { "<leader><leader>", "<cmd>Telescope <cr>", desc = "Telescope All" },
-        { "<leader>/", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "Search Buffer" },
+        -- { "<leader>/", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "Search Buffer" },
 
         {
             "<leader>fk",
@@ -475,7 +514,7 @@ require("lazy").setup({ --Start Quote
             function()
                 require('telescope.builtin').buffers(
                     require('telescope.themes').get_dropdown{
-                        previewer = false,
+                        -- previewer = false,
                         attach_mappings = function (_,map)
                             map( {'i','n'}, '<C-p>',
                                 function(...)
@@ -527,10 +566,30 @@ require("lazy").setup({ --Start Quote
             end,
             desc = "MRU"
         },
+        -- {
+        --     "<C-f>",
+        --     function()
+        --         require('telescope.builtin').current_buffer_fuzzy_find(
+        --             require('telescope.themes').get_dropdown({
+        --                 previewer = true,
+        --                 attach_mappings = function (_,map)
+        --                     map( {'i','n'}, '<C-f>',
+        --                         function(...)
+        --                             return require("telescope.actions").close(...)
+        --                         end
+        --                     )
+        --                     return true
+        --                 end,
+        --             })
+        --         )
+        --     end,
+        --     desc = "MRU"
+        -- },
 
         { "<leader>fm", "<cmd>Telescope man_pages<cr>", desc = "Man Pages" },
         { "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "Help Pages" },
-        { "<leader>ff", "<cmd>Telescope live_grep<cr>", desc = "Live Grep" },
+        { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find Files" },
+        { "<leader>fg", "<cmd>Telescope live_grep<cr>", desc = "Live Grep" },
 
 
     },
@@ -668,9 +727,38 @@ require("lazy").setup({ --Start Quote
         vim.keymap.set('', '<leader>hp', function()
             hop.hint_patterns()
         end, {remap=true, desc='Hop Pattern'})
+        -- vim.api.nvim_command('highlight default link HopPreview HopNextKey' )
     end
 },
-
+-- {
+--     "folke/flash.nvim",
+--     event = "VeryLazy",
+--     opts = {},
+--     -- stylua: ignore
+--     keys = {
+--         -- { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
+--         -- { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+--         { "<leader>sf", mode = { "n","c" },
+--         function()
+--             require("flash").jump({continue = true})
+--         end,
+--         desc = "Toggle Flash Search" },
+--     },
+-- },
+--
+-- {
+--     'woosaaahh/sj.nvim',
+--     config = function ()
+--         local sj = require("sj")
+--         sj.setup()
+--
+--         vim.keymap.set("n", "s", sj.run)
+--         vim.keymap.set("n", "<A-,>", sj.prev_match)
+--         vim.keymap.set("n", "<A-;>", sj.next_match)
+--         vim.keymap.set("n", "<localleader>s", sj.redo)
+--     end
+--
+-- },
 
 
 
@@ -836,6 +924,9 @@ require("lazy").setup({ --Start Quote
         -- lspconfig Config Zone
         -- --------------------------------
         -- vim.diagnostic.disable()
+        require'lspconfig'.ccls.setup{
+            -- filetypes = { "c", "cpp", "objc", "objcpp", "asm" },
+        }
         vim.api.nvim_create_autocmd('LspAttach', {
             group = vim.api.nvim_create_augroup('UserLspConfig', {}),
             callback = function(ev)
@@ -870,9 +961,17 @@ require("lazy").setup({ --Start Quote
             -- optionally use on_attach to set keymaps when aerial has attached to a buffer
             on_attach = function(bufnr)
                 -- Jump forwards/backwards with '{' and '}'
-                vim.keymap.set('n', '{', '<cmd>AerialPrev<CR>', {buffer = bufnr})
-                vim.keymap.set('n', '}', '<cmd>AerialNext<CR>', {buffer = bufnr})
-            end
+                -- vim.keymap.set('n', '{', '<cmd>AerialPrev<CR>', {buffer = bufnr})
+                -- vim.keymap.set('n', '}', '<cmd>AerialNext<CR>', {buffer = bufnr})
+            end,
+            filter_kind = {
+                "Variable",
+                "Constructor",
+                "Enum",
+                "Function",
+                "Method",
+                "Struct",
+            },
         })
         vim.keymap.set('n', '<leader>a', '<cmd>AerialToggle!<CR>')
     end,
@@ -1025,6 +1124,7 @@ require("lazy").setup({ --Start Quote
     -- Emacs-like Keymap
     vim.keymap.set('!','<C-a>','<home>')
     vim.keymap.set('!','<C-e>','<end>')
+    vim.keymap.set('n','ZA','<cmd>confirm quitall<CR>', { desc = "Quit All" })
 
     -- better up/down
     vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
@@ -1035,6 +1135,9 @@ require("lazy").setup({ --Start Quote
     vim.keymap.set("n", "<M-S-J>", "<C-W>j", { desc = "Go to lower window", remap = true })
     vim.keymap.set("n", "<M-S-K>", "<C-W>k", { desc = "Go to upper window", remap = true })
     vim.keymap.set("n", "<M-S-L>", "<C-W>l", { desc = "Go to right window", remap = true })
+
+    vim.keymap.set("n","<M-S-V>","<cmd>wincmd v<CR>",{ desc = "Vertical split", remap = true })
+    vim.keymap.set("n","<M-S-C>","<cmd>wincmd c<CR>",{ desc = "Close current pane", remap = true })
 
     -- Switch Buffer using <meta>+<shift>+pn
     vim.keymap.set("n", "<M-S-N>", "<cmd>bn<CR>", { desc = "Go to right window", remap = true })
@@ -1063,6 +1166,7 @@ require("lazy").setup({ --Start Quote
 -- -------------------------------------------
 -- 6.2 Leader Keymap
 -- -------------------------------------------
+    vim.keymap.set('n', '<leader>rce' , '<cmd>tabe $MYVIMRC<CR>' , { desc = ' Edit MYVIMRC ' } )
     vim.keymap.set('n', '<leader>``' , '<cmd>nohlsearch<CR>' , { desc = ' Close Highlight ' } )
 
     vim.keymap.set("n", "<leader>wp",
@@ -1117,6 +1221,7 @@ function PE.ToggleOpts(option, silent, values)
         end
     end
 end
+
 
 function PE.man()
     require("telescope.builtin").man_pages({
@@ -1179,5 +1284,8 @@ end
 -- end, {remap=true, desc='Hop to char'})
 
 -- end, {remap=true, desc='Hop to char'})
+
+
+
 
 
