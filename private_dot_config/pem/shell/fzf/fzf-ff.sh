@@ -1,51 +1,16 @@
-# ----------------------------------------- 
+#e ----------------------------------------- 
 # Change working Dir
 # dcd: use dirname to change dir
 # fcd: use filename to change dir
 # fff: fzf ranger like 
 # ----------------------------------------- 
-    # internal use cd
-    #
-    # LEGECY: USE `fzf | bcd` 
-    #
-    # 
-    # __fzf_cd(){
-    #     local fd_dir fd_t fd_cmd fzf_opt fzf_res
-    #     # File Or Dir Check
-    #     if [ "$1" = 'fcd' ]; then 
-    #         fd_t=' -type f '
-    #     else 
-    #         fd_t=' -type d '
-    #     fi
-    #
-    #     # Path Check
-    #     if [ "$2" = '.' ]; then 
-    #         fd_dir=' . '
-    #     elif [ \( "$2" = '*' \) -o \( -z "$2" \) ]; then
-    #         fd_dir=' * '
-    #     else 
-    #         fd_dir="$2" 
-    #     fi
-    #
-    #     # Get FzF result
-    #     fd_cmd='find '"$fd_dir $fd_t"
-    #     fzf_opt="--height ${FZF_TMUX_HEIGHT:-40%} --bind=ctrl-z:ignore --reverse"
-    #     fzf_res=$( eval $fd_cmd 2>/dev/null | eval "fzf $fzf_opt"  )
-    #     # If File , Get dirname
-    #     if [ "$1" = 'fcd' ]; then 
-    #         fzf_res=$(dirname $fzf_res) 
-    #     fi 
-    #     # CD to dir
-    #     cd "$fzf_res"
-    # }
-    
     # Implement
 
     fcd(){
         if [ "$#" -eq 0 ];then
             local path_arg='.'
         else
-            local path_arg="$1"
+            local path_arg="$@"
         fi
    
         local temp=`find "$path_arg" -type f | fzf`
@@ -58,7 +23,7 @@
         if [ "$#" -eq 0 ];then
             local path_arg='.'
         else
-            local path_arg="$1"
+            local path_arg="$@"
         fi
 
         local temp=`find "$path_arg" -type d | fzf | bcd --print`  
@@ -67,45 +32,23 @@
         fi
         cd `echo "$temp" | bcd --print`
     }
-    
-    # dcd(){
-    #     __fzf_cd "dcd" "$1"
-    # }
-    # alias f-dcd="dcd"
 
     f-ranger(){
         local res
-        while [ '1' = '1' ]
+        while true
         do
-            res=$( find .  -maxdepth 1 -type d | awk 'BEGIN{ print ".." } { print }'|
-                fzf --preview 'tree -C {} -L 2' --height 70%) 
+            res=$( find .  -maxdepth 1 | awk 'BEGIN{ print ".." } { print }'|
+                fzf --preview 'tree {} -L 2 || cat {} ' --height 90%) 
             if [ "$?" -ne 0 ];then
                 return 0
             fi
-            cd "$res"
+            cd `echo "$res" | bcd --print`
         done
     }
 
 # ----------------------------------------- 
 # fxf: take dir as parameter to search
 # ----------------------------------------- 
-    # fpf(){ 
-    #     if [ -z "$1" ]; then
-    #         local temp='.'
-    #     else
-    #         local temp="$1"
-    #     fi
-
-    #     while [ '1' = '1' ]
-    #     do
-            
-    #     done
-
-
-
-    #     local cmd="find $1 -type f"
-    #     eval "$cmd" | fzf --preview 'cat {}' 
-    # }
     fxf(){ 
         # all_name
         if [ "$#" -eq 0 ]; then
@@ -118,38 +61,44 @@
       
     }
 
-    __fzf_rg(){
-        local rg_res file_name line_num
-
-        rg_res=$(   RG_PREFIX="rg --column --line-number --no-heading --color=always --smart-case "
-                    INITIAL_QUERY="${*:-}"
-                    : | fzf --ansi --disabled --query "$INITIAL_QUERY" \
-                        --bind "change:reload:sleep 0.1; $RG_PREFIX {q} || true" \
-                        --delimiter : \
-                        --preview 'batcat --color=always {1} --highlight-line {2}' \
-                        --preview-window 'up,60%,border-bottom,+{2}+3/3,~3'  )
-        if [ "$?" -ne 0 ];then
-            return 0
-        fi
-        # echo "$rg_res"
-        file_name=$( echo "$rg_res" | cut -d ':' -f '1' )
-        line_num=$( echo "$rg_res" | cut -d ':' -f '2' )
-        vim "$file_name" +"$line_num"
-    }
-    # __fzf_history()
-    # {
-    #     local out=`cat $HISTFILE | fzf`
-    #     READLINE_LINE=${out#*$'\t'}
-    #     echo "$temp"
-    # }
-
-
-
-
 # ----------------------------------------- 
 # ff: other fzf base tools
 # ----------------------------------------- 
     ff(){
+    # ----------------------------------------- 
+    # __fzf_rg
+    # ----------------------------------------- 
+    __fzf_rg(){
+        local rg_res file_name line_num
+        if [ -n "$1" ] ; then
+            local RG_FILETYPE="-g \*.$1"
+            shift
+        else 
+            local RG_FILETYPE=""
+        fi
+
+        rg_res=$(   RG_PREFIX="rg --column --line-number --no-heading --color=always --smart-case "
+        INITIAL_QUERY="${*:-}"
+        : | fzf --ansi --disabled --query "$INITIAL_QUERY" \
+            --bind "change:reload:sleep 0.1; $RG_PREFIX $RG_FILETYPE -- {q} || true" \
+            --delimiter : \
+            --preview 'batcat --color=always {1} --highlight-line {2}' )
+            # --preview-window 'up,60%,border-bottom,+{2}+3/3,~3'  )
+                        if [ "$?" -ne 0 ];then
+                            return 0
+                        fi
+                        # echo "$rg_res"
+                        file_name=$( echo "$rg_res" | cut -d ':' -f '1' )
+                        line_num=$( echo "$rg_res" | cut -d ':' -f '2' )
+                        vim "$file_name" +"$line_num"
+    }
+    # ----------------------------------------- 
+    # __fzf_history
+    # ----------------------------------------- 
+
+    # ----------------------------------------- 
+    # Arguments 
+    # ----------------------------------------- 
         if [ "$1" = "apt" ]; then
             apt-cache search '' | sort | cut --delimiter ' ' --fields 1 |
                 fzf --multi --cycle --reverse --preview 'apt-cache show {1}' |
@@ -165,7 +114,8 @@
                 --preview='echo {}' --preview-window=down,3,wrap \
                 --layout=reverse --height=80% | awk '{print $2}' | xargs kill -9
         elif [ "$1" = "rg" ]; then
-            __fzf_rg
+            shift
+            __fzf_rg $1
         else 
             echo -e '
             ff ps: process show, select and kill 
