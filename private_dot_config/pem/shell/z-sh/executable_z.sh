@@ -215,12 +215,11 @@ _z() {
         [ -f "$datafile" ] || return
 
         if [ "$typ" = "mark" ]; then
-           local temp=` _z_dirs | awk -F"|" '
+            _z_dirs | awk -F"|" '
                 $4 != "" {
                     print  "Mark:" $4 "   |" $1
                 }
-            ' `
-            echo $temp
+            ' 
             return 0
 
         fi
@@ -480,6 +479,6 @@ alias cdt='z-fzf -t '
 alias cdr='z-fzf -r '
 alias cdd='z-fzf -d '
 alias cdm='z-fzf -m '
-alias md='z-mark '
+alias dm='z-mark '
 
 
