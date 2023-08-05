@@ -243,15 +243,16 @@ let g:startify_custom_header = [
     "    CTRL-J 同回车（有两个码 0x0d 或 0x0a），C-J是0x0d，硬回车是0x0a，没人按这个，覆盖。
     "    CTRL-K 输入 digraph，比如可以用来输入欧洲文字，不需要，实在需要可以把这个功能挪给 INSERT模式下的 CTRL-B （空闲），或者 <c-x><c-k> ，完全可以覆盖。
     "    CTRL-L 重绘，很少用，自己可以把他挪到 <leader>r 之类的键去多干净，覆盖。
-    nnoremap <silent><M-S-H> :wincmd h<CR>
-    nnoremap <silent><M-S-L> :wincmd l<CR>
-    nnoremap <silent><M-S-J> :wincmd j<CR>
-    nnoremap <silent><M-S-K> :wincmd k<CR>
+    " nnoremap <silent><M-S-H> :wincmd h<CR>
+    " nnoremap <silent><M-S-L> :wincmd l<CR>
+    " nnoremap <silent><M-S-J> :wincmd j<CR>
+    " nnoremap <silent><M-S-K> :wincmd k<CR>
 
     tnoremap <silent><M-S-H> <C-W>:wincmd h<CR>
     tnoremap <silent><M-S-L> <C-W>:wincmd l<CR>
     tnoremap <silent><M-S-J> <C-W>:wincmd j<CR>
     tnoremap <silent><M-S-K> <C-W>:wincmd k<CR>
+
 
     nnoremap <silent> j gj
     nnoremap <silent> k gk
@@ -495,7 +496,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         nmap <Leader>vl :VimuxRunLastCommand<CR>
         nmap <Leader>vp :VimuxPromptCommand<CR>
         " nmap <Leader>vo :VimuxOpenRunner<CR>
-    Plug 'gioele/vim-autoswap' 
+    Plug 'gioele/vim-autoswap'
         let g:autoswap_detect_tmux = 1
         " set title titlestring=
         " ALT + =: toggle terminal below.
@@ -510,13 +511,28 @@ call plug#begin(pe_runtimepath . '/plugged')
         "
         " 另外从 vim 寄存器到 终端粘贴内容的操作因为 vim/nvim 不一样
         " vim 的终端粘贴是在终端 insert 模式下按 termkey + " + 寄存器 ，termkey 在这个脚本里是 <c-_>
-    Plug 'skywind3000/vim-terminal-help'
-        tnoremap <C-[><C-[> <c-\><c-n>:bdelete! %<CR>
-        let g:terminal_key = '<leader>='
+    " Plug 'skywind3000/vim-terminal-help'
+    "     tnoremap <C-[><C-[> <c-\><c-n>:bdelete! %<CR>
+    "     let g:terminal_key = '<leader>='
         " let g:terminal_key = '<M-`>'
     " Plug 'voldikss/vim-floaterm'
         " nnoremap <M-`> :FloatermToggle! Default<CR>
         " nnoremap <leader>ft :FloatermToggle! Default<CR>
+    Plug 'christoomey/vim-tmux-navigator'
+        let g:tmux_navigator_no_mappings = 1
+        noremap  <M-S-h> :<C-U>TmuxNavigateLeft<cr>
+        noremap  <M-S-j> :<C-U>TmuxNavigateDown<cr>
+        noremap  <M-S-k> :<C-U>TmuxNavigateUp<cr>
+        noremap  <M-S-l> :<C-U>TmuxNavigateRight<cr>
+        " Tmux Like
+        nnoremap <silent><M-S-%> :vsplit<CR>
+        nnoremap <silent><M-S-X> :wincmd c<CR>
+
+
+        " noremap  <C-h> :<C-U>TmuxNavigateLeft<cr>
+        " noremap  <C-j> :<C-U>TmuxNavigateDown<cr>
+        " noremap  <C-k> :<C-U>TmuxNavigateUp<cr>
+        " noremap  <C-l> :<C-U>TmuxNavigateRight<cr>
 
 " Tag and Quickfix
     Plug 'ludovicchabant/vim-gutentags'

@@ -1136,6 +1136,9 @@ require("lazy").setup({ --Start Quote
     vim.keymap.set("n", "<M-S-K>", "<C-W>k", { desc = "Go to upper window", remap = true })
     vim.keymap.set("n", "<M-S-L>", "<C-W>l", { desc = "Go to right window", remap = true })
 
+    vim.keymap.set("n","<M-S-V>","<cmd>wincmd v<CR>",{ desc = "Vertical split", remap = true })
+    vim.keymap.set("n","<M-S-C>","<cmd>wincmd c<CR>",{ desc = "Close current pane", remap = true })
+
     -- Switch Buffer using <meta>+<shift>+pn
     vim.keymap.set("n", "<M-S-N>", "<cmd>bn<CR>", { desc = "Go to right window", remap = true })
     vim.keymap.set("n", "<M-S-P>", "<cmd>bp<CR>", { desc = "Go to right window", remap = true })
