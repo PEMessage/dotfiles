@@ -29,9 +29,14 @@ RunAdmin()
 #Hotif WinActive("ahk_exe YuanShen.exe")
     Xbutton1::{
         Send "f"
-        Sleep 100
+        Send "{WheelDown}"
+        Sleep 150
         Send "f"
-        Sleep 100
+        Send "{WheelDown}"
+        Sleep 150
+        Send "f"
+        Send "{WheelDown}"
+        Sleep 150
         Send "f"
     }
 #Hotif
