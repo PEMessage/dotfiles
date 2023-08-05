@@ -5,6 +5,9 @@ GroupAdd "chrome_base", "ahk_class Chrome_WidgetWin_1"
 GroupAdd "vscode", "ahk_exe Code.exe"
 GroupAdd "edge", "ahk_exe msedge.exe"
 
+GroupAdd "ai_full", "ahk_exe Magpie.exe"
+GroupAdd "ai_full", "ahk_exe LunaTranslator_main.exe"
+
 
 #include "../lib/PE.ah2"
 

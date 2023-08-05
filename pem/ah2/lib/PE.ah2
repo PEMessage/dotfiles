@@ -142,6 +142,19 @@ class PE {   ; Pure Function Class(Just like a namespace)
             url := "http://" url
         return url
     }
+;Sub Clipboard
+    SubSign(textContent)
+    {
+        keywords := [
+                ["，", ", "], 
+                ["。", ". "],
+                ["！","! "]
+            ]
+        loop  keywords.Length {
+            textContent := StrReplace(textContent, keywords[A_Index][1], keywords[A_Index][2])
+        }
+        return textContent
+    }
 
 
 
