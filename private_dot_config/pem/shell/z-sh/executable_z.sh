@@ -478,6 +478,7 @@ z-mark(){
 alias cdt='z-fzf -t '
 alias cdr='z-fzf -r '
 alias cdd='z-fzf -d '
+# alias c='z-fzf -d '
 alias cdm='z-fzf -m '
 alias dm='z-mark '
 

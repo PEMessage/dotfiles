@@ -415,13 +415,24 @@ require("lazy").setup({ --Start Quote
     },
 
 },
-
+--
 -- {
 --     "gioele/vim-autoswap",
 --     config = function()
 --         vim.g.autoswap_detect_tmux = 1
 --     end
 -- },
+{
+    "christoomey/vim-tmux-navigator",
+    config = function()
+        vim.g.tmux_navigator_no_mappings = 1
+        vim.keymap.set( 'n',  '<M-S-h>', ':<C-U>TmuxNavigateLeft<cr>'  )
+        vim.keymap.set( 'n',  '<M-S-j>', ':<C-U>TmuxNavigateDown<cr>'  )
+        vim.keymap.set( 'n',  '<M-S-k>', ':<C-U>TmuxNavigateUp<cr>'    )
+        vim.keymap.set( 'n',  '<M-S-l>', ':<C-U>TmuxNavigateRight<cr>' )
+
+    end
+},
 -- -------------------------------------------
 -- 5.2 Mini.nvim Plugin
 -- -------------------------------------------
@@ -777,14 +788,15 @@ require("lazy").setup({ --Start Quote
         vim.g.VM_maps = {
             ['Find Under']          = '<C-d>',
             ['Find Subword Under']  = '<C-d>',
+            ['Exit']                = '<C-c>',
             -- Arrow Key
-            ["Add Cursor Up"]       = '<M-C-Up>',
-            ["Add Cursor Down"]     = '<M-C-Down>',
+            -- ["Add Cursor Up"]       = '<M-C-Up>',
+            -- ["Add Cursor Down"]     = '<M-C-Down>',
             -- Mouse
             ["Mouse Cursor"]        = '<C-LeftMouse>',
             -- Multi-Mode
             ["Align"]               = '<C-A>',
-            ["Enlarge"]             = "+",
+            ["Enlarge"]             = "=",
             ["Shrink"]              = "-",
         }
     end,
@@ -1131,13 +1143,19 @@ require("lazy").setup({ --Start Quote
     vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 
     -- Move to window using the <meta>+<shift>+hjkl keys
-    vim.keymap.set("n", "<M-S-H>", "<C-W>h", { desc = "Go to left window", remap = true })
-    vim.keymap.set("n", "<M-S-J>", "<C-W>j", { desc = "Go to lower window", remap = true })
-    vim.keymap.set("n", "<M-S-K>", "<C-W>k", { desc = "Go to upper window", remap = true })
-    vim.keymap.set("n", "<M-S-L>", "<C-W>l", { desc = "Go to right window", remap = true })
+    -- vim.keymap.set("n", "<M-S-H>", "<C-W>h", { desc = "Go to left window", remap = true })
+    -- vim.keymap.set("n", "<M-S-J>", "<C-W>j", { desc = "Go to lower window", remap = true })
+    -- vim.keymap.set("n", "<M-S-K>", "<C-W>k", { desc = "Go to upper window", remap = true })
+    -- vim.keymap.set("n", "<M-S-L>", "<C-W>l", { desc = "Go to right window", remap = true })
 
-    vim.keymap.set("n","<M-S-V>","<cmd>wincmd v<CR>",{ desc = "Vertical split", remap = true })
-    vim.keymap.set("n","<M-S-C>","<cmd>wincmd c<CR>",{ desc = "Close current pane", remap = true })
+    -- vim.keymap.set("n","<M-S-V>","<cmd>wincmd v<CR>",{ desc = "Vertical split", remap = true })
+    -- vim.keymap.set("n","<M-S-C>","<cmd>wincmd c<CR>",{ desc = "Close current pane", remap = true })
+    vim.keymap.set( 'n',  '<M-S-C>', ':vsplit<cr>' )
+    vim.keymap.set( 'n',  '<M-S-X>', ':confirm q<cr>' )
+
+    vim.keymap.set( 'n',  '<M-S-E>', ':tabn<cr>' )
+    vim.keymap.set( 'n',  '<M-S-W>', ':tab new<cr>' )
+    vim.keymap.set( 'n',  '<M-S-Q>', ':tabp<cr>' )
 
     -- Switch Buffer using <meta>+<shift>+pn
     vim.keymap.set("n", "<M-S-N>", "<cmd>bn<CR>", { desc = "Go to right window", remap = true })

@@ -488,7 +488,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:VM_maps["Exit"]                = '<C-c>'   " quit VM
         let g:VM_maps["Mouse Cursor"]        = '<C-LeftMouse>'
         let g:VM_maps["Align"]               = '<C-a>'
-        let g:VM_maps["Enlarge"]             = "+"
+        let g:VM_maps["Enlarge"]             = "="
         let g:VM_maps["Shrink"]              = "-"
 
 " Tmux and Terminal
@@ -520,13 +520,18 @@ call plug#begin(pe_runtimepath . '/plugged')
         " nnoremap <leader>ft :FloatermToggle! Default<CR>
     Plug 'christoomey/vim-tmux-navigator'
         let g:tmux_navigator_no_mappings = 1
-        noremap  <M-S-h> :<C-U>TmuxNavigateLeft<cr>
-        noremap  <M-S-j> :<C-U>TmuxNavigateDown<cr>
-        noremap  <M-S-k> :<C-U>TmuxNavigateUp<cr>
-        noremap  <M-S-l> :<C-U>TmuxNavigateRight<cr>
+        noremap  <silent><M-S-h> :<C-U>TmuxNavigateLeft<cr>
+        noremap  <silent><M-S-j> :<C-U>TmuxNavigateDown<cr>
+        noremap  <silent><M-S-k> :<C-U>TmuxNavigateUp<cr>
+        noremap  <silent><M-S-l> :<C-U>TmuxNavigateRight<cr>
         " Tmux Like
-        nnoremap <silent><M-S-%> :vsplit<CR>
-        nnoremap <silent><M-S-X> :wincmd c<CR>
+        nnoremap <silent><M-S-C> :vsplit<CR>
+        nnoremap <silent><M-S-X> :confirm q<CR>
+
+        nnoremap <silent><M-S-E> :tabn<CR>
+        nnoremap <silent><M-S-W> :tab new<CR>
+        nnoremap <silent><M-S-Q> :tabp<CR>
+        " 
 
 
         " noremap  <C-h> :<C-U>TmuxNavigateLeft<cr>
