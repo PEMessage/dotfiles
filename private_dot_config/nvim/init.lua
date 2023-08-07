@@ -426,10 +426,10 @@ require("lazy").setup({ --Start Quote
     "christoomey/vim-tmux-navigator",
     config = function()
         vim.g.tmux_navigator_no_mappings = 1
-        vim.keymap.set( 'n',  '<M-S-h>', ':<C-U>TmuxNavigateLeft<cr>'  )
-        vim.keymap.set( 'n',  '<M-S-j>', ':<C-U>TmuxNavigateDown<cr>'  )
-        vim.keymap.set( 'n',  '<M-S-k>', ':<C-U>TmuxNavigateUp<cr>'    )
-        vim.keymap.set( 'n',  '<M-S-l>', ':<C-U>TmuxNavigateRight<cr>' )
+        vim.keymap.set( 'n',  '<M-S-h>', ':<C-U>TmuxNavigateLeft<cr>' , { silent = true, desc = "Navigate Left"  } )
+        vim.keymap.set( 'n',  '<M-S-j>', ':<C-U>TmuxNavigateDown<cr>' , { silent = true, desc = "Navigate Down"  } )
+        vim.keymap.set( 'n',  '<M-S-k>', ':<C-U>TmuxNavigateUp<cr>'   , { silent = true, desc = "Navigate Up"    } )
+        vim.keymap.set( 'n',  '<M-S-l>', ':<C-U>TmuxNavigateRight<cr>', { silent = true, desc = "Navigate Right" } )
 
     end
 },
