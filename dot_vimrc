@@ -299,7 +299,7 @@ let g:startify_custom_header = [
     let g:netrw_hide = 1
 
     autocmd FileType netrw call s:RemoveNetrwMap()
-    function s:RemoveNetrwMap()
+    function! s:RemoveNetrwMap()
         if hasmapto('<Plug>NetrwRefresh')
         " Unmap Netrw Keybind
             unmap <buffer> <C-I>
@@ -694,14 +694,14 @@ call plug#begin(pe_runtimepath . '/plugged')
             endwhile
             copen   " Quickfix window is not open, so open it
         endfunction
-        " Call the function to setup the autocmd
+        " Call the function! to setup the autocmd
     " -------------------------------------------
     " Quicktoggle
     " -------------------------------------------
         noremap <silent> go :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
         nnoremap <leader>cc  :call ToggleQuickfix()<CR>
-        nnoremap <S-F11> :call QuickfixArrowPreview('j')<CR>
-        nnoremap <S-F12> :call QuickfixArrowPreview('k')<CR>
+        nnoremap <S-F12> :call QuickfixArrowPreview('j')<CR>
+        nnoremap <S-F11> :call QuickfixArrowPreview('k')<CR>
 
 " Auto Popup
     Plug 'skywind3000/vim-auto-popmenu'
@@ -824,7 +824,7 @@ call plug#end()
     \ '[', ']'   
     \ ]
     " Stay in c-w prefix
-    function PEWinMode()
+    function! PEWinMode()
         echo "VIM Windows Mode"
         while(1)
             let follow = nr2char(getchar())
@@ -841,7 +841,7 @@ call plug#end()
     " nnoremap <silent><C-w> :PEWinMode<CR>
 
     " TimeStamp in english or locale language 
-    function PEDate(lang)
+    function! PEDate(lang)
         if a:lang == "en"
             let l:temp_lc_time = v:lc_time
             exec "normal :language time en_US.UTF-8\<CR>"
@@ -856,7 +856,7 @@ call plug#end()
 
     command! PEDate :call PEDate("en")
     " Surround Viusal Zone
-    function PESurroundViusalZone()
+    function! PESurroundViusalZone()
         echo "VIM Surround"
         let follow = nr2char(getchar())
         if index( s:exitKeyList , follow ) >= 0
@@ -888,7 +888,7 @@ call plug#end()
     endfunction
     noremap <silent><leader>sr :call PESurroundViusalZone()<CR>
 
-    " function PEToggleReadonly()
+    " function! PEToggleReadonly()
     "     set readonly!
     "     set modifiable
     " endfunction
