@@ -56,6 +56,7 @@ PE.logo = {
     vim.o.ruler        = true            -- 显示光标位置
     vim.o.ffs          = 'unix,dos,mac' -- 文件换行符，默认使用 unix 换行符
     vim.o.mouse        = 'a'
+    vim.o.diffopt = "linematch:60"
 -- -------------------------------------------
 -- 3.3 Search Zone
 -- -------------------------------------------
@@ -321,6 +322,12 @@ require("lazy").setup({ --Start Quote
         -- configurations go here
     },
 
+},
+{
+    'lewis6991/gitsigns.nvim',
+    config = function ()
+        require('gitsigns').setup()
+    end
 },
 -- {
 --     "nvim-neo-tree/neo-tree.nvim",
