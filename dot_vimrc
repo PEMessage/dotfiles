@@ -431,8 +431,8 @@ call plug#begin(pe_runtimepath . '/plugged')
         augroup colorextend
             autocmd!
             " Override the `Identifier` background color in GUI mode
-            autocmd ColorScheme * call onedark#extend_highlight("Search", { "gui" : "underline,bold,italic,standout",  "bg": { "gui": "#4e5466" } , "fg" : {"gui":"yellow" }})
-            autocmd ColorScheme * call onedark#extend_highlight("IncSearch", { "gui" : "underline,bold,italic,standout",  "bg": { "gui": "#4e5466" } , "fg" : {"gui":"yellow" }})
+            autocmd ColorScheme * call onedark#extend_highlight("Search", { "gui" : "underline,bold,italic,standout",  "bg": { "gui": "#444959" } , "fg" : {"gui":"yellow" }})
+            autocmd ColorScheme * call onedark#extend_highlight("IncSearch", { "gui" : "underline,bold,italic,standout",  "bg": { "gui": "#444959" } , "fg" : {"gui":"yellow" }})
 
             autocmd ColorScheme * call onedark#extend_highlight("QuickFixLine", { "gui" : "underline",  "bg": { "gui": "NONE" } , "fg" : {"gui":"yellow" }})
             autocmd ColorScheme * highlight QuickFixLineScope gui=underline guifg=#e5c07b
@@ -453,6 +453,8 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'luochen1990/rainbow'
         let g:rainbow_active = 0 "0 if you want to enable it later via :RainbowToggle
         let g:cursorword_delay = 600
+    Plug 'ARM9/arm-syntax-vim'
+        autocmd BufNewFile,BufRead *.s,*.S set filetype=arm " arm = armv6/7
 
 
     " vi 1976
