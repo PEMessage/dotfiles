@@ -195,6 +195,9 @@ function q-whois () {
 }
 
 
+function q-littlebig () {
+    [[ "$(printf '\01\03' | hexdump)" == *0103* ]] && echo big || echo little
+}
 # function q-weather {
 # 	local city="${1:-xiamen}"
 # 	if [ -x "$(which wget)" ]; then
