@@ -63,6 +63,10 @@ let g:startify_custom_header = [
       source $MYVIMRC
     endif
 
+    let g:pe_cachedir = expand('~/.cache/vim')
+    if !isdirectory(pe_cachedir)
+        call mkdir(pe_cachedir, "p")
+    endif
 
 " 3. Some General Setting
 " ===========================================
@@ -284,6 +288,10 @@ let g:startify_custom_header = [
     nnoremap <leader>gp  `[v`]
     nnoremap gp  `[v`]
 
+    command! PCD execute 'cd' .. expand('%:p:h')
+    command! PFile echo  expand('%:p')
+
+
     vnoremap <cr> iwoiwo
 
 " Netrw
@@ -446,6 +454,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'mhinz/vim-startify'
         nnoremap <leader>st :tab new<CR>:Startify<CR> " Most Recent File MRF
         nnoremap <leader>sb :Startify<CR> " Most Recent File MRF
+        let g:startify_session_dir = pe_cachedir .. "/session"
     " Plug 'ap/vim-buftabline'
    
     Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
@@ -539,12 +548,12 @@ call plug#begin(pe_runtimepath . '/plugged')
         " nunmap ds
         " <leader>yr
     Plug 'vim-scripts/YankRing.vim'
-        let vimd_path = expand('~/.cache/vim')
-        if !isdirectory(vimd_path)
-            call mkdir(vimd_path, "p")
-        endif
+        " let vimd_path = 
+        " if !isdirectory(vimd_path)
+        "     call mkdir(vimd_path, "p")
+        " endif
 
-        let g:yankring_history_dir = expand('~/.cache/vim')
+        let g:yankring_history_dir = pe_cachedir
         nnoremap <silent> <leader>yy :YRShow<CR>
         let yankring_min_element_length = 2
         let g:yankring_paste_using_g = 0
