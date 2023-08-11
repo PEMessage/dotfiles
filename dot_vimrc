@@ -670,7 +670,7 @@ call plug#begin(pe_runtimepath . '/plugged')
 
         noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr>
         noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
-        noremap <silent> zg         :GscopeFind g <C-R><C-W><cr>
+        noremap <silent> zg         :GscopeFind g <C-R><C-W><cr>:call QuickfixArrowPreview('j')<cr>
 
         noremap <silent> <leader>gc :GscopeFind c <C-R><C-W><cr>
         noremap <silent> <leader>gd :GscopeFind d <C-R><C-W><cr>
