@@ -30,14 +30,15 @@
     # emulate -lLR zsh  -> list all opt
     # setopt -> list opt differnt to default
     setopt AUTO_CD #No exec -> cd to it
+    setopt no_nomatch
     bindkey -e
 
 # -----------------------------------------
 # History Setting Zone
 # -----------------------------------------
     HISTFILE=$HOME/.local/share/zsh/zsh_history
-    HISTSIZE=1000
-    SAVEHIST=1000
+    HISTSIZE=2500
+    SAVEHIST=2500
     [ -e "$HISTFILE" ] || mkdir -p `dirname $HISTFILE` ; touch "$HISTFILE"
         
 

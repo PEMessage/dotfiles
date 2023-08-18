@@ -242,6 +242,32 @@
             done
         fi 
     done
+
+    if [ -n "$BASH_VERSION" ] ; then
+        for d in "${PEMHOME}"/shell/* ; do 
+            if [ -d "$d" ] ; then
+                # echo "$d"
+                for f in "$d"/*.bash ; do 
+                    if [ -f "$f" ] ; then
+                        source "$f"
+                    fi
+                done
+            fi 
+        done
+    fi
+
+    if [ -n "$ZSH_VERSION" ] ; then
+        for d in "${PEMHOME}"/shell/* ; do 
+            if [ -d "$d" ] ; then
+                # echo "$d"
+                for f in "$d"/*.zsh ; do 
+                    if [ -f "$f" ] ; then
+                        source "$f"
+                    fi
+                done
+            fi 
+        done
+    fi
     
     if [ -f "${PEM_CACHE_HOME}/shell/init-sh.sh" ] ; then
         source "${PEM_CACHE_HOME}/shell/init-sh.sh"

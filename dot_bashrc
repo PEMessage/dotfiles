@@ -5,6 +5,11 @@
 [[ $- != *i* ]] && return
 
 
+HISTSIZE=2500
+HISTFILESIZE=2500
+HISTCONTROL=ignoredups:erasedups
+shopt -s histappend
+PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 
 # -----------------------------------------
 # PS1 Setting
