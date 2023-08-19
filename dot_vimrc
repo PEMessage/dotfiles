@@ -544,12 +544,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:EasyMotion_use_upper = 1
         
         nmap / <Plug>(easymotion-sn)
-        " map <space> <Plug>(easymotion-s)
-    Plug 'justinmk/vim-sneak'
-        " map f <Plug>Sneak_f
-        " map F <Plug>Sneak_F
-        " map t <Plug>Sneak_t
-        " map T <Plug>Sneak_T
+        map <space> <Plug>(easymotion-s)
         " nunmap ds
         " <leader>yr
     Plug 'vim-scripts/YankRing.vim'
@@ -630,6 +625,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         set tags=./.tags;,.tags
         let g:gutentags_project_root = ['.root','.project']
         let g:gutentags_add_default_project_roots = 1
+        let g:gutentags_add_ctrlp_root_markers = 0
         " 所生成的数据文件的名称
         let g:gutentags_ctags_tagfile = '.tags'
         " 同时开启 ctags 和 gtags 支持：
@@ -672,6 +668,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         " 9 or a: Find places where this symbol is assigned a value
     Plug 'skywind3000/gutentags_plus'
         let g:gutentags_plus_nomap = 1
+        let g:gutentags_plus_height = 5
 
         noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr>
         noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
