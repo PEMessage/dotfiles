@@ -1,0 +1,63 @@
+-A If VViimm has been compiled with ARABIC support for editing right-to-left oriented files and Arabic keyboard mapping, this option starts VViimm in Arabic mode, i.e. 'arabic' is set. Otherwise an error message is given and VViimm aborts.
+-b Binary mode. A few options will be set that makes it possible to edit a binary or executable file.
+-c {command} {command} will be executed after the first file has been read. {command} is interpreted as an Ex command. If the {command} contains spaces it must be enclosed in double quotes (this depends on the shell that is used). Example: vim "+set si" main.c Note: You can use up to 10 "+" or "-c" commands.
+-C Compatible. Set the 'compatible' option. This will make VViimm behave mostly like Vi, even though a .vimrc file exists.
+--clean Do not use any personal configuration (vimrc, plugins, etc.). Useful to see if a problem reproduces with a clean Vim setup.
+--cmd {command} Like using "-c", but the command is executed just before processing any vimrc file. You can use up to 10 of these commands, independently from "-c" commands.
++{command} {command} will be executed after the first file has been read. {command} is interpreted as an Ex command. If the {command} contains spaces it must be enclosed in double quotes (this depends on the shell that is used). Example: vim "+set si" main.c Note: You can use up to 10 "+" or "-c" commands.
+-D Debugging. Go to debugging mode when executing the first command from a script.
+-- Denotes the end of the options. Arguments after this will be handled as a file name. This can be used to edit a filename that starts with a '-'.
+-d Start in diff mode. There should between two to eight file name arguments. VViimm will open all the files and show differences between them. Works like vimdiff(1).
+--echo-wid GTK GUI only: Echo the Window ID on stdout.
+-e Start VViimm in Ex mode, just like the executable was called "ex".
+-E Start VViimm in improved Ex mode, just like the executable was called "exim".
+-f Foreground. For the GUI version, VViimm will not fork and detach from the shell it was started in. On the Amiga, VViimm is not restarted to open a new window. This option should be used when VViimm is executed by a program that will wait for the edit session to finish (e.g. mail). On the Amiga the ":sh" and ":!" commands will not work.
+-F If VViimm has been compiled with FKMAP support for editing right-to-left oriented files and Farsi keyboard mapping, this option starts VViimm in Farsi mode, i.e. 'fkmap' and 'rightleft' are set. Otherwise an error message is given and VViimm aborts.
+-g If VViimm has been compiled with GUI support, this option enables the GUI. If no GUI support was compiled in, an error message is given and VViimm aborts.
+--help Give a help message and exit, just like "-h".
+-h Give a bit of help about the command line arguments and options. After this VViimm exits.
+-H If VViimm has been compiled with RIGHTLEFT support for editing right-to-left oriented files and Hebrew keyboard mapping, this option starts VViimm in Hebrew mode, i.e. 'hkmap' and 'rightleft' are set. Otherwise an error message is given and VViimm aborts.
+-i {viminfo} Specifies the filename to use when reading or writing the viminfo file, instead of the default "~/.viminfo". This can also be used to skip the use of the .viminfo file, by giving the name "NONE".
+--literal Take file name arguments literally, do not expand wildcards. This has no effect on Unix where the shell expands wildcards.
+-l Lisp mode. Sets the 'lisp' and 'showmatch' options on.
+-L Same as -r.
+-M Modifications not allowed. The 'modifiable' and 'write' options will be unset, so that changes are not allowed and files can not be written. Note that these options can be set to enable making modifications.
+-m Modifying files is disabled. Resets the 'write' option. You can still modify the buffer, but writing a file is not possible.
+-nb Become an editor server for NetBeans. See the docs for details.
+-N No-compatible mode. Resets the 'compatible' option. This will make VViimm behave a bit better, but less Vi compatible, even though a .vimrc file does not exist.
+-n No swap file will be used. Recovery after a crash will be impossible. Handy if you want to edit a file on a very slow medium (e.g. floppy). Can also be done with ":set uc=0". Can be undone with ":set uc=200".
+--nofork Foreground. For the GUI version, VViimm will not fork and detach from the shell it was started in.
+--noplugin Skip loading plugins. Implied by -u NONE.
++[num]For the first file the cursor will be positioned on line "num". If "num" is missing, the cursor will be positioned on the last line.
+-O[N]Open N windows side by side. When N is omitted, open one window for each file.
+-o[N]Open N windows stacked. When N is omitted, open one window for each file.
++/{pat} For the first file the cursor will be positioned in the line with the first occurrence of {pat}. See ":help search-pattern" for the available search patterns.
+-p[N]Open N tab pages. When N is omitted, open one tab page for each file.
+-q [errorfile] Start in quickFix mode. The file [errorfile] is read and the first error is displayed. If [errorfile] is omitted, the filename is obtained from the 'errorfile' option (defaults to "AztecC.Err" for the Amiga, "errors.err" on other systems). Further errors can be jumped to with the ":cn" command. See ":help quickfix".
+--remote Connect to a Vim server and make it edit the files given in the rest of the arguments. If no server is found a warning is given and the files are edited in the current Vim.
+--remote-expr {expr} Connect to a Vim server, evaluate {expr} in it and print the result on stdout.
+--remote-send {keys} Connect to a Vim server and send {keys} to it.
+--remote-silent As --remote, but without the warning when no server is found.
+--remote-wait As --remote, but Vim does not exit until the files have been edited.
+--remote-wait-silent As --remote-wait, but without the warning when no server is found.
+-r List swap files, with information about using them for recovery.
+-R Read-only mode. The 'readonly' option will be set. You can still edit the buffer, but will be prevented from accidentally overwriting a file. If you do want to overwrite a file, add an exclamation mark to the Ex command, as in ":w!". The -R option also implies the -n option (see above). The 'readonly' option can be reset with ":set noro". See ":help 'readonly'".
+--serverlist List the names of all Vim servers that can be found.
+--servername {name} Use {name} as the server name. Used for the current Vim, unless used with a --remote argument, then it's the name of the server to connect to.
+-S {file} {file} will be sourced after the first file has been read. This is equivalent to -c "source {file}". {file} cannot start with '-'. If {file} is omitted "Session.vim" is used (only works when -S is the last argument).
+--socketid {id} GTK GUI only: Use the GtkPlug mechanism to run gvim in another window.
+-s Silent mode. Only when started as "Ex" or when the "-e" option was given before the "-s" option.
+--startuptime {file} During startup write timing messages to the file {fname}.
+-t {tag} The file to edit and the initial cursor position depends on a "tag", a sort of goto label. {tag} is looked up in the tags file, the associated file becomes the current file and the associated command is executed. Mostly this is used for C programs, in which case {tag} could be a function name. The effect is that the file containing that function becomes the current file and the cursor is positioned on the start of the function. See ":help tag-commands".
+-T {terminal} Tells VViimm the name of the terminal you are using. Only required when the automatic way doesn't work. Should be a terminal known to VViimm (builtin) or defined in the termcap or terminfo file.
+-U {gvimrc} Use the commands in the file {gvimrc} for GUI initializations. All the other GUI initializations are skipped. It can also be used to skip all GUI initializations by giving the name "NONE". See ":help gui-init" within vim for more details.
+-u {vimrc} Use the commands in the file {vimrc} for initializations. All the other initializations are skipped. Use this to edit a special kind of files. It can also be used to skip all initializations by giving the name "NONE". See ":help initialization" within vim for more details.
+--version Print version information and exit.
+-V[N]Verbose. Give messages about which files are sourced and for reading and writing a viminfo file. The optional number N is the value for 'verbose'. Default is 10.
+-v Start VViimm in Vi mode, just like the executable was called "vi". This only has effect when the executable is called "ex".
+-w {scriptout} All the characters that you type are recorded in the file {scriptout}, until you exit VViimm.. This is useful if you want to create a script file to be used with "vim -s" or ":source!". If the {scriptout} file exists, characters are appended.
+-W {scriptout} Like -w, but an existing file is overwritten.
+-X Don't connect to the X server. Shortens startup time in a terminal, but the window title and clipboard will not be used.
+-x Use encryption when writing files. Will prompt for a crypt key.
+-y Start VViimm in easy mode, just like the executable was called "evim" or "eview". Makes VViimm behave like a click-and-type editor.
+-Z Restricted mode. Works like the executable starts with "r".

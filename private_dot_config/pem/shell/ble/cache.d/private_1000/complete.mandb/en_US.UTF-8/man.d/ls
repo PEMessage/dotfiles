@@ -1,0 +1,83 @@
+-1 list one file per line. Avoid '\n' with --qq or --bb
+-a do not ignore entries starting with .
+-A do not list implied . and ..
+--all [1m[[0;36m-a[0;1m][m do not ignore entries starting with .
+--almost-all [1m[[0;36m-A[0;1m][m do not list implied . and ..
+--author with --ll, print the author of each file
+-B do not list implied entries ending with ~
+--block-size=SIZE=with --ll, scale sizes by SIZE when printing them.
+-b print C-style escapes for nongraphic characters
+--classify [1m[[0;36m-F[0;1m][m append indicator (one of */=>@|) to entries
+-C list entries by columns
+--color[=WHEN]=colorize the output.
+--context [1m[[0;36m-Z[0;1m][m print any security context of each file
+-c with --lltt: sort by, and show, ctime (time of last modification of file status information).
+--dereference [1m[[0;36m-L[0;1m][m when showing file information for a symbolic link, show information for the file the link references rather than for the link itself
+--dereference-command-line [1m[[0;36m-H[0;1m][m follow symbolic links listed on the command line
+--dereference-command-line-symlink-to-dir follow each command line symbolic link
+-D generate output designed for Emacs' dired mode
+--directory [1m[[0;36m-d[0;1m][m list directories themselves, not their contents
+--dired [1m[[0;36m-D[0;1m][m generate output designed for Emacs' dired mode
+-d list directories themselves, not their contents
+--escape [1m[[0;36m-b[0;1m][m print C-style escapes for nongraphic characters
+-F append indicator (one of */=>@|) to entries
+-f do not sort, enable --aaUU, disable --llss ----ccoolloorr
+--file-type likewise, except do not append '*'
+--format=WORD=across --xx, commas --mm, horizontal --xx, long --ll, single-column --11, verbose --ll, vertical --CC
+--full-time like --ll ----ttiimmee--ssttyyllee=_f_u_l_l_-_i_s_o
+-G in a long listing, don't print group names
+-g like --ll, but do not list owner
+--group-directories-first group directories before files;
+--help display this help and exit
+-H follow symbolic links listed on the command line
+--hide-control-chars [1m[[0;36m-q[0;1m][m print ? instead of nongraphic characters
+--hide=PATTERN=do not list implied entries matching shell PATTERN (overridden by --aa or --AA)
+--human-readable [1m[[0;36m-h[0;1m][m with --ll and --ss, print sizes like 1K 234M 2G etc.
+-h with --ll and --ss, print sizes like 1K 234M 2G etc.
+--hyperlink[=WHEN]=hyperlink file names.
+--ignore-backups [1m[[0;36m-B[0;1m][m do not list implied entries ending with ~
+--ignore=PATTERN=[1m[[0;36m-I[0;1m][m do not list implied entries matching shell PATTERN
+--indicator-style=WORD=append indicator with style WORD to entry names: none (default), slash (--pp), file-type (----ffiillee--ttyyppee), classify (--FF)
+--inode [1m[[0;36m-i[0;1m][m print the index number of each file
+-I PATTERN do not list implied entries matching shell PATTERN
+-i print the index number of each file
+-k default to 1024-byte blocks for disk usage.
+--kibibytes [1m[[0;36m-k[0;1m][m default to 1024-byte blocks for disk usage.
+--literal [1m[[0;36m-N[0;1m][m print entry names without quoting
+-l use a long listing format
+-L when showing file information for a symbolic link, show information for the file the link references rather than for the link itself
+-m fill width with a comma separated list of entries
+-n like --ll, but list numeric user and group IDs
+--no-group [1m[[0;36m-G[0;1m][m in a long listing, don't print group names
+-N print entry names without quoting
+--numeric-uid-gid [1m[[0;36m-n[0;1m][m like --ll, but list numeric user and group IDs
+-o like --ll, but do not list group information
+-p append / indicator to directories
+-Q enclose entry names in double quotes
+-q print ? instead of nongraphic characters
+--quote-name [1m[[0;36m-Q[0;1m][m enclose entry names in double quotes
+--quoting-style=WORD=use quoting style WORD for entry names: literal, locale, shell, shell-always, shell-escape, shell-escape-always, c, escape (overrides QUOTING_STYLE environment variable)
+--recursive [1m[[0;36m-R[0;1m][m list subdirectories recursively
+--reverse [1m[[0;36m-r[0;1m][m reverse order while sorting
+-R list subdirectories recursively
+-r reverse order while sorting
+--show-control-chars show nongraphic characters as-is (the default, unless program is 'ls' and output is a terminal)
+--si likewise, but use powers of 1000 not 1024
+--size [1m[[0;36m-s[0;1m][m print the allocated size of each file, in blocks
+--sort=WORD=sort by WORD instead of name: none (--UU), size (--SS), time (--tt), version (--vv), extension (--XX)
+-s print the allocated size of each file, in blocks
+-S sort by file size, largest first
+--tabsize=COLS=[1m[[0;36m-T[0;1m][m assume tab stops at each COLS instead of 8
+-T COLS assume tab stops at each COLS instead of 8
+--time-style=TIME_STYLE=time/date format with --ll.
+--time=WORD=change the default of using modification times.
+-t sort by time, newest first.
+-U do not sort.
+-u with --lltt: sort by, and show, access time.
+--version output version information and exit
+-v natural sort of (version) numbers within text
+-w COLS set output width to COLS. 0 means no limit
+--width=COLS=[1m[[0;36m-w[0;1m][m set output width to COLS. 0 means no limit
+-x list entries by lines instead of by columns
+-X sort alphabetically by entry extension
+-Z print any security context of each file
