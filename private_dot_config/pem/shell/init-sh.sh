@@ -1,4 +1,3 @@
-#! /usr/bin/sh 
 # Shoud be by ~/.bashrc or ~/.zshrc
 # -----------------------------------------
 # prvent load twice
@@ -63,6 +62,12 @@
         for d in "$PEMHOME"/bin/*.d; do 
             [ -d $d ] &&  export PATH="$PATH:$d"
         done
+        for d in "$PEMHOME"/bin/*.kd; do 
+            [ -d $d ] &&  source "$d/init-sh.sh"
+        done
+    fi
+
+    if [ -d "$PEMHOME/bin" ]; then
     fi
 
     # remove duplicate path
