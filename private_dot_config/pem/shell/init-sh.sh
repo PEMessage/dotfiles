@@ -67,9 +67,6 @@
         done
     fi
 
-    if [ -d "$PEMHOME/bin" ]; then
-    fi
-
     # remove duplicate path
     # From skywind3000/vim/etc init.sh
     if [ -n "$PATH" ]; then
@@ -243,7 +240,9 @@
         if [ -d "$d" ] ; then
             # echo "$d"
             for f in "$d"/*.sh ; do 
-                source "$f"
+                if [ -f "$f" ] ; then
+                    source "$f"
+                fi
             done
         fi 
     done
