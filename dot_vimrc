@@ -119,8 +119,11 @@ let g:startify_custom_header = [
     endif
 
     if has("patch-8.1.0360")
-        set diffopt+=internal,algorithm:patience
+        set diffopt+=internal,algorithm:patience,iwhite
     endif
+    set diffopt+=iwhite
+
+    vnoremap RightMouse "+y
 
 
 
@@ -455,7 +458,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'mhinz/vim-startify'
         nnoremap <leader>st :tab new<CR>:Startify<CR> " Most Recent File MRF
         nnoremap <leader>sb :Startify<CR> " Most Recent File MRF
-        let g:startify_session_dir = pe_cachedir .. "/session"
+        let g:startify_session_dir = pe_cachedir . "/session"
     " Plug 'ap/vim-buftabline'
    
     Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
