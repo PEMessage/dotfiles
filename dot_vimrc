@@ -279,7 +279,7 @@ let g:startify_custom_header = [
 
 " KeyBinding Setting Zone ( Better Mouse )
     nnoremap <leader>rcc  :w<CR> :source %<CR> " Re:Configuration
-    nnoremap <leader>rce  :w<CR> :tabe ~/.vimrc <CR> 
+    nnoremap <leader>rce  :tabe ~/.vimrc <CR> 
 
     nnoremap <leader>``   :nohlsearch<CR>
     nnoremap <leader>wp  :set nowrap!<CR>
@@ -402,6 +402,10 @@ call plug#begin(pe_runtimepath . '/plugged')
         "     autocmd filetype fzf tnoremap  <buffer> <C-o> <enter>
         " augroup END 
         " JUST USE <C-M> AS ENTER
+    Plug 'kana/vim-submode'
+        let g:submode_timeout = 0
+        " let g:submode_keep_leaving_key = 0
+        let g:submode_always_show_submode = 1
 
 " Style PlugIn
     Plug 'itchyny/lightline.vim'
@@ -506,6 +510,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     "     xmap ga <Plug>(EasyAlign)
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-commentary'
+        autocmd FileType c setlocal commentstring=//\ %s
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-fugitive'
     Plug 'tpope/vim-vinegar'
@@ -571,8 +576,8 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:M_default_mappings = 0
         let g:VM_mouse_mappings  = 1
         let g:VM_maps = {}
-        let g:VM_maps['Find Under']          = '<C-d>'
-        let g:VM_maps['Find Subword Under']  = '<C-d>'
+        let g:VM_maps['Find Under']          = '<C-h>'
+        let g:VM_maps['Find Subword Under']  = '<C-h>'
         let g:VM_maps["Exit"]                = '<C-c>'   " quit VM
         let g:VM_maps["Mouse Cursor"]        = '<C-LeftMouse>'
         let g:VM_maps["Align"]               = '<C-a>'
@@ -679,7 +684,11 @@ call plug#begin(pe_runtimepath . '/plugged')
 
         noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr>
         noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
-        noremap <silent> zg         :GscopeFind g <C-R><C-W><cr>:call QuickfixArrowPreview('j')<cr>
+
+        noremap <silent> gn         :GscopeFind g <C-R><C-W><cr>
+        noremap <silent> gy         :GscopeFind g <C-R><C-W><cr>:call QuickfixArrowPreview('j')<cr>
+        noremap <silent> gh         :GscopeFind g <C-R><C-W><cr>:cnext<cr>
+        noremap <silent> gb         <C-o>
 
         noremap <silent> <leader>gc :GscopeFind c <C-R><C-W><cr>
         noremap <silent> <leader>gd :GscopeFind d <C-R><C-W><cr>
@@ -820,7 +829,34 @@ call plug#begin(pe_runtimepath . '/plugged')
 call plug#end()
 
     colorscheme onedark
+" -------------------------------------------
+" Submode Map
+" -------------------------------------------
 
+    " call submode#enter_with('viewcode', 'n', '', 'gh', 'zz')
+    " call submode#leave_with('viewcode', 'n', '', '<Esc>')
+    " call submode#leave_with('viewcode', 'n', '', '<C-c>')
+    " call submode#map('viewcode', 'n', '', 'y', ':GscopeFind g <C-R><C-W><cr>:call QuickfixArrowPreview("j")<cr>')
+    " call submode#map('viewcode', 'n', '', 'g', ':GscopeFind g <C-R><C-W><cr>:cnext<cr>')
+    " call submode#map('viewcode', 'n', '', 'v', '<C-o>')
+
+    " " Go through every letter
+    " for key in ['a','b','c','d','e','f','g','h','i','j','k','l','m',
+    " \           'n','o','p','q','r','s','t','u','v','w','x','y','z']
+    "   " maps lowercase, uppercase and <C-key>
+    "   call submode#map('viewcode', 'n', '', key,  key)
+    "   call submode#map('viewcode', 'n', '', toupper(key), toupper(key))
+    "   call submode#map('viewcode', 'n', '', '<C-' . key . '>',  '<C-'.key . '>')
+    " endfor
+    " for key in ['=','_','+','-','<','>']
+    "     call submode#map('window', 'n', '', key,  key)
+    " endfor
+
+
+
+" -------------------------------------------
+" Quick UI
+" -------------------------------------------
   " Quick UI Register
    " let g:quickui_color_scheme = 'system'
   "  " 安装一个 File 目录，使用 [名称，命令] 的格式表示各个选项。

@@ -23,7 +23,8 @@ bcd()
     if [ "$1" = '--print' ] ; then
         echo "$location_path"
     else
-        cd "$location_path" > /dev/null 2&>1 
+        # cd "$location_path" > /dev/null 2&>1 
+        cd "$location_path" 
     fi
     return 0
 }
