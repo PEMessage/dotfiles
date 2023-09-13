@@ -423,6 +423,7 @@ z-fzf(){
     esac; last=$1; [ "$#" -gt 0 ] && shift; done
 
     if [ "$cmd" = d ] ; then
+        [ -d "$fnd" ] && cd "$fnd" && return
         [ -n "$fnd" ] &&  _z  "$fnd" && return
         local temp=` _z -l 2>&1 | awk '{print $2}' | fzf  --no-sort | sed -e "s@^~@${HOME}@g" `
         cd "$temp"

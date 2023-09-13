@@ -59,12 +59,15 @@
 
     # set PATH so it includes user's private bin if it exists
     if [ -d "$PEMHOME/bin" ]; then
+        temp_d=$d
         for d in "$PEMHOME"/bin/*.d; do 
             [ -d $d ] &&  export PATH="$PATH:$d"
         done
         for d in "$PEMHOME"/bin/*.kd; do 
             [ -d $d ] &&  source "$d/init-sh.sh"
         done
+        d=$temp_d
+        unset temp_d
     fi
 
     # remove duplicate path

@@ -474,6 +474,8 @@ call plug#begin(pe_runtimepath . '/plugged')
         autocmd BufNewFile,BufRead *.s,*.S set filetype=arm " arm = armv6/7
     Plug 'rubberduck203/aosp-vim'
         autocmd BufNewFile,BufRead *.bp set filetype=json " arm = armv6/7
+    Plug 'chrisbra/Colorizer'
+    Plug 'powerman/vim-plugin-AnsiEsc'
 
 
 

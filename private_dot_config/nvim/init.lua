@@ -985,15 +985,24 @@ require("lazy").setup({ --Start Quote
             end,
             filter_kind = {
                 "Variable",
-                "Constructor",
                 "Enum",
                 "Function",
-                "Method",
                 "Struct",
+                "Class",
+                "Method",
+                "Constructor",
             },
         })
-        vim.keymap.set('n', '<leader>a', '<cmd>AerialToggle!<CR>')
+        vim.keymap.set('n', '<leader>ae', '<cmd>AerialToggle!<CR>')
     end,
+},
+{
+    'liuchengxu/vista.vim',
+    config = function ()
+        vim.keymap.set('n', '<leader>av', '<cmd>Vista!!<CR>')
+	vim.cmd('let g:vista#renderer#enable_icon = 0')
+    end,
+
 },
 
 {

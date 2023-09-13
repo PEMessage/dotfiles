@@ -1,0 +1,289 @@
+#! /bin/bash
+
+# Stand alone script, do not need to source lib.bash
+usage() {
+    echo "USAGE:"
+    echo 
+    echo "  -p|--print                 : print cmd before run"
+    echo "    |--only-print            : only print cmd, do not run at all "
+    echo "  -g|--glob [*]              : glob matching dir or file"
+    echo "  -n|--no-interactive        : no interactive mode"
+    echo "  -f|--force                 : mv -f"
+    echo "  -s|--sed-script [*]        : your sed script"
+    echo
+    echo "EXAMPLE:"
+}
+
+error_echo() {
+    local prev_ret="$?"
+
+    # Set track_level
+    local track_level
+    if [ "$1" = "--track-level" ] ; then
+        shift 
+        track_level="$1"
+        shift
+    else
+        track_level=1
+    fi
+
+    # echo
+    echo -n "[${FUNCNAME[$track_level]}]" >&2
+    echo -n "[error]" >&2
+    echo -n "[$prev_ret]:" >&2
+    echo    "$@" >&2
+
+    return $prev_ret
+}
+
+assert_run() {
+    local cmd=$@
+    $cmd || {
+        error_echo --track-level 2 "Runing '$cmd' fail"
+        exit 1
+    }
+    return 0
+}
+
+assert_exec_exist() {
+    which $1 &>/dev/null || {
+        error_echo --track-level 2 "Cmd '$1' not in PATH"
+        exit 1
+    }
+    return 0
+}
+
+assert_exec_exist find
+assert_exec_exist getopt
+assert_exec_exist sed
+
+
+parse_arg() {
+
+    # echo "$@"
+    local origin_argv="$@"
+    local origin_argc="$#"
+
+    local long_arg_list='
+    no-interactive,
+    print,
+    only-print
+    force
+    help,
+    glob:,
+    sed-script:,
+    '
+
+    local short_arg_list='
+    n,
+    p,
+    f,
+    h,
+    g:,
+    e:,
+    '
+
+    # using local cmdline="$@"
+    # -- $cmdline will casue '*' expend
+    # use $@ directly will avoid this
+    local format_arg=$( getopt \
+        -o "$short_arg_list" \
+        -l "$long_arg_list" \
+        -q \
+        -- "$@" )
+    local getopt_res=$?
+    [ $getopt_res = 0 ] || { 
+        error_echo "Fail to run getopt"
+    }
+    # echo $format_arg
+    eval set -- $format_arg
+    # echo "$@"
+
+    # return
+
+    CONF_NO_INTERACTIVE=
+    CONF_SED_SCRIPT=
+    CONF_GLOB=
+    CONF_PRINT=
+    CONF_ONLY_PRINT=
+    CONF_MV_ARGS=
+    while true ; do
+        case $1 in
+            -n|--no-interactive)
+                CONF_NO_INTERACTIVE=1
+                shift ;;
+            -p|--print)
+                CONF_PRINT=1
+                shift ;;
+            --only-print)
+                CONF_PRINT=1
+                CONF_ONLY_PRINT=1
+                shift ;;
+            -f|--force)
+                CONF_MV_ARGS='-f'
+                shift;;
+            -h|--help)
+                usage 
+                exit 0 ;;
+            -e|--sed-script)
+                shift
+                CONF_SED_SCRIPT="$1"
+                shift ;;
+            -g|--glob)
+                shift 
+                CONF_GLOB="$1"
+                shift ;;
+            --)
+                shift
+                # echo "$1"
+                # echo "$2"
+                # echo "NEw"
+                break ;;
+            *)
+                error_echo "Unknow case"
+                exit 1 ;;
+        esac
+    done
+    # if '*' in var 
+    # use "$VAR" to prevent expand
+    # echo "$CONF_GLOB"
+    [ $origin_argc = 0 ] &&
+        usage && exit 0
+    check_arg "$@"
+}
+
+check_arg() {
+    # if [ -z "$CONF_SED_SCRIPT" ] || [ -z "$CONF_GLOB" ]; 
+    # then
+    #     # [ $# -ge 2 ] || error_echo "Not enough arguement" || exit 1 
+    #     CONF_GLOB="$1"
+    #     shift
+    #     CONF_SED_SCRIPT="$@"
+    #     CONF_PRINT=1
+    #     # echo "Not POSIX mode"
+    # fi
+
+    if [ -z "$CONF_SED_SCRIPT" ] ; then 
+        SED_SCRIPT_SIGN=
+    else
+        SED_SCRIPT_SIGN='-e'
+    fi
+    if [ -z "$CONF_GLOB" ] ; then 
+        CONF_GLOB='*'
+        # echo Default Glob
+    fi
+
+
+    # 
+    # if [ -z "$CONF_SED_SCRIPT" ] || [ -z "$CONF_GLOB" ] ; then
+    #     error_echo "Not -e|--sed-script or -g|--glob arguement"
+    #     exit 1
+    # fi
+
+
+    # echo "$CONF_SED_SCRIPT"
+    # echo "$CONF_GLOB"
+}
+
+declare -a CMD_LIST
+declare -a NO_CHANGE_CMD_LIST
+
+make_cmdlist() {
+
+    # FILE_LIST=$(find . -maxdepth 1 -wholename "$CONF_GLOB")
+    # expand glob here
+    FILE_LIST=$CONF_GLOB
+
+
+    # echo $FILE_LIST
+    # echo END
+    for file in $FILE_LIST
+    do
+        # echo -n "$file -> "
+        [ -d "$file" -o -f "$file" ] || continue
+        rename=$(echo "$file" | 
+            assert_run sed -n \
+                "$SED_SCRIPT_SIGN" "$CONF_SED_SCRIPT" \
+                -e "p" 2>/dev/null 
+        ) || {
+            error_echo "Sed script invaild in file [$file]"
+            exit 1
+        }
+
+        if [ "$rename" = "$file" ] ; then
+            NO_CHANGE_CMD_LIST+=( "mv $CONF_MV_ARGS $file $rename" )
+        else
+            CMD_LIST+=( "mv $CONF_MV_ARGS $file $rename" )
+        fi
+    done
+    # [ -z "$CMD_LIST" ] && error_echo "Not match $FILE_LIST in glob" && exit 1
+    # declare -p CMD_LIST
+}
+
+print_all() {
+    [ "$CONF_PRINT" = 1 ] || return 0
+
+    echo
+    echo "The following cmd will be run:"
+    echo 
+
+    local total=${#CMD_LIST[@]}
+    local index=0
+    while [ $index -lt $total ] ; do
+        echo -n "    "
+        echo "${CMD_LIST[$index]}"
+        index=$(($index+1))
+    done
+
+    echo 
+    echo "The following cmd will not be run(do noting):"
+    echo 
+
+    local total=${#NO_CHANGE_CMD_LIST[@]}
+    local index=0
+    while [ $index -lt $total ] 
+    do
+        echo -n "    "
+        echo "${NO_CHANGE_CMD_LIST[$index]}"
+        index=$(($index+1))
+    done
+
+    echo
+
+    [ "$CONF_ONLY_PRINT" = 1 ] && exit 0
+}
+
+run_cmd() {
+    local total=${#CMD_LIST[@]}
+    # echo $total
+    local index=0
+    local cur_index=0
+    local input
+    # declare -p CMD_LIST
+    while [ $index -lt $total ] ; do
+        cur_index=$index
+        index=$(($index+1))
+        if [ "$CONF_NO_INTERACTIVE" != 1 ]; then 
+            echo -n "Are you sure run this cmd(y/n/q): "
+            echo "'${CMD_LIST[$cur_index]}'"
+            read input 
+
+            [ "$input" = n ] && continue
+            [ "$input" = q ] && exit 1
+            [ "$input" != y ] && error_echo "Unknow choose" && exit 1
+        fi
+        eval "${CMD_LIST[$cur_index]}" || {
+            error_echo "Runing ${CMD_LIST[$cur_index]}"
+            exit 1
+        }
+    done
+
+}
+
+
+# Notic : use $@ will casuse * expend 
+# even if you use [this file path] '*'
+parse_arg "$@"
+make_cmdlist
+print_all
+run_cmd
