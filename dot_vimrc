@@ -641,12 +641,12 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:gutentags_add_default_project_roots = 1
         let g:gutentags_add_ctrlp_root_markers = 0
         " 所生成的数据文件的名称
-        let g:gutentags_ctags_tagfile = '.tags'
+        " let g:gutentags_ctags_tagfile = '.tags'
         " 同时开启 ctags 和 gtags 支持：
         let g:gutentags_modules = []
-        if executable('ctags')
-            let g:gutentags_modules += [ 'ctags' ]
-        endif
+        " if executable('ctags')
+        "     let g:gutentags_modules += [ 'ctags' ]
+        " endif
         if executable('gtags-cscope') && executable('gtags')
             let g:gutentags_modules += ['gtags_cscope']
         endif

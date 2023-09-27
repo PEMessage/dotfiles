@@ -279,7 +279,8 @@
     if [ -f "${PEM_CACHE_HOME}/shell/init-sh.sh" ] ; then
         source "${PEM_CACHE_HOME}/shell/init-sh.sh"
     fi
-     if [ -f "${PEM_DATA_HOME}/shell/init-sh.sh" ] ; then
+
+    if [ -f "${PEM_DATA_HOME}/shell/init-sh.sh" ] ; then
         source "${PEM_DATA_HOME}/shell/init-sh.sh"
     fi
      

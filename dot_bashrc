@@ -17,7 +17,8 @@ PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
     parse_git_branch() {
         git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
     }
-    function pe_prompt(){
+
+    pe_prompt() {
 
         local blackF="\[\e[30m\]" # Fonts color
         local redF="\[\e[1;31m\]" 
