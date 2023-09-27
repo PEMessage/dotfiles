@@ -1,0 +1,76 @@
+#! /bin/bash
+
+which tmux > /dev/null || {
+    echo "tmux not exist" 
+    exit 1
+}
+
+[ -n "$TMUX" ] || {
+    echo "not in tmux envir"
+    exit 1
+}
+tmux_ismouse() {
+    local mouse_setting="$(tmux show -g mouse)"
+    if [ "$mouse_setting" = "mouse on" ] ; then 
+        return 0
+    else
+        return 1
+    fi
+}
+
+tmux_isvim() {
+
+    local is_vim="ps -o state= -o comm= -t '#{pane_tty}' \
+        | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?)(diff)?$'"
+    # Method 1: 
+    # tmux run-shell "$is_vim" > /dev/null
+
+    # Method 2: older tmux, will always return 0.
+    # you need to parse youself
+    local ret=$( tmux run-shell "$is_vim" )
+    ret=${ret##*returned}
+    return $ret
+}
+
+mouse_on() {
+    tmux set -g mouse on
+    if tmux_isvim ; then
+        tmux send-keys ":PEMouseON"
+        tmux send-keys "C-m"
+    fi
+}
+mouse_off() {
+    tmux set -g mouse off
+    if tmux_isvim ; then
+        tmux send-keys ":PEMouseOFF"
+        tmux send-keys "C-m"
+    fi
+}
+
+mouse_toggle() {
+    if tmux_ismouse ; then
+        mouse_off
+    else
+        mouse_on
+    fi
+}
+
+case "$1" in
+    on) 
+        mouse_on
+        ;;
+    off) 
+        mouse_off
+        ;;
+    toggle) 
+        mouse_toggle
+        ;;
+
+    *) 
+        echo "unknow cmd '$1', use (on/off/toggle)"
+        exit 1
+        ;;
+esac
+tmux display "Mouse #{?mouse,ON,OFF}!" > /dev/null
+# tmux run-shell "is_vim"
+

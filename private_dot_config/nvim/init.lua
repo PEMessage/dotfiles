@@ -438,6 +438,15 @@ require("lazy").setup({ --Start Quote
         vim.keymap.set( 'n',  '<M-S-k>', ':<C-U>TmuxNavigateUp<cr>'   , { silent = true, desc = "Navigate Up"    } )
         vim.keymap.set( 'n',  '<M-S-l>', ':<C-U>TmuxNavigateRight<cr>', { silent = true, desc = "Navigate Right" } )
 
+        -- vim.keymap.set( 'n',  '<leader>`pon', ':set mouse=a<CR>', { silent = true, desc = "Mouse on" } )
+        -- vim.keymap.set( 'n',  '<leader>`pof', ':set mouse=<CR>', { silent = true, desc = "Mouse off" } )
+
+        -- 注册命令
+        vim.cmd([[
+        command! -nargs=0 PEMouseON lua PE.MouseSet("a")
+        command! -nargs=0 PEMouseOFF lua PE.MouseSet("")
+        ]])
+
     end
 },
 -- -------------------------------------------
@@ -1305,6 +1314,9 @@ function PE.PrintTbl(tb)
     return RecuPrint(tb)
 end
 
+function PE.MouseSet(arg)
+    vim.o.mouse = arg
+end
 
 -- local pehop = require('pehop')
 -- local hopp = require('hop-search')

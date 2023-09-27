@@ -626,6 +626,11 @@ call plug#begin(pe_runtimepath . '/plugged')
         nnoremap <silent><M-S-E> :tabn<CR>
         nnoremap <silent><M-S-W> :tab new<CR>
         nnoremap <silent><M-S-Q> :tabp<CR>
+
+        command! -nargs=0 PEMouseON set mouse=a
+        command! -nargs=0 PEMouseOFF set mouse=""
+
+
         " 
 
 
