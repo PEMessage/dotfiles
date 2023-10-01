@@ -2,7 +2,7 @@
 -- File: init.lua
 -- Author: PEMessage
 -- Description: This is my VIM8+/NeoVIM configuration
--- Last Modified:  2023-05-29 Mon 03:01 PM
+-- Last Modified: 2023-10-01 11:11
 -- +++++++++++++++++++++++++++++++++++++++++++
 
 -- 1. Global Options
@@ -329,6 +329,61 @@ require("lazy").setup({ --Start Quote
         require('gitsigns').setup()
     end
 },
+{
+    'yamatsum/nvim-cursorline',
+    config = function ()
+        require('nvim-cursorline').setup {
+            cursorline = {
+                enable = true,
+                timeout = 1000,
+                number = false,
+            },
+            cursorword = {
+                enable = true,
+                min_length = 3,
+                hl = { underline = true },
+            }
+        }
+    end
+},
+
+-- -------------------------------------------
+-- -- 5.2 File Manger
+-- -- -------------------------------------------
+{
+    'nvim-tree/nvim-tree.lua',
+    init = function ()
+        vim.g.loaded_netrw = 1
+        vim.g.loaded_netrwPlugin = 1
+    end,
+    keys = {
+        {'<leader>b','<cmd>NvimTreeToggle<cr>',desc = 'Tree Toggle'},
+    },
+    opts = {
+
+        filters = {
+            dotfiles = false,
+        },
+
+        on_attach = function (bufnr)
+            local api = require "nvim-tree.api"
+
+            local function opts(desc)
+                return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+            end
+
+            -- default mappings
+            api.config.mappings.default_on_attach(bufnr)
+
+            -- custom mappings
+            -- vim.keymap.set('n', '<C-t>', api.tree.change_root_to_parent,        opts('Up'))
+            vim.keymap.set('n', '?',     api.tree.toggle_help,          opts('Help'))
+            vim.keymap.set('n', '.',     api.tree.change_root_to_node,  opts('CD'))
+        end
+
+    },
+
+},
 -- {
 --     "nvim-neo-tree/neo-tree.nvim",
 --     branch = "v2.x",
@@ -388,40 +443,6 @@ require("lazy").setup({ --Start Quote
 --         require("neo-tree").setup(opts)
 --     end,
 -- },
-{
-    'nvim-tree/nvim-tree.lua',
-    init = function ()
-        vim.g.loaded_netrw = 1
-        vim.g.loaded_netrwPlugin = 1
-    end,
-    keys = {
-        {'<leader>b','<cmd>NvimTreeToggle<cr>',desc = 'Tree Toggle'},
-    },
-    opts = {
-
-        filters = {
-            dotfiles = false,
-        },
-
-        on_attach = function (bufnr)
-            local api = require "nvim-tree.api"
-
-            local function opts(desc)
-                return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
-            end
-
-            -- default mappings
-            api.config.mappings.default_on_attach(bufnr)
-
-            -- custom mappings
-            -- vim.keymap.set('n', '<C-t>', api.tree.change_root_to_parent,        opts('Up'))
-            vim.keymap.set('n', '?',     api.tree.toggle_help,          opts('Help'))
-            vim.keymap.set('n', '.',     api.tree.change_root_to_node,  opts('CD'))
-        end
-
-    },
-
-},
 --
 -- {
 --     "gioele/vim-autoswap",
@@ -450,7 +471,7 @@ require("lazy").setup({ --Start Quote
     end
 },
 -- -------------------------------------------
--- 5.2 Mini.nvim Plugin
+-- 5.3 Mini.nvim Plugin
 -- -------------------------------------------
 {
     'echasnovski/mini.pairs',
@@ -495,7 +516,7 @@ require("lazy").setup({ --Start Quote
 },
 
 -- -------------------------------------------
--- 5.3 Telescope Setting
+-- 5.4 Telescope Setting
 -- -------------------------------------------
 {
     'nvim-telescope/telescope.nvim', tag = '0.1.1',
@@ -700,7 +721,7 @@ require("lazy").setup({ --Start Quote
 },
 
 -- -------------------------------------------
--- 5.4 Editing Plugin
+-- 5.5 Editing Plugin
 -- -------------------------------------------
 {
     'numToStr/Comment.nvim',
@@ -790,7 +811,7 @@ require("lazy").setup({ --Start Quote
 
 
 -- -------------------------------------------
--- 5.5 Leagcy Plugin
+-- 5.6 Leagcy Plugin
 -- -------------------------------------------
 {
     'yianwillis/vimcdoc'
@@ -806,14 +827,19 @@ require("lazy").setup({ --Start Quote
             ['Find Subword Under']  = '<C-h>',
             ['Exit']                = '<C-c>',
             -- Arrow Key
-            -- ["Add Cursor Up"]       = '<M-C-Up>',
-            -- ["Add Cursor Down"]     = '<M-C-Down>',
+            ["Add Cursor Up"]       = '<C-Up>',
+            ["Add Cursor Down"]     = '<C-Down>',
             -- Mouse
             ["Mouse Cursor"]        = '<C-LeftMouse>',
             -- Multi-Mode
-            ["Align"]               = '<C-A>',
+            ["Align"]               = '<C-a>',
             ["Enlarge"]             = "=",
             ["Shrink"]              = "-",
+            -- Move
+            ["Find Next"]           = ']',
+            ["Find Prev"]           = '[',
+            ["Remove Region"]       = 'Q',
+            ["Skip Region"]         = 'q'
         }
     end,
 },
@@ -838,7 +864,7 @@ require("lazy").setup({ --Start Quote
 { 'tpope/vim-repeat', event = 'VeryLazy' },
 
 -- -------------------------------------------
--- 5.6 Treesitter Plugin
+-- 5.7 Treesitter Plugin
 -- -------------------------------------------
 {
     "nvim-treesitter/nvim-treesitter",
@@ -880,7 +906,7 @@ require("lazy").setup({ --Start Quote
 },
 
 -- -------------------------------------------
--- 5.7 Completion Plugin
+-- 5.8 Completion Plugin
 -- -------------------------------------------
 
 {

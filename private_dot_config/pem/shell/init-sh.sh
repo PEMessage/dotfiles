@@ -284,7 +284,6 @@
         source "${PEM_DATA_HOME}/shell/init-sh.sh"
     fi
      
-
     # Method 3: Manualy source
     # source "$PEMHOME"/shell/fzf/fzf-ff.sh
     # source "$PEMHOME"/shell/vless/vless.sh

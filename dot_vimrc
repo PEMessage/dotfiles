@@ -15,6 +15,7 @@ let g:startify_custom_header = [
 " +++++++++++++++++++++++++++++++++++++++++++
 "
 
+
  
 " 1. Configure List
 " ===========================================
@@ -46,6 +47,7 @@ let g:startify_custom_header = [
                     \ },
                 \ }
     nnoremap <leader>tt :call lightline#toggle()<CR>
+
     
 
 
@@ -113,6 +115,7 @@ let g:startify_custom_header = [
         syntax enable 
         syntax on 
     endif
+    
 
     if has('mouse')
         set mouse+=a
@@ -213,27 +216,58 @@ let g:startify_custom_header = [
             call s:metacode(c)
         endfor
     endif
+" -------------------------------------------
+" 3.7 VIM Style Setting
+" -------------------------------------------
+    set laststatus=2            " 总是显示状态栏
+    set showtabline=2           " 总是显示标签栏
+    set splitright              " 水平切割窗口时，默认在右边显示新窗口
+    
+    set statusline=                                 " 清空状态了
+    set statusline+=\ %F                            " 文件名
+    set statusline+=\ [%1*%M%*%n%R%H]               " buffer 编号和状态
+    set statusline+=%=                              " 向右对齐
+    set statusline+=%{!getcwd()}
+    set statusline+=\ %y                            " 文件类型
+    nnoremap <silent> <leader>wd :echo getcwd()<CR>
 
-"  Mark A
-" Difference Map | Norm | Ins | Cmd | Vis | Sel | Opr | Term | Lang | 
-"                +------+-----+-----+-----+-----+-----+------+------+ 
-" [nore]map      | yes  |  -  |  -  | yes | yes | yes |  -   |  -   |
-" n[nore]map     | yes  |  -  |  -  |  -  |  -  |  -  |  -   |  -   |
-" [nore]map!     |  -   | yes | yes |  -  |  -  |  -  |  -   |  -   |
-" i[nore]map     |  -   | yes |  -  |  -  |  -  |  -  |  -   |  -   |
-" c[nore]map     |  -   |  -  | yes |  -  |  -  |  -  |  -   |  -   |
-" v[nore]map     |  -   |  -  |  -  | yes | yes |  -  |  -   |  -   |
-" x[nore]map     |  -   |  -  |  -  | yes |  -  |  -  |  -   |  -   |
-" s[nore]map     |  -   |  -  |  -  |  -  | yes |  -  |  -   |  -   |
-" o[nore]map     |  -   |  -  |  -  |  -  |  -  | yes |  -   |  -   |
-" t[nore]map     |  -   |  -  |  -  |  -  |  -  |  -  | yes  |  -   |
-" l[nore]map     |  -   | yes | yes |  -  |  -  |  -  |  -   | yes  |
+    " 最右边显示文件编码和行号等信息，并且固定在一个 group 中，优先占位
+    set statusline+=\ %0(%{&fileformat}\ [%{(&fenc==\"\"?&enc:&fenc).(&bomb?\",BOM\":\"\")}]\ %v:%l/%L%)
+
+
+
 
 " 4. Keybending list
 " ===========================================
-" KeyBinding Setting Zone ( Input Mode  )
+
+"  Mark A
+"  " Difference Map | Norm | Ins | Cmd | Vis | Sel | Opr | Term | Lang | 
+"  "                +------+-----+-----+-----+-----+-----+------+------+ 
+"  " [nore]map      | yes  |  -  |  -  | yes | yes | yes |  -   |  -   |
+"  " n[nore]map     | yes  |  -  |  -  |  -  |  -  |  -  |  -   |  -   |
+"  " [nore]map!     |  -   | yes | yes |  -  |  -  |  -  |  -   |  -   |
+"  " i[nore]map     |  -   | yes |  -  |  -  |  -  |  -  |  -   |  -   |
+"  " c[nore]map     |  -   |  -  | yes |  -  |  -  |  -  |  -   |  -   |
+"  " v[nore]map     |  -   |  -  |  -  | yes | yes |  -  |  -   |  -   |
+"  " x[nore]map     |  -   |  -  |  -  | yes |  -  |  -  |  -   |  -   |
+"  " s[nore]map     |  -   |  -  |  -  |  -  | yes |  -  |  -   |  -   |
+"  " o[nore]map     |  -   |  -  |  -  |  -  |  -  | yes |  -   |  -   |
+"  " t[nore]map     |  -   |  -  |  -  |  -  |  -  |  -  | yes  |  -   |
+"  " l[nore]map     |  -   | yes | yes |  -  |  -  |  -  |  -   | yes  |
+"
+
+" -------------------------------------------
+" 4.1 Basic Setting Zone ( Input Mode  )
+" -------------------------------------------
     inoremap jj <ESC>
+    nnoremap <silent> j gj
+    nnoremap <silent> k gk
     nnoremap <C-c> <ESC>
+    nnoremap ZA :confirm qall<CR> 
+
+    " nnoremap _ 4kzz
+    " nnoremap + 5jzz
+
     "Emacs Like ShortCut
     noremap! <C-A> <home> 
     noremap! <C-E> <end>
@@ -241,12 +275,6 @@ let g:startify_custom_header = [
     " inoremap <m-f> <S-Right> 
     " inoremap <m-b> <S-Left> 
     
-
-    
-
-" KeyBinding Setting Zone ( Normal Mode  )
-    nnoremap <silent><M-S-N> :bnext<CR>
-    nnoremap <silent><M-S-P> :bprev<CR>
 
     "    CTRL-H 同 `<BS>` 一样功能，我们都是直接用 `<BS>` 没人CTRL-H的，直接覆盖掉
     "    CTRL-J 同回车（有两个码 0x0d 或 0x0a），C-J是0x0d，硬回车是0x0a，没人按这个，覆盖。
@@ -257,27 +285,36 @@ let g:startify_custom_header = [
     " nnoremap <silent><M-S-J> :wincmd j<CR>
     " nnoremap <silent><M-S-K> :wincmd k<CR>
 
+" -------------------------------------------
+" 4.2 wincmd/buffer/tab keymap
+" -------------------------------------------
+    " Switch window
     tnoremap <silent><M-S-H> <C-W>:wincmd h<CR>
     tnoremap <silent><M-S-L> <C-W>:wincmd l<CR>
     tnoremap <silent><M-S-J> <C-W>:wincmd j<CR>
     tnoremap <silent><M-S-K> <C-W>:wincmd k<CR>
 
+    " Switch buffer
+    nnoremap <silent><M-S-N> :bnext<CR>
+    nnoremap <silent><M-S-P> :bprev<CR>
 
-    nnoremap <silent> j gj
-    nnoremap <silent> k gk
-
-" KeyBinding Setting Zone ( Better Mouse )
+    " Switch Tab
     nnoremap <silent><C-S-TAB> :tabp<CR>
     inoremap <silent><C-S-TAB> <C-o>:tabp<CR>
     nnoremap <silent><C-TAB>   :tabn<CR>
     inoremap <silent><C-TAB>   <C-o>:tabn<CR>
+
+" -------------------------------------------
+" 4.3 Mouse mapping
+" -------------------------------------------
     " nnoremap <MiddleMouse>     :tabclose<CR>
     vnoremap <RightMouse>            "+y
     inoremap <RightMouse>       <C-o>"+p
 
-    nnoremap ZA :confirm qall<CR> 
 
-" KeyBinding Setting Zone ( Better Mouse )
+" -------------------------------------------
+" 4.3 Extend mapping and command
+" -------------------------------------------
     nnoremap <leader>rcc  :w<CR> :source %<CR> " Re:Configuration
     nnoremap <leader>rce  :tabe ~/.vimrc <CR> 
 
@@ -294,11 +331,16 @@ let g:startify_custom_header = [
 
     command! PCD execute 'cd' .. expand('%:p:h')
     command! PFile echo  expand('%:p')
+    nnoremap <silent><leader>ro :set readonly!<CR>:set modifiable<CR>
 
+    " vnoremap <cr> iwoiwo
 
-    vnoremap <cr> iwoiwo
+" 5. Netrw Setting
+" ===========================================
 
-" Netrw
+" -------------------------------------------
+" 5.1 Basic netrw setting
+" -------------------------------------------
     let g:netrw_banner = 0                      " 设置是否显示横幅
     if argv(0) ==# '.'
         let g:netrw_browse_split = 0
@@ -312,6 +354,9 @@ let g:startify_custom_header = [
     let g:netrw_sort_sequence = '[\/]$,*'
     let g:netrw_hide = 1
 
+" -------------------------------------------
+" 5.2 Buffer mapping
+" -------------------------------------------
     autocmd FileType netrw call s:RemoveNetrwMap()
     function! s:RemoveNetrwMap()
         if hasmapto('<Plug>NetrwRefresh')
@@ -337,37 +382,16 @@ let g:startify_custom_header = [
 
     nnoremap <silent><leader>b  :Lexplore<CR>
 
-
-
-    " nnoremap _ 4kzz
-    " nnoremap + 5jzz
-" Command Zone
     command! PEWrite w! sudo tee % 
 
-" VIM Style Setting
-    set laststatus=2            " 总是显示状态栏
-    set showtabline=2           " 总是显示标签栏
-    set splitright              " 水平切割窗口时，默认在右边显示新窗口
-    
-    set statusline=                                 " 清空状态了
-    set statusline+=\ %F                            " 文件名
-    set statusline+=\ [%1*%M%*%n%R%H]               " buffer 编号和状态
-    set statusline+=%=                              " 向右对齐
-    set statusline+=%{!getcwd()}
-    set statusline+=\ %y                            " 文件类型
-    nnoremap <silent> <leader>wd :echo getcwd()<CR>
 
-    " 最右边显示文件编码和行号等信息，并且固定在一个 group 中，优先占位
-    set statusline+=\ %0(%{&fileformat}\ [%{(&fenc==\"\"?&enc:&fenc).(&bomb?\",BOM\":\"\")}]\ %v:%l/%L%)
-
-
-" 5. VIM Plug-in Zone
+" 6. VIM Plug-in Zone (Part1)
 " ===========================================
 call plug#begin(pe_runtimepath . '/plugged')
 
-" Basic Funtion
-    " Plug 'skywind3000/vim-quickui'
-    
+" -------------------------------------------
+" 6.1 Basic Funtion
+" -------------------------------------------
     " Some little tweak
     " Plug 'drmikehenry/vim-fixkey'
     Plug 'PEMessage/vim-fixkey'
@@ -402,12 +426,85 @@ call plug#begin(pe_runtimepath . '/plugged')
         "     autocmd filetype fzf tnoremap  <buffer> <C-o> <enter>
         " augroup END 
         " JUST USE <C-M> AS ENTER
+    Plug 'mg979/vim-visual-multi', {'branch': 'master'}
+        let g:M_default_mappings = 0
+        let g:VM_mouse_mappings  = 1
+        let g:VM_maps = {}
+        " Basic
+        let g:VM_maps['Find Under']          = '<C-h>'
+        let g:VM_maps['Find Subword Under']  = '<C-h>'
+        let g:VM_maps["Exit"]                = '<C-c>'   " quit VM
+        " Arrow key
+        let g:VM_maps["Add Cursor Up"]       = '<C-Up>'
+        let g:VM_maps["Add Cursor Down"]     = '<C-Down>'
+
+        " Mouse
+        let g:VM_maps["Mouse Cursor"]        = '<C-LeftMouse>'
+        " Multi-Mode
+        let g:VM_maps["Align"]               = '<C-a>'
+        let g:VM_maps["Enlarge"]             = "="
+        let g:VM_maps["Shrink"]              = "-"
+        " Move
+        let g:VM_maps["Find Next"]           = ']'
+        let g:VM_maps["Find Prev"]           = '['
+        let g:VM_maps["Remove Region"]       = 'Q'
+        let g:VM_maps["Skip Region"]         = 'q'
+
+    Plug 'easymotion/vim-easymotion'
+        let g:EasyMotion_smartcase = 1
+        let g:EasyMotion_enter_jump_first= 1
+        let g:EasyMotion_space_jump_first = 1
+        let g:EasyMotion_use_upper = 1
+        
+        nmap / <Plug>(easymotion-sn)
+        map <space> <Plug>(easymotion-s)
+        " nunmap ds
+        " <leader>yr
+    Plug 'vim-scripts/YankRing.vim'
+        " let vimd_path = 
+        " if !isdirectory(vimd_path)
+        "     call mkdir(vimd_path, "p")
+        " endif
+        let g:yankring_history_dir = pe_cachedir
+        nnoremap <silent> <leader>yy :YRShow<CR>
+        let yankring_min_element_length = 2
+        let g:yankring_paste_using_g = 0
+
+" -------------------------------------------
+" 6.2 Textobj
+" -------------------------------------------
     Plug 'kana/vim-submode'
         let g:submode_timeout = 0
         " let g:submode_keep_leaving_key = 0
         let g:submode_always_show_submode = 1
+    Plug 'kana/vim-textobj-user'
+    Plug 'kana/vim-textobj-indent'
+    Plug 'kana/vim-textobj-syntax'
+    Plug 'kana/vim-textobj-line'
+    Plug 'sgur/vim-textobj-parameter'
+    Plug 'jceb/vim-textobj-uri'
+    Plug 'terryma/vim-expand-region'
+    let g:expand_region_text_objects = {
+                \ 'iw'  :0,
+                \ 'iW'  :0,
+                \ 'i"'  :0,
+                \ 'i''' :0,
+                \ 'i]'  :1, 
+                \ 'ib'  :1, 
+                \ 'iB'  :1, 
+                \ 'il'  :0, 
+                \ 'ip'  :0,
+                \ 'ab' :1,
+                \ 'aB' :1,
+                \ 'ii' :0,
+                \ 'ai' :0, 
+    \ }
+        map <CR> <Plug>(expand_region_expand)
+        map <BS> <Plug>(expand_region_shrink)
 
-" Style PlugIn
+" -------------------------------------------
+" 6.3 Style PlugIn
+" -------------------------------------------
     Plug 'itchyny/lightline.vim'
     Plug 'edkolev/tmuxline.vim'
 
@@ -449,14 +546,11 @@ call plug#begin(pe_runtimepath . '/plugged')
             " Override the `Identifier` background color in GUI mode
             autocmd ColorScheme * call onedark#extend_highlight("Search", { "gui" : "underline,bold,italic,standout",  "bg": { "gui": "#444959" } , "fg" : {"gui":"yellow" }})
             autocmd ColorScheme * call onedark#extend_highlight("IncSearch", { "gui" : "underline,bold,italic,standout",  "bg": { "gui": "#444959" } , "fg" : {"gui":"yellow" }})
-
             autocmd ColorScheme * call onedark#extend_highlight("QuickFixLine", { "gui" : "underline",  "bg": { "gui": "NONE" } , "fg" : {"gui":"yellow" }})
             autocmd ColorScheme * highlight QuickFixLineScope gui=underline guifg=#e5c07b
         
         augroup END
     endif
-
-
 
     Plug 'Yggdroot/indentLine'
     Plug 'mhinz/vim-startify'
@@ -477,8 +571,6 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'chrisbra/Colorizer'
     Plug 'powerman/vim-plugin-AnsiEsc'
 
-
-
     " vi 1976
     " | \      more 1978
     " |  \     /
@@ -491,22 +583,21 @@ call plug#begin(pe_runtimepath . '/plugged')
 " File Manager
         
 
-
-
     " Plug 'kvngvikram/rightclick-macros'
     " Plug 'skywind3000/vim-quickui'
    
-  
-
-
-" Locale
+" -------------------------------------------
+" 6.4 Locale
+" -------------------------------------------
     Plug 'yianwillis/vimcdoc'
     " Plug 'brglng/vim-im-select'
     if has('win32')
         let g:im_select_default = '1033'
     endif
    
-" Edit Experinece
+" -------------------------------------------
+" 6.5 Tpope plugin
+" -------------------------------------------
     " Plug 'junegunn/vim-easy-align'
     "     nmap ga <Plug>(EasyAlign)
     "     xmap ga <Plug>(EasyAlign)
@@ -519,6 +610,9 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'tpope/vim-rsi'
 
 
+" -------------------------------------------
+" 6.6 Git plugin
+" -------------------------------------------
     Plug 'airblade/vim-gitgutter'
         command! Gqf GitGutterQuickFix | copen
     Plug 'will133/vim-dirdiff'
@@ -529,7 +623,6 @@ call plug#begin(pe_runtimepath . '/plugged')
         " :h copy-diffs
         " :'<,'>diffget  do(diff obtain)
         " :'<,'>diffput. dp(diff put)
-
     Plug 'cohama/agit.vim'
         " J			    <Plug>(agit-scrolldown-stat)
         " K			    <Plug>(agit-scrollup-stat)
@@ -551,42 +644,12 @@ call plug#begin(pe_runtimepath . '/plugged')
         " dl			<Plug>(agit-diff-with-local)
         nnoremap <leader>ag :Agit<CR>
         
-    Plug 'easymotion/vim-easymotion'
-        let g:EasyMotion_smartcase = 1
-        let g:EasyMotion_enter_jump_first= 1
-        let g:EasyMotion_space_jump_first = 1
-        let g:EasyMotion_use_upper = 1
-        
-        nmap / <Plug>(easymotion-sn)
-        map <space> <Plug>(easymotion-s)
-        " nunmap ds
-        " <leader>yr
-    Plug 'vim-scripts/YankRing.vim'
-        " let vimd_path = 
-        " if !isdirectory(vimd_path)
-        "     call mkdir(vimd_path, "p")
-        " endif
-
-        let g:yankring_history_dir = pe_cachedir
-        nnoremap <silent> <leader>yy :YRShow<CR>
-        let yankring_min_element_length = 2
-        let g:yankring_paste_using_g = 0
 
 
 
-    Plug 'mg979/vim-visual-multi', {'branch': 'master'}
-        let g:M_default_mappings = 0
-        let g:VM_mouse_mappings  = 1
-        let g:VM_maps = {}
-        let g:VM_maps['Find Under']          = '<C-h>'
-        let g:VM_maps['Find Subword Under']  = '<C-h>'
-        let g:VM_maps["Exit"]                = '<C-c>'   " quit VM
-        let g:VM_maps["Mouse Cursor"]        = '<C-LeftMouse>'
-        let g:VM_maps["Align"]               = '<C-a>'
-        let g:VM_maps["Enlarge"]             = "="
-        let g:VM_maps["Shrink"]              = "-"
-
-" Tmux and Terminal
+" -------------------------------------------
+" 6.7 Tmux and Terminal
+" -------------------------------------------
     Plug 'NickLaMuro/vimux'
         nmap <Leader>vl :VimuxRunLastCommand<CR>
         nmap <Leader>vp :VimuxPromptCommand<CR>
@@ -630,16 +693,14 @@ call plug#begin(pe_runtimepath . '/plugged')
         command! -nargs=0 PEMouseON set mouse=a
         command! -nargs=0 PEMouseOFF set mouse=""
 
-
-        " 
-
-
         " noremap  <C-h> :<C-U>TmuxNavigateLeft<cr>
         " noremap  <C-j> :<C-U>TmuxNavigateDown<cr>
         " noremap  <C-k> :<C-U>TmuxNavigateUp<cr>
         " noremap  <C-l> :<C-U>TmuxNavigateRight<cr>
 
-" Tag and Quickfix
+" -------------------------------------------
+" 6.8 Tag Plugin
+" -------------------------------------------
     Plug 'ludovicchabant/vim-gutentags'
         set tags=./.tags;,.tags
         let g:gutentags_project_root = ['.root','.project']
@@ -673,8 +734,6 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:gutentags_auto_add_cscope = 0
         let g:gutentags_define_advanced_commands = 1
         set cscopetag 
-
-
 
         " 0 or s: Find this symbol
         " 1 or g: Find this definition
@@ -758,86 +817,133 @@ call plug#begin(pe_runtimepath . '/plugged')
 
 
 
-" Quickfix Config
+" -------------------------------------------
+" 6.9 Quickfix Plugin
+" -------------------------------------------
+    " Quickfix Config
     Plug 'skywind3000/vim-preview'
         autocmd FileType qf nnoremap <silent><buffer> p :PreviewQuickfix<cr>
         autocmd FileType qf nnoremap <silent><buffer> P :PreviewClose<cr>
         autocmd FileType qf nnoremap <silent><buffer> <MiddleMouse> :PreviewQuickfix<cr>
 
-    " -------------------------------------------
     " Quicktoggle
-    " -------------------------------------------
-            function! ToggleQuickfix()
-                if empty(filter(getwininfo(), 'v:val.quickfix'))
-                    copen
-                else
-                    cclose
-                endif
-            endfunction
-    " -------------------------------------------
-    " Better Preview
-    " -------------------------------------------
-        " function! HighlightQuickfixLine()
-        "     " highlight link QuickfixLine Search
-        " endfunction
-        " call HighlightQuickfixLine()
-        function! QuickfixArrowPreview(direction)
-            " Check if quickfix window is open
-            let winnow = winnr()
-            let winnr = winnr('$')
-            let i = 1
-            while i <= winnr
-                if getwinvar(i, '&buftype') == 'quickfix'
-                    " Quickfix window is open, so just move the cursor to it
-                    execute i . 'wincmd w'
-                    execute 'normal ' . a:direction
-                    execute 'match QuickFixLineScope /\%'.line('.').'l/'
-                    execute 'PreviewQuickfix'
-                    execute winnow . 'wincmd w'
-                    return
-                endif
-                let i += 1
-            endwhile
-            copen   " Quickfix window is not open, so open it
-        endfunction
-        " Call the function! to setup the autocmd
-    " -------------------------------------------
-    " Quicktoggle
-    " -------------------------------------------
+    function! ToggleQuickfix()
+        if empty(filter(getwininfo(), 'v:val.quickfix'))
+            copen
+        else
+            cclose
+        endif
+    endfunction
+
+    " Move cursor in quickfix preview
+    function! QuickfixArrowPreview(direction)
+        " Check if quickfix window is open
+        let winnow = winnr()
+        let winnr = winnr('$')
+        let i = 1
+        while i <= winnr
+            if getwinvar(i, '&buftype') == 'quickfix'
+                " Quickfix window is open, so just move the cursor to it
+                execute i . 'wincmd w'
+                execute 'normal ' . a:direction
+                execute 'match QuickFixLineScope /\%'.line('.').'l/'
+                execute 'PreviewQuickfix'
+                execute winnow . 'wincmd w'
+                return
+            endif
+            let i += 1
+        endwhile
+        copen   " Quickfix window is not open, so open it
+    endfunction
+    " Call the function! to setup the autocmd
+    
+    " Gtag quickfix keymap
         noremap <silent> go :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
         nnoremap <leader>cc  :call ToggleQuickfix()<CR>
         nnoremap <S-F12> :call QuickfixArrowPreview('j')<CR>
         nnoremap <S-F11> :call QuickfixArrowPreview('k')<CR>
 
-" Auto Popup
-    Plug 'skywind3000/vim-auto-popmenu'
-    Plug 'skywind3000/vim-dict'
-        " enable this plugin for filetypes, '*' for all files.
-        let g:apc_enable_ft = {'*':1}
-        let g:apc_trigger = "\<c-x>\<c-n>"
-        let g:apc_cr_confirm = 1
-        set cpt=.,k,w,b
-        " source for dictionary, current or other loaded buffers, see ':help cpt'
-        " don't select the first item.
-        set completeopt=menu,menuone,noselect
-        " suppress annoy messages.
-        set shortmess+=c
-        filetype plugin on
-        if has("autocmd") && exists("+omnifunc")
-        autocmd Filetype *
-                \	if &omnifunc == "" |
-                \		setlocal omnifunc=syntaxcomplete#Complete |
-                \	endif
-        endif
+" -------------------------------------------
+" 6.10 Complete Engine (APC)
+" -------------------------------------------
+    " Auto Popup
+    " Plug 'skywind3000/vim-auto-popmenu'
+    " Plug 'skywind3000/vim-dict'
+        " " enable this plugin for filetypes, '*' for all files.
+        " let g:apc_enable_ft = {'*':1}
+        " let g:apc_trigger = "\<c-x>\<c-n>"
+        " let g:apc_cr_confirm = 1
+        " set cpt=.,k,w,b
+        " " source for dictionary, current or other loaded buffers, see ':help cpt'
+        " " don't select the first item.
+        " set completeopt=menu,menuone,noselect
+        " " suppress annoy messages.
+        " set shortmess+=c
+        " filetype plugin on
+        " if has("autocmd") && exists("+omnifunc")
+        " autocmd Filetype *
+        "         \	if &omnifunc == "" |
+        "         \		setlocal omnifunc=syntaxcomplete#Complete |
+        "         \	endif
+        " endif
 
+" -------------------------------------------
+" 6.11 Complete Engine (async complete)
+" -------------------------------------------
+    Plug 'prabirshrestha/async.vim'
+    Plug 'prabirshrestha/asyncomplete.vim'
+    Plug 'prabirshrestha/asyncomplete-buffer.vim'
+    Plug 'wellle/tmux-complete.vim'
+        let g:asyncomplete_auto_popup = 0
+
+        function! s:check_back_space() abort
+            let col = col('.') - 1
+            return !col || getline('.')[col - 1]  =~ '\s'
+        endfunction
+        
+
+        inoremap <silent><expr> <TAB>
+                    \ pumvisible() ? "\<C-n>" :
+                    \ <SID>check_back_space() ? "\<TAB>" :
+                    \ asyncomplete#force_refresh()
+        inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+        inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
+        imap <c-space> <Plug>(asyncomplete_force_refresh)
+    Plug 'hrsh7th/vim-vsnip'
+    Plug 'hrsh7th/vim-vsnip-integ'
+    Plug 'rafamadriz/friendly-snippets'
 
 
 
 call plug#end()
 
+" 7. VIM Plug-in Zone (Part2)
+" ===========================================
+" -------------------------------------------
+" 7.1 Style
+" -------------------------------------------
     colorscheme onedark
 " -------------------------------------------
-" Submode Map
+" 7.2 Async complete
+" -------------------------------------------
+call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options({
+    \ 'name': 'buffer',
+    \ 'allowlist': ['*'],
+    \ 'blocklist': ['go'],
+    \ 'completor': function('asyncomplete#sources#buffer#completor'),
+    \ 'config': {
+    \    'max_buffer_size': 5000000,
+    \  },
+    \ }))
+
+" -------------------------------------------
+" 7.3 Expand region
+" -------------------------------------------
+    call expand_region#custom_text_objects()
+    
+" -------------------------------------------
+" 7.4 Submode Map
 " -------------------------------------------
 
     " call submode#enter_with('viewcode', 'n', '', 'gh', 'zz')
@@ -862,90 +968,90 @@ call plug#end()
 
 
 " -------------------------------------------
-" Quick UI
+" 7.5 Quick UI
 " -------------------------------------------
-  " Quick UI Register
-   " let g:quickui_color_scheme = 'system'
-  "  " 安装一个 File 目录，使用 [名称，命令] 的格式表示各个选项。
-  "  call quickui#menu#install('&File', [
-  "              \ [ "&New File\tCtrl+n", 'echo 0' ],
-  "              \ [ "&Open File\t(F3)", 'echo 1' ],
-  "              \ [ "&Close", 'echo 2' ],
-  "              \ [ "--", '' ],
-  "              \ [ "&Save\tCtrl+s", 'echo 3'],
-  "              \ [ "Save &As", 'echo 4' ],
-  "              \ [ "Save All", 'echo 5' ],
-  "              \ [ "--", '' ],
-  "              \ [ "E&xit\tAlt+x", 'echo 6' ],
-  "              \ ])
+    " Quick UI Register
+    " let g:quickui_color_scheme = 'system'
+    "  " 安装一个 File 目录，使用 [名称，命令] 的格式表示各个选项。
+    "  call quickui#menu#install('&File', [
+    "              \ [ "&New File\tCtrl+n", 'echo 0' ],
+    "              \ [ "&Open File\t(F3)", 'echo 1' ],
+    "              \ [ "&Close", 'echo 2' ],
+    "              \ [ "--", '' ],
+    "              \ [ "&Save\tCtrl+s", 'echo 3'],
+    "              \ [ "Save &As", 'echo 4' ],
+    "              \ [ "Save All", 'echo 5' ],
+    "              \ [ "--", '' ],
+    "              \ [ "E&xit\tAlt+x", 'echo 6' ],
+    "              \ ])
 
-  "  " 每个项目还可以多包含一个字段，表示它的帮助文档，光标过去时会被显示到最下方的命令行
-  "  call quickui#menu#install('&Edit', [
-  "              \ [ '&Copy', 'echo 1', 'help 1' ],
-  "              \ [ '&Paste', 'echo 2', 'help 2' ],
-  "              \ [ '&Find', 'echo 3', 'help 3' ],
-  "              \ ])
+    "  " 每个项目还可以多包含一个字段，表示它的帮助文档，光标过去时会被显示到最下方的命令行
+    "  call quickui#menu#install('&Edit', [
+    "              \ [ '&Copy', 'echo 1', 'help 1' ],
+    "              \ [ '&Paste', 'echo 2', 'help 2' ],
+    "              \ [ '&Find', 'echo 3', 'help 3' ],
+    "              \ ])
 
-  "  " 在 %{...} 内的脚本会被求值并展开成字符串
-  "  call quickui#menu#install("&Option", [
-  "              \ ['Set &Spell %{&spell? "Off":"On"}', 'set spell!'],
-  "              \ ['Set &Cursor Line %{&cursorline? "Off":"On"}', 'set cursorline!'],
-  "              \ ['Set &Paste %{&paste? "Off":"On"}', 'set paste!'],
-  "              \ ])
-
-
-  "  function! PECheetMessage()
-  "      let content =[  "=======================" 
-  "                  \ , " Basic Usage" 
-  "                  \ , "   Normal: <C-R> <-> u " 
-  "                  \ , "   Normal: y\"[reg] copy to reg " 
-  "                  \ , "   Visual: vi<range> r <space>" 
-  "                  \ , "   Terminal: <C-\\><C-N> back to Terminal-Normal" 
-  "                  \ , "=======================" 
-  "                  \ , " EasyAlign" 
-  "                  \ , "   <C-X> Interactive Mode " 
-  "                  \ , "   :LiveEasyAlign live Mode" 
-  "                  \ , "   `2=` Around the 2nd Occurrences " 
-  "                  \ , "   `*=` Around all Occurrences" 
-  "                  \ , "======================="  ]
-  "      let opts = {"close":"button", "title":"My CheetSheet"}
-  "      call quickui#textbox#open(content, opts)
-  "  endfunc
-
-  "  " install 命令最后可以加一个 “权重”系数，用于决定目录位置，权重越大越靠右，越小越靠左
-  "  call quickui#menu#install('H&elp', [
-  "              \ ["&PE_CheetThing", ':call PECheetMessage()', 'Leader+U' ],
-  "              \ ["&Cheatsheet", 'help index', ''],
-  "              \ ['T&ips', 'help tips', ''],
-  "              \ ['--',''],
-  "              \ ["&Tutorial", 'help tutor', ''],
-  "              \ ['&Quick Reference', 'help quickref', ''],
-  "              \ ['&Summary', 'help summary', ''],
-  "              \ ], 10000)
-  "  nnoremap leaderh :call PECheetMessage()<CR>
-
-  "  " 打开下面选项，允许在 vim 的下面命令行部分显示帮助信息
-  "  let g:quickui_show_tip = 1
-
-  "  " 定义按两次空格就打开上面的目录
-  "  noremap <space>m :call quickui#menu#open()<cr>
-  "  noremap <space>a :call quickui#tools#list_buffer('e')<cr>
-  "  
-
-   " let n_rightmouse_content = [
-   "             \ ["Paste", "exec 'normal" . '"' . "+p'" ],
-   "             \ ['-'],
-   "             \ ["Find File(Tags)", 'exec "normal gi"' ],
-   "             \ ]
-  
-   " " set cursor to the last position
-   " let n_rightmouse_opts = {'index':g:quickui#context#cursor}
-   " nnoremap <RightMouse> :call quickui#context#open(n_rightmouse_content, n_rightmouse_opts)<CR>
-
-  
+    "  " 在 %{...} 内的脚本会被求值并展开成字符串
+    "  call quickui#menu#install("&Option", [
+    "              \ ['Set &Spell %{&spell? "Off":"On"}', 'set spell!'],
+    "              \ ['Set &Cursor Line %{&cursorline? "Off":"On"}', 'set cursorline!'],
+    "              \ ['Set &Paste %{&paste? "Off":"On"}', 'set paste!'],
+    "              \ ])
 
 
-" Self Funtion Zone
+    "  function! PECheetMessage()
+    "      let content =[  "=======================" 
+    "                  \ , " Basic Usage" 
+    "                  \ , "   Normal: <C-R> <-> u " 
+    "                  \ , "   Normal: y\"[reg] copy to reg " 
+    "                  \ , "   Visual: vi<range> r <space>" 
+    "                  \ , "   Terminal: <C-\\><C-N> back to Terminal-Normal" 
+    "                  \ , "=======================" 
+    "                  \ , " EasyAlign" 
+    "                  \ , "   <C-X> Interactive Mode " 
+    "                  \ , "   :LiveEasyAlign live Mode" 
+    "                  \ , "   `2=` Around the 2nd Occurrences " 
+    "                  \ , "   `*=` Around all Occurrences" 
+    "                  \ , "======================="  ]
+    "      let opts = {"close":"button", "title":"My CheetSheet"}
+    "      call quickui#textbox#open(content, opts)
+    "  endfunc
+
+    "  " install 命令最后可以加一个 “权重”系数，用于决定目录位置，权重越大越靠右，越小越靠左
+    "  call quickui#menu#install('H&elp', [
+    "              \ ["&PE_CheetThing", ':call PECheetMessage()', 'Leader+U' ],
+    "              \ ["&Cheatsheet", 'help index', ''],
+    "              \ ['T&ips', 'help tips', ''],
+    "              \ ['--',''],
+    "              \ ["&Tutorial", 'help tutor', ''],
+    "              \ ['&Quick Reference', 'help quickref', ''],
+    "              \ ['&Summary', 'help summary', ''],
+    "              \ ], 10000)
+    "  nnoremap leaderh :call PECheetMessage()<CR>
+
+    "  " 打开下面选项，允许在 vim 的下面命令行部分显示帮助信息
+    "  let g:quickui_show_tip = 1
+
+    "  " 定义按两次空格就打开上面的目录
+    "  noremap <space>m :call quickui#menu#open()<cr>
+    "  noremap <space>a :call quickui#tools#list_buffer('e')<cr>
+    "  
+
+    " let n_rightmouse_content = [
+    "             \ ["Paste", "exec 'normal" . '"' . "+p'" ],
+    "             \ ['-'],
+    "             \ ["Find File(Tags)", 'exec "normal gi"' ],
+    "             \ ]
+
+    " " set cursor to the last position
+    " let n_rightmouse_opts = {'index':g:quickui#context#cursor}
+    " nnoremap <RightMouse> :call quickui#context#open(n_rightmouse_content, n_rightmouse_opts)<CR>
+
+
+
+
+" 8 Self Funtion Zone
 " ===========================================
     let s:exitKeyList = [ 'q', "\<ESC>" ]
     let s:delKeyList  = [ 'x', 'd' ]
@@ -1026,7 +1132,6 @@ call plug#end()
     "     set modifiable
     " endfunction
 
-    nnoremap <silent><leader>ro :set readonly!<CR>:set modifiable<CR>
     
 
     function! s:DiffWithSaved()
@@ -1047,8 +1152,3 @@ call plug#end()
         exe "setlocal bt=nofile bh=wipe nobl noswf ro ft=" . filetype
     endfunction
     com! DiffCVS call s:DiffWithCVSCheckedOut()
-
-
-
-    " highlight Search ctermbg=NONE ctermfg=NONE cterm=underline
-    " highlight IncSearch ctermbg=NONE ctermfg=NONE cterm=underline
