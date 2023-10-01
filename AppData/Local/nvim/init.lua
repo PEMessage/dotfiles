@@ -2,7 +2,7 @@
 -- File: init.lua
 -- Author: PEMessage
 -- Description: This is my VIM8+/NeoVIM configuration
--- Last Modified:  2023-05-29 Mon 03:01 PM
+-- Last Modified: 2023-10-01 11:11
 -- +++++++++++++++++++++++++++++++++++++++++++
 
 -- 1. Global Options
@@ -56,6 +56,7 @@ PE.logo = {
     vim.o.ruler        = true            -- 显示光标位置
     vim.o.ffs          = 'unix,dos,mac' -- 文件换行符，默认使用 unix 换行符
     vim.o.mouse        = 'a'
+    vim.o.diffopt = "linematch:60"
 -- -------------------------------------------
 -- 3.3 Search Zone
 -- -------------------------------------------
@@ -322,6 +323,67 @@ require("lazy").setup({ --Start Quote
     },
 
 },
+{
+    'lewis6991/gitsigns.nvim',
+    config = function ()
+        require('gitsigns').setup()
+    end
+},
+{
+    'yamatsum/nvim-cursorline',
+    config = function ()
+        require('nvim-cursorline').setup {
+            cursorline = {
+                enable = true,
+                timeout = 1000,
+                number = false,
+            },
+            cursorword = {
+                enable = true,
+                min_length = 3,
+                hl = { underline = true },
+            }
+        }
+    end
+},
+
+-- -------------------------------------------
+-- -- 5.2 File Manger
+-- -- -------------------------------------------
+{
+    'nvim-tree/nvim-tree.lua',
+    init = function ()
+        vim.g.loaded_netrw = 1
+        vim.g.loaded_netrwPlugin = 1
+    end,
+    keys = {
+        {'<leader>b','<cmd>NvimTreeToggle<cr>',desc = 'Tree Toggle'},
+    },
+    opts = {
+
+        filters = {
+            dotfiles = false,
+        },
+
+        on_attach = function (bufnr)
+            local api = require "nvim-tree.api"
+
+            local function opts(desc)
+                return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+            end
+
+            -- default mappings
+            api.config.mappings.default_on_attach(bufnr)
+
+            -- custom mappings
+            -- vim.keymap.set('n', '<C-t>', api.tree.change_root_to_parent,        opts('Up'))
+            vim.keymap.set('n', '?',     api.tree.toggle_help,          opts('Help'))
+            vim.keymap.set('n', '.',     api.tree.change_root_to_node,  opts('CD'))
+        end
+
+    },
+
+},
 -- {
 --     "nvim-neo-tree/neo-tree.nvim",
 --     branch = "v2.x",
@@ -381,49 +443,35 @@ require("lazy").setup({ --Start Quote
 --         require("neo-tree").setup(opts)
 --     end,
 -- },
-{
-    'nvim-tree/nvim-tree.lua',
-    init = function ()
-        vim.g.loaded_netrw = 1
-        vim.g.loaded_netrwPlugin = 1
-    end,
-    keys = {
-        {'<leader>b','<cmd>NvimTreeToggle<cr>',desc = 'Tree Toggle'},
-    },
-    opts = {
-
-        filters = {
-            dotfiles = false,
-        },
-
-        on_attach = function (bufnr)
-            local api = require "nvim-tree.api"
-
-            local function opts(desc)
-                return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
-            end
-
-            -- default mappings
-            api.config.mappings.default_on_attach(bufnr)
-
-            -- custom mappings
-            -- vim.keymap.set('n', '<C-t>', api.tree.change_root_to_parent,        opts('Up'))
-            vim.keymap.set('n', '?',     api.tree.toggle_help,          opts('Help'))
-            vim.keymap.set('n', '.',     api.tree.change_root_to_node,  opts('CD'))
-        end
-
-    },
-
-},
-
+--
 -- {
 --     "gioele/vim-autoswap",
 --     config = function()
 --         vim.g.autoswap_detect_tmux = 1
 --     end
 -- },
+{
+    "christoomey/vim-tmux-navigator",
+    config = function()
+        vim.g.tmux_navigator_no_mappings = 1
+        vim.keymap.set( 'n',  '<M-S-h>', ':<C-U>TmuxNavigateLeft<cr>' , { silent = true, desc = "Navigate Left"  } )
+        vim.keymap.set( 'n',  '<M-S-j>', ':<C-U>TmuxNavigateDown<cr>' , { silent = true, desc = "Navigate Down"  } )
+        vim.keymap.set( 'n',  '<M-S-k>', ':<C-U>TmuxNavigateUp<cr>'   , { silent = true, desc = "Navigate Up"    } )
+        vim.keymap.set( 'n',  '<M-S-l>', ':<C-U>TmuxNavigateRight<cr>', { silent = true, desc = "Navigate Right" } )
+
+        -- vim.keymap.set( 'n',  '<leader>`pon', ':set mouse=a<CR>', { silent = true, desc = "Mouse on" } )
+        -- vim.keymap.set( 'n',  '<leader>`pof', ':set mouse=<CR>', { silent = true, desc = "Mouse off" } )
+
+        -- 注册命令
+        vim.cmd([[
+        command! -nargs=0 PEMouseON lua PE.MouseSet("a")
+        command! -nargs=0 PEMouseOFF lua PE.MouseSet("")
+        ]])
+
+    end
+},
 -- -------------------------------------------
--- 5.2 Mini.nvim Plugin
+-- 5.3 Mini.nvim Plugin
 -- -------------------------------------------
 {
     'echasnovski/mini.pairs',
@@ -468,7 +516,7 @@ require("lazy").setup({ --Start Quote
 },
 
 -- -------------------------------------------
--- 5.3 Telescope Setting
+-- 5.4 Telescope Setting
 -- -------------------------------------------
 {
     'nvim-telescope/telescope.nvim', tag = '0.1.1',
@@ -673,7 +721,7 @@ require("lazy").setup({ --Start Quote
 },
 
 -- -------------------------------------------
--- 5.4 Editing Plugin
+-- 5.5 Editing Plugin
 -- -------------------------------------------
 {
     'numToStr/Comment.nvim',
@@ -763,7 +811,7 @@ require("lazy").setup({ --Start Quote
 
 
 -- -------------------------------------------
--- 5.5 Leagcy Plugin
+-- 5.6 Leagcy Plugin
 -- -------------------------------------------
 {
     'yianwillis/vimcdoc'
@@ -775,17 +823,23 @@ require("lazy").setup({ --Start Quote
         vim.g.M_default_mappings = 0
         vim.g.VM_mouse_mappings  = 1
         vim.g.VM_maps = {
-            ['Find Under']          = '<C-d>',
-            ['Find Subword Under']  = '<C-d>',
+            ['Find Under']          = '<C-h>',
+            ['Find Subword Under']  = '<C-h>',
+            ['Exit']                = '<C-c>',
             -- Arrow Key
-            ["Add Cursor Up"]       = '<M-C-Up>',
-            ["Add Cursor Down"]     = '<M-C-Down>',
+            ["Add Cursor Up"]       = '<C-Up>',
+            ["Add Cursor Down"]     = '<C-Down>',
             -- Mouse
             ["Mouse Cursor"]        = '<C-LeftMouse>',
             -- Multi-Mode
-            ["Align"]               = '<C-A>',
-            ["Enlarge"]             = "+",
+            ["Align"]               = '<C-a>',
+            ["Enlarge"]             = "=",
             ["Shrink"]              = "-",
+            -- Move
+            ["Find Next"]           = ']',
+            ["Find Prev"]           = '[',
+            ["Remove Region"]       = 'Q',
+            ["Skip Region"]         = 'q'
         }
     end,
 },
@@ -810,7 +864,7 @@ require("lazy").setup({ --Start Quote
 { 'tpope/vim-repeat', event = 'VeryLazy' },
 
 -- -------------------------------------------
--- 5.6 Treesitter Plugin
+-- 5.7 Treesitter Plugin
 -- -------------------------------------------
 {
     "nvim-treesitter/nvim-treesitter",
@@ -852,7 +906,7 @@ require("lazy").setup({ --Start Quote
 },
 
 -- -------------------------------------------
--- 5.7 Completion Plugin
+-- 5.8 Completion Plugin
 -- -------------------------------------------
 
 {
@@ -966,15 +1020,24 @@ require("lazy").setup({ --Start Quote
             end,
             filter_kind = {
                 "Variable",
-                "Constructor",
                 "Enum",
                 "Function",
-                "Method",
                 "Struct",
+                "Class",
+                "Method",
+                "Constructor",
             },
         })
-        vim.keymap.set('n', '<leader>a', '<cmd>AerialToggle!<CR>')
+        vim.keymap.set('n', '<leader>ae', '<cmd>AerialToggle!<CR>')
     end,
+},
+{
+    'liuchengxu/vista.vim',
+    config = function ()
+        vim.keymap.set('n', '<leader>av', '<cmd>Vista!!<CR>')
+	vim.cmd('let g:vista#renderer#enable_icon = 0')
+    end,
+
 },
 
 {
@@ -1131,13 +1194,19 @@ require("lazy").setup({ --Start Quote
     vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 
     -- Move to window using the <meta>+<shift>+hjkl keys
-    vim.keymap.set("n", "<M-S-H>", "<C-W>h", { desc = "Go to left window", remap = true })
-    vim.keymap.set("n", "<M-S-J>", "<C-W>j", { desc = "Go to lower window", remap = true })
-    vim.keymap.set("n", "<M-S-K>", "<C-W>k", { desc = "Go to upper window", remap = true })
-    vim.keymap.set("n", "<M-S-L>", "<C-W>l", { desc = "Go to right window", remap = true })
+    -- vim.keymap.set("n", "<M-S-H>", "<C-W>h", { desc = "Go to left window", remap = true })
+    -- vim.keymap.set("n", "<M-S-J>", "<C-W>j", { desc = "Go to lower window", remap = true })
+    -- vim.keymap.set("n", "<M-S-K>", "<C-W>k", { desc = "Go to upper window", remap = true })
+    -- vim.keymap.set("n", "<M-S-L>", "<C-W>l", { desc = "Go to right window", remap = true })
 
-    vim.keymap.set("n","<M-S-V>","<cmd>wincmd v<CR>",{ desc = "Vertical split", remap = true })
-    vim.keymap.set("n","<M-S-C>","<cmd>wincmd c<CR>",{ desc = "Close current pane", remap = true })
+    -- vim.keymap.set("n","<M-S-V>","<cmd>wincmd v<CR>",{ desc = "Vertical split", remap = true })
+    -- vim.keymap.set("n","<M-S-C>","<cmd>wincmd c<CR>",{ desc = "Close current pane", remap = true })
+    vim.keymap.set( 'n',  '<M-S-C>', ':vsplit<cr>' )
+    vim.keymap.set( 'n',  '<M-S-X>', ':confirm q<cr>' )
+
+    vim.keymap.set( 'n',  '<M-S-E>', ':tabn<cr>' )
+    vim.keymap.set( 'n',  '<M-S-W>', ':tab new<cr>' )
+    vim.keymap.set( 'n',  '<M-S-Q>', ':tabp<cr>' )
 
     -- Switch Buffer using <meta>+<shift>+pn
     vim.keymap.set("n", "<M-S-N>", "<cmd>bn<CR>", { desc = "Go to right window", remap = true })
@@ -1271,6 +1340,9 @@ function PE.PrintTbl(tb)
     return RecuPrint(tb)
 end
 
+function PE.MouseSet(arg)
+    vim.o.mouse = arg
+end
 
 -- local pehop = require('pehop')
 -- local hopp = require('hop-search')
