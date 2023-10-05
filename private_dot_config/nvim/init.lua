@@ -1,8 +1,8 @@
 -- +++++++++++++++++++++++++++++++++++++++++++
 -- File: init.lua
 -- Author: PEMessage
--- Description: This is my VIM8+/NeoVIM configuration
--- Last Modified: 2023-10-01 11:11
+-- Description: This is my NeoVIM configuration
+-- Last Modified: 2023-10-05 15:13
 -- +++++++++++++++++++++++++++++++++++++++++++
 
 -- 1. Global Options
@@ -28,12 +28,12 @@ PE.logo = {
     local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
     if not vim.loop.fs_stat(lazypath) then
       vim.fn.system({
-        "git",
-        "clone",
-        "--filter=blob:none",
-        "https://github.com/folke/lazy.nvim.git",
-        "--branch=stable", -- latest stable release
-        lazypath,
+          "git",
+          "clone",
+          "--filter=blob:none",
+          "https://github.com/folke/lazy.nvim.git",
+          "--branch=stable", -- latest stable release
+          lazypath,
       })
     end
     vim.opt.rtp:prepend(lazypath)
@@ -50,7 +50,7 @@ PE.logo = {
 -- -------------------------------------------
 -- 3.1 Basic Setting Zone
 -- -------------------------------------------
-    vim.o.nocompatible = true     -- 禁用 vi 兼容模式
+    -- vim.o.nocompatible = true     -- 禁用 vi 兼容模式
     vim.o.helplang     = "cn"      -- 设置中文帮助手册
     vim.o.wrap         = false          -- 关闭自动换行
     vim.o.ruler        = true            -- 显示光标位置
@@ -306,6 +306,7 @@ require("lazy").setup({ --Start Quote
     version = "*",
     dependencies = {
         "SmiteshP/nvim-navic",
+        "nvim-treesitter/nvim-treesitter",
         -- "nvim-tree/nvim-web-devicons", -- optional dependency
     },
     opts = {
@@ -505,12 +506,35 @@ require("lazy").setup({ --Start Quote
 {
     "lukas-reineke/indent-blankline.nvim",
     event = { "BufReadPost", "BufNewFile" },
-
+    -- Version 2
+    -- config = function(_,opts)
+    --     require("indent_blankline").setup({
+    --         char = '┆',
+    --         filetype_exclude = { "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy", "mason" },
+    --     })
+    --     vim.cmd [[highlight IndentBlanklineChar guifg=#455574 gui=nocombine]]
+    -- end
+    --
+    -- Version 3
     config = function(_,opts)
-        require("indent_blankline").setup({
-            char = '┆',
-            filetype_exclude = { "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy", "mason" },
+        require("ibl").setup({
+
+            debounce = 100,
+            indent = { char = "|" },
+            exclude = {
+                filetypes = {
+                     "help",
+                     "alpha",
+                     "dashboard",
+                     "neo-tree",
+                     "Trouble",
+                     "lazy",
+                     "mason"
+                }
+            }
+
         })
+
         vim.cmd [[highlight IndentBlanklineChar guifg=#455574 gui=nocombine]]
     end
 },
@@ -778,21 +802,22 @@ require("lazy").setup({ --Start Quote
         -- vim.api.nvim_command('highlight default link HopPreview HopNextKey' )
     end
 },
--- {
---     "folke/flash.nvim",
---     event = "VeryLazy",
---     opts = {},
---     -- stylua: ignore
---     keys = {
---         -- { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
---         -- { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
---         { "<leader>sf", mode = { "n","c" },
---         function()
---             require("flash").jump({continue = true})
---         end,
---         desc = "Toggle Flash Search" },
---     },
--- },
+{
+    "folke/flash.nvim",
+    event = "VeryLazy",
+    opts = {},
+    -- stylua: ignore
+    keys = {
+        -- { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
+        -- { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+        -- { "<leader>sf", mode = { "n","c" },
+        -- function()
+        --     require("flash").jump({continue = true})
+        -- end,
+        -- desc = "Toggle Flash Search" },
+        { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
+    },
+},
 --
 -- {
 --     'woosaaahh/sj.nvim',
@@ -868,7 +893,8 @@ require("lazy").setup({ --Start Quote
 -- -------------------------------------------
 {
     "nvim-treesitter/nvim-treesitter",
-    version = false, -- last release is way too old and doesn't work on Windows
+    -- version = false, -- last release is way too old and doesn't work on Windows
+    -- enabled = false,
     build = ":TSUpdate",
     event = { "BufReadPost", "BufNewFile" },
     opts = {
@@ -876,7 +902,7 @@ require("lazy").setup({ --Start Quote
             enable = true,
             additional_vim_regex_highlighting = false,
         },
-        -- indent = { enable = true },
+        indent = { enable = true },
         ensure_installed = {
             'json',
             'css',

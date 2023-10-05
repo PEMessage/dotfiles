@@ -208,7 +208,7 @@
 
 
     alias grep='grep --color=auto'
-    alias cnl='LC_ALL=zh_CN.UTF-8'
+    alias cnl='LC_ALL=zh_CN.UTF-8 LANG=zh_CN.UTF-8'
 
     export EDITOR=vim
 
@@ -222,6 +222,10 @@
     alias df='df -h'
     alias du='du -h'
 
+
+# -----------------------------------------
+# Lazy load
+# -----------------------------------------
 
 # -----------------------------------------
 # Source Zone
