@@ -8,7 +8,7 @@ if [ -n "$BASH_VERSION" ]; then
 
     __fzf_history__() {
         local output opts script
-        opts="--height ${FZF_TMUX_HEIGHT:-40%} --bind=ctrl-z:ignore ${FZF_DEFAULT_OPTS-} -n2..,.. --bind=ctrl-r:toggle-sort ${FZF_CTRL_R_OPTS-} +m --read0"
+        opts="--height ${FZF_TMUX_HEIGHT:-40%} --bind=ctrl-z:ignore ${FZF_DEFAULT_OPTS-+s} -n2..,.. --bind=ctrl-r:toggle-sort ${FZF_CTRL_R_OPTS-+s} +m --read0"
         script='BEGIN { getc; $/ = "\n\t"; $HISTCOUNT = $ENV{last_hist} + 1 } s/^[ *]//; print $HISTCOUNT - $. . "\t$_" if !$seen{$_}++'
         output=$(
         builtin fc -lnr -2147483648 |
