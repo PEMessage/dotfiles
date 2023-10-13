@@ -44,7 +44,7 @@
 
 # Third Part Feature
 # =========================================
-    Import-Module z # $($PROFILE | bcd)/Module/z
+    # Import-Module z # $($PROFILE | bcd)/Module/z
 
     Invoke-Expression (&scoop-search --hook)
     Invoke-Expression (&starship init powershell)

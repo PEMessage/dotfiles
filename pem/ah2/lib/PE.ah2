@@ -67,16 +67,16 @@ class PE {   ; Pure Function Class(Just like a namespace)
 ; Only depend on this.CmdRet
     SetEnglish(){
         cur_imm_str := Trim(this.CmdRet("im-select-imm.exe"),"`r`n")
-        cur_imm := StrSplit(cur_imm_str, ' ')
+        cur_imm := StrSplit(cur_imm_str, '-')
         if(cur_imm[1] == '1033'){
             return -1
         }
-        if(cur_imm[1] == '2052'){
-            if(not Mod(cur_imm[2],1024)){   ; Do not change(ret -1) cur_imm[1] == 0 
-                return -1 
-            } 
-        } 
-        this.CmdRet("im-select-imm.exe 1033")
+        ; if(cur_imm[1] == '2052'){
+        ;     if(not Mod(cur_imm[2],1024)){   ; Do not change(ret -1) cur_imm[1] == 0 
+        ;         return -1 
+        ;     } 
+        ; } 
+        this.CmdRet("im-select-imm.exe 2052-0")
         return cur_imm_str
     }
 
@@ -141,19 +141,6 @@ class PE {   ; Pure Function Class(Just like a namespace)
         if (InStr(wTitle, edge) && url && !(url ~= "^\w+:"))
             url := "http://" url
         return url
-    }
-;Sub Clipboard
-    SubSign(textContent)
-    {
-        keywords := [
-                ["，", ", "], 
-                ["。", ". "],
-                ["！","! "]
-            ]
-        loop  keywords.Length {
-            textContent := StrReplace(textContent, keywords[A_Index][1], keywords[A_Index][2])
-        }
-        return textContent
     }
 
 
