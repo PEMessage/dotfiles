@@ -385,65 +385,65 @@ require("lazy").setup({ --Start Quote
     },
 
 },
--- {
---     "nvim-neo-tree/neo-tree.nvim",
---     branch = "v2.x",
---     dependencies = {
---         "nvim-lua/plenary.nvim",
---         "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
---         "MunifTanjim/nui.nvim",
---     },
---     keys = {
---         {
---             "<M-b>",
---             function()
---                 require("neo-tree.command").execute({
---                     toggle = true, dir = vim.loop.cwd()
---                 })
---             end,
---             desc = "Explorer NeoTree (cwd)",
---         },
---         {
---             "<leader>b",
---             function()
---                 require("neo-tree.command").execute({
---                     toggle = true, dir = vim.loop.cwd()
---                 })
---             end,
---             desc = "Explorer NeoTree (cwd)",
---         },
---     },
---     opts = {
---         window = {
---             mappings = {
---                 ["<space>"] = 'none',
---             },
---         },
---         -- git_status = {
---         --     window = {
---         --         position = "float",
---         --         mappings = {
---         --             ["A"]  = "git_add_all",
---         --             ["gu"] = "git_unstage_file",
---         --             ["ga"] = "git_add_file",
---         --             ["gr"] = "git_revert_file",
---         --             ["gc"] = "git_commit",
---         --             ["gp"] = "git_push",
---         --             ["gg"] = "git_commit_and_push",
---         --         }
---         --     }
---         -- }
---
---     },
---     deactivate = function()
---         vim.cmd([[Neotree close]])
---     end,
---
---     config = function(_,opts)
---         vim.cmd([[ let g:neo_tree_remove_legacy_commands = 1 ]])
---         require("neo-tree").setup(opts)
---     end,
--- },
+{
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v2.x",
+    dependencies = {
+        "nvim-lua/plenary.nvim",
+        "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+        "MunifTanjim/nui.nvim",
+    },
+    keys = {
+        {
+            "<M-b>",
+            function()
+                require("neo-tree.command").execute({
+                    toggle = true, dir = vim.loop.cwd()
+                })
+            end,
+            desc = "Explorer NeoTree (cwd)",
+        },
+        {
+            "<leader>b",
+            function()
+                require("neo-tree.command").execute({
+                    toggle = true, dir = vim.loop.cwd()
+                })
+            end,
+            desc = "Explorer NeoTree (cwd)",
+        },
+    },
+    opts = {
+        window = {
+            mappings = {
+                ["<space>"] = 'none',
+            },
+        },
+        -- git_status = {
+        --     window = {
+        --         position = "float",
+        --         mappings = {
+        --             ["A"]  = "git_add_all",
+        --             ["gu"] = "git_unstage_file",
+        --             ["ga"] = "git_add_file",
+        --             ["gr"] = "git_revert_file",
+        --             ["gc"] = "git_commit",
+        --             ["gp"] = "git_push",
+        --             ["gg"] = "git_commit_and_push",
+        --         }
+        --     }
+        -- }
+
+    },
+    deactivate = function()
+        vim.cmd([[Neotree close]])
+    end,
+
+    config = function(_,opts)
+        vim.cmd([[ let g:neo_tree_remove_legacy_commands = 1 ]])
+        require("neo-tree").setup(opts)
+    end,
+},
 --
 -- {
 --     "gioele/vim-autoswap",
@@ -486,7 +486,7 @@ require("lazy").setup({ --Start Quote
     -- active indent guide and indent text objects
     "echasnovski/mini.indentscope",
     version = false, -- wait till new 0.7.0 release to put it back on semver
-    enabled = false,
+    enabled = true,
     event = { "BufReadPre", "BufNewFile" },
     config = function(_,opts)
         vim.api.nvim_create_autocmd("FileType", {
@@ -518,10 +518,14 @@ require("lazy").setup({ --Start Quote
     --
     -- Version 3
     config = function(_,opts)
+        vim.cmd [[highlight IndentBlanklineChar guifg=#455574 gui=nocombine]]
         require("ibl").setup({
 
             debounce = 100,
-            indent = { char = "|" },
+            indent = {
+                char = "|",
+                highlight = 'IndentBlanklineChar'
+            },
             exclude = {
                 filetypes = {
                      "help",
@@ -532,11 +536,10 @@ require("lazy").setup({ --Start Quote
                      "lazy",
                      "mason"
                 }
-            }
+            },
 
         })
 
-        vim.cmd [[highlight IndentBlanklineChar guifg=#455574 gui=nocombine]]
     end
 },
 
@@ -544,7 +547,7 @@ require("lazy").setup({ --Start Quote
 -- 5.4 Telescope Setting
 -- -------------------------------------------
 {
-    'nvim-telescope/telescope.nvim', tag = '0.1.1',
+    'nvim-telescope/telescope.nvim', tag = '0.1.4',
     dependencies = { 'nvim-lua/plenary.nvim' },
     cmd = "Telescope",
 
@@ -1196,6 +1199,18 @@ require("lazy").setup({ --Start Quote
 
     end
 
+},
+{
+    'WhoIsSethDaniel/toggle-lsp-diagnostics.nvim',
+    config = function ()
+        require('toggle_lsp_diagnostics').init()
+        vim.keymap.set(
+            "n",
+            "<leader>tda",
+            "<Plug>(toggle-lsp-diag-vtext)",
+            { desc = "Toggle diagnostic underline", remap = true }
+        )
+    end
 },
 
 -- -------------------------------------------
