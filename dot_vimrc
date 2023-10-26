@@ -150,6 +150,11 @@ let g:startify_custom_header = [
     set autoindent                 " 自动缩进
     set cindent                    " C语言更好的缩进
 
+    filetype plugin indent on
+    set cinkeys-=0#
+    set indentkeys-=0#
+
+
     set backspace=eol,start,indent " 类似所有编辑器的删除键
 
     if has('autocmd')
