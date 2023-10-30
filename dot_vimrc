@@ -85,6 +85,7 @@ let g:startify_custom_header = [
     set linebreak
     " set clipboard=       " 关闭系统剪贴板共享
     " set clipboard=       " 关闭系统剪贴板共享
+    
 
 " -------------------------------------------
 " 3.2 Coding Zone
@@ -181,6 +182,10 @@ let g:startify_custom_header = [
     "     endif
     " endfunction
     " hi
+    execute "set viewdir=" . g:pe_cachedir . '/view'
+    autocmd BufWinLeave *.* mkview
+    autocmd BufWinEnter *.* silent loadview
+    set wildmenu
 
 " -------------------------------------------
 " 3.6 Meta Setting
@@ -678,9 +683,10 @@ call plug#begin(pe_runtimepath . '/plugged')
     "     tnoremap <C-[><C-[> <c-\><c-n>:bdelete! %<CR>
     "     let g:terminal_key = '<leader>='
         " let g:terminal_key = '<M-`>'
-    " Plug 'voldikss/vim-floaterm'
-        " nnoremap <M-`> :FloatermToggle! Default<CR>
-        " nnoremap <leader>ft :FloatermToggle! Default<CR>
+    Plug 'voldikss/vim-floaterm'
+        let g:floaterm_keymap_toggle = '<M-`>'
+        let g:floaterm_position = 'bottomright'
+        let g:floaterm_opener = 'tabe'
     Plug 'christoomey/vim-tmux-navigator'
         let g:tmux_navigator_no_mappings = 1
         noremap  <silent><M-S-h> :<C-U>TmuxNavigateLeft<cr>
@@ -915,8 +921,10 @@ call plug#begin(pe_runtimepath . '/plugged')
 
         inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
         imap <c-space> <Plug>(asyncomplete_force_refresh)
-    Plug 'hrsh7th/vim-vsnip'
-    Plug 'hrsh7th/vim-vsnip-integ'
+    if has('patch-8.0.1494')
+        Plug 'hrsh7th/vim-vsnip'
+        Plug 'hrsh7th/vim-vsnip-integ'
+    endif
     Plug 'rafamadriz/friendly-snippets'
 
 

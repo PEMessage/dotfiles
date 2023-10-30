@@ -5,13 +5,11 @@
 [[ $- != *i* ]] && return
 
 
-HISTSIZE=5000
-HISTFILESIZE=5000
+HISTSIZE=2500
+HISTFILESIZE=2500
 HISTCONTROL=ignoredups:erasedups
 shopt -s histappend
-if [[ ! "$PROMPT_COMMAND" = *"history -a; history -c; history -r;"* ]] ; then
-    PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
-fi
+PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 
 # -----------------------------------------
 # PS1 Setting
@@ -22,33 +20,43 @@ fi
 
     pe_prompt() {
 
-        local blackF="\[\e[30m\]" # Fonts color
-        local redF="\[\e[1;31m\]" 
-        local yellowF="\[\e[1;33m\]" 
-        local magentaF="\[\e[1;35m\]" 
-        local cyanF="\[\e[1;36m\]" 
-        local blueF="\[\e[1;34m\]" 
-        local greenF="\[\e[1;32m\]" 
-        local whiteF="\[\e[37m\]" 
-
-        local blackB="\[\e[30m\]" # Background color
-        local redB="\[\e[41m\]" 
-        local greenB="\[\e[42m\]" 
-        local yellowB="\[\e[43m\]" 
-        local blueB="\[\e[44m\]" 
-        local magentaB="\[\e[45m\]" 
-        local cyanB="\[\e[46m\]" 
-        local whiteB="\[\e[47m\]" 
-        local colorEnd="\[\e[00m\]"
+        # local exit_code="\$(VALU="\$?" ; echo -n \$VALU)"
         case "$TERM" in 
             xterm-color|*-256color) color_prompt=yes;;
         esac
-
         if [ "$color_prompt" = yes ]; then
-            PS1="[$blueF\u@\h$colorEnd:$greenF\w$colorEnd]\$ "
-        else
-            PS1="[\u@\h \w]\$ "
+            local blackF="\[\e[30m\]" # Fonts color
+            local redF="\[\e[1;31m\]" 
+            local yellowF="\[\e[1;33m\]" 
+            local magentaF="\[\e[1;35m\]" 
+            local cyanF="\[\e[1;36m\]" 
+            local blueF="\[\e[1;34m\]" 
+            local greenF="\[\e[1;32m\]" 
+            local whiteF="\[\e[37m\]" 
+            local blackB="\[\e[30m\]" # Background color
+            local redB="\[\e[41m\]" 
+            local greenB="\[\e[42m\]" 
+            local yellowB="\[\e[43m\]" 
+            local blueB="\[\e[44m\]" 
+            local magentaB="\[\e[45m\]" 
+            local cyanB="\[\e[46m\]" 
+            local whiteB="\[\e[47m\]" 
+            local colorEnd="\[\e[00m\]"
         fi
+
+        local exit_code='\e[01;31m$(code=${?##0};echo ${code:+\ err:${code}})\e[00m'
+        # if [ "$color_prompt" = yes ]; then
+        PS1=""
+        PS1+="["
+        PS1+="$blueF\u@\h$colorEnd"
+        PS1+=":"
+        PS1+="$greenF\w$colorEnd"
+        PS1+="]"
+        PS1+="$exit_code\$(parse_git_branch)"
+        PS1+="\$ "
+        # else
+            # PS1="[\u@\h \w]\$ "
+        # fi
     }
     pe_prompt
 
@@ -65,5 +73,8 @@ fi
 # -----------------------------------------
 # Source Zone
 # -----------------------------------------
+    bind '"\e[A": history-search-backward'
+    bind '"\e[B": history-search-forward'
+    # bind 'TAB:menu-complete'
 
     source ~/.config/pem/shell/init-sh.sh

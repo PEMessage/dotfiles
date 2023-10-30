@@ -35,14 +35,14 @@ tmux_isvim() {
 mouse_on() {
     tmux set -g mouse on
     if tmux_isvim ; then
-        tmux send-keys ":PEMouseON"
+        tmux send-keys ":set mouse=a"
         tmux send-keys "C-m"
     fi
 }
 mouse_off() {
     tmux set -g mouse off
     if tmux_isvim ; then
-        tmux send-keys ":PEMouseOFF"
+        tmux send-keys ":set mouse="
         tmux send-keys "C-m"
     fi
 }
