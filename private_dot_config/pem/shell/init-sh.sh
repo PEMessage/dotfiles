@@ -194,8 +194,12 @@
 # -----------------------------------------
 
     case "$OSTYPE" in
-        *gnu*|*linux*|*msys*|*cygwin*) alias ls='ls --color=auto' ;;
-        *freebsd*|*darwin*) alias ls='ls -G' ;;
+        *gnu*|*linux*|*msys*|*cygwin*)
+            alias ls='ls --color=auto --time-style=full-iso -h'
+        ;;
+        *freebsd*|*darwin*)
+            alias ls='ls -G'
+        ;;
     esac
 
 
@@ -209,6 +213,7 @@
 
     alias grep='grep --color=auto'
     alias cnl='LC_ALL=zh_CN.UTF-8 LANG=zh_CN.UTF-8'
+    alias nvi="nvim"
 
     export EDITOR=vim
 

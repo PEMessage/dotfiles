@@ -40,10 +40,11 @@ let g:startify_custom_header = [
                 \ 'colorscheme': 'selenized_black',
                 \ 'active': {
                     \   'left': [ [ 'mode', 'paste' ],
-                    \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+                    \             [ 'gitbranch', 'readonly', 'filename', 'modified', 'searchcount' ] ]
                     \ },
                 \ 'component_function': {
-                    \   'gitbranch': 'FugitiveHead'
+                    \   'gitbranch': 'FugitiveHead',
+                    \   'searchcount': 'SearchIndex'
                     \ },
                 \ }
     nnoremap <leader>tt :call lightline#toggle()<CR>
@@ -516,6 +517,7 @@ call plug#begin(pe_runtimepath . '/plugged')
 " 6.3 Style PlugIn
 " -------------------------------------------
     Plug 'itchyny/lightline.vim'
+    Plug 'google/vim-searchindex'
     Plug 'edkolev/tmuxline.vim'
 
     Plug 'romgrk/github-light.vim'
@@ -578,6 +580,8 @@ call plug#begin(pe_runtimepath . '/plugged')
         autocmd BufNewFile,BufRead *.s,*.S set filetype=arm " arm = armv6/7
     Plug 'rubberduck203/aosp-vim'
         autocmd BufNewFile,BufRead *.bp set filetype=json " arm = armv6/7
+    Plug 'sheerun/vim-polyglot'
+    Plug 'mtdl9/vim-log-highlighting'
     Plug 'chrisbra/Colorizer'
     Plug 'powerman/vim-plugin-AnsiEsc'
 
@@ -1165,3 +1169,30 @@ call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options
         exe "setlocal bt=nofile bh=wipe nobl noswf ro ft=" . filetype
     endfunction
     com! DiffCVS call s:DiffWithCVSCheckedOut()
+
+    " let g:lightline = {
+    "             \ 'active': {
+    "             \   'left': [ [ 'mode', 'paste' ],
+    "             \             [ 'readonly', 'filename', 'modified' ] ],
+    "             \   'right': [ [ 'lineinfo' ],
+    "             \              [ 'percent' ],
+    "             \              [ 'searchcount' ] ]
+    "             \ },
+    "             \ 'component_function': {
+    "             \   'searchcount': 'SearchCount',
+    "             \ },
+    "         \ }
+
+    function! SearchCount() abort
+        let search_count = searchcount()
+        if !empty(search_count)
+            return '[' . search_count.current . '/' . search_count.total . ']'
+        else
+            return ''
+        endif
+    endfunction
+
+    function! SearchIndex() abort
+        let res = searchindex#MatchCounts()
+        return '[' . res[0] . '/' . res[1] . ']'
+    endfunction
