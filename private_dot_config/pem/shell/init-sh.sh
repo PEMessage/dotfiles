@@ -70,6 +70,11 @@
         unset temp_d
     fi
 
+    # go install default path
+    if [ -d "$HOME/go/bin" ]; then
+        export PATH="$PATH:$HOME/go/bin"
+    fi
+
     # remove duplicate path
     # From skywind3000/vim/etc init.sh
     if [ -n "$PATH" ]; then
