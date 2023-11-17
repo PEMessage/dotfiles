@@ -190,6 +190,12 @@ require("lazy").setup({ --Start Quote
     end,
 },
 {
+    'fei6409/log-highlight.nvim',
+    config = function()
+        require('log-highlight').setup {}
+    end,
+},
+{
     'PEMessage/alpha-nvim',
     event = "VimEnter",
     -- dependencies = { 'nvim-tree/nvim-web-devicons' },
@@ -296,6 +302,14 @@ require("lazy").setup({ --Start Quote
                 icons_enabled = false,
                 component_separators = { left = '|', right = '|' },
                 section_separators = { left = '', right = '' },
+            },
+            sections = {
+                lualine_a = {'mode'},
+                lualine_b = {'branch', 'diff', 'diagnostics'},
+                lualine_c = {'filename','searchcount'},
+                lualine_x = {'encoding', 'fileformat', 'filetype'},
+                lualine_y = {'progress'},
+                lualine_z = {'location'}
             },
         })
     end
@@ -904,6 +918,7 @@ require("lazy").setup({ --Start Quote
     opts = {
         highlight = {
             enable = true,
+            disable = { 'markdown', },
             additional_vim_regex_highlighting = false,
         },
         indent = { enable = true },
@@ -914,6 +929,7 @@ require("lazy").setup({ --Start Quote
             'lua',
             'c',
             'cpp',
+            'markdown',
             'python',
             'bash',
         },
@@ -958,7 +974,8 @@ require("lazy").setup({ --Start Quote
             'pylsp',
             'lua_ls',
             'lemminx',
-            'clangd',
+            -- 'ccls'
+            -- 'clangd',
 
         },
     },
