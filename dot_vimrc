@@ -315,6 +315,8 @@ let g:startify_custom_header = [
     nnoremap <silent><C-TAB>   :tabn<CR>
     inoremap <silent><C-TAB>   <C-o>:tabn<CR>
 
+    nnoremap gq :exit<CR>
+
 " -------------------------------------------
 " 4.3 Mouse mapping
 " -------------------------------------------
@@ -478,12 +480,18 @@ call plug#begin(pe_runtimepath . '/plugged')
         " endif
         let g:yankring_history_dir = pe_cachedir
         nnoremap <silent> <leader>yy :YRShow<CR>
+        let g:yankring_replace_n_pkey = ''
         let yankring_min_element_length = 2
         let g:yankring_paste_using_g = 0
+   
+        
+        
+
 
 " -------------------------------------------
 " 6.2 Textobj
 " -------------------------------------------
+"
     Plug 'kana/vim-submode'
         let g:submode_timeout = 0
         " let g:submode_keep_leaving_key = 0
@@ -512,6 +520,8 @@ call plug#begin(pe_runtimepath . '/plugged')
     \ }
         map <CR> <Plug>(expand_region_expand)
         map <BS> <Plug>(expand_region_shrink)
+
+        
 
 " -------------------------------------------
 " 6.3 Style PlugIn
@@ -573,14 +583,41 @@ call plug#begin(pe_runtimepath . '/plugged')
    
     Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
     Plug 'itchyny/vim-cursorword'
+    " Plug 'junegunn/rainbow_parentheses.vim'
+    augroup rainbow_auto
+        autocmd!
+        autocmd FileType make syn clear makeDefine
+        " autocmd FileType make syn clear makeCommands
+    augroup END
+
     Plug 'luochen1990/rainbow'
-        let g:rainbow_active = 0 "0 if you want to enable it later via :RainbowToggle
+        let g:rainbow_active = 1 "0 if you want to enable it later via :RainbowToggle
         let g:cursorword_delay = 600
-    Plug 'ARM9/arm-syntax-vim'
-        autocmd BufNewFile,BufRead *.s,*.S set filetype=arm " arm = armv6/7
+        	let g:rainbow_conf = {
+            \	'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'firebrick'],
+            \	'ctermfgs': ['lightblue', 'lightyellow', 'lightcyan', 'lightmagenta'],
+            \	'operators': '_,_',
+            \	'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],
+            \	'separately': {
+            \		'*': 0,
+            \		'vim': 0,
+            \		'make': {
+            \			'parentheses': ['start=/$\+(/ end=/)/', 'start=/\[/ end=/\]/'],
+            \		},
+            \		'nerdtree': 0, 
+            \	}
+            \}
+            " nnoremap <S-f1> :echo synIDattr(synID(line('.'), col('.'), 0), 'name')<cr>
+            " nnoremap <S-f2> :echo ("hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
+            "             \ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
+            "             \ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">")<cr>
+            " nnoremap <S-f3> :echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')<cr>
+            nnoremap <S-f1> :exec 'syn list '.synIDattr(synID(line('.'), col('.'), 0), 'name')<cr>
+    " Plug 'ARM9/arm-syntax-vim'
+        " autocmd BufNewFile,BufRead *.s,*.S set filetype=arm " arm = armv6/7
     Plug 'rubberduck203/aosp-vim'
         autocmd BufNewFile,BufRead *.bp set filetype=json " arm = armv6/7
-    Plug 'sheerun/vim-polyglot'
+    " Plug 'sheerun/vim-polyglot'
     Plug 'mtdl9/vim-log-highlighting'
     Plug 'chrisbra/Colorizer'
     Plug 'powerman/vim-plugin-AnsiEsc'

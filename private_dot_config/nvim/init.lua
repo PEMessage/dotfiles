@@ -338,6 +338,22 @@ require("lazy").setup({ --Start Quote
     },
 
 },
+-- {
+--     'HiPhish/nvim-ts-rainbow2',
+--     config = function()
+--         require('nvim-treesitter.configs').setup {
+--             rainbow = {
+--                 enable = true,
+--                 -- list of languages you want to disable the plugin for
+--                 disable = { 'jsx', 'cpp' },
+--                 -- Which query to use for finding delimiters
+--                 query = 'rainbow-parens',
+--                 -- Highlight the entire buffer all at once
+--                 strategy = require('ts-rainbow').strategy.global,
+--             }
+--         }
+--     end
+-- },
 {
     'lewis6991/gitsigns.nvim',
     config = function ()
@@ -820,22 +836,22 @@ require("lazy").setup({ --Start Quote
         -- vim.api.nvim_command('highlight default link HopPreview HopNextKey' )
     end
 },
-{
-    "folke/flash.nvim",
-    event = "VeryLazy",
-    opts = {},
-    -- stylua: ignore
-    keys = {
-        -- { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
-        -- { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
-        -- { "<leader>sf", mode = { "n","c" },
-        -- function()
-        --     require("flash").jump({continue = true})
-        -- end,
-        -- desc = "Toggle Flash Search" },
-        { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
-    },
-},
+-- {
+--     "folke/flash.nvim",
+--     event = "VeryLazy",
+--     opts = {},
+--     -- stylua: ignore
+--     keys = {
+--         -- { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
+--         -- { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+--         -- { "<leader>sf", mode = { "n","c" },
+--         -- function()
+--         --     require("flash").jump({continue = true})
+--         -- end,
+--         -- desc = "Toggle Flash Search" },
+--         { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
+--     },
+-- },
 --
 -- {
 --     'woosaaahh/sj.nvim',
@@ -918,7 +934,7 @@ require("lazy").setup({ --Start Quote
     opts = {
         highlight = {
             enable = true,
-            disable = { 'markdown', },
+            -- disable = { 'markdown', },
             additional_vim_regex_highlighting = false,
         },
         indent = { enable = true },
@@ -929,7 +945,9 @@ require("lazy").setup({ --Start Quote
             'lua',
             'c',
             'cpp',
-            'markdown',
+            'make',
+            'markdown_inline',
+            'go',
             'python',
             'bash',
         },
@@ -974,6 +992,7 @@ require("lazy").setup({ --Start Quote
             'pylsp',
             'lua_ls',
             'lemminx',
+            'gopls'
             -- 'ccls'
             -- 'clangd',
 
@@ -984,7 +1003,16 @@ require("lazy").setup({ --Start Quote
     end,
 
 },
-
+{
+    'mfussenegger/nvim-dap',
+},
+{
+    'leoluz/nvim-dap-go',
+    config = function ()
+        require('dap-go').setup()
+        vim.cmd([[nmap <silent> <leader>xgo :lua require('dap-go').debug_test()<CR>]])
+    end,
+},
 {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },

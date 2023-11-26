@@ -98,14 +98,14 @@ if [[ "$APPLY_LIST" =~ ^[[:space:]]$ ]] ; then
 fi
 
 echo
-echo "your selected commit is: [ $APPLY_LIST ]"
+echo "your selected commit is: [ $APPLY_LIST ] (count:$(echo $APPLY_LIST | wc -w))"
 echo "your git head now is   : [ $( git describe --contains --all HEAD) ] "
 echo "your git repo top is   : [ $(git rev-parse --show-toplevel) ]"
 echo
 echo -n "are you sure to run this? (y/n):"
 read key
 if [ "$key" = y ] ; then 
-    echo "git cherry-pick $APPLY_LIST"
+    eval "git cherry-pick $APPLY_LIST"
 else
     echo "abort: nothing change"
 fi
