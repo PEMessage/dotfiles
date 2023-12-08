@@ -298,6 +298,38 @@ require("lazy").setup({ --Start Quote
         open_mapping = [[<M-=>]],
     }
 },
+-- {
+--     'luochen1990/rainbow',
+--     event = { "BufReadPost", "BufNewFile" },
+--     config = function ()
+--         vim.g.rainbow_active = 1
+--         vim.g.cursorword_delay = 600
+--         vim.cmd([[ 
+--             let g:rainbow_conf = {                                                                                 
+--            \   'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'firebrick'],                                 
+--            \   'ctermfgs': ['lightblue', 'lightyellow', 'lightcyan', 'lightmagenta'],                             
+--            \   'operators': '_,_',                                                                                
+--            \   'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],   
+--            \   'separately': {                                                                                    
+--            \       '*': 0,                                                                                        
+--            \       'vim': 0,                                                                                      
+--            \       'make': {                                                                                      
+--            \           'parentheses': ['start=/$\+(/ end=/)/', 'start=/\[/ end=/\]/'],                            
+--            \       },                                                                                             
+--            \       'nerdtree': 0,                                                                                 
+--            \   }                                                                                                  
+--            \}
+--
+--            nnoremap <f1> :exec 'syn list '.synIDattr(synID(line('.'), col('.'), 0), 'name')<cr>
+--
+--            augroup rainbow_auto                                                 
+--               autocmd!                                                         
+--               autocmd FileType make syntax clear makeIdent
+--            augroup END
+--         ]])
+--         -- code
+--     end
+-- },
 -- -------------------------------------------
 -- 5.2 Editing Plugin
 -- -------------------------------------------
@@ -426,14 +458,25 @@ require("lazy").setup({ --Start Quote
     "nvim-treesitter/nvim-treesitter",
     -- version = false, -- last release is way too old and doesn't work on Windows
     -- enabled = false,
+    -- dependencies = {
+    --     'hiphish/rainbow-delimiters.nvim',
+    -- },
     build = ":TSUpdate",
     event = { "BufReadPost", "BufNewFile" },
     opts = {
         highlight = {
             enable = true,
-            -- disable = { 'markdown', },
+            disable = { 'markdown', 'lua', 'make' },
             additional_vim_regex_highlighting = false,
         },
+        -- rainbow = {
+        --     enable = true,
+        --     -- disable = { "jsx", "cpp" }, list of languages you want to disable the plugin for
+        --     extended_mode = true, -- Also highlight non-bracket delimiters like html tags, boolean or table: lang -> boolean
+        --     max_file_lines = nil, -- Do not enable for files with more than n lines, int
+        --     -- colors = {}, -- table of hex strings
+        --     -- termcolors = {} -- table of colour name strings
+        -- },
         indent = { enable = false },
         ensure_installed = {
             'json',
@@ -752,9 +795,9 @@ require("lazy").setup({ --Start Quote
         ensure_installed = {
             'pylsp',
             'lua_ls',
-            'gopls'
+            'gopls',
+            'clangd',
             -- 'ccls'
-            -- 'clangd',
 
         },
         automatic_installation = true,
@@ -869,7 +912,7 @@ require("lazy").setup({ --Start Quote
         map(0, "x", "gx", ":<c-u>Lspsaga range_code_action<cr>", {silent = true, noremap = true})
         map(0, "n", "gd", ":<cmd>Lspsaga finder<cr>", {noremap = true})
         map(0, "n", "go", "<cmd>Lspsaga show_line_diagnostics<cr>", {silent = true, noremap = true})
-        map(0, "n", "K",  "<cmd>Lspsaga hover_doc<cr>", {silent = true, noremap = true})
+        -- map(0, "n", "K",  "<cmd>Lspsaga hover_doc<cr>", {silent = true, noremap = true})
     end,
     dependencies = {
         'nvim-treesitter/nvim-treesitter', -- optional
@@ -894,6 +937,7 @@ require("lazy").setup({ --Start Quote
     vim.keymap.set('!','<C-a>','<home>')
     vim.keymap.set('!','<C-e>','<end>')
     vim.keymap.set('n','ZA','<cmd>confirm quitall<CR>', { desc = "Quit All" })
+    vim.keymap.set('n','ZX','<cmd>confirm quit<CR>', { desc = "Quit This" })
 
     -- better up/down
     vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
