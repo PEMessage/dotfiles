@@ -9,7 +9,7 @@ usage() {
     echo "  -g|--glob [*]              : glob matching dir or file"
     echo "  -n|--no-interactive        : no interactive mode"
     echo "  -f|--force                 : mv -f"
-    echo "  -s|--sed-script [*]        : your sed script"
+    echo "  -e|--sed-script [*]        : your sed script"
     echo
     echo "EXAMPLE:"
 }

@@ -22,9 +22,11 @@ cd ~
 mkdir -p build
 cp ~/.vimrc ./.config/pem/config/vim/init-pe.vim
 tar pcfz ./build/$TAR_NAME \
+    ./.tmux.conf \
     ./.config/pem \
-    ./.config/tmux \
+    ./.config/starship.toml \
     ./.config/vim \
+    ./.config/tmux \
     ./.local/pem 
 echo -e '\e[092m INFO: \e[0m done'
 echo -e '\e[092m INFO: \e[0m use "tar pzxvf ./build/offline-micro.tar.gz -C ~"'

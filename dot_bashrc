@@ -44,7 +44,7 @@ PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
             local colorEnd="\[\e[00m\]"
         fi
 
-        local exit_code='\e[01;31m$(code=${?##0};echo ${code:+\ err:${code}})\e[00m'
+        local exit_code='\e[01;31m$(code=${?##0};echo ${code:+:${code}})\e[00m'
         # if [ "$color_prompt" = yes ]; then
         PS1=""
         PS1+="["

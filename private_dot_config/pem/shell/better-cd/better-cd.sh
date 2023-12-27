@@ -28,3 +28,5 @@ bcd()
     fi
     return 0
 }
+
+wcd () { cd "`wslpath "$1"`"; }

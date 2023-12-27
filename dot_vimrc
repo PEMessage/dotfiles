@@ -16,14 +16,14 @@ let g:startify_custom_header = [
 "
 
 
- 
+
 " 1. Configure List
 " ===========================================
-    
+
     " Plug-Mirror
     let s:PE_VimPlugURL = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
     " let s:PE_VimPlugURL = 'https://gitee.com/yaozhijin/vim-plug/raw/master/plug.vim'
-     
+
     " let g:plug_url_format='https://git::@hub.fastgit.xyz/%s.git'
     " let g:plug_url_format='https://ghproxy.com/https://github.com/%s.git'
 
@@ -31,7 +31,7 @@ let g:startify_custom_header = [
     set termguicolors
     set nocompatible
 
-    
+
     " Comment Color
     let s:PECommentColor = {"gui": "#00af87", "cterm": "246", "cterm16": "7"}
     " let s:PECompleteSys  = "asyncomplete"
@@ -49,17 +49,17 @@ let g:startify_custom_header = [
                 \ }
     nnoremap <leader>tt :call lightline#toggle()<CR>
 
-    
+
 
 
 " 2. Auto Install ViM-Plug
 " ===========================================
-"   
+"
     if has('nvim')
         let g:pe_runtimepath = stdpath('data') . '/site'
     else
         exe 'set rtp+=' . expand('~/.config/vim')
-        let g:pe_runtimepath = expand('~/.config/vim') 
+        let g:pe_runtimepath = expand('~/.config/vim')
     endif
     if empty(glob(pe_runtimepath . '/autoload/plug.vim'))
       silent execute '!curl -fLo '.pe_runtimepath.'/autoload/plug.vim --create-dirs '.s:PE_VimPlugURL
@@ -86,7 +86,7 @@ let g:startify_custom_header = [
     set linebreak
     " set clipboard=       " 关闭系统剪贴板共享
     " set clipboard=       " 关闭系统剪贴板共享
-    
+
 
 " -------------------------------------------
 " 3.2 Coding Zone
@@ -113,11 +113,11 @@ let g:startify_custom_header = [
         set foldlevel=99
     endif
 
-    if has('syntax')  
-        syntax enable 
-        syntax on 
+    if has('syntax')
+        syntax enable
+        syntax on
     endif
-    
+
 
     if has('mouse')
         set mouse+=a
@@ -138,7 +138,7 @@ let g:startify_custom_header = [
     set smartcase   " 智能搜索大小写判断，默认忽略大小写，除非搜索内容包含大写字母
     set incsearch   " 查找输入时动态增量显示查找结果
     set hlsearch    " 高亮搜索内容
- 
+
 
 
 " -------------------------------------------
@@ -233,7 +233,7 @@ let g:startify_custom_header = [
     set laststatus=2            " 总是显示状态栏
     set showtabline=2           " 总是显示标签栏
     set splitright              " 水平切割窗口时，默认在右边显示新窗口
-    
+
     set statusline=                                 " 清空状态了
     set statusline+=\ %F                            " 文件名
     set statusline+=\ [%1*%M%*%n%R%H]               " buffer 编号和状态
@@ -252,8 +252,8 @@ let g:startify_custom_header = [
 " ===========================================
 
 "  Mark A
-"  " Difference Map | Norm | Ins | Cmd | Vis | Sel | Opr | Term | Lang | 
-"  "                +------+-----+-----+-----+-----+-----+------+------+ 
+"  " Difference Map | Norm | Ins | Cmd | Vis | Sel | Opr | Term | Lang |
+"  "                +------+-----+-----+-----+-----+-----+------+------+
 "  " [nore]map      | yes  |  -  |  -  | yes | yes | yes |  -   |  -   |
 "  " n[nore]map     | yes  |  -  |  -  |  -  |  -  |  -  |  -   |  -   |
 "  " [nore]map!     |  -   | yes | yes |  -  |  -  |  -  |  -   |  -   |
@@ -274,18 +274,18 @@ let g:startify_custom_header = [
     nnoremap <silent> j gj
     nnoremap <silent> k gk
     nnoremap <C-c> <ESC>
-    nnoremap ZA :confirm qall<CR> 
+    nnoremap ZA :confirm qall<CR>
 
     " nnoremap _ 4kzz
     " nnoremap + 5jzz
 
     "Emacs Like ShortCut
-    noremap! <C-A> <home> 
+    noremap! <C-A> <home>
     noremap! <C-E> <end>
     noremap! <C-_> <C-K> " 插入 digraph（见 :h digraph），快速输入日文或符号等
-    " inoremap <m-f> <S-Right> 
-    " inoremap <m-b> <S-Left> 
-    
+    " inoremap <m-f> <S-Right>
+    " inoremap <m-b> <S-Left>
+
 
     "    CTRL-H 同 `<BS>` 一样功能，我们都是直接用 `<BS>` 没人CTRL-H的，直接覆盖掉
     "    CTRL-J 同回车（有两个码 0x0d 或 0x0a），C-J是0x0d，硬回车是0x0a，没人按这个，覆盖。
@@ -329,12 +329,12 @@ let g:startify_custom_header = [
 " 4.3 Extend mapping and command
 " -------------------------------------------
     nnoremap <leader>rcc  :w<CR> :source %<CR> " Re:Configuration
-    nnoremap <leader>rce  :tabe ~/.vimrc <CR> 
+    nnoremap <leader>rce  :tabe ~/.vimrc <CR>
 
     nnoremap <leader>``   :nohlsearch<CR>
     nnoremap <leader>wp  :set nowrap!<CR>
     nnoremap <leader>cl  :set cursorline!<CR>
-    
+
     nnoremap <leader>nu  :set number!<CR>
                         set number
     nnoremap <leader>nr :set relativenumber!<CR>
@@ -384,9 +384,9 @@ let g:startify_custom_header = [
             nmap <buffer> <C-O> u
             " ctrl-l for left pannel
 
-        " New Map 
+        " New Map
             " Back to parent dir
-            nmap <buffer> H -           
+            nmap <buffer> H -
             nmap <buffer> <C-0> echo b
             " Enter next dir
             nmap <buffer> L <C-M>
@@ -395,7 +395,7 @@ let g:startify_custom_header = [
 
     nnoremap <silent><leader>b  :Lexplore<CR>
 
-    command! PEWrite w! sudo tee % 
+    command! PEWrite w! sudo tee %
 
 
 " 6. VIM Plug-in Zone (Part1)
@@ -437,7 +437,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         " augroup PE_FZF_GROUP
         "     autocmd!
         "     autocmd filetype fzf tnoremap  <buffer> <C-o> <enter>
-        " augroup END 
+        " augroup END
         " JUST USE <C-M> AS ENTER
     Plug 'mg979/vim-visual-multi', {'branch': 'master'}
         let g:M_default_mappings = 0
@@ -468,13 +468,13 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:EasyMotion_enter_jump_first= 1
         let g:EasyMotion_space_jump_first = 1
         let g:EasyMotion_use_upper = 1
-        
+
         nmap / <Plug>(easymotion-sn)
         map <space> <Plug>(easymotion-s)
         " nunmap ds
         " <leader>yr
     Plug 'vim-scripts/YankRing.vim'
-        " let vimd_path = 
+        " let vimd_path =
         " if !isdirectory(vimd_path)
         "     call mkdir(vimd_path, "p")
         " endif
@@ -483,9 +483,11 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:yankring_replace_n_pkey = ''
         let yankring_min_element_length = 2
         let g:yankring_paste_using_g = 0
-   
-        
-        
+    Plug 'ojroques/vim-oscyank', {'branch': 'main'}
+        vmap <leader>c <Plug>OSCYankVisual
+
+
+
 
 
 " -------------------------------------------
@@ -508,20 +510,20 @@ call plug#begin(pe_runtimepath . '/plugged')
                 \ 'iW'  :0,
                 \ 'i"'  :0,
                 \ 'i''' :0,
-                \ 'i]'  :1, 
-                \ 'ib'  :1, 
-                \ 'iB'  :1, 
-                \ 'il'  :0, 
+                \ 'i]'  :1,
+                \ 'ib'  :1,
+                \ 'iB'  :1,
+                \ 'il'  :0,
                 \ 'ip'  :0,
                 \ 'ab' :1,
                 \ 'aB' :1,
                 \ 'ii' :0,
-                \ 'ai' :0, 
+                \ 'ai' :0,
     \ }
         map <CR> <Plug>(expand_region_expand)
         map <BS> <Plug>(expand_region_shrink)
 
-        
+
 
 " -------------------------------------------
 " 6.3 Style PlugIn
@@ -570,7 +572,7 @@ call plug#begin(pe_runtimepath . '/plugged')
             autocmd ColorScheme * call onedark#extend_highlight("IncSearch", { "gui" : "underline,bold,italic,standout",  "bg": { "gui": "#444959" } , "fg" : {"gui":"yellow" }})
             autocmd ColorScheme * call onedark#extend_highlight("QuickFixLine", { "gui" : "underline",  "bg": { "gui": "NONE" } , "fg" : {"gui":"yellow" }})
             autocmd ColorScheme * highlight QuickFixLineScope gui=underline guifg=#e5c07b
-        
+
         augroup END
     endif
 
@@ -580,7 +582,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         nnoremap <leader>sb :Startify<CR> " Most Recent File MRF
         let g:startify_session_dir = pe_cachedir . "/session"
     " Plug 'ap/vim-buftabline'
-   
+
     Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
     Plug 'itchyny/vim-cursorword'
     " Plug 'junegunn/rainbow_parentheses.vim'
@@ -604,7 +606,7 @@ call plug#begin(pe_runtimepath . '/plugged')
             \		'make': {
             \			'parentheses': ['start=/$\+(/ end=/)/', 'start=/\[/ end=/\]/'],
             \		},
-            \		'nerdtree': 0, 
+            \		'nerdtree': 0,
             \	}
             \}
             " nnoremap <S-f1> :echo synIDattr(synID(line('.'), col('.'), 0), 'name')<cr>
@@ -632,11 +634,11 @@ call plug#begin(pe_runtimepath . '/plugged')
     " vim 1991
     " Plug 'rkitover/vimpager'
 " File Manager
-        
+
 
     " Plug 'kvngvikram/rightclick-macros'
     " Plug 'skywind3000/vim-quickui'
-   
+
 " -------------------------------------------
 " 6.4 Locale
 " -------------------------------------------
@@ -645,7 +647,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     if has('win32')
         let g:im_select_default = '1033'
     endif
-   
+
 " -------------------------------------------
 " 6.5 Tpope plugin
 " -------------------------------------------
@@ -694,7 +696,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         " di			<Plug>(agit-diff)
         " dl			<Plug>(agit-diff-with-local)
         nnoremap <leader>ag :Agit<CR>
-        
+
 
 
 
@@ -785,7 +787,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:gutentags_auto_add_gtags_cscope = 0
         let g:gutentags_auto_add_cscope = 0
         let g:gutentags_define_advanced_commands = 1
-        set cscopetag 
+        set cscopetag
 
         " 0 or s: Find this symbol
         " 1 or g: Find this definition
@@ -819,14 +821,14 @@ call plug#begin(pe_runtimepath . '/plugged')
 
         noremap <silent> <leader>ga :GscopeFind a <C-R><C-W><cr>
         " " Go Symbol
-        " noremap <silent> gs :GscopeFind s <C-R><C-W><cr> 
+        " noremap <silent> gs :GscopeFind s <C-R><C-W><cr>
         " " Go Defintion
-        " noremap <silent> gd :GscopeFind g <C-R><C-W><cr> 
+        " noremap <silent> gd :GscopeFind g <C-R><C-W><cr>
 
         " " Go Ref by this function
-        " noremap <silent> gr :GscopeFind d <C-R><C-W><cr> 
+        " noremap <silent> gr :GscopeFind d <C-R><C-W><cr>
         " " Go Reference Being Called
-        " noremap <silent> gk :GscopeFind c <C-R><C-W><cr> 
+        " noremap <silent> gk :GscopeFind c <C-R><C-W><cr>
         " " File
         " " noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
     Plug 'preservim/tagbar'
@@ -844,7 +846,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         " $VIM_FILENOEXT - File name of current buffer without path and extension
         " $VIM_CWD       - Current directory
         " $VIM_RELDIR    - File path relativize to current directory
-        " $VIM_RELNAME   - File name relativize to current directory 
+        " $VIM_RELNAME   - File name relativize to current directory
         " $VIM_ROOT      - Project root directory
         " $VIM_CWORD     - Current word under cursor
         " $VIM_CFILE     - Current filename under cursor
@@ -852,18 +854,18 @@ call plug#begin(pe_runtimepath . '/plugged')
         " $VIM_VERSION   - Value of v:version
         " $VIM_COLUMNS   - How many columns in vim's screen
         " $VIM_LINES     - How many lines in vim's screen
-        " $VIM_SVRNAME   - Value of v:servername for +clientserver usage 
+        " $VIM_SVRNAME   - Value of v:servername for +clientserver usage
         let g:asyncrun_open = 7
-        nnoremap <leader>ar :AsyncRun! 
+        nnoremap <leader>ar :AsyncRun!
         " Compile current file
         nnoremap <silent> <leader>aq1 :AsyncRun gcc -Wall -O2 "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
         " Run it !
         nnoremap <silent> <leader>aq2 :AsyncRun -raw -cwd=$(VIM_FILEDIR) "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
         if has('win32') || has('win64')
-            noremap <silent><leader>aqe :AsyncRun! -cwd=<root> findstr /n /s /C:"<C-R><C-W>" 
+            noremap <silent><leader>aqe :AsyncRun! -cwd=<root> findstr /n /s /C:"<C-R><C-W>"
                         \ "\%CD\%\*.h" "\%CD\%\*.c*" <cr>
         else
-            noremap <silent><leader>aqe :AsyncRun! -cwd=<root> grep -n -s -R <C-R><C-W> 
+            noremap <silent><leader>aqe :AsyncRun! -cwd=<root> grep -n -s -R <C-R><C-W>
                         \ --include='*.h' --include='*.c*' '<root>' <cr>
         endif
 
@@ -908,7 +910,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         copen   " Quickfix window is not open, so open it
     endfunction
     " Call the function! to setup the autocmd
-    
+
     " Gtag quickfix keymap
         noremap <silent> go :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
         nnoremap <leader>cc  :call ToggleQuickfix()<CR>
@@ -952,7 +954,7 @@ call plug#begin(pe_runtimepath . '/plugged')
             let col = col('.') - 1
             return !col || getline('.')[col - 1]  =~ '\s'
         endfunction
-        
+
 
         inoremap <silent><expr> <TAB>
                     \ pumvisible() ? "\<C-n>" :
@@ -995,7 +997,7 @@ call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options
 " 7.3 Expand region
 " -------------------------------------------
     call expand_region#custom_text_objects()
-    
+
 " -------------------------------------------
 " 7.4 Submode Map
 " -------------------------------------------
@@ -1055,18 +1057,18 @@ call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options
 
 
     "  function! PECheetMessage()
-    "      let content =[  "=======================" 
-    "                  \ , " Basic Usage" 
-    "                  \ , "   Normal: <C-R> <-> u " 
-    "                  \ , "   Normal: y\"[reg] copy to reg " 
-    "                  \ , "   Visual: vi<range> r <space>" 
-    "                  \ , "   Terminal: <C-\\><C-N> back to Terminal-Normal" 
-    "                  \ , "=======================" 
-    "                  \ , " EasyAlign" 
-    "                  \ , "   <C-X> Interactive Mode " 
-    "                  \ , "   :LiveEasyAlign live Mode" 
-    "                  \ , "   `2=` Around the 2nd Occurrences " 
-    "                  \ , "   `*=` Around all Occurrences" 
+    "      let content =[  "======================="
+    "                  \ , " Basic Usage"
+    "                  \ , "   Normal: <C-R> <-> u "
+    "                  \ , "   Normal: y\"[reg] copy to reg "
+    "                  \ , "   Visual: vi<range> r <space>"
+    "                  \ , "   Terminal: <C-\\><C-N> back to Terminal-Normal"
+    "                  \ , "======================="
+    "                  \ , " EasyAlign"
+    "                  \ , "   <C-X> Interactive Mode "
+    "                  \ , "   :LiveEasyAlign live Mode"
+    "                  \ , "   `2=` Around the 2nd Occurrences "
+    "                  \ , "   `*=` Around all Occurrences"
     "                  \ , "======================="  ]
     "      let opts = {"close":"button", "title":"My CheetSheet"}
     "      call quickui#textbox#open(content, opts)
@@ -1090,7 +1092,7 @@ call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options
     "  " 定义按两次空格就打开上面的目录
     "  noremap <space>m :call quickui#menu#open()<cr>
     "  noremap <space>a :call quickui#tools#list_buffer('e')<cr>
-    "  
+    "
 
     " let n_rightmouse_content = [
     "             \ ["Paste", "exec 'normal" . '"' . "+p'" ],
@@ -1109,12 +1111,12 @@ call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options
 " ===========================================
     let s:exitKeyList = [ 'q', "\<ESC>" ]
     let s:delKeyList  = [ 'x', 'd' ]
-    let s:pairKeyList = [ 
-    \ '(', ')' , 
-    \ '<', '>' , 
-    \ '{', '}' , 
-    \ '`', '`' , 
-    \ '[', ']'   
+    let s:pairKeyList = [
+    \ '(', ')' ,
+    \ '<', '>' ,
+    \ '{', '}' ,
+    \ '`', '`' ,
+    \ '[', ']'
     \ ]
     " Stay in c-w prefix
     function! PEWinMode()
@@ -1125,7 +1127,7 @@ call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options
                 echo "Mode End"
                 return
             endif
-            exec "normal \<c-w>" . follow 
+            exec "normal \<c-w>" . follow
             redraw
         endwhile
     endfunction
@@ -1133,7 +1135,7 @@ call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options
     nnoremap <silent><leader>wm :PEWinMode<CR>
     " nnoremap <silent><C-w> :PEWinMode<CR>
 
-    " TimeStamp in english or locale language 
+    " TimeStamp in english or locale language
     function! PEDate(lang)
         if a:lang == "en"
             let l:temp_lc_time = v:lc_time
@@ -1145,7 +1147,7 @@ call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options
             exec "normal a \<C-R>=" . 'strftime("%Y-%m-%d %a %I:%M %p")' . "\<CR>\<Esc>"
         endif
     endfunction
-    
+
 
     command! PEDate :call PEDate("en")
     " Surround Viusal Zone
@@ -1162,10 +1164,10 @@ call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options
             return
         endif
 
-        let pairIndex = index( s:pairKeyList , follow ) 
+        let pairIndex = index( s:pairKeyList , follow )
         if pairIndex >= 0
             if ( pairIndex % 2 ) == 0
-                let leftpair = s:pairKeyList[ pairIndex ] 
+                let leftpair = s:pairKeyList[ pairIndex ]
                 let rightpair  = s:pairKeyList[ pairIndex+1 ]
             else
                 let rightpair  = s:pairKeyList[ pairIndex ]
@@ -1185,8 +1187,15 @@ call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options
     "     set readonly!
     "     set modifiable
     " endfunction
+    " fun! TrimWhitespace()
+    "     let l:save = winsaveview()
+    "     keeppatterns %s/\s\+$//e
+    "     call winrestview(l:save)
+    " endfun
+    " autocmd BufWritePre * %s/\s\+$//e
+    vnoremap tt :s/\s\+$//e<CR>
 
-    
+
 
     function! s:DiffWithSaved()
         let filetype=&ft

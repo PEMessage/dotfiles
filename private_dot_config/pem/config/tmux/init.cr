@@ -131,24 +131,28 @@
 # --------------------------------
      set -g @tpm_plugins '          \
        tmux-plugins/tpm             \
-       Morantron/tmux-fingers       \
+       fcsonline/tmux-thumbs \
      '
-     set -g @fingers-key F
+    set -g @thumbs-select-fg-color \#3e444e
+
 
 # --------------------------------
 # .tmux.conf ref
 # --------------------------------
-    # # .tmux.conf
+    # # source tmux.init
     # if "test -f ~/.config/pem/config/tmux/init.cr" \
     #     "source ~/.config/pem/config/tmux/init.cr"
+
+
 
     # if "test ! -d ~/.config/tmux/plugins/tpm" \
     #    "run 'git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm && ~/.config/tmux/plugins/tpm/bin/install_plugins'"
     # set-environment -g TMUX_PLUGIN_MANAGER_PATH '~/.config/tmux/plugins'
     # # # List of plugins
-    # set -g @plugin 'tmux-plugins/tpm'
+    # # set -g @plugin 'tmux-plugins/tmux-copycat'
 
         
     # # Initialize TMUX plugin manager 
     # # (keep this line at the very bottom of tmux.conf)
+    # run-shell '~/.config/tmux/plugins/tmux-thumbs/tmux-thumbs.tmux'
     # run '~/.config/tmux/plugins/tpm/tpm'
