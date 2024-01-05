@@ -142,7 +142,7 @@
         fi
     fi
 
-    export PEM_DATA_HOME=${XDG_DATA_HOME:-${HOME}/.local}/pem
+    export PEM_DATA_HOME=${XDG_DATA_HOME:-${HOME}/.local/share}/pem
     # dir not exist
     if [ ! -d "$PEM_DATA_HOME" ]; then
         # is a file
@@ -152,6 +152,8 @@
         else
             mkdir -p "$PEM_DATA_HOME"
             mkdir -p "$PEM_DATA_HOME/shell"
+            mkdir -p "$PEM_DATA_HOME/bin"
+            mkdir -p "$PEM_DATA_HOME/pre-bin"
             touch "$PEM_DATA_HOME/shell/init-sh.sh"
         fi
     fi
@@ -310,4 +312,5 @@
     # source "$PEMHOME"/shell/vless/vless.sh
     # source "$PEMHOME"/shell/fff/fff-conf.sh
     # source "$PEMHOME"/shell/z-sh/z.sh
+    eval "$(fasd --init auto)"
 

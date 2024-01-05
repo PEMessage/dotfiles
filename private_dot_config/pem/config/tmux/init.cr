@@ -71,7 +71,8 @@
     bind -n C-M-l select-pane -R
 
     bind -n C-M-e next-window
-    bind -n C-M-w new-window
+    # Credit: https://nju-projectn.github.io/ics-pa-gitbook/ics2023/0.5.html
+    bind -n C-M-w new-window -c "#{pane_current_path}"
     bind -n C-M-q previous-window
     
     bind -n C-M-c splitw -h -c '#{pane_current_path}' # 水平方向新增面板，默认进入当前目录
@@ -89,7 +90,7 @@
     bind-key -n 'M-L' if-shell "$is_vim" 'send-keys M-L'  'select-pane -R'
 
     bind-key -n 'M-X' if-shell "$is_vim" 'send-keys M-X'  'confirm-before -p "kill-pane #P? (y/n)" kill-pane'
-    bind-key -n 'M-C' if-shell "$is_vim" 'send-keys M-C'  'split-window -h'
+    bind-key -n 'M-C' if-shell "$is_vim" 'send-keys M-C'  'split-window -h -c "#{pane_current_path}"'
 
     tmux_version='$(tmux -V | sed -En "s/^tmux ([0-9]+(.[0-9]+)?).*/\1/p")'
     if-shell -b '[ "$(echo "$tmux_version < 3.0" | bc)" = 1 ]' \

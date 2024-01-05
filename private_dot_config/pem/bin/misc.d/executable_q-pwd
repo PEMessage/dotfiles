@@ -1,0 +1,17 @@
+#!/bin/sh
+
+myip()
+{
+	case $(uname) in
+	Darwin|*BSD)
+		local ip=$(ifconfig  | grep -E 'inet.[0-9]' | grep -v '127.0.0.1' | awk '{ print $2}')
+		;;
+	*)
+		local ip=$(hostname --all-ip-addresses | tr " " "\n" | grep -v "0.0.0.0" | grep -v "127.0.0.1")
+		;;
+	esac
+
+	echo "${ip}"
+}
+
+echo `whoami`@`myip`:`pwd`
