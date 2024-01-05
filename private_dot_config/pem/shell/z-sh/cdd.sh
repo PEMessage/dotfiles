@@ -35,5 +35,5 @@ cdd(){
 }
 
 vf(){
-    fasd -f "$1" -e vim 
+    fasd -fi "$1" -e vim 
 }
