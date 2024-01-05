@@ -3,20 +3,37 @@
 dm(){
     local mark_name
     local prompt_message
-    local local_dir=`pwd`
-    if [ -z $1 ] ; then
-        mark_nane='EMPTY'
-        prompt_message='Clean the mark'
-    else
+    local mark_path
+    if [ -n "$2" ] ; then
         mark_name="$1"
+        mark_path="$2"
         prompt_message="Mark to $mark_name"
+
+    elif [ -n "$1" ] ; then
+        mark_name="$1"
+        mark_path=`pwd`
+        prompt_message="Mark to $mark_name"
+    else
+        mark_nane='EMPTY'
+        mark_path=`pwd`
+        prompt_message='Clean the mark'
     fi
     # echo $local_dir
-    fasd --mark  "$local_dir" "$mark_name"
-    echo "$local_dir -> $prompt_message "
+    fasd --mark  "$mark_path" "$mark_name"
+    echo "$mark_path -> $prompt_message "
 }
 
-zfzf(){
-    echo
+cdd(){
+    local fnd="$1"
+    [ -d "$fnd" ] && cd "$fnd" && return
+    [ -n "$fnd" ] &&  fasd_cd -d "$fnd" && return
+    local temp=` fasd -sd 2>&1 | sort -rn |
+        awk '{print $2}' |
+        fzf  --no-sort --query="$fnd" 
+        `
+    cd "$temp"
+}
 
+vf(){
+    fasd -f "$1" -e vim 
 }
