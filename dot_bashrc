@@ -14,13 +14,18 @@ PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 # -----------------------------------------
 # PS1 Setting
 # ----------------------------------------- 
-    parse_git_branch() {
-        git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+    # parse_git_branch() {
+    #     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+    # }
+
+    parse_git_branch_v2() {
+        git symbolic-ref --short HEAD 2> /dev/null
     }
 
     pe_prompt() {
 
         # local exit_code="\$(VALU="\$?" ; echo -n \$VALU)"
+        # local exit_code='$(code=${?##0};echo ${code:+:${code}})'
         case "$TERM" in 
             xterm-color|*-256color) color_prompt=yes;;
         esac
@@ -44,7 +49,6 @@ PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
             local colorEnd="\[\e[00m\]"
         fi
 
-        local exit_code='\e[01;31m$(code=${?##0};echo ${code:+:${code}})\e[00m'
         # if [ "$color_prompt" = yes ]; then
         PS1=""
         PS1+="["
@@ -52,10 +56,11 @@ PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
         PS1+=":"
         PS1+="$greenF\w$colorEnd"
         PS1+="]"
-        PS1+="$exit_code\$(parse_git_branch)"
+        PS1+="$yellowF(\$(parse_git_branch_v2))$colorEnd"
+        # PS1+="$exit_code"
         PS1+="\$ "
         # else
-            # PS1="[\u@\h \w]\$ "
+        #     PS1="[\u@\h \w]\$ "
         # fi
     }
     pe_prompt
