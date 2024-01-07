@@ -18,10 +18,39 @@ PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
     #     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
     # }
 
-    _parse_git_branch_v2() {
-        rev="$(git symbolic-ref --short HEAD 2> /dev/null)"
-        [ "$rev" != "" ] && echo "($rev)"
+    # _parse_git_branch_v2() {
+    #     rev="$(git symbolic-ref --short HEAD 2> /dev/null)"
+    #     [ "$rev" != "" ] && echo "($rev)"
+    # }
+
+    # From: https://gist.github.com/bingzhangdai/dd4e283a14290c079a76c4ba17f19d69
+    _parse_git_branch_v3() {
+        local _head_file _head
+        local _dir="$PWD"
+
+        while [[ -n "$_dir" ]]; do
+            _head_file="$_dir/.git/HEAD"
+            if [[ -f "$_dir/.git" ]]; then
+                read -r _head_file < "$_dir/.git" && _head_file="$_dir/${_head_file#gitdir: }/HEAD"
+            fi
+            [[ -e "$_head_file" ]] && break
+            _dir="${_dir%/*}"
+        done
+
+        if [[ -e "$_head_file" ]]; then
+            read -r _head < "$_head_file" || return
+            case "$_head" in
+                ref:*) printf "(${_head#ref: refs/heads/})" ;;
+                "") ;;
+                # HEAD detached
+                *) printf "(${_head:0:9})" ;;
+            esac
+            return 0
+        fi
+
+        return 1
     }
+
 
     _pe_last3dir() {
         local pwd="${PWD//~/\~}"
@@ -65,7 +94,7 @@ PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
         PS1+="$greenF\$(_pe_last3dir)$colorEnd"
         
         PS1+="]"
-        PS1+="$yellowF\$(_parse_git_branch_v2)$colorEnd"
+        PS1+="$yellowF\$(_parse_git_branch_v3)$colorEnd"
         # PS1+="$exit_code"
         PS1+="\$ "
         # else
