@@ -18,16 +18,20 @@ PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
     #     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
     # }
 
-    parse_git_branch_v2() {
+    _parse_git_branch_v2() {
         rev="$(git symbolic-ref --short HEAD 2> /dev/null)"
         [ "$rev" != "" ] && echo "($rev)"
     }
 
-    pe_prompt() {
+    _pe_last3dir() {
+        local pwd="${PWD//~/\~}"
+        echo "${pwd#${pwd%/*/*/*}/}"
+    }
+
+    _pe_prompt() {
 
         # local exit_code="\$(VALU="\$?" ; echo -n \$VALU)"
         # local exit_code='$(code=${?##0};echo ${code:+:${code}})'
-        local last3dir='${PWD#${PWD%/*/*/*}/}'
         case "$TERM" in 
             xterm-color|*-256color) color_prompt=yes;;
         esac
@@ -58,17 +62,17 @@ PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
         PS1+=":"
 
         # PS1+="$greenF\w$colorEnd"
-        PS1+="$greenF$last3dir$colorEnd"
+        PS1+="$greenF\$(_pe_last3dir)$colorEnd"
         
         PS1+="]"
-        PS1+="$yellowF\$(parse_git_branch_v2)$colorEnd"
+        PS1+="$yellowF\$(_parse_git_branch_v2)$colorEnd"
         # PS1+="$exit_code"
         PS1+="\$ "
         # else
         #     PS1="[\u@\h \w]\$ "
         # fi
     }
-    pe_prompt
+    _pe_prompt
 
 # -----------------------------------------
 # Alias and Path Config Zone
