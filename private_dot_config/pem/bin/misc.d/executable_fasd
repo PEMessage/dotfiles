@@ -493,8 +493,8 @@ $(fasd --backend $each)"
       rank) local prior='times[i]';;
       recent) local prior='sqrt(100000/(1+t-la[i]))';;
       default_v1) local prior='times[i] * frecent(la[i])';;
-      # *) local prior='default_v2(i,times[i] * frecent(la[i]))';;
-      *) local prior='times[i] * frecent(la[i])';;
+      *) local prior='default_v2(i,times[i] * frecent(la[i]))';;
+      # *) local prior='times[i] * frecent(la[i])';;
     esac
 
     if [ "$fnd" ]; then # default matching
@@ -539,6 +539,20 @@ $(fasd --backend $each)"
         [ -${typ:-e} "${line%%\|*}" ] && printf %s\\n "$line"
       done)"
     fi
+
+    local prjroot=$(pwd)
+    while [ "$prjroot" != "/" ]; do
+        if [ -e "$prjroot/.root" ]; then
+            break
+        else
+            prjroot=$(dirname "$prjroot")
+        fi
+    done
+    if  [ "$prjroot" == "/" ] ; then
+        prjroot=""
+    fi
+    
+
 
     # query the database
     [ "$_fasd_data" ] && printf %s\\n "$_fasd_data" | \
