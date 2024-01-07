@@ -1,4 +1,5 @@
 export _FASD_BACKENDS="native viminfo"
+eval "$(fasd --init auto)"
 
 dm(){
     local mark_name

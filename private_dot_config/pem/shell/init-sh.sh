@@ -312,5 +312,4 @@
     # source "$PEMHOME"/shell/vless/vless.sh
     # source "$PEMHOME"/shell/fff/fff-conf.sh
     # source "$PEMHOME"/shell/z-sh/z.sh
-    eval "$(fasd --init auto)"
 
