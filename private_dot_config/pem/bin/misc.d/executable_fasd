@@ -78,9 +78,16 @@ fasd() {
           [ -z "$_FASD_GREP" ] && _FASD_GREP=grep
           if [ -z "$_FASD_DATA" ]; then
             if [ -n "$XDG_CACHE_HOME" ]; then
-              _FASD_DATA="$XDG_CACHE_HOME/fasd"
+              _FASD_DATA="$XDG_CACHE_HOME/fasd/data.txt"
             else
-              _FASD_DATA="$HOME/.cache/fasd"
+              _FASD_DATA="$HOME/.cache/fasd/data.txt"
+            fi
+          fi
+          if [ -z "$_FASD_PROJECT" ]; then
+            if [ -n "$XDG_CACHE_HOME" ]; then
+              _FASD_PROJECT="$XDG_CACHE_HOME/fasd/project.txt"
+            else
+              _FASD_PROJECT="$HOME/.cache/fasd/project.txt"
             fi
           fi
           [ -z "$_FASD_BLACKLIST" ] && _FASD_BLACKLIST="--help"
@@ -479,10 +486,14 @@ $(fasd --backend $each)"
     done
     [ "$_fasd_data" ] || _fasd_data="$(cat "$_FASD_DATA")"
 
+    
+
     # set mode specific code for calculating the prior
     case $mode in
       rank) local prior='times[i]';;
       recent) local prior='sqrt(100000/(1+t-la[i]))';;
+      default_v1) local prior='times[i] * frecent(la[i])';;
+      # *) local prior='default_v2(i,times[i] * frecent(la[i]))';;
       *) local prior='times[i] * frecent(la[i])';;
     esac
 
@@ -531,13 +542,26 @@ $(fasd --backend $each)"
 
     # query the database
     [ "$_fasd_data" ] && printf %s\\n "$_fasd_data" | \
-      $_FASD_AWK -v t="$(date +%s)" -F"|" '
+      $_FASD_AWK -v t="$(date +%s)" -v prjroot="$prjroot" -F"|" '
       function frecent(time) {
         dx = t-time
         if( dx < 3600 ) return 6
         if( dx < 86400 ) return 4
         if( dx < 604800 ) return 2
         return 1
+      }
+      function isPrefix(str, prefix) {
+          if ( prefix == "" ) {
+            return 0
+          }
+          return substr(str, 1, length(prefix)) == prefix
+      }
+      function default_v2(i,prev) {
+        if( isPrefix(i,prjroot) ) {
+            return prev + 100
+        } else {
+            return prev
+        }
       }
       {
         if(!paths[$1]) {

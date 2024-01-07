@@ -14,4 +14,9 @@ myip()
 	echo "${ip}"
 }
 
-echo `whoami`@`myip`:`pwd`
+if [ -z "$1" ]; then 
+    echo `whoami`@`myip`:`pwd`
+else
+    path="$(readlink -f "$1")"
+    echo `whoami`@`myip`:"$path"
+fi

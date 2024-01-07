@@ -1,4 +1,4 @@
-
+export _FASD_BACKENDS="native viminfo"
 
 dm(){
     local mark_name
