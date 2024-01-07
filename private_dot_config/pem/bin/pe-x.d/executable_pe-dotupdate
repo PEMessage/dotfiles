@@ -10,7 +10,7 @@ git add .
 
 
 if [ -z "$1" ]; then
-    MEG="Update time: "`date -u '+%Y-%m-%d %H:%M'`
+    MEG="Update time: "`date '+%Y-%m-%d %H:%M'`
 else
     MEG="$1"
 fi
