@@ -1,4 +1,5 @@
 export _FASD_BACKENDS="native viminfo"
+export _FASD_MAX=6000
 eval "$(fasd --init auto)"
 
 dm(){
