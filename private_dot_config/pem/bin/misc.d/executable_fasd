@@ -548,7 +548,7 @@ $(fasd --backend $each)"
             prjroot=$(dirname "$prjroot")
         fi
     done
-    if  [ "$prjroot" == "/" ] ; then
+    if  [ "$prjroot" = "/" ] ; then
         prjroot=""
     fi
     
