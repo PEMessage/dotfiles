@@ -36,6 +36,17 @@ cdd(){
     cd "$temp"
 }
 
+cdt(){
+    local fnd="$1"
+    [ -d "$fnd" ] && cd "$fnd" && return
+    [ -n "$fnd" ] &&  fasd_cd -d "$fnd" && return
+    local temp=` fasd -sdt 2>&1 | sort -rn |
+        awk '{print $2}' |
+        fzf  --no-sort --query="$fnd" 
+        `
+    cd "$temp"
+}
+
 vf(){
-    fasd -fi "$1" -e vim 
+    fasd -fi "$1" -e vim && return
 }
