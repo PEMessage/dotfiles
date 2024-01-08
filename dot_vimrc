@@ -1198,7 +1198,7 @@ call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options
     " endfun
     " autocmd BufWritePre * %s/\s\+$//e
     vnoremap tt :s/\s\+$//e<CR>
-
+    vnoremap p pgvy
 
 
     function! s:DiffWithSaved()

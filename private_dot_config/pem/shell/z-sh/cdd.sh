@@ -30,7 +30,7 @@ cdd(){
     [ -d "$fnd" ] && cd "$fnd" && return
     [ -n "$fnd" ] &&  fasd_cd -d "$fnd" && return
     local temp=` fasd -sd 2>&1 | sort -rn |
-        awk '{print $2}' |
+        awk '{ print substr($0, index($0,$2)) }' |
         fzf  --no-sort --query="$fnd" 
         `
     cd "$temp"
@@ -41,7 +41,7 @@ cdt(){
     [ -d "$fnd" ] && cd "$fnd" && return
     [ -n "$fnd" ] &&  fasd_cd -d "$fnd" && return
     local temp=` fasd -sdt 2>&1 | sort -rn |
-        awk '{print $2}' |
+        awk '{ print substr($0, index($0,$2)) }' |
         fzf  --no-sort --query="$fnd" 
         `
     cd "$temp"

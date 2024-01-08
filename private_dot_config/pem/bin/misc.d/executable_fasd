@@ -83,6 +83,7 @@ fasd() {
               _FASD_DATA="$HOME/.cache/fasd/data.txt"
             fi
           fi
+          [ ! -d "$(dirname $_FASD_DATA)" ] && mkdir -p "$(dirname $_FASD_DATA)"
           if [ -z "$_FASD_PROJECT" ]; then
             if [ -n "$XDG_CACHE_HOME" ]; then
               _FASD_PROJECT="$XDG_CACHE_HOME/fasd/project.txt"
