@@ -47,6 +47,17 @@ cdt(){
     cd "$temp"
 }
 
+cdm() {
+    local data="$(cat ~/.cache/fasd/data.txt | awk -F"|" '$4 != "" { print $0 } ')"
+    local path="$(echo "$data" |
+        awk -F"|" '{printf "%-10s %s\n",$4,$1}' |
+        fzf | 
+        awk '{ print substr($0, index($0,$2)) }'
+        )"
+    [ -f "$path" ] && cd "$(dirname "$path")" && return
+    [ -d "$path" ] && cd "$path" && return
+}
+
 vf(){
     fasd -fi "$1" -e vim && return
 }
