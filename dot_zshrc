@@ -13,6 +13,7 @@
     # Exit for non-interactive shell
     [[ $- != *i* ]] && return
 
+    # [[ -e ~/.profile ]] && emulate sh -c 'source ~/.profile'
     # Ubuntu temp fix for snap format package
     if [ -f "/etc/profile.d/apps-bin-path.sh" ] ; then
         source /etc/profile.d/apps-bin-path.sh
