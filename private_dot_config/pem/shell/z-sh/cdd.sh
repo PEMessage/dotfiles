@@ -26,7 +26,7 @@ dm(){
 }
 
 cdd(){
-    local fnd="$1"
+    local fnd="$*"
     [ -d "$fnd" ] && cd "$fnd" && return
     [ -n "$fnd" ] &&  fasd_cd -d "$fnd" && return
     local temp=` fasd -sd 2>&1 | sort -rn |
@@ -37,7 +37,7 @@ cdd(){
 }
 
 cdt(){
-    local fnd="$1"
+    local fnd="$*"
     [ -d "$fnd" ] && cd "$fnd" && return
     [ -n "$fnd" ] &&  fasd_cd -d "$fnd" && return
     local temp=` fasd -sdt 2>&1 | sort -rn |
@@ -59,5 +59,5 @@ cdm() {
 }
 
 vf(){
-    fasd -fi "$1" -e vim && return
+    fasd -fi "$*" -e vim && return
 }
