@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+
+git config --global alias.pk cherry-pick
+git config --global alias.cm commit
+git config --global alias.co checkout
+git config --global alias.re 'remote -v'
+git config --global alias.st 'status --short --branch'
+git config --global alias.ddf 'difftool --ignore-submodules --dir-diff --no-symlinks --tool=dirdiff'
+git config --global difftool.dirdiff.cmd 'dirdiff $LOCAL $REMOTE'
