@@ -479,7 +479,11 @@ call plug#begin(pe_runtimepath . '/plugged')
         "     call mkdir(vimd_path, "p")
         " endif
         let g:yankring_history_dir = pe_cachedir
-        nnoremap <silent> <leader>yy :YRShow<CR>
+        " nnoremap <silent> <leader>yy :YRShow<CR>
+        nnoremap <silent> <C-y> :YRShow<CR>
+        inoremap <silent> <C-y> <ESC>:YRShow<CR>
+
+
         let g:yankring_replace_n_pkey = ''
         let yankring_min_element_length = 2
         let g:yankring_paste_using_g = 0
@@ -489,6 +493,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     "     nnoremap f :F<CR>
     Plug 'preservim/nerdtree'
         nnoremap <leader>n :NERDTreeFocus<CR>
+
 
 
 
@@ -1246,3 +1251,16 @@ call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options
         let res = searchindex#MatchCounts()
         return '[' . res[0] . '/' . res[1] . ']'
     endfunction
+
+
+    " copy to attached terminal using the yank(1) script:
+    " https://github.com/sunaku/home/blob/master/bin/yank
+    function! Yank(text) abort
+        let escape = system('yank', a:text)
+    if v:shell_error
+        echoerr escape
+    else
+        call writefile([escape], '/dev/tty', 'b')
+    endif
+    endfunction
+    noremap <silent> <Leader>y y:<C-U>call Yank(@0)<CR>
