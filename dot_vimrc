@@ -74,6 +74,7 @@ let g:startify_custom_header = [
 " 3. Some General Setting
 " ===========================================
 
+
 " -------------------------------------------
 " 3.1 Basic Setting Zone
 " -------------------------------------------
@@ -84,6 +85,7 @@ let g:startify_custom_header = [
     set ffs=unix,dos,mac " 文件换行符，默认使用 unix 换行符
     set updatetime=700
     set linebreak
+    set nomore
     " set clipboard=       " 关闭系统剪贴板共享
     " set clipboard=       " 关闭系统剪贴板共享
 
@@ -953,11 +955,13 @@ call plug#begin(pe_runtimepath . '/plugged')
 " -------------------------------------------
 " 6.11 Complete Engine (async complete)
 " -------------------------------------------
+    set pumheight=5
     Plug 'prabirshrestha/async.vim'
     Plug 'prabirshrestha/asyncomplete.vim'
     Plug 'prabirshrestha/asyncomplete-buffer.vim'
     Plug 'wellle/tmux-complete.vim'
-        let g:asyncomplete_auto_popup = 0
+        let g:asyncomplete_auto_popup = 1
+        
 
         function! s:check_back_space() abort
             let col = col('.') - 1
@@ -978,6 +982,10 @@ call plug#begin(pe_runtimepath . '/plugged')
         Plug 'hrsh7th/vim-vsnip-integ'
     endif
     Plug 'rafamadriz/friendly-snippets'
+    Plug 'prabirshrestha/asyncomplete-file.vim'
+    
+    
+    
 
 
 
@@ -1001,6 +1009,13 @@ call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options
     \    'max_buffer_size': 5000000,
     \  },
     \ }))
+au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#file#get_source_options({
+    \ 'name': 'file',
+    \ 'allowlist': ['*'],
+    \ 'priority': 10,
+    \ 'completor': function('asyncomplete#sources#file#completor')
+    \ }))
+
 
 " -------------------------------------------
 " 7.3 Expand region
