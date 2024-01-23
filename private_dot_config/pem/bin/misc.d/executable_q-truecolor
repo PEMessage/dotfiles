@@ -16,6 +16,7 @@ awk -v term_cols="${width:-$(tput cols || echo 80)}" -v term_lines="${height:-1}
 }'
 
 echo 
+echo 
 
 # Display ANSI colours. Found this on the interwebs, credited
 # to "HH".

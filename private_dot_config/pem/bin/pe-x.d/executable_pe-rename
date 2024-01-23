@@ -238,7 +238,7 @@ print_all() {
     done
 
     echo 
-    echo "The following cmd will not be run(do noting):"
+    echo "The following file select but nothing will happen"
     echo 
 
     local total=${#NO_CHANGE_CMD_LIST[@]}
