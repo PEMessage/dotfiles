@@ -19,10 +19,10 @@ run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | cut -c 6-8)"
     # transfer copied text to attached terminal with yank
     # transfer most-recently copied text to attached terminal with yank
     # transfer previously copied text (chosen from a menu) to attached terminal
-    # if-shell -b '[ "$(echo " $TMUX_VERSION >= 2.4" | bc)" = 1 ]' " \
-    #     bind-key -T copy-mode-vi Y send-keys -X copy-pipe 'yank > #{pane_tty}' ; \
-    #     bind-key -n M-y run-shell 'tmux save-buffer - | yank > #{pane_tty}' ; \
-    #     bind-key -n M-Y choose-buffer 'run-shell tmux save-buffer -b \"%%%\" - | yank > #{pane_tty}'"
+    if-shell -b '[ "$(echo "3.3 > $TMUX_VERSION  &&  $TMUX_VERSION >= 2.4" | bc)" = 1 ]' " \
+        bind-key -T copy-mode-vi Y send-keys -X copy-pipe 'yank > #{pane_tty}' ; \
+        bind-key -n M-y run-shell 'tmux save-buffer - | yank > #{pane_tty}' ; \
+        bind-key -n M-Y choose-buffer 'run-shell tmux save-buffer -b \"%%%\" - | yank > #{pane_tty}'"
 
 
 # --------------------------------

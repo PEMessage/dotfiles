@@ -121,3 +121,4 @@ PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
     # bind 'TAB:menu-complete'
 
     source ~/.config/pem/shell/init-sh.sh
+. "$HOME/.cargo/env"

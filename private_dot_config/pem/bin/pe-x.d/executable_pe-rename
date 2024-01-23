@@ -5,13 +5,14 @@ usage() {
     echo "USAGE:"
     echo 
     echo "  -p|--print                 : print cmd before run"
-    echo "    |--only-print            : only print cmd, do not run at all "
+    echo "  -b|--only-print            : (only print/bare run), do not run at all "
     echo "  -g|--glob [*]              : glob matching dir or file"
     echo "  -n|--no-interactive        : no interactive mode"
     echo "  -f|--force                 : mv -f"
     echo "  -e|--sed-script [*]        : your sed script"
     echo
     echo "EXAMPLE:"
+    echo "  pe-rename -g '*' -e 's@^[[:digit:]]*_@xxx@g' -n"
 }
 
 error_echo() {
@@ -77,6 +78,7 @@ parse_arg() {
     local short_arg_list='
     n,
     p,
+    b,
     f,
     h,
     g:,
@@ -115,7 +117,7 @@ parse_arg() {
             -p|--print)
                 CONF_PRINT=1
                 shift ;;
-            --only-print)
+            -b|--only-print)
                 CONF_PRINT=1
                 CONF_ONLY_PRINT=1
                 shift ;;

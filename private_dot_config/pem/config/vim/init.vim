@@ -161,6 +161,8 @@
     " nnoremap <MiddleMouse>     :tabclose<CR>
     vnoremap <RightMouse>            "+y
     inoremap <RightMouse>       <C-o>"+p
+    vnoremap tt :s/\s\+$//e<CR>
+    vnoremap p pgvy
 
 
 " -------------------------------------------

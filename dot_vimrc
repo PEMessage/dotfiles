@@ -487,8 +487,8 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:yankring_replace_n_pkey = ''
         let yankring_min_element_length = 2
         let g:yankring_paste_using_g = 0
-    Plug 'ojroques/vim-oscyank', {'branch': 'main'}
-        vmap <leader>c <Plug>OSCYankVisual
+    " Plug 'ojroques/vim-oscyank', {'branch': 'main'}
+    "     vmap <leader>c <Plug>OSCYankVisual
     " Plug 'dylanaraps/fff.vim'
     "     nnoremap f :F<CR>
     Plug 'preservim/nerdtree'
