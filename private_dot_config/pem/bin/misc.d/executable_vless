@@ -1,3 +1,4 @@
+#!/bin/sh
 if test -t 1; then
     if test $# = 0; then
         if test -t 0; then
