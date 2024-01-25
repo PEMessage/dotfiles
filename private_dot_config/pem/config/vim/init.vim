@@ -5,6 +5,7 @@
     set termguicolors
     set nocompatible
     colorscheme desert
+    runtime macros/matchit.vim
 " -------------------------------------------
 " Basic setting
 " -------------------------------------------

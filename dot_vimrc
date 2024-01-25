@@ -173,6 +173,7 @@ let g:startify_custom_header = [
     autocmd FileType man wincmd L
 
 	runtime ftplugin/man.vim
+    runtime macros/matchit.vim
     " augroup previewWindowPosition
     "     au!
     "     autocmd BufWinEnter * call PreviewWindowPosition()

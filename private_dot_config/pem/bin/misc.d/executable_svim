@@ -1,0 +1,18 @@
+#!/bin/sh
+MY_VIM_CONF=""
+
+test_list() {
+
+    if [ -n "$MY_VIM_CONF" ] ; then
+        return 0
+    fi
+
+    if [ -e "$1" ] ; then
+        MY_VIM_CONF="$1"
+    fi
+}
+
+test_list "$PEMHOME/config/vim/init.vim"
+test_list "$HOME/.config/pem/config/vim/init.vim"
+
+vim -u "$MY_VIM_CONF" "$@"
