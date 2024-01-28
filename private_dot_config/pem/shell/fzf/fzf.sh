@@ -118,7 +118,9 @@
     # ----------------------------------------- 
         if [ "$1" = "apt" ]; then
             apt-cache search '' | sort | cut --delimiter ' ' --fields 1 |
-                fzf --multi --cycle --reverse --preview 'apt-cache show {1}' |
+                fzf --multi --cycle --reverse \
+                --preview-window=right:70%:wrap \
+                --preview 'apt-cache show {1}' |
                 xargs -r sudo apt install -y
         elif [ "$1" = "ps" ]; then
             # 1. ps:   Feed the list of processes to fzf
