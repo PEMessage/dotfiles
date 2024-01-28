@@ -108,22 +108,22 @@
     # unameOut=$(uname -a)
     case $(uname -a) in
     # case "$unameOut" in
-        *Microsoft*)     PEMOS="WSL";; #wls must be first since it will have Linux in the name too
-        *WSL2*)          PEMOS="WSL2";; 
-        Linux*)          PEMOS="Linux";;
-        Darwin*)         PEMOS="Mac";;
-        CYGWIN*)         PEMOS="Cygwin";;
-        MINGW*)          PEMOS="Windows";; 
-        *Msys)           PEMOS="Windows";;
-        *)               PEMOS="UNKNOWN:${unameOut}"
+        *Microsoft*)     PEM_OS="WSL";; #wls must be first since it will have Linux in the name too
+        *WSL2*)          PEM_OS="WSL2";; 
+        Linux*)          PEM_OS="Linux";;
+        Darwin*)         PEM_OS="Mac";;
+        CYGWIN*)         PEM_OS="Cygwin";;
+        MINGW*)          PEM_OS="Windows";; 
+        *Msys)           PEM_OS="Windows";;
+        *)               PEM_OS="UNKNOWN:${unameOut}"
     esac
 
     case $(uname -m) in 
-        *x86_64*)   PEMARCH=x86_64;;
-        *amd64*)    PEMARCH=x86_64;;
-        *arm64*)    PEMARCH=arm64;;
-        *aarch64*)  PEMARCH=arm64;;
-        *armv8l*)   PEMARCH=arm64;;
+        *x86_64*)   PEM_ARCH=x86_64;;
+        *amd64*)    PEM_ARCH=x86_64;;
+        *arm64*)    PEM_ARCH=arm64;;
+        *aarch64*)  PEM_ARCH=arm64;;
+        *armv8l*)   PEM_ARCH=arm64;;
     esac
 
     # if xdg_cache_home didn't exist use ~/.cache
@@ -218,8 +218,12 @@
 
 
 
-    if [ "$PEMOS" = "WSL2" ]; then
+    if [ "$PEM_OS" = "WSL2" ]; then
         alias neovide="neovide.exe --wsl"
+    fi
+
+    if [ "$PEM_OS" = "Windows" ]; then
+        alias stmux="script -c tmux /dev/null"
     fi
 
 
@@ -249,8 +253,8 @@
 # -----------------------------------------
 # Source Zone
 # -----------------------------------------
-    if [ -f "${PEMHOME}/arch/${PEMARCH}/init-sh.sh"  ]; then
-        source "${PEMHOME}/arch/${PEMARCH}/init-sh.sh" 
+    if [ -f "${PEMHOME}/arch/${PEM_ARCH}/init-sh.sh"  ]; then
+        source "${PEMHOME}/arch/${PEM_ARCH}/init-sh.sh" 
     fi
 
     # Method 1: use findutils
