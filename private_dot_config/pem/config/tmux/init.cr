@@ -35,7 +35,9 @@ run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | cut -c 6-8)"
     # setw -g mode-keys vi 
     set-window-option -g mode-keys vi # 开启vi风格后，支持vi的C-d、C-u、hjkl等快捷键
 
+
     bind P paste-buffer
+    bind C-v paste-buffer
     bind-key -T copy-mode-vi v send-keys -X begin-selection
     bind-key -T copy-mode-vi y send-keys -X copy-selection
     bind-key -T copy-mode-vi r send-keys -X rectangle-toggle
@@ -147,7 +149,9 @@ run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | cut -c 6-8)"
 # --------------------------------
      set -g @tpm_plugins '          \
        tmux-plugins/tpm             \
-       fcsonline/tmux-thumbs \
+       fcsonline/tmux-thumbs        \
+       tmux-plugins/tmux-copycat    \
+       fmount/tmux-quickfix  
      '
     set -g @thumbs-select-fg-color \#3e444e
 

@@ -176,6 +176,8 @@ let g:startify_custom_header = [
     autocmd FileType man wincmd L
 
 	runtime ftplugin/man.vim
+    runtime macros/matchit.vim
+    
     " augroup previewWindowPosition
     "     au!
     "     autocmd BufWinEnter * call PreviewWindowPosition()
@@ -832,6 +834,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
 
         noremap <silent> <leader>ga :GscopeFind a <C-R><C-W><cr>
+        
         " " Go Symbol
         " noremap <silent> gs :GscopeFind s <C-R><C-W><cr>
         " " Go Defintion

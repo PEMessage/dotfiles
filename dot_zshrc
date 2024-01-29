@@ -102,6 +102,8 @@
 # -----------------------------------------
 
     source ~/.config/pem/shell/init-sh.sh
+    # default: export WORDCHARS='*?_-.[]~&;!#$%^(){}<>'
+    export WORDCHARS='*?_-.[]~&;!#$%^(){}<>'
 
     # source ~/.config/chezmoi/chezmoi.zsh
     # source ~/.config/pem/shell/fzf/fzf-ff.sh
