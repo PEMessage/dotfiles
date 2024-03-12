@@ -509,6 +509,7 @@ call plug#begin(pe_runtimepath . '/plugged')
 " 6.2 Textobj
 " -------------------------------------------
 "
+
     Plug 'kana/vim-submode'
         let g:submode_timeout = 0
         " let g:submode_keep_leaving_key = 0
@@ -849,9 +850,11 @@ call plug#begin(pe_runtimepath . '/plugged')
         " " noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
     Plug 'preservim/tagbar'
     Plug 'liuchengxu/vista.vim'
-    Plug 'vim-scripts/a.vim'
         nnoremap <leader>at :TagbarToggle<CR>
         nnoremap <leader>av :Vista!!<CR>
+
+    # This will do "imap \ihs so !!! DONT USE IT !!!
+    " Plug 'vim-scripts/a.vim'
     " Plug 'vim-scripts/taglist.vim'
 
     Plug 'skywind3000/asyncrun.vim'
