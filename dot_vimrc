@@ -11,7 +11,7 @@ let g:startify_custom_header = [
 " File: .vimrc
 " Author: PEMessage
 " Description: This is my VIM8+/NeoVIM configuration
-" Last Modified:  2023-05-29 Mon 03:01 PM
+" Last Modified:  2024-03-12 19:39
 " +++++++++++++++++++++++++++++++++++++++++++
 "
 
@@ -42,9 +42,9 @@ let g:startify_custom_header = [
                     \   'left': [ [ 'mode', 'paste' ],
                     \             [ 'gitbranch', 'readonly', 'filename', 'modified', 'searchcount' ] ]
                     \ },
-                \ 'component_function': {
-                    \ },
                 \ }
+                " \ 'component_function': {
+                "    \ },
                 "    \   'gitbranch': 'FugitiveHead',
                 "    \   'searchcount': 'SearchIndex'
     nnoremap <leader>tt :call lightline#toggle()<CR>
@@ -188,9 +188,11 @@ let g:startify_custom_header = [
     "     endif
     " endfunction
     " hi
+
+    " See https://vim.fandom.com/wiki/Make_views_automatic
     execute "set viewdir=" . g:pe_cachedir . '/view'
-    autocmd BufWinLeave *.* mkview
-    autocmd BufWinEnter *.* silent loadview
+    autocmd BufWinLeave ?* mkview
+    autocmd BufWinEnter ?* silent loadview
     set wildmenu
 
 " -------------------------------------------
@@ -672,6 +674,10 @@ call plug#begin(pe_runtimepath . '/plugged')
     "     xmap ga <Plug>(EasyAlign)
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-commentary'
+    " Using :verbose and :set together will (likely) tell you
+    " the file and line number where the option was last set.
+    " Can you do the following after opening a kotlin file?
+    " verbose set commentstring?
         autocmd FileType c setlocal commentstring=//\ %s
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-fugitive'
