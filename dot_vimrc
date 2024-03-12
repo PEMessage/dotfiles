@@ -853,7 +853,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         nnoremap <leader>at :TagbarToggle<CR>
         nnoremap <leader>av :Vista!!<CR>
 
-    # This will do "imap \ihs so !!! DONT USE IT !!!
+    " This will do "imap \ihs so !!! DONT USE IT !!!
     " Plug 'vim-scripts/a.vim'
     " Plug 'vim-scripts/taglist.vim'
 
