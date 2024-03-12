@@ -185,6 +185,7 @@ require("lazy").setup({ --Start Quote
 },
 {
     "lukas-reineke/indent-blankline.nvim",
+    enabled = true,
     event = { "BufReadPost", "BufNewFile" },
     -- Version 2
     -- config = function(_,opts)
@@ -268,7 +269,7 @@ require("lazy").setup({ --Start Quote
 },
 {
     'nvim-lualine/lualine.nvim',
-    disabled = true,
+    enabled = true,
     dependencies = {
         -- 'nvim-tree/nvim-web-devicons',
         -- opt = true
@@ -461,6 +462,7 @@ require("lazy").setup({ --Start Quote
     -- dependencies = {
     --     'hiphish/rainbow-delimiters.nvim',
     -- },
+    enabled = true,
     build = ":TSUpdate",
     event = { "BufReadPost", "BufNewFile" },
     opts = {
@@ -469,6 +471,9 @@ require("lazy").setup({ --Start Quote
             disable = { 'markdown', 'lua', 'make' },
             additional_vim_regex_highlighting = false,
         },
+        disable = function(lang,bufnr)
+            return lang == "ninjia" and vim.api.nvim_buf_line_count(bufnr) > 50000
+        end,
         -- rainbow = {
         --     enable = true,
         --     -- disable = { "jsx", "cpp" }, list of languages you want to disable the plugin for
@@ -519,6 +524,7 @@ require("lazy").setup({ --Start Quote
 -- -------------------------------------------
 {
     'nvim-telescope/telescope.nvim', tag = '0.1.4',
+    enabled = true,
     dependencies = { 'nvim-lua/plenary.nvim' },
     cmd = "Telescope",
     keys = {
@@ -844,6 +850,17 @@ require("lazy").setup({ --Start Quote
                 })
 
             end,
+            ["clangd"] = function ()
+                lspconfig.clangd.setup({
+                    autostart = true
+                })
+            end,
+            ["gopls"] = function ()
+                lspconfig.gopls.setup({
+                    autostart = true
+                })
+            end
+
         })
 
 
@@ -875,11 +892,48 @@ require("lazy").setup({ --Start Quote
     end,
 
 },
-
+-- {
+--     "jay-babu/mason-nvim-dap.nvim",
+--     dependencies = {
+--         "mfussenegger/nvim-dap",
+--         'williamboman/mason.nvim',
+--     },
+--     opts = {
+--         ensure_installed = {
+--             "delev",
+--             -- 'ccls'
+--         },
+--         handlers = {},
+--     },
+--     config = function (_,opts)
+--         require("mason-nvim-dap").setup(opts)
+--     end
+-- },
+-- {
+--     "mfussenegger/nvim-dap",
+--     dependencies = {
+--         'williamboman/mason.nvim',
+--     },
+-- },
+-- {
+--     "leoluz/nvim-dap-go",
+--     config = function ()
+--         require('dap-go').setup()
+--     end
+-- },
+-- {
+--     "rcarriga/nvim-dap-ui",
+--     dependencies = {"mfussenegger/nvim-dap"},
+--     config = function ()
+--         require("dapui").setup()
+--     end,
+-- },
 {
 
     'nvimdev/lspsaga.nvim',
-    -- disabled = true,
+    -- Note: this also have barbecue.nvim feature something like
+    -- nvim › init.lua › 󰅨 require("lazy").setup ›  [25]
+    enabled = true,
     config = function()
         require('lspsaga').setup({
             ui = {
@@ -904,13 +958,16 @@ require("lazy").setup({ --Start Quote
                     exec = '<CR>',
                 }
             },
-
+            symbol_in_winbar = {
+                enable = false,
+                separator = ' > '
+            }
         })
         local map = vim.api.nvim_buf_set_keymap
         map(0, "n", "<F2>", "<cmd>Lspsaga rename<cr>", {silent = true, noremap = true})
-        map(0, "n", "gx", "<cmd>Lspsaga code_action<cr>", {silent = true, noremap = true})
-        map(0, "x", "gx", ":<c-u>Lspsaga range_code_action<cr>", {silent = true, noremap = true})
-        map(0, "n", "gd", ":<cmd>Lspsaga finder<cr>", {noremap = true})
+        map(0, "n", "gk", "<cmd>Lspsaga code_action<cr>", {silent = true, noremap = true})
+        map(0, "x", "gk", ":<c-u>Lspsaga range_code_action<cr>", {silent = true, noremap = true})
+        map(0, "n", "gd", ":<cmd>Lspsaga finder def+ref<cr><cr>", {silent = true,noremap = true})
         map(0, "n", "go", "<cmd>Lspsaga show_line_diagnostics<cr>", {silent = true, noremap = true})
         -- map(0, "n", "K",  "<cmd>Lspsaga hover_doc<cr>", {silent = true, noremap = true})
     end,

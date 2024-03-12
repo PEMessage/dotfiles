@@ -7,5 +7,6 @@ git config --global alias.co checkout
 git config --global alias.re 'remote -v'
 git config --global alias.st 'status --short --branch'
 git config --global alias.lg 'log --oneline --graph'
+git config --global alias.lgs 'log  --graph --format="%C(yellow)%h %C(red)%ae %Creset%s"'
 git config --global alias.ddf 'difftool --ignore-submodules --dir-diff --no-symlinks --tool=dirdiff'
 git config --global difftool.dirdiff.cmd 'dirdiff $LOCAL $REMOTE'
