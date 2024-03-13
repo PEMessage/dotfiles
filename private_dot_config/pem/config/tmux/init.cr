@@ -151,7 +151,7 @@ run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | cut -c 6-8)"
        tmux-plugins/tpm             \
        fcsonline/tmux-thumbs        \
        tmux-plugins/tmux-copycat    \
-       fmount/tmux-quickfix  
+       fmount/tmux-quickfix         \
      '
     set -g @thumbs-select-fg-color \#3e444e
 
