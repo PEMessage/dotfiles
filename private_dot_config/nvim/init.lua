@@ -3,7 +3,7 @@
 -- File: init.lua
 -- Author: PEMessage
 -- Description: This is my NeoVIM configuration
--- Last Modified: 2023-10-05 15:13
+-- Last Modified: 2024-03-13
 -- +++++++++++++++++++++++++++++++++++++++++++
 
 -- 1. Global Options
@@ -757,17 +757,17 @@ require("lazy").setup({ --Start Quote
     config = function(_,opts)
         local cmp = require('cmp')
         cmp.setup(opts)
-        cmp.setup.cmdline(':', {
-            mapping = cmp.mapping.preset.cmdline(),
-            -- view = {
-            --     entries = {name = 'wildmenu', separator = '|' }
-            -- },
-            sources = cmp.config.sources({
-                { name = 'path' }
-            }, {
-                { name = 'cmdline' }
-            })
-        })
+        -- cmp.setup.cmdline(':', {
+        --     mapping = cmp.mapping.preset.cmdline(),
+        --     -- view = {
+        --     --     entries = {name = 'wildmenu', separator = '|' }
+        --     -- },
+        --     sources = cmp.config.sources({
+        --         { name = 'path' }
+        --     }, {
+        --         { name = 'cmdline' }
+        --     })
+        -- })
 
         cmp.setup.cmdline({ '/', '?' }, {
             mapping = cmp.mapping.preset.cmdline(),
@@ -961,15 +961,42 @@ require("lazy").setup({ --Start Quote
             symbol_in_winbar = {
                 enable = false,
                 separator = ' > '
-            }
+            },
+            finder = {
+                max_height = 0.6,
+                keys = {
+                    vsplit = 'v'
+                }
+            },
+            definition = {
+                width = 0.6,
+                height = 0.5,
+                save_pos = false,
+                keys = {
+                    quit = { 'q', '<ESC>', '<C-c>' },
+                    edit = '<C-w>o',
+                    vsplit = '<C-w>v',
+                    split = '<C-w>i',
+                    tabe = '<C-w>t',
+                    tabnew = '<C-w>n',
+                },
+            },
+
         })
-        local map = vim.api.nvim_buf_set_keymap
-        map(0, "n", "<F2>", "<cmd>Lspsaga rename<cr>", {silent = true, noremap = true})
-        map(0, "n", "gk", "<cmd>Lspsaga code_action<cr>", {silent = true, noremap = true})
-        map(0, "x", "gk", ":<c-u>Lspsaga range_code_action<cr>", {silent = true, noremap = true})
-        map(0, "n", "gd", ":<cmd>Lspsaga finder def+ref<cr><cr>", {silent = true,noremap = true})
-        map(0, "n", "go", "<cmd>Lspsaga show_line_diagnostics<cr>", {silent = true, noremap = true})
+        -- local map = vim.api.nvim_buf_set_keymap
+        -- map(0, "n", "<F2>", "<cmd>Lspsaga rename<cr>", {silent = true, noremap = true})
+        -- map(0, "n", "gk", "<cmd>Lspsaga code_action<cr>", {silent = true, noremap = true})
+        -- map(0, "x", "gk", ":<c-u>Lspsaga range_code_action<cr>", {silent = true, noremap = true})
+        -- map(0, "n", "gd", "<cmd>Lspsaga  peek_definition<cr>", {silent = true,noremap = true})
+        -- map(0, "n", "go", "<cmd>Lspsaga show_line_diagnostics<cr>", {silent = true, noremap = true})
         -- map(0, "n", "K",  "<cmd>Lspsaga hover_doc<cr>", {silent = true, noremap = true})
+        --
+        local map = vim.keymap.set
+        map( "n", "<F2>", "<cmd>Lspsaga rename<cr>", {silent = true, noremap = true})
+        map( "n", "gk", "<cmd>Lspsaga code_action<cr>", {silent = true, noremap = true})
+        map( "x", "gk", ":<c-u>Lspsaga range_code_action<cr>", {silent = true, noremap = true})
+        map( "n", "gd", "<cmd>Lspsaga  peek_definition<cr>", {silent = true,noremap = true})
+        map( "n", "go", "<cmd>Lspsaga show_line_diagnostics<cr>", {silent = true, noremap = true})
     end,
     dependencies = {
         'nvim-treesitter/nvim-treesitter', -- optional
