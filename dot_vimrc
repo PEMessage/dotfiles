@@ -49,6 +49,8 @@ let g:startify_custom_header = [
                 "    \   'searchcount': 'SearchIndex'
     nnoremap <leader>tt :call lightline#toggle()<CR>
 
+                    " \   'gitbranch': 'FugitiveHead',
+                    " \   'searchcount': 'SearchIndex'
 
 
 
