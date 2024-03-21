@@ -176,6 +176,11 @@ let g:startify_custom_header = [
 " -------------------------------------------
     autocmd FileType help wincmd L
     autocmd FileType man wincmd L
+    augroup vimrc_help
+        autocmd!
+        autocmd BufEnter *.* if &buftype == 'help' | wincmd L | endif
+    augroup END
+
 
 	runtime ftplugin/man.vim
     runtime macros/matchit.vim
@@ -193,8 +198,41 @@ let g:startify_custom_header = [
 
     " See https://vim.fandom.com/wiki/Make_views_automatic
     execute "set viewdir=" . g:pe_cachedir . '/view'
-    autocmd BufWinLeave ?* mkview
-    autocmd BufWinEnter ?* silent loadview
+    set viewoptions-=options
+    let g:skipview_files = [
+                \ '[EXAMPLE PLUGIN BUFFER]'
+                \ ]
+    function! MakeViewCheck()
+        if has('quickfix') && &buftype =~ 'nofile'
+            " Buffer is marked as not a file
+            return 0
+        endif
+        if empty(glob(expand('%:p')))
+            " File does not exist on disk
+            return 0
+        endif
+        if len($TEMP) && expand('%:p:h') == $TEMP
+            " We're in a temp dir
+            return 0
+        endif
+        if len($TMP) && expand('%:p:h') == $TMP
+            " Also in temp dir
+            return 0
+        endif
+        if index(g:skipview_files, expand('%')) >= 0
+            " File is in skip list
+            return 0
+        endif
+        return 1
+    endfunction
+    augroup vimrcAutoView
+        autocmd!
+        " Autosave & Load Views.
+        autocmd BufWritePost,BufLeave,WinLeave ?* if MakeViewCheck() | mkview | endif
+        autocmd BufWinEnter ?* if MakeViewCheck() | silent loadview | endif
+    augroup end
+    " autocmd BufWinLeave ?* mkview
+    " autocmd BufWinEnter ?* silent loadview
     set wildmenu
 
 " -------------------------------------------
@@ -784,6 +822,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:gutentags_project_root = ['.root','.project']
         let g:gutentags_add_default_project_roots = 1
         let g:gutentags_add_ctrlp_root_markers = 0
+        let g:gutentags_plus_native = 0
         " 所生成的数据文件的名称
         " let g:gutentags_ctags_tagfile = '.tags'
         " 同时开启 ctags 和 gtags 支持：
@@ -902,6 +941,8 @@ call plug#begin(pe_runtimepath . '/plugged')
 " 6.9 Quickfix Plugin
 " -------------------------------------------
     " Quickfix Config
+    set cscopequickfix=s-,g-,d-,c-,t-,e-,f-,i-,a-
+    Plug 'vim-scripts/cscope-quickfix'
     Plug 'skywind3000/vim-preview'
         autocmd FileType qf nnoremap <silent><buffer> p :PreviewQuickfix<cr>
         autocmd FileType qf nnoremap <silent><buffer> P :PreviewClose<cr>
