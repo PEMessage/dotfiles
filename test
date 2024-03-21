@@ -1,0 +1,35 @@
+\
+c
+
+c
+
+i  <Plug>(vsnip-jump-prev) * <Esc>:<C-U>call <SNR>104_jump(-1)<CR>
+i  <Plug>(vsnip-jump-next) * <Esc>:<C-U>call <SNR>104_jump(1)<CR>
+i  <Plug>(vsnip-expand) * <Esc>:<C-U>call <SNR>104_expand()<CR>
+i  <Plug>(vsnip-expand-or-jump) * <Esc>:<C-U>call <SNR>104_expand_or_jump()<CR>
+i  <Plug>(asyncomplete_force_refresh) * asyncomplete#force_refresh()
+!  <M-C-H>     * <C-W>
+!  <M-BS>      * <C-W>
+!  <M-p>       * <Up>
+!  <M-n>       * <Down>
+i  <M-d>       * <C-O>dw
+!  <M-f>       * <S-Right>
+!  <M-b>       * <S-Left>
+!  <F35>       * <C-W>
+!  <F34>       * <C-W>
+!  <F33>       * <Up>
+!  <F32>       * <Down>
+i  <F31>       * <C-O>dw
+!  <F30>       * <S-Right>
+!  <F29>       * <S-Left>
+i  <C-F>       * col('.')>strlen(getline('.'))?"\<C-F>":"\<Right>"
+i  <C-E>       * col('.')>strlen(getline('.'))||pumvisible()?"\<C-E>":"\<End>"
+i  <C-D>       * col('.')>strlen(getline('.'))?"\<C-D>":"\<Del>"
+i  <C-B>       * getline('.')=~'^\s*$'&&col('.')>strlen(getline('.'))?"0\<C-D>\<Esc>kJs":"\<Left>"
+i  <C-X><C-A>  * <C-A>
+i  <C-A>       * <C-O>^
+i  <C-G>S        <Plug>ISurround
+i  <C-G>s        <Plug>Isurround
+i  <C-S>         <Plug>Isurround
+i  <Plug>ISurround * <C-R>=<SNR>78_insert(1)<CR>
+i  <Plug>Isurround * <C-R>=<SNR>78_insert()<C\k

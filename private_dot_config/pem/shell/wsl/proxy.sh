@@ -21,4 +21,7 @@ unpx() {
     echo export hostip="$PREV_hostip"
     echo export https_proxy="$PREV_https_proxy"
     echo export http_proxy="$PREV_http_proxy"
+    export hostip="$PREV_hostip"
+    export https_proxy="$PREV_https_proxy"
+    export http_proxy="$PREV_http_proxy"
 }
