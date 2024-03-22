@@ -458,7 +458,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'PEMessage/vim-fixkey'
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
-    Plug 'linrongbin16/fzfx.vim'
+    " Plug 'linrongbin16/fzfx.vim'
     Plug 'tacahiroy/ctrlp-funky'
     Plug 'ctrlpvim/ctrlp.vim'
         let g:ctrlp_map = ''
@@ -468,15 +468,16 @@ call plug#begin(pe_runtimepath . '/plugged')
 
         noremap <silent> <C-r> :History<CR>
         noremap <silent> <C-p> :CtrlPBuffer<CR>
-        nnoremap <leader>cm :\<C-U>FzfxCommands<CR>
+        " nnoremap <leader>cm :\<C-U>FzfxCommands<CR>
+        noremap <silent> <C-e> :FZF<CR>
         " nnoremap <C-S-p> :\<C-U>FzfxCommands<CR>
 
 
         noremap <leader>ft :BTags<CR>
         nnoremap <leader>fbr :\<C-U>FzfxBranches<CR>
 
-        nnoremap <leader>fg :\<C-U>FzfxLiveGrep<CR>
-        nnoremap <leader>ff :\<C-U>FzfxFiles<CR>
+        " nnoremap <leader>fg :\<C-U>FzfxLiveGrep<CR>
+        " nnoremap <leader>ff :\<C-U>FzfxFiles<CR>
         nnoremap <Leader>fu :CtrlPFunky<Cr>
         " nnoremap <space>fw :\<C-U>FzfxLiveGrep<CR>
         " if has('autocmd')

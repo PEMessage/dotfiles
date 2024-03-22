@@ -428,8 +428,21 @@ require("lazy").setup({ --Start Quote
 
 {
     'lewis6991/gitsigns.nvim',
-    config = function ()
-        require('gitsigns').setup()
+    opts = {
+        -- current_line_blame = true,
+        current_line_blame_opts = {
+            virt_text = true,
+            virt_text_pos = 'right_align', -- 'eol' | 'overlay' | 'right_align'
+            delay = 800,
+            ignore_whitespace = false,
+            virt_text_priority = 100,
+        },
+
+    },
+    config = function (_,opts)
+        require('gitsigns').setup(opts)
+        vim.keymap.set( 'n',  '<leader>`1', '<cmd>Gitsigns toggle_current_line_blame<cr>' ,
+            { silent = true, desc = "Toggle line blame"  } )
     end
 },
 {
@@ -974,8 +987,8 @@ require("lazy").setup({ --Start Quote
                 save_pos = false,
                 keys = {
                     quit = { 'q', '<ESC>', '<C-c>' },
-                    edit = '<C-w>o',
-                    vsplit = '<C-w>v',
+                    edit = { '<C-w>o', '<enter>','<C-]>' },
+                    vsplit = { '<C-w>v', '<space>' },
                     split = '<C-w>i',
                     tabe = '<C-w>t',
                     tabnew = '<C-w>n',
@@ -1095,6 +1108,7 @@ require("lazy").setup({ --Start Quote
         { desc = "Alpha" })
 
     vim.keymap.set("n", "<leader>o/",'/', { noremap = true, desc = "Origin VIM /" })
+    vim.keymap.set("v", "<leader>y",'"+y', { noremap = true, desc = "Origin VIM /" })
 -- 7. Function Zone
 -- ===========================================
 
@@ -1173,6 +1187,12 @@ function PE.PrintTbl(tb)
     end
     return RecuPrint(tb)
 end
+
+function PE.CurrentFile()
+    print( vim.api.nvim_buf_get_name(0))
+end
+
+vim.cmd('command! PFile lua PE.CurrentFile()')
 
 function PE.MouseSet(arg)
     vim.o.mouse = arg
