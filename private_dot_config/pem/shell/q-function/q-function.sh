@@ -116,6 +116,10 @@ function q-whois () {
     /usr/bin/whois -h whois.internic.net $domain | sed '/NOTICE:/q'
 }
 
+function q-path () {
+    echo $PATH | tr ':' '\n'
+}
+
 
 function q-littlebig () {
     [[ "$(printf '\01\03' | hexdump)" == *0103* ]] && echo big || echo little

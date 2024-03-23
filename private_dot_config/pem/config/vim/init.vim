@@ -2,6 +2,7 @@
 " -------------------------------------------
 " Color Scheme
 " -------------------------------------------
+    source $VIMRUNTIME/defaults.vim
     set termguicolors
     set nocompatible
     colorscheme desert

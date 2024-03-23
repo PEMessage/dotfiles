@@ -83,10 +83,32 @@ vim.keymap.set('i', 'jj', '<C-[>')
     vim.o.number      = true -- Print line number
     vim.o.splitright  = true -- Put new windows right of current
 
-    vim.api.nvim_create_autocmd( { 'FileType' },{
-        pattern       = { 'help','man' },
-        command       = 'wincmd L'
+    -- vim.api.nvim_create_autocmd( { 'FileType' },{
+    --     pattern       = { 'help','man' },
+    --     command       = 'wincmd L'
+    -- })
+    vim.api.nvim_create_augroup('vimrc_help', {clear = true})
+    vim.api.nvim_create_autocmd({'BufEnter'}, {
+        group = 'vimrc_help',
+        pattern = { '*.*' },
+        command = 'if &buftype == \'help\' | wincmd L | endif',
     })
+    local lastplace = vim.api.nvim_create_augroup("LastPlace", {})
+    vim.api.nvim_clear_autocmds({ group = lastplace })
+    vim.api.nvim_create_autocmd("BufReadPost", {
+        group = lastplace,
+        pattern = { "*" },
+        desc = "remember last cursor place",
+        callback = function()
+            local mark = vim.api.nvim_buf_get_mark(0, '"')
+            local lcount = vim.api.nvim_buf_line_count(0)
+            if mark[1] > 0 and mark[1] <= lcount then
+                pcall(vim.api.nvim_win_set_cursor, 0, mark)
+            end
+        end,
+    })
+
+
 -- -------------------------------------------
 -- 3.6 Stateline Setting
 -- -------------------------------------------
@@ -163,6 +185,7 @@ require("lazy").setup({ --Start Quote
 -- -------------------------------------------
 {
     -- active indent guide and indent text objects
+    -- indent animation
     "echasnovski/mini.indentscope",
     version = false, -- wait till new 0.7.0 release to put it back on semver
     enabled = true,
@@ -418,7 +441,17 @@ require("lazy").setup({ --Start Quote
         vim.keymap.set(
             'n',
             '/','<Plug>(easymotion-sn)',
-            { remap = true }
+            {   desc = 'Search using easymotion',
+                remap = true,
+            }
+
+        )
+        vim.keymap.set(
+            'n',
+            '<leader>/','/',
+            {   desc = 'Search using origin VIM /',
+                remap = true,
+            }
 
         )
     end,
@@ -512,6 +545,7 @@ require("lazy").setup({ --Start Quote
             'go',
             'java',
             'python',
+            'vimdoc',
             'bash',
         },
         incremental_selection = {
@@ -654,7 +688,7 @@ require("lazy").setup({ --Start Quote
         init = function()
             local wk = require('which-key')
             wk.register({
-                ["<leader>f"] = { name = "Fuzzy Find (Telescope)" }
+                ["<leader>f"] = { name = "Fuzzy Find (Telescope)" },
             })
         end
     },
@@ -812,10 +846,10 @@ require("lazy").setup({ --Start Quote
     },
     opts = {
         ensure_installed = {
-            'pylsp',
+            -- 'pylsp',
             'lua_ls',
-            'gopls',
-            'clangd',
+            -- 'gopls',
+            -- 'clangd',
             -- 'ccls'
 
         },
@@ -978,7 +1012,8 @@ require("lazy").setup({ --Start Quote
             finder = {
                 max_height = 0.6,
                 keys = {
-                    vsplit = 'v'
+                    vsplit = 'v',
+                    edit = 'enter'
                 }
             },
             definition = {
@@ -1010,6 +1045,7 @@ require("lazy").setup({ --Start Quote
         map( "x", "gk", ":<c-u>Lspsaga range_code_action<cr>", {silent = true, noremap = true})
         map( "n", "gd", "<cmd>Lspsaga  peek_definition<cr>", {silent = true,noremap = true})
         map( "n", "go", "<cmd>Lspsaga show_line_diagnostics<cr>", {silent = true, noremap = true})
+        map( "n", "Q", "<cmd>Lspsaga finder tyd+ref+imp+def<cr>", {silent = true, noremap = true})
     end,
     dependencies = {
         'nvim-treesitter/nvim-treesitter', -- optional
@@ -1025,7 +1061,7 @@ require("lazy").setup({ --Start Quote
 
 -- 6. KeyMap Zone
 -- ===========================================
-
+local wk = require('which-key')
 -- -------------------------------------------
 -- 6.1 Basic I / N Mode
 -- -------------------------------------------
@@ -1072,9 +1108,11 @@ require("lazy").setup({ --Start Quote
     vim.keymap.set("v", "<M-k>", ":m '<-2<cr>gv=gv", { desc = "Move up" })
 
     -- Jump Section
-    vim.keymap.set("n", "gp",
-     '`[' .. 'v' .. '`]',
-    { desc = "Go to Previous Paste", noremap = true })
+    vim.keymap.set(
+        "n", "gp",
+        '`[' .. 'v' .. '`]',
+        { desc = "Go to Previous Paste", noremap = true }
+    )
 
     vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to Next diagnostic' })
     vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to Pervious diagnostic' })
@@ -1082,8 +1120,8 @@ require("lazy").setup({ --Start Quote
 -- -------------------------------------------
 -- 6.2 Leader Keymap
 -- -------------------------------------------
-    vim.keymap.set('n', '<leader>rce' , '<cmd>tabe $MYVIMRC<CR>' , { desc = ' Edit MYVIMRC ' } )
-    vim.keymap.set('n', '<leader>``' , '<cmd>nohlsearch<CR>' , { desc = ' Close Highlight ' } )
+    vim.keymap.set('n', '<leader>rce' , '<cmd>tabe $MYVIMRC<CR>' , { desc = 'Edit MYVIMRC' } )
+    vim.keymap.set('n', '<leader>``' , '<cmd>nohlsearch<CR>' , { desc = 'Close Highlight' } )
 
     vim.keymap.set("n", "<leader>wp",
         function() PE.ToggleOpts("wrap") end,
@@ -1091,9 +1129,8 @@ require("lazy").setup({ --Start Quote
 
 
     -- Also see @Line-Number
-        local wk = require('which-key')
         wk.register({
-            ["<leader>n"] = { name = "+Number Options" }
+            ["<leader>n"] = { name = "+LineNumber Options" }
         })
     vim.keymap.set("n", "<leader>nu",
         function() PE.ToggleOpts("number") end,
@@ -1102,13 +1139,16 @@ require("lazy").setup({ --Start Quote
         function() PE.ToggleOpts("relativenumber") end,
         { desc = "Toggle Relative Numbers" })
 
+        wk.register({
+            ["<leader>t"] = { name = "+Tabe Options" }
+        })
     vim.keymap.set("n", "<leader>tb", '<cmd>tab ball<cr>',
         { desc = "Tab Ball buffers" })
-    vim.keymap.set("n", "<leader>al", '<cmd>tab new<cr><cmd>Alpha<cr>',
-        { desc = "Alpha" })
+    vim.keymap.set("n", "<leader>tn", '<cmd>tab new<cr><cmd>Alpha<cr>',
+        { desc = "Alpha Startpage" })
 
-    vim.keymap.set("n", "<leader>o/",'/', { noremap = true, desc = "Origin VIM /" })
-    vim.keymap.set("v", "<leader>y",'"+y', { noremap = true, desc = "Origin VIM /" })
+    -- vim.keymap.set("n", "<leader>o/",'/', { noremap = true, desc = "Origin VIM /" })
+    vim.keymap.set("v", "<leader>y",'"+y', { noremap = true, desc = "Copy to clipboard(Reg\")" })
 -- 7. Function Zone
 -- ===========================================
 
