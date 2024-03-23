@@ -120,15 +120,15 @@ vim.keymap.set('i', 'jj', '<C-[>')
 
 -- 5. LazyNvim Auto Install
 -- ===========================================
-require("lazy").setup({ --Start Quote
+require("lazy").setup({
 -- -------------------------------------------
-
 -- -------------------------------------------
 -- 5.0 Essiential Plug
 -- -------------------------------------------
 {
     "folke/which-key.nvim",
     event = "VeryLazy",
+    enabled = true,
     init = function()
         vim.o.timeout = true
         vim.o.timeoutlen = 300
@@ -188,7 +188,7 @@ require("lazy").setup({ --Start Quote
     -- indent animation
     "echasnovski/mini.indentscope",
     version = false, -- wait till new 0.7.0 release to put it back on semver
-    enabled = true,
+    enabled = false,
     event = { "BufReadPre", "BufNewFile" },
     config = function(_,opts)
         vim.api.nvim_create_autocmd("FileType", {
@@ -208,6 +208,7 @@ require("lazy").setup({ --Start Quote
 },
 {
     "lukas-reineke/indent-blankline.nvim",
+    -- The indent that always exist one
     enabled = true,
     event = { "BufReadPost", "BufNewFile" },
     -- Version 2
@@ -221,13 +222,20 @@ require("lazy").setup({ --Start Quote
     --
     -- Version 3
     config = function(_,opts)
-        vim.cmd [[highlight IndentBlanklineChar guifg=#455574 gui=nocombine]]
+        --
+        -- use Inspect/InspectTree to check highlight
+        -- See: help hl-IblIndent
+        -- Default: takes the values from |hl-Whitespace| when not defined ~
+        -- So this set must be set before setup()
+        vim.cmd [[highlight IblIndent guifg=#455574 gui=nocombine]]
         require("ibl").setup({
 
             debounce = 100,
             indent = {
                 char = "|",
-                highlight = 'IndentBlanklineChar'
+                -- This will causing telescope.colorscheme live show error !!!
+                -- DONT USE IT !!!
+                -- highlight = 'IndentBlanklineChar'
             },
             exclude = {
                 filetypes = {
@@ -981,6 +989,7 @@ require("lazy").setup({ --Start Quote
     -- Note: this also have barbecue.nvim feature something like
     -- nvim › init.lua › 󰅨 require("lazy").setup ›  [25]
     enabled = true,
+    event = "VeryLazy",
     config = function()
         require('lspsaga').setup({
             ui = {
@@ -1052,8 +1061,45 @@ require("lazy").setup({ --Start Quote
         -- 'nvim-tree/nvim-web-devicons'     -- optional
     },
 },
+-- {
+--     'roobert/search-replace.nvim',
+-- },
 
 -- -------------------------------------------
+},{ -- Lazy.nvim Options
+-- -------------------------------------------
+install = {
+    -- install missing plugins on startup. This doesn't increase startup time.
+    missing = false,
+    -- try to load one of these colorschemes when starting an installation during startup
+    colorscheme = { "habamax" },
+},
+ui = {
+    icons = {
+        cmd = ":",
+        config = "c",
+        event = "e",
+        ft = "ft ",
+        init = "init ",
+        import = "import ",
+        keys = "k ",
+        lazy = "lazy ",
+        loaded = "i",
+        not_loaded = "n",
+        plugin = "p ",
+        runtime = "r ",
+        require = "r ",
+        source = "s ",
+        start = "s",
+        task = "t",
+        list = {
+            "-",
+            "-",
+            "=",
+            "=",
+        },
+    }
+}
 }) --End Lazy.nvim Quote
 -- ===========================================
 --
@@ -1061,7 +1107,20 @@ require("lazy").setup({ --Start Quote
 
 -- 6. KeyMap Zone
 -- ===========================================
-local wk = require('which-key')
+-- local wk = require('which-key')
+function PE.WkCheck()
+    -- return require('which-key')
+    local status, maywk = pcall(require, 'which-key')
+    if status then
+        return maywk
+    else
+        -- Fallback to a dummy table with a no-op register function
+        return {
+            register = function(...) end
+        }
+    end
+end
+local wk = PE.WkCheck()
 -- -------------------------------------------
 -- 6.1 Basic I / N Mode
 -- -------------------------------------------
@@ -1129,9 +1188,9 @@ local wk = require('which-key')
 
 
     -- Also see @Line-Number
-        wk.register({
-            ["<leader>n"] = { name = "+LineNumber Options" }
-        })
+    wk.register({
+        ["<leader>n"] = { name = "+LineNumber Options" }
+    })
     vim.keymap.set("n", "<leader>nu",
         function() PE.ToggleOpts("number") end,
         { desc = "Toggle Line Numbers" })
@@ -1139,9 +1198,11 @@ local wk = require('which-key')
         function() PE.ToggleOpts("relativenumber") end,
         { desc = "Toggle Relative Numbers" })
 
-        wk.register({
-            ["<leader>t"] = { name = "+Tabe Options" }
-        })
+    vim.keymap.set('v','tt','<cmd>s/\\s\\+$//e<cr>',{ desc = 'Clean tail spaces'})
+
+    wk.register({
+        ["<leader>t"] = { name = "+Tabe Options" }
+    })
     vim.keymap.set("n", "<leader>tb", '<cmd>tab ball<cr>',
         { desc = "Tab Ball buffers" })
     vim.keymap.set("n", "<leader>tn", '<cmd>tab new<cr><cmd>Alpha<cr>',
@@ -1231,8 +1292,10 @@ end
 function PE.CurrentFile()
     print( vim.api.nvim_buf_get_name(0))
 end
-
 vim.cmd('command! PFile lua PE.CurrentFile()')
+
+
+
 
 function PE.MouseSet(arg)
     vim.o.mouse = arg
