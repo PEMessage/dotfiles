@@ -278,6 +278,11 @@ require("lazy").setup({
             startify.section.footer,
         }
         require'alpha'.setup(startify.config)
+        vim.keymap.set(
+            "n", "<leader>st",
+            '<cmd>tab new<cr><cmd>Alpha<cr>',
+            { desc = "Startify(using Alpha)" }
+        )
     end
 },
 
@@ -582,6 +587,7 @@ require("lazy").setup({
     enabled = true,
     dependencies = { 'nvim-lua/plenary.nvim' },
     cmd = "Telescope",
+    -- See : help LazyKeysSpec
     keys = {
         {
             "<C-p>",
@@ -1021,8 +1027,9 @@ require("lazy").setup({
             finder = {
                 max_height = 0.6,
                 keys = {
-                    vsplit = 'v',
-                    edit = 'enter'
+                    vsplit = {'v','s'},
+                    quit = { '<ESC>', '<C-c>','q' },
+                    tabe = {'<enter>','t'}
                 }
             },
             definition = {
@@ -1205,8 +1212,6 @@ local wk = PE.WkCheck()
     })
     vim.keymap.set("n", "<leader>tb", '<cmd>tab ball<cr>',
         { desc = "Tab Ball buffers" })
-    vim.keymap.set("n", "<leader>tn", '<cmd>tab new<cr><cmd>Alpha<cr>',
-        { desc = "Alpha Startpage" })
 
     -- vim.keymap.set("n", "<leader>o/",'/', { noremap = true, desc = "Origin VIM /" })
     vim.keymap.set("v", "<leader>y",'"+y', { noremap = true, desc = "Copy to clipboard(Reg\")" })
