@@ -188,7 +188,7 @@ require("lazy").setup({
     -- indent animation
     "echasnovski/mini.indentscope",
     version = false, -- wait till new 0.7.0 release to put it back on semver
-    enabled = false,
+    enabled = true,
     event = { "BufReadPre", "BufNewFile" },
     config = function(_,opts)
         vim.api.nvim_create_autocmd("FileType", {
