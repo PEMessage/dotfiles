@@ -68,13 +68,16 @@
     # unameOut=$(uname -a)
     case $(uname -a) in
     # case "$unameOut" in
-        *WSL2*)          PEM_OS="WSL2";;
-        *Microsoft*)     PEM_OS="WSL";; #wls must be first since it will have Linux in the name too
-        Linux*)          PEM_OS="Linux";;
-        Darwin*)         PEM_OS="Mac";;
-        CYGWIN*)         PEM_OS="Cygwin";;
-        MINGW*)          PEM_OS="Windows";;
-        *Msys)           PEM_OS="Windows";;
+        *WSL2*)          PEM_OS="linux" 
+                         PEM_OS_VARIANT="wsl2";;
+        *Microsoft*)     PEM_OS="linux" #wls must be first since it will have Linux in the name too
+                         PEM_OS_VARIANT="wsl";;
+        Linux*)          PEM_OS="linux";;
+        Darwin*)         PEM_OS="mac";;
+        CYGWIN*)         PEM_OS="cygwin";;
+        MINGW*)          PEM_OS="windows";;
+        *Msys)           PEM_OS="windows";;
+        *)               PEM_OS="unknow"
     esac
 
     case $(uname -m) in
@@ -83,6 +86,7 @@
         *arm64*)    PEM_ARCH=arm64;;
         *aarch64*)  PEM_ARCH=arm64;;
         *armv8l*)   PEM_ARCH=arm64;;
+        *)          PEM_ARCH="unknow"
     esac
 
     PEM_INIT_SCRIPT="$(readlink -f ${BASH_SOURCE[0]-$0})"
@@ -92,6 +96,21 @@
     # No space in these variable
     PEM_ROOT_LIST="$PEM_HOME $PEM_DATA_HOME $PEM_CACHE_HOME"
 
+    # Some simple alias
+    alias grep='grep --color=auto'
+    alias cnl='LC_ALL=zh_CN.UTF-8 LANG=zh_CN.UTF-8'
+    alias nvi="nvim"
+
+    alias nvim-lazy='NVIM_APPNAME=lazynvim nvim'
+    alias mv='mv -i'
+    alias rm='rm -i'
+    alias cp='cp -i'
+
+    # Default to human readable figures
+    alias df='df -h'
+    alias du='du -h'
+    alias ls='ls --color --time-style=long-iso -h'
+    alias ll='ls --color --time-style=long-iso -h -l -a'
 
 
     # var expansion is not split (by default) in zsh,
@@ -113,11 +132,11 @@
             . "$x/shell/autorun.sh"
         }
 
-        [ ! -f "$x/bin/init/already" ] &&
-            [ -x "$x/bin/init/bootstrap" ] &&
-            (
-                "$x/bin/init/bootstrap" "$PEM_OS" "$PEM_ARCH"
-            )
+        # [ ! -f "$x/bin/init/already" ] &&
+        #     [ -x "$x/bin/init/bootstrap" ] &&
+        #     (
+        #         "$x/bin/init/bootstrap" "$PEM_OS" "$PEM_ARCH"
+        #     )
 
         for xbin in "$x/bin"/* ;
         do
@@ -126,7 +145,13 @@
                     *.bin)
                         PATH="$PATH:$xbin"
                         ;;
-                    *.${PEM_OS}.$PEM_ARCH) 
+                    *.${PEM_OS}-${PEM_ARCH}) 
+                        PATH="$PATH:$xbin"
+                        ;;
+                    *.pre-bin)
+                        PATH="$PATH:$xbin"
+                        ;;
+                    *.pre-${PEM_OS}-${PEM_ARCH}) 
                         PATH="$PATH:$xbin"
                         ;;
                 esac
@@ -141,7 +166,7 @@
                 for xsh in "$xshell"/*sh ;
                 do
                     [ -x "$xsh" ] && {
-                       case "$xsh" in
+                        case "$xsh" in
                             *.sh) . "$xsh" ;;
                             *.bash) [ -n "$BASH_VERSION" ] && . "$xsh" ;;
                             *.zsh) [ -n "$ZSH_VERSION" ] && . "$xsh" ;;
@@ -161,18 +186,3 @@
     unset x
 
 
-    # Some simple alias
-    alias grep='grep --color=auto'
-    alias cnl='LC_ALL=zh_CN.UTF-8 LANG=zh_CN.UTF-8'
-    alias nvi="nvim"
-
-    alias nvim-lazy='NVIM_APPNAME=lazynvim nvim'
-    alias mv='mv -i'
-    alias rm='rm -i'
-    alias cp='cp -i'
-
-    # Default to human readable figures
-    alias df='df -h'
-    alias du='du -h'
-    alias ls='ls --color --time-style=long-iso -h'
-    alias ll='ls --color --time-style=long-iso -h -l -a'
