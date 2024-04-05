@@ -1,0 +1,327 @@
+#!/bin/bash
+#
+# ---------------------------------
+# Some basic setting
+# ---------------------------------
+    THIS_SCRIPT="$(readlink -f $0)"
+    THIS_DIR="$(dirname "$THIS_SCRIPT")"
+    # echo "PWD is :$THIS_SCRIPT"
+
+# ---------------------------------
+# Some Helper function here
+# ---------------------------------
+    usage() {
+        echo "USAGE: "
+        echo "EXAMPE:"
+        echo "      ./bootstrap --os linux --arch x86_64 --root $PEM_HOME "
+    }
+
+    cmd() {
+        if  [ "$NODEBUG" = "true" ] ; then
+            echo "Runing...:  $@"
+            "$@"
+            return "$?"
+        else 
+            echo "Runing...:  $@"
+            return "$?"
+        fi
+    }
+
+    q-extract ()
+    {
+        [ -n "$1" ] || return 1
+        [ -n "$2" ] || return 2
+
+        if [ -f "$1" ]; then
+            case "$1" in
+                *.tar.bz2)
+                    tar -xvjf "$1" -C "${2}"
+                ;;
+                *.tar.gz)
+                    tar -xvzf "$1" -C "${2}"
+                ;;
+                *.tar.xz)
+                    tar -xvJf "$1" -C "${2}"
+                ;;
+                *.tar.zst)
+                    tar --use-compress-program=unzstd -xvf "$1" -C "${2}"
+                ;;
+                *.tar)
+                    tar -xvf "$1" -C "${2}"
+                ;;
+                *.tbz2)
+                    tar -xvjf "$1" -C "${2}"
+                ;;
+                *.tgz)
+                    tar -xvzf "$1" -C "${2}"
+                ;;
+                # *.bz2)
+                #     bunzip2 "$1"
+                # ;;
+                # *.rar)
+                #     rar x $1
+                # ;;
+                # *.gz)
+                #     gunzip $1
+                # ;;
+                # *.zip)
+                #     unzip $1
+                # ;;
+                # *.Z)
+                #     uncompress $1
+                # ;;
+                # *.7z)
+                #     7z x $1
+                # ;;
+                *)
+                    echo "don't know how to extract '$1'..."
+                ;;
+            esac;
+        else
+            echo "'$1' is not a valid file!";
+        fi
+    }
+# ---------------------------------
+# Step to run
+# ---------------------------------
+    download_extract() {
+        set -x 
+        [ -n "$tempdir" ]    && 
+        [ -n "$url" ]        && 
+        [ -n "$filename" ]   || {
+                echo "[Err]: emprty download sheet "
+                echo "     : pls check"
+                exit 1
+        }
+        set +x
+
+        cmd wget --directory-prefix="${tempdir}" "${url}"  || {
+            echo "[Err]: fail to download"
+            rm -rvf "${tempdir:-/UNKNOW}"
+            return 1
+        }
+        cmd q-extract "$tempdir/$filename" "$tempdir"
+        echo 
+        # echo "[Info]: success install, now clear temp dir" && {
+        #     rm -rvf "${tempdir:-/UNKNOW}"
+        #     return 0
+        # }
+        # echo 
+    }
+
+    copy_bin() {
+        set -x 
+        [ -n "$tempdir" ]    && 
+        [ -n "$target_dir" ]  &&
+        [ -n "$bin_path" ]    &&
+        [ -n "$binroot" ]     &&
+        [ -n "$target_name" ] &&
+        [ -n "$target_dir" ] || {
+                echo "[Err]: emprty download sheet "
+                echo "     : pls check"
+                exit 1
+        }
+        set +x
+        cmd mkdir -p "$binroot/$target_dir"
+        cmd cp "$tempdir/$bin_path" "$binroot/$target_dir/$target_name" || {
+            echo "[Err]: fail to cp"
+            rm -rvf "${tempdir:-/UNKNOW}"
+            return 1
+        }
+        cmd chmod a+x "$binroot/$target_dir/$target_name"
+    }
+
+    clear_temp() {
+        set -x 
+        [ -n "$tempdir" ] || {
+                echo "[Err]: emprty download sheet "
+                echo "     : pls check"
+                exit 1
+        }
+        set +x
+
+        rm -rfv "${tempdir:-/UNKNOW}"
+    }
+
+
+
+# ---------------------------------
+# Actually logic
+# ---------------------------------
+    parse_arg() {
+
+        # echo "$@"
+        local origin_argv="$@"
+        local origin_argc="$#"
+
+        local long_arg_list='
+        arch:,
+        os:,
+        root:,
+        name:,
+        '
+
+        local short_arg_list='
+        a:,
+        o:,
+        r:,
+        n:,
+        '
+
+        # using local cmdline="$@"
+        # -- $cmdline will casue '*' expend
+        # use $@ directly will avoid this
+        local format_arg=$( getopt \
+            -o "$short_arg_list" \
+            -l "$long_arg_list" \
+            -q \
+            -- "$@" )
+                local getopt_res=$?
+                [ $getopt_res = 0 ] || {
+                    error_echo "Fail to run getopt"
+                }
+                # echo $format_arg
+                eval set -- $format_arg
+                # echo "$@"
+
+        # return
+
+        CONF_ARCH=
+        CONF_OS=
+        CONF_ROOT=
+        CONF_NAME=
+        while true ; do
+            case $1 in
+                -a|--arch)
+                    shift
+                    CONF_ARCH="$1"
+                    shift ;;
+                -o|--os)
+                    shift
+                    CONF_OS="$1"
+                    shift ;;
+                -r|--root)
+                    shift
+                    CONF_ROOT="$1"
+                    shift ;;
+                -n|--name)
+                    shift
+                    CONF_NAME="$1"
+                    shift ;;
+                --)
+                    shift
+                    CONF_MODULE="$@"
+                    # echo "$1"
+                    # echo "$2"
+                    # echo "NEw"
+                    break ;;
+                *)
+                    error_echo "Unknow case"
+                    exit 1 ;;
+            esac
+        done
+        # if '*' in var
+        # use "$VAR" to prevent expand
+        # echo "$CONF_GLOB"
+        [ $origin_argc = 0 ] &&
+            usage && exit 0
+        check_args "$@"
+
+    }
+
+    check_args() {
+        [ -n "$CONF_ROOT" ] && [ -d "$CONF_ROOT" ] || {
+            echo "[Err]: rootpath (--root|-r|g:CONF_ROOT) not given"
+            echo "     : e.g --root $HOME/.config/pem"
+            exit 1
+        }
+
+        [ -n "$CONF_OS" ] || {
+            echo "[Err]: os (--os|-o|g:CONF_OS) not given"
+            echo "     : e.g --os linux"
+            exit 1
+        }
+
+        [ -n "$CONF_ARCH" ] || {
+            echo "[Err]: arch (--arch|-a|g:CONF_ARCH) not given"
+            echo "     : e.g --arch x86_64"
+            exit 1
+        }
+        [ -n "$CONF_MODULE" ] || {
+            echo "[Err]: module (-- [module name]) not given"
+            echo "     : e.g -- rg"
+            exit 1
+        }
+    }
+
+
+
+
+rg() {
+    local version="14.1.0"
+    local os="$CONF_OS"
+    local arch="$CONF_ARCH"
+    local binroot="$CONF_ROOT/bin"
+    local lang="rust"
+    local target_name="rg"
+
+    # These 4 in order
+    local url
+    [ "$os" = "linux" ] && [ "$arch" = "x86_64" ] && {
+        local url="https://github.com/BurntSushi/ripgrep/releases/download/$version/ripgrep-$version-$arch-unknown-${os}-musl.tar.gz"
+    }
+    local filename="$(basename "${url}")"
+    local filename_nosuffix="${filename%%.tar.gz}"
+    local bin_path="${filename_nosuffix}/rg"
+    # These 4 in order
+
+    # autogen
+    local tempdir="$(mktemp -d)"
+    local target_dir="$lang.$os-$arch"
+    # local bash_path="${filename_nosuffix}/rg.bash"
+
+    download_extract &&
+    copy_bin 
+    clear_temp
+
+}
+
+fzf() {
+    local version="0.49.0"
+    local os="$CONF_OS"
+    local arch="$CONF_ARCH"
+    local binroot="$CONF_ROOT/bin"
+    local lang="go"
+    local target_name="fzf"
+
+    # These 4 in order
+    local url
+    [ "$os" = "linux" ] && [ "$arch" = "x86_64" ] && {
+        local url="https://github.com/junegunn/fzf/releases/download/${version}/fzf-${version}-${os}_amd64.tar.gz"
+    }
+    local filename="$(basename "${url}")"
+    local filename_nosuffix="${filename%%.tar.gz}"
+    local bin_path="fzf"
+    # These 4 in order
+
+
+    # autogen
+    local target_dir="$lang.$os-$arch"
+    local tempdir="$(mktemp -d)"
+    # local bash_path="${filename_nosuffix}/rg.bash"
+
+    download_extract &&
+    copy_bin 
+    clear_temp
+}
+
+NODEBUG=true
+parse_arg "$@"
+
+for x in $CONF_MODULE
+do
+    echo "=============================================================="
+    echo "[Info]: Now install Module '$x'"
+    echo "=============================================================="
+    $x
+done
