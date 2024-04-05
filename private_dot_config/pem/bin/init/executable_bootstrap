@@ -3,8 +3,8 @@
 # ---------------------------------
 # Some basic setting
 # ---------------------------------
-    THIS_SCRIPT="$(readlink -f $0)"
-    THIS_DIR="$(dirname "$THIS_SCRIPT")"
+    SCRIPT_PATH="$(readlink -f $0)"
+    SCRIPT_DIR="$(dirname "$THIS_SCRIPT")"
     # echo "PWD is :$THIS_SCRIPT"
 
 # ---------------------------------
@@ -164,6 +164,7 @@
         # set +x
         step_header tempdir bin_source_path bin_root \
             bin_target_dir bin_target_name
+        set -e
 
         cmd mkdir -p "$bin_root/$bin_target_dir"
         cmd cp "$tempdir/$bin_source_path" "$bin_root/$bin_target_dir/$bin_target_name" || {
@@ -172,6 +173,7 @@
             return 1
         }
         cmd chmod a+x "$bin_root/$bin_target_dir/$bin_target_name"
+        set +e
     }
 
     clear_temp() {
@@ -299,94 +301,22 @@
     }
 
 
+# ---------------------------------
+# Main function here
+# ---------------------------------
 
-
-rg() {
-    # Part 1
-    # meta infomation
-    # ------------------------------
-    local version="14.1.0"
-    local os="$CONF_OS"
-    local arch="$CONF_ARCH"
-    local lang="rust"
-
-    # Part 2
-    # url and filename
-    # These 3 in order
-    # ------------------------------
-    local url
-    [ "$os" = "linux" ] && [ "$arch" = "x86_64" ] && {
-        local url="https://github.com/BurntSushi/ripgrep/releases/download/$version/ripgrep-$version-$arch-unknown-${os}-musl.tar.gz"
-    }
-    local filename="$(basename "${url}")"
-    local filename_nosuffix="${filename%%.tar.gz}"
-
-    # Part3
-    # install bin infomation
-    # ------------------------------
-    local bin_source_path="${filename_nosuffix}/rg"
-    local bin_root="$CONF_ROOT/bin"
-    local bin_target_dir="$lang.$os-$arch"
-    local bin_target_name="rg"
-
-    # Part4
-    # other infomation
-    # ------------------------------
-    local tempdir="$(mktemp -d)"
-    local tempdir="$(mktemp -d)"
-
-    download_extract &&
-    copy_bin 
-    clear_temp
-
-}
-
-fzf() {
-    # Part 1
-    # meta infomation
-    # ------------------------------
-    local version="0.49.0"
-    local os="$CONF_OS"
-    local arch="$CONF_ARCH"
-    local lang="go"
-
-    # Part 2
-    # url and filename
-    # These 3 in order
-    # ------------------------------
-    local url
-    [ "$os" = "linux" ] && [ "$arch" = "x86_64" ] && {
-        local url="https://github.com/junegunn/fzf/releases/download/${version}/fzf-${version}-${os}_amd64.tar.gz"
-    }
-    local filename="$(basename "${url}")"
-    local filename_nosuffix="${filename%%.tar.gz}"
-
-
-    # Part3
-    # install bin infomation
-    # ------------------------------
-    local bin_source_path="fzf"
-    local bin_root="$CONF_ROOT/bin"
-    local bin_target_dir="$lang.$os-$arch"
-    local bin_target_name="fzf"
-
-    # Part4
-    # other infomation
-    # ------------------------------
-    local tempdir="$(mktemp -d)"
-
-    download_extract &&
-    copy_bin 
-    clear_temp
-}
-
-NODEBUG=
+NODEBUG=true
 parse_arg "$@"
+
 
 for x in $CONF_MODULE
 do
+    [ -f "${SCRIPT_DIR}/bucket/install-$x.bash" ] && {
+        source "${SCRIPT_DIR}/bucket/install-$x.bash"
+    }
+
     echo "=============================================================="
     echo "[Info]: Now install Module '$x'"
     echo "=============================================================="
-    $x
+    install-$x
 done
