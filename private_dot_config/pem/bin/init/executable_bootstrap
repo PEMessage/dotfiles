@@ -10,21 +10,56 @@
 # ---------------------------------
 # Some Helper function here
 # ---------------------------------
+    step_header() {
+        echo "-------------------------------------------"
+        echo "[Info]: Step ${FUNCNAME[1]}"
+        echo 
+        assertvars "$@"
+        echo "-------------------------------------------"
+    }
+
     usage() {
         echo "USAGE: "
+        echo "      --os  |-o)        target os [windows|mac|linux]"
+        echo "      --arch|-a)        target arch [x86_64|arm64|risv64]"
+        echo "      --root|-r)        target root [\$PEM_HOME|\$PEM_DATA_HOME]"
+        echo 
+        echo "      -- [module name]) target module to install [fzf|rg|...]"
         echo "EXAMPE:"
-        echo "      ./bootstrap --os linux --arch x86_64 --root $PEM_HOME "
+        echo "      ./bootstrap --os linux --arch x86_64 --root $PEM_HOME fzf "
     }
 
     cmd() {
         if  [ "$NODEBUG" = "true" ] ; then
             echo "Runing...:  $@"
-            "$@"
+            echo 
+            time "$@"
             return "$?"
         else 
             echo "Runing...:  $@"
+            echo 
             return "$?"
         fi
+    }
+
+    checkvars() {
+        for x in $@ 
+        do
+            declare -n p="$x"
+            echo "[Info]: Var '$x' is '$p'"
+        done
+    }
+
+    assertvars() {
+        for x in $@ 
+        do
+            declare -n p="$x"
+            echo "[Info]: Var '$x' is '$p'"
+            [ -n "$p" ] || {
+                echo "[Err]: Var '$x' is empty"
+                echo "     : pls check(${FUNCNAME[1]})"
+            }
+        done
     }
 
     q-extract ()
@@ -85,23 +120,28 @@
 # Step to run
 # ---------------------------------
     download_extract() {
-        set -x 
-        [ -n "$tempdir" ]    && 
-        [ -n "$url" ]        && 
-        [ -n "$filename" ]   || {
-                echo "[Err]: emprty download sheet "
-                echo "     : pls check"
-                exit 1
-        }
-        set +x
+        # set -x 
+        # [ -n "$tempdir" ]    && 
+        # [ -n "$url" ]        && 
+        # [ -n "$filename" ]   || {
+        #         echo "[Err]: emprty download sheet "
+        #         echo "     : pls check"
+        #         exit 1
+        # }
+        # set +x
+        #
+        step_header tempdir url filename
 
         cmd wget --directory-prefix="${tempdir}" "${url}"  || {
             echo "[Err]: fail to download"
             rm -rvf "${tempdir:-/UNKNOW}"
             return 1
         }
+        if [ "$skip_extract" = true ] ; then 
+            echo "Skiping extract due to \$skip_extract = true"
+            return 0
+        fi
         cmd q-extract "$tempdir/$filename" "$tempdir"
-        echo 
         # echo "[Info]: success install, now clear temp dir" && {
         #     rm -rvf "${tempdir:-/UNKNOW}"
         #     return 0
@@ -110,37 +150,41 @@
     }
 
     copy_bin() {
-        set -x 
-        [ -n "$tempdir" ]    && 
-        [ -n "$target_dir" ]  &&
-        [ -n "$bin_path" ]    &&
-        [ -n "$binroot" ]     &&
-        [ -n "$target_name" ] &&
-        [ -n "$target_dir" ] || {
-                echo "[Err]: emprty download sheet "
-                echo "     : pls check"
-                exit 1
-        }
-        set +x
-        cmd mkdir -p "$binroot/$target_dir"
-        cmd cp "$tempdir/$bin_path" "$binroot/$target_dir/$target_name" || {
+        # set -x 
+        # [ -n "$tempdir" ]    && 
+        # [ -n "$bin_target_dir" ]  &&
+        # [ -n "$bin_source_path" ]    &&
+        # [ -n "$bin_root" ]     &&
+        # [ -n "$bin_target_name" ] &&
+        # [ -n "$bin_target_dir" ] || {
+        #         echo "[Err]: emprty download sheet "
+        #         echo "     : pls check"
+        #         exit 1
+        # }
+        # set +x
+        step_header tempdir bin_source_path bin_root \
+            bin_target_dir bin_target_name
+
+        cmd mkdir -p "$bin_root/$bin_target_dir"
+        cmd cp "$tempdir/$bin_source_path" "$bin_root/$bin_target_dir/$bin_target_name" || {
             echo "[Err]: fail to cp"
             rm -rvf "${tempdir:-/UNKNOW}"
             return 1
         }
-        cmd chmod a+x "$binroot/$target_dir/$target_name"
+        cmd chmod a+x "$bin_root/$bin_target_dir/$bin_target_name"
     }
 
     clear_temp() {
-        set -x 
-        [ -n "$tempdir" ] || {
-                echo "[Err]: emprty download sheet "
-                echo "     : pls check"
-                exit 1
-        }
-        set +x
+        # set -x 
+        # [ -n "$tempdir" ] || {
+        #         echo "[Err]: emprty download sheet "
+        #         echo "     : pls check"
+        #         exit 1
+        # }
+        # set +x
+        step_header tempdir
 
-        rm -rfv "${tempdir:-/UNKNOW}"
+        cmd rm -rfv "${tempdir:-/UNKNOW}"
     }
 
 
@@ -258,27 +302,38 @@
 
 
 rg() {
+    # Part 1
+    # meta infomation
+    # ------------------------------
     local version="14.1.0"
     local os="$CONF_OS"
     local arch="$CONF_ARCH"
-    local binroot="$CONF_ROOT/bin"
     local lang="rust"
-    local target_name="rg"
 
-    # These 4 in order
+    # Part 2
+    # url and filename
+    # These 3 in order
+    # ------------------------------
     local url
     [ "$os" = "linux" ] && [ "$arch" = "x86_64" ] && {
         local url="https://github.com/BurntSushi/ripgrep/releases/download/$version/ripgrep-$version-$arch-unknown-${os}-musl.tar.gz"
     }
     local filename="$(basename "${url}")"
     local filename_nosuffix="${filename%%.tar.gz}"
-    local bin_path="${filename_nosuffix}/rg"
-    # These 4 in order
 
-    # autogen
+    # Part3
+    # install bin infomation
+    # ------------------------------
+    local bin_source_path="${filename_nosuffix}/rg"
+    local bin_root="$CONF_ROOT/bin"
+    local bin_target_dir="$lang.$os-$arch"
+    local bin_target_name="rg"
+
+    # Part4
+    # other infomation
+    # ------------------------------
     local tempdir="$(mktemp -d)"
-    local target_dir="$lang.$os-$arch"
-    # local bash_path="${filename_nosuffix}/rg.bash"
+    local tempdir="$(mktemp -d)"
 
     download_extract &&
     copy_bin 
@@ -287,35 +342,45 @@ rg() {
 }
 
 fzf() {
+    # Part 1
+    # meta infomation
+    # ------------------------------
     local version="0.49.0"
     local os="$CONF_OS"
     local arch="$CONF_ARCH"
-    local binroot="$CONF_ROOT/bin"
     local lang="go"
-    local target_name="fzf"
 
-    # These 4 in order
+    # Part 2
+    # url and filename
+    # These 3 in order
+    # ------------------------------
     local url
     [ "$os" = "linux" ] && [ "$arch" = "x86_64" ] && {
         local url="https://github.com/junegunn/fzf/releases/download/${version}/fzf-${version}-${os}_amd64.tar.gz"
     }
     local filename="$(basename "${url}")"
     local filename_nosuffix="${filename%%.tar.gz}"
-    local bin_path="fzf"
-    # These 4 in order
 
 
-    # autogen
-    local target_dir="$lang.$os-$arch"
+    # Part3
+    # install bin infomation
+    # ------------------------------
+    local bin_source_path="fzf"
+    local bin_root="$CONF_ROOT/bin"
+    local bin_target_dir="$lang.$os-$arch"
+    local bin_target_name="fzf"
+
+    # Part4
+    # other infomation
+    # ------------------------------
     local tempdir="$(mktemp -d)"
-    # local bash_path="${filename_nosuffix}/rg.bash"
 
     download_extract &&
     copy_bin 
     clear_temp
 }
 
-NODEBUG=true
+NODEBUG=
 parse_arg "$@"
 
 for x in $CONF_MODULE
