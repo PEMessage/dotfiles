@@ -99,9 +99,9 @@
                 # *.gz)
                 #     gunzip $1
                 # ;;
-                # *.zip)
-                #     unzip $1
-                # ;;
+                *.zip)
+                    unzip $1 -d "${2}"
+                ;;
                 # *.Z)
                 #     uncompress $1
                 # ;;
@@ -131,6 +131,7 @@
         # set +x
         #
         step_header tempdir url filename
+        touch "$tempdir/.INIT_FLAG"
 
         cmd wget --directory-prefix="${tempdir}" "${url}"  || {
             echo "[Err]: fail to download"
@@ -167,7 +168,7 @@
         set -e
 
         cmd mkdir -p "$bin_root/$bin_target_dir"
-        cmd cp "$tempdir/$bin_source_path" "$bin_root/$bin_target_dir/$bin_target_name" || {
+        cmd cp -i "$tempdir/$bin_source_path" "$bin_root/$bin_target_dir/$bin_target_name" || {
             echo "[Err]: fail to cp"
             rm -rvf "${tempdir:-/UNKNOW}"
             return 1
