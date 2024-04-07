@@ -23,6 +23,9 @@
         return
     fi
 
+# -----------------------------------------
+# Some basic function 
+# -----------------------------------------
 
     __PEM_ShowVar() {
         [ -n "$1" ] || return 1; 
@@ -64,6 +67,9 @@
     }
 
 
+# -----------------------------------------
+# Basic enviroment setup
+# -----------------------------------------
         # OS Check
     # unameOut=$(uname -a)
     case $(uname -a) in
@@ -96,6 +102,9 @@
     # No space in these variable
     PEM_ROOT_LIST="$PEM_HOME $PEM_DATA_HOME $PEM_CACHE_HOME"
 
+# -----------------------------------------
+# alias zone
+# -----------------------------------------
     # Some simple alias
     alias grep='grep --color=auto'
     alias cnl='LC_ALL=zh_CN.UTF-8 LANG=zh_CN.UTF-8'
@@ -112,7 +121,13 @@
     alias ls='ls --color --time-style=long-iso -h'
     alias ll='ls --color --time-style=long-iso -h -l -a'
 
-
+# -----------------------------------------
+# configuration
+# -----------------------------------------
+    PEM_Z_BACKEND="fasd"
+# -----------------------------------------
+# load other setup
+# -----------------------------------------
     # var expansion is not split (by default) in zsh,
     # but command expansions are.
     # Therefore in both Bash and zsh you can use
@@ -184,5 +199,7 @@
         unset xbin
     done
     unset x
+
+
 
 

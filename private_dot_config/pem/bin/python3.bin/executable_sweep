@@ -2263,24 +2263,23 @@ class InputWidget:
                         else:
                             break
                     self.notify()
-                    
+
                     # Method2:
                     # if not self.buffer:
                     #     return True
-
                     # sep = (' ','/')
                     # first = self.buffer[max(0, self.cursor - 1)]
                     # if first in sep:
                     #     del_sep = True
                     # else:
                     #     del_sep = False
-                        
+
                     # def is_del(c):
                     #     if del_sep:
                     #         return c in sep
                     #     else:
                     #         return c not in sep
-                        
+
                     # while self.cursor > 0:
                     #     cur = self.buffer[max(0, self.cursor - 1)]
                     #     if is_del(cur):
@@ -2290,16 +2289,12 @@ class InputWidget:
                     #         break
                     # self.notify()
                     # return True
-
-
                         # self.cursor -= 1
                         # del self.buffer[self.cursor]
                         # if self.buffer[self.cursor-1] not in (' ','/'):
                         #     pass
                         # else:
                         #     break
-                    self.notify()
-
         elif type == TTY_CHAR:
             self.buffer.insert(self.cursor, attrs)
             self.notify()
