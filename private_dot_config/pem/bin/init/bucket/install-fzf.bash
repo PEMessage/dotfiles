@@ -28,7 +28,7 @@ install-fzf() {
     # ------------------------------
     local bin_source_path="fzf"
     local bin_root="$CONF_ROOT/bin"
-    local bin_target_dir="$lang.$os-$arch"
+    local bin_target_dir="arch/$os-$arch/$lang.d"
     local bin_target_name="fzf"
 
     # Part4

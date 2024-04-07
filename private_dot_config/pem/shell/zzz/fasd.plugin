@@ -61,6 +61,6 @@ vf(){
     else
         __PEM_TEMP_PEM_EDITOR="$PEM_EDITOR"
     fi
-    fasd -fi "$*" -e "$PEM_EDITOR" && return
+    fasd -fi "$*" -e "$__PEM_TEMP_PEM_EDITOR" && return
     unset __PEM_TEMP_PEM_EDITOR
 }

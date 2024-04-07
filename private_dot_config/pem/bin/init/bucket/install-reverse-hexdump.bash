@@ -1,30 +1,31 @@
 
-install-sweep() {
+install-reverse-hexdump() {
     # Part 1
     # meta infomation
     # ------------------------------
-    local version="1.0.0"
+    local version="master"
     local os="all"
     local arch="all"
-    local lang="python"
+    local lang="sh"
 
     # Part 2
     # url and filename
     # These 3 in order
     # ------------------------------
     local url
-    local url="https://github.com/PEMessage/sweep.py/archive/refs/tags/v${version}.zip"
+    local url="https://raw.githubusercontent.com/mfleetwo/reverse-hexdump/$version/reverse-hexdump.sh"
     local filename="$(basename "${url}")"
-    local filename_nosuffix="${filename%%.zip}"
+    local filename_nosuffix="${filename%%.*}"
+    local skip_extract="true"
 
 
     # Part3
     # install bin infomation
     # ------------------------------
-    local bin_source_path="sweep.py-${version}/sweep.py"
+    local bin_source_path="$filename"
     local bin_root="$CONF_ROOT/bin"
     local bin_target_dir="common/$lang.d"
-    local bin_target_name="sweep"
+    local bin_target_name="$filename_nosuffix"
 
     # Part4
     # other infomation
