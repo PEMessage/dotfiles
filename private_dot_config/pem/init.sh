@@ -153,25 +153,40 @@
         #         "$x/bin/init/bootstrap" "$PEM_OS" "$PEM_ARCH"
         #     )
 
-        for xbin in "$x/bin"/* ;
+        # common PATH
+        for xbin in \
+            "$x/bin"/*.d \
+            "$x/bin/arch/${PEM_OS}-${PEM_ARCH}"/*.d \
+            "$x/bin/common"/*.d 
         do
             [ -d "$xbin" ] && {
                 case "$xbin" in
-                    *.bin)
-                        PATH="$PATH:$xbin"
+                    *.pre.d)
+                        PATH="$xbin:$PATH"
                         ;;
-                    *.${PEM_OS}-${PEM_ARCH}) 
-                        PATH="$PATH:$xbin"
-                        ;;
-                    *.pre-bin)
-                        PATH="$PATH:$xbin"
-                        ;;
-                    *.pre-${PEM_OS}-${PEM_ARCH}) 
+                    *.d)
                         PATH="$PATH:$xbin"
                         ;;
                 esac
             }
         done
+
+        # # arch specific PATH
+        # if [ -d "$x/bin/arch/${PEM_OS}-${PEM_ARCH}" ] ; then
+        #     for xbin in "$x/bin/arch/${PEM_OS}-${PEM_ARCH}"/*.d
+        #     do
+        #         [ -d "$xbin" ] && {
+        #             case "$xbin" in
+        #                 *.pre.d)
+        #                     PATH="$xbin:$PATH"
+        #                     ;;
+        #                 *.d)
+        #                     PATH="$PATH:$xbin"
+        #                     ;;
+        #             esac
+        #         }
+        #     done
+        # fi
         unset xbin
 
 
