@@ -100,7 +100,7 @@
     export PEM_DATA_HOME="${XDG_CONFIG_HOME:-${HOME}/.local/share}/pem"
     export PEM_CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}/pem"
     # No space in these variable
-    PEM_ROOT_LIST="$PEM_HOME $PEM_DATA_HOME $PEM_CACHE_HOME"
+    PEM_ROOT_LIST="$PEM_CACHE_HOME $PEM_DATA_HOME $PEM_HOME"
 
 # -----------------------------------------
 # alias zone
