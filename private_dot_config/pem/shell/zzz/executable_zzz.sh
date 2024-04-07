@@ -9,6 +9,7 @@ case "$PEM_Z_BACKEND" in
     fasd)
         export _FASD_BACKENDS="native viminfo"
         export _FASD_MAX=6000
+        export _FASD_STOP=0
         source "${__PEM_TEMP_THIS_DIR:-UNKNOW}/fasd"
         source "${__PEM_TEMP_THIS_DIR:-UNKNOW}/fasd.plugin"
         eval "$(fasd --init auto)"

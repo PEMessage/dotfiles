@@ -56,5 +56,11 @@ cdm() {
 }
 
 vf(){
-    fasd -fi "$*" -e vim && return
+    if [ -z "$PEM_EDITOR" ] ; then
+        __PEM_TEMP_PEM_EDITOR=vim
+    else
+        __PEM_TEMP_PEM_EDITOR="$PEM_EDITOR"
+    fi
+    fasd -fi "$*" -e "$PEM_EDITOR" && return
+    unset __PEM_TEMP_PEM_EDITOR
 }
