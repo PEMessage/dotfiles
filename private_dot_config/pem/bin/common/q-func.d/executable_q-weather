@@ -1,0 +1,12 @@
+#!/bin/sh
+q_weather() {
+	local city="${1:-xiamen}"
+	if [ -x "$(which wget)" ]; then
+		wget -qO- "wttr.in/~${city}"
+	elif [ -x "$(which curl)" ]; then
+		curl "wttr.in/~${city}"
+	fi
+}
+
+# ` curl wttr.in/:help ` for help
+q_weather "$@"
