@@ -1,0 +1,12 @@
+#!/bin/sh
+
+q_myip()
+{
+	if command -v wget &> /dev/null; then
+		wget -qO- ifconfig.co
+	elif command -v curl &> /dev/null; then
+		curl ifconfig.co
+	fi
+}
+
+q_myip "$@"
