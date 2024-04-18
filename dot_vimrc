@@ -438,6 +438,7 @@ let g:startify_custom_header = [
             nmap <buffer> <C-0> echo b
             " Enter next dir
             nmap <buffer> L <C-M>
+            nmap <buffer> <leader>b :wincmd c<CR>
         endif
     endfunction
 

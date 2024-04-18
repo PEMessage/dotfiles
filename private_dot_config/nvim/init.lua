@@ -1214,7 +1214,9 @@ local wk = PE.WkCheck()
         { desc = "Tab Ball buffers" })
 
     -- vim.keymap.set("n", "<leader>o/",'/', { noremap = true, desc = "Origin VIM /" })
-    vim.keymap.set("v", "<leader>y",'"+y', { noremap = true, desc = "Copy to clipboard(Reg\")" })
+    vim.keymap.set("n", "<leader>yy",'"+yy', { noremap = true, desc = "Yank to clipboard(Reg\")" })
+    vim.keymap.set("v", "<leader>y",'"+y', { noremap = true, desc = "Yank to clipboard(Reg\")" })
+    vim.keymap.set("n", "<leader>p",'"+p', { noremap = true, desc = "Paste from clipboard(Reg\")" })
 -- 7. Function Zone
 -- ===========================================
 

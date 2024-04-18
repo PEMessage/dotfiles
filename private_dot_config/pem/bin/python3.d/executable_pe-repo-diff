@@ -12,18 +12,25 @@ pp = pprint.PrettyPrinter(indent=2)
 
 
 def get_xmllist(entry: str):
-    filelist = []
-    pathlist = []
-    filelist.append(entry)
+    filelist = set()
+    pathlist = set()
+    filelist.add(entry)
     xmltree = ET.parse(entry).getroot()
     for obj in xmltree:
         if obj.tag == "include":
             f1, p1 = get_xmllist(".repo/manifests/" + obj.attrib["name"])
-            filelist.extend(f1)
-            pathlist.extend(p1)
+            filelist = filelist.union(f1)
+            pathlist = pathlist.union(p1)
         if obj.tag == "project":
-            if os.path.isdir(obj.attrib["path"]):
-                pathlist.append(obj.attrib["path"])
+            if "path" in obj.attrib:
+                realpath = obj.attrib["path"]
+            else:
+                realpath = obj.attrib["name"]
+
+            if os.path.isdir(realpath):
+                pathlist.add(realpath)
+            else:
+                print("invalid project " + realpath)
 
     return filelist, pathlist
 
