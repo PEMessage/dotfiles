@@ -522,6 +522,9 @@ call plug#begin(pe_runtimepath . '/plugged')
         nmap / <Plug>(easymotion-sn)
         nnoremap <leader>/ /
         map <space> <Plug>(easymotion-s)
+        " See: https://www.reddit.com/r/vim/comments/lhohqd/remap_after_searching/
+        " https://github.com/romainl/vim-cool
+        " cnoremap <expr> <silent> <cr> getcmdtype() =~ '[?/]' ? "\<cr>:noh\<cr>" : "\<cr>"
         " nunmap ds
         " <leader>yr
     Plug 'vim-scripts/YankRing.vim'
@@ -904,10 +907,13 @@ call plug#begin(pe_runtimepath . '/plugged')
         " noremap <silent> gk :GscopeFind c <C-R><C-W><cr>
         " " File
         " " noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
-    Plug 'preservim/tagbar'
+    " Plug 'preservim/tagbar'
     Plug 'liuchengxu/vista.vim'
+        let g:vista#renderer#enable_icon = 0
+        let g:vista_echo_cursor_strategy = "scroll"
         nnoremap <leader>at :TagbarToggle<CR>
         nnoremap <leader>av :Vista!!<CR>
+    Plug 'Shougo/vinarise.vim'
 
     " This will do "imap \ihs so !!! DONT USE IT !!!
     " Plug 'vim-scripts/a.vim'
