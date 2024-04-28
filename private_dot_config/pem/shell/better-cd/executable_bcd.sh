@@ -1,29 +1,42 @@
 # For file autocd to it's dir / accept stdin 
 bcd()
 {
-    local location_path
-    # if [ "$1" = '-' -o "$#" = 0 ]; then
-    if [   "$#" = 0 -o "$1" = '--print'  ]; then
-        location_path=$(</dev/stdin)
-    else
-        location_path="$1"
+    if [ "$1" = "--print"  ] || 
+        [ "$1" = "-p" ] ; then
+        local op="echo"
+        shift
+    else 
+        local op="cd"
     fi
 
-    local pathtype
-    pathtype=$( file "$location_path" | cut -d ' ' -f 2 )
-
-    # echo $pathtype
-    
-    if [ "$pathtype" != "directory" ] ; then
-        location_path=`dirname "$location_path"`
+    if [ "$#" = 0 ] ; then
+        local input="$(</dev/stdin)"
+    else 
+        local input="$*"
     fi
+    [ -d "$input" ] && {
+        "$op" "$input"
+        return 0 
+    }
 
-    if [ "$1" = '--print' ] ; then
-        echo "$location_path"
-    else
-        # cd "$location_path" > /dev/null 2&>1 
-        cd "$location_path" 
-    fi
-    return 0
+    local dirname_input="$(dirname "$input")"
+    [ -d "$input_base" ] && {
+        "$op" "$dirname_input"
+        return 0
+    }
+    local env_input="$(eval echo \"\$${input}\")"
+    [ -d "$env_input" ] && {
+        "$op" "$env_input"
+        return 0
+    }
+
+    local which_input="$(which "$input")"
+    [ "$which_input" ] && {
+        "$op" "$(dirname "$which_input")"
+        return 0
+    }
+
+    return 1
 }
+
 wcd () { cd "`wslpath "$1"`"; }
