@@ -1,0 +1,13 @@
+#!/bin/sh
+command() {
+    echo "$1"
+    $1
+}
+command git config --global alias.pk cherry-pick
+command git config --global alias.cm commit
+command git config --global alias.co checkout
+command git config --global alias.re 'remote -v'
+command git config --global alias.st 'status --short --branch'
+command git config --global alias.lg 'log --oneline --graph'
+command git config --global alias.ddf 'difftool --ignore-submodules --dir-diff --no-symlinks --tool=dirdiff'
+command git config --global difftool.dirdiff.cmd 'dirdiff $LOCAL $REMOTE'

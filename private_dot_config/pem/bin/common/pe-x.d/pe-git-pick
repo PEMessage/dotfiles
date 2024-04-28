@@ -1,0 +1,119 @@
+#!/bin/bash
+
+
+set -o pipefail
+# --------------------------------
+# Helper Function
+# --------------------------------
+reverse_out() {
+    awk '{ lines[NR] = $0 } END { for (i = NR; i >= 1; i--) print lines[i] }'
+}
+
+git_log_serach() {
+    local ref="$1"
+    shift
+    local regex_pattern=""
+    for x in "$@"
+    do
+        regex_pattern="$regex_pattern --grep $x"
+    done
+        
+
+    eval "git log $ref $regex_pattern --pretty=format:\"%h\""
+
+    # git log "$ref" --grep "$regex_pattern" --pretty=format:"%h" 
+}
+
+
+# --------------------------------
+# actual logic
+# --------------------------------
+env_preset() {
+    # some global var and object define
+    git rev-parse --is-inside-work-tree >/dev/null 2>&1 || {
+        echo "[error] not a git repo"
+        return 1
+    }
+
+    MATCH_LIST=$(git_log_serach "$@")
+    # echo $MATCH_LIST
+    # exit 1
+    WORK_FILE=$(mktemp) || {
+        echo "[error] could not mktemp dir"
+        exit 1
+    }
+    WORK_FILE=$WORK_FILE
+    APPLY_LIST=""
+}
+fill_workfile() {
+    echo "# This is symbol list" >> "$WORK_FILE"
+    echo "# (p) for pick" >> "$WORK_FILE"
+    echo "# (d) for drop" >> "$WORK_FILE"
+    for x in $MATCH_LIST
+    do
+        message="$(git log "$x" -n1 --format='%h %s %D <%ae>' --decorate=short)"
+        echo "drop $message" >> "$WORK_FILE"
+        git log -n1 $x | sed 's/^/    #/' >> "$WORK_FILE"
+        echo >> "$WORK_FILE"
+    done
+}
+
+open_editor() {
+    vim  -c 'set ft=gitrebase' "$WORK_FILE"
+}
+
+gen_apply_list() {
+    APPLY_LIST="$(awk '
+        /^ *#/{
+            next
+        } 
+        /^\s*$/{
+            next
+        }
+        $1 != "drop" {
+            print $2
+        }
+        ' "$WORK_FILE" )"  || {
+        echo "[awk] invalid input"
+    }
+
+
+    rm -f "$WORK_FILE"
+}
+
+
+env_preset "$@" &&
+fill_workfile  &&
+open_editor &&
+gen_apply_list  || {
+    echo "[error] fail to countine"
+    exit 1
+}
+
+APPLY_LIST="$(echo "$APPLY_LIST" | reverse_out | tr '\n' ' ')"
+
+if [[ "$APPLY_LIST" =~ ^[[:space:]]$ ]] ; then 
+    echo "no commit selected, exit"
+    exit
+fi
+
+echo
+echo "your selected commit is: [ $APPLY_LIST ] (count:$(echo $APPLY_LIST | wc -w))"
+echo "your git head now is   : [ $( git describe --contains --all HEAD) ] "
+echo "your git repo top is   : [ $(git rev-parse --show-toplevel) ]"
+echo
+echo -n "are you sure to run this? (y/n):"
+read key
+if [ "$key" = y ] ; then 
+    eval "git cherry-pick $APPLY_LIST"
+else
+    echo "abort: nothing change"
+fi
+
+
+
+
+
+
+
+
