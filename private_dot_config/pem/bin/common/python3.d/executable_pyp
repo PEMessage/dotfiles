@@ -1,0 +1,51 @@
+#!/usr/bin/env sh
+if [ "$#" -eq 0  ] ; then
+cmd="$(basename "${0}")"
+# ================================
+# Help messgae
+# ================================
+cat <<EOF
+Format Specification Mini-Language:
+    format_spec     ::=  [[fill]align][sign]["z"]["#"]["0"][width][grouping_option]["." precision][type]
+    fill            ::=  <any character>
+    align           ::=  "<" | ">" | "=" | "^"
+    sign            ::=  "+" | "-" | " "
+    width           ::=  digit+
+    grouping_option ::=  "_" | ","
+    precision       ::=  digit+
+    type            ::=  "b" | "c" | "d" | "e" | "E" | "f" | "F" | "g" | "G" | "n" | "o" | "s" | "x" | "X" | "%"
+        Integer:
+            'b' Binary format. Outputs the number in base 2.
+            'c' Character. Converts the integer to the corresponding unicode character before printing.
+            'd' Decimal Integer. Outputs the number in base 10.
+            'o' Octal format. Outputs the number in base 8.
+            'x' Hex format. Outputs the number in base 16, using lower-case letters for the digits above 9.
+            'X' Hex format. Outputs the number in base 16, using upper-case letters for the digits above 9.
+                In case '#' is specified, the prefix '0x' will be upper-cased to '0X' as well.
+            'n' Number. This is the same as 'd',
+                except that it uses the current locale setting to insert the appropriate number separator characters.
+        Float:
+            'e' Scientific notation
+            'E' Scientific notation. Same as 'e' except it uses an upper case ‘E’ as the separator character.
+            'f' Fixed-point notation
+            'F' Fixed-point notation. Same as 'f', but converts nan to NAN and inf to INF.
+
+EXAMPLE:
+     $cmd '"{} {}".format("hello", "world")'
+     $cmd '"The story of {0}, {1}, and {other}".format("Bill", "Manfred", other="Georg")'
+PYTHON: 
+    '{:<30}'.format('left aligned')
+    'left aligned                  '
+    '{:>30}'.format('right aligned')
+    '                 right aligned'
+    '{:^30}'.format('centered')
+    '           centered           '
+    '{:*^30}'.format('centered')  # use '*' as a fill char
+
+EOF
+# ================================
+exit 0
+
+fi
+
+python3 -c "print($*)"
