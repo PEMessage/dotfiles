@@ -13,7 +13,7 @@ git add .
 if [ -z "$1" ]; then
     MEG="Update time: "`date '+%Y-%m-%d %H:%M'`
 else
-    MEG="$1"
+    MEG="$*"
 fi
 git commit -m "$MEG"
 git log HEAD -n2 --stat
