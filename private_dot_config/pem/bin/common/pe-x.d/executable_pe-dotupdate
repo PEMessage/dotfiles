@@ -16,7 +16,7 @@ else
     MEG="$1"
 fi
 git commit -m "$MEG"
-git log HEAD -n1 --stat
+git log HEAD -n2 --stat
 git push 
 echo "${GREEN}INFO${STOP}: ""Push to git"
 cd ~
