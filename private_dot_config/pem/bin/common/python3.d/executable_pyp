@@ -1,4 +1,14 @@
 #!/usr/bin/env sh
+
+
+predefine="
+    def oct(num):
+        return '{:o}'.format(num)
+    def hex(num):
+        return '{:_x}'.format(num)
+    def bin(num):
+        return '{:_b}'.format(num)"
+
 if [ "$#" -eq 0  ] ; then
 cmd="$(basename "${0}")"
 # ================================
@@ -30,6 +40,12 @@ Format Specification Mini-Language:
             'f' Fixed-point notation
             'F' Fixed-point notation. Same as 'f', but converts nan to NAN and inf to INF.
 
+PREDEFINE:
+    \`\`\`python
+    $predefine
+
+    \`\`\`
+
 EXAMPLE:
      $cmd "'{} {}'.format('hello', 'world')" ## output: hello world
      $cmd "'{:o}'.format(0x123)"             ## output: 443
@@ -40,17 +56,14 @@ EXAMPLE:
      $cmd "bin(123)" ## output: 1111011
 
 EOF
+
 # ================================
 exit 0
 
 fi
+
+
 python3 -c "
-def oct(num):
-    return '{:o}'.format(num)
-def hex(num):
-    return '{:x}'.format(num)
-def bin(num):
-    return '{:b}'.format(num)
 
 print($*)
 "
