@@ -31,21 +31,26 @@ Format Specification Mini-Language:
             'F' Fixed-point notation. Same as 'f', but converts nan to NAN and inf to INF.
 
 EXAMPLE:
-     $cmd '"{} {}".format("hello", "world")'
-     $cmd '"The story of {0}, {1}, and {other}".format("Bill", "Manfred", other="Georg")'
-PYTHON: 
-    '{:<30}'.format('left aligned')
-    'left aligned                  '
-    '{:>30}'.format('right aligned')
-    '                 right aligned'
-    '{:^30}'.format('centered')
-    '           centered           '
-    '{:*^30}'.format('centered')  # use '*' as a fill char
+     $cmd "'{} {}'.format('hello', 'world')" ## output: hello world
+     $cmd "'{:o}'.format(0x123)"             ## output: 443
+     $cmd "'{:#x}'.format(0x123)"            ## output: 0x123
+
+     $cmd "oct(123)" ## output: 173
+     $cmd "hex(123)" ## output: 7b
+     $cmd "bin(123)" ## output: 1111011
 
 EOF
 # ================================
 exit 0
 
 fi
+python3 -c "
+def oct(num):
+    return '{:o}'.format(num)
+def hex(num):
+    return '{:x}'.format(num)
+def bin(num):
+    return '{:b}'.format(num)
 
-python3 -c "print($*)"
+print($*)
+"
