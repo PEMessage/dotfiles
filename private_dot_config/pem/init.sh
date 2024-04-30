@@ -67,6 +67,7 @@
     }
 
 
+
 # -----------------------------------------
 # Basic enviroment setup
 # -----------------------------------------
@@ -102,6 +103,12 @@
     # No space in these variable
     PEM_ROOT_LIST="$PEM_CACHE_HOME $PEM_DATA_HOME $PEM_HOME"
 
+    # For PATH="$PEM_PRE_PATH:$PATH" use
+    #   why not just append to PATH directly ?
+    #   make sure $PEM_CACHE_HOME *.pre.bin
+    #   have higher prioty then $PEM_HOME
+    PEM_PRE_PATH=""
+
 # -----------------------------------------
 # alias zone
 # -----------------------------------------
@@ -126,7 +133,8 @@
 # -----------------------------------------
     PEM_Z_BACKEND="fasd"
 # -----------------------------------------
-# load other setup
+# load other setup 
+# Step 1: mkdir and add to path
 # -----------------------------------------
     # var expansion is not split (by default) in zsh,
     # but command expansions are.
@@ -162,14 +170,19 @@
             [ -d "$xbin" ] && {
                 case "$xbin" in
                     *.pre.d)
-                        PATH="$xbin:$PATH"
+                        # will be preappend to $PATH later
+                        PEM_PRE_PATH="$PEM_PRE_PATH:$xbin"
                         ;;
                     *.d)
                         PATH="$PATH:$xbin"
                         ;;
                 esac
             }
-        done
+        done ; unset xbin
+    done ; unset x
+    PATH="$PEM_PRE_PATH:$PATH"
+
+
 
         # # arch specific PATH
         # if [ -d "$x/bin/arch/${PEM_OS}-${PEM_ARCH}" ] ; then
@@ -187,9 +200,14 @@
         #         }
         #     done
         # fi
-        unset xbin
 
 
+# -----------------------------------------
+# load other setup 
+# Step 2: load other shell script
+# -----------------------------------------
+    for x in $(echo $PEM_ROOT_LIST) ;
+    do
         for xshell in "$x/shell"/* ;
         do
             [ -d "$xshell" ] && {
@@ -202,18 +220,10 @@
                             *.zsh) [ -n "$ZSH_VERSION" ] && . "$xsh" ;;
                         esac
                     }
-                done
+                done ; unset xshell
             }
-        done
-        unset xbin
-
-        for xbin in "$x/bin"/*.d
-        do
-            [ -d "$xbin" ] &&  PATH="$PATH:$xbin"
-        done
-        unset xbin
-    done
-    unset x
+        done ; unset xbin
+    done ; unset x
 
 
 
