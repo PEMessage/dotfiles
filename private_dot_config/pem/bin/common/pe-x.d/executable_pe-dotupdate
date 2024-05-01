@@ -1,22 +1,42 @@
 #!/bin/sh
-cd ~
-chezmoi re-add
 GREEN='\e[092m'
 STOP='\e[0m'
+
+
+
+echo "${GREEN}INFO${STOP}: ""chezmoi re-add all trackfile"
+cd ~
+chezmoi re-add
+
+
 echo "${GREEN}INFO${STOP}: ""Add File to source"
 # exit
 temp=$(chezmoi source-path)
 cd $temp
-git add .
+git add . 
 
-
+echo "${GREEN}INFO${STOP}: ""Are you sure commit with this change?"
 if [ -z "$1" ]; then
     MEG="Update time: "`date '+%Y-%m-%d %H:%M'`
 else
     MEG="$*"
 fi
+echo
+git status --short --branch
+echo
+echo "${GREEN}Commit message${STOP}:"
+echo "    $MEG"
+echo
+
+while true; do
+    read -p "pls input (y) to continue: " input
+    if [ "$input" = "y" ]; then
+        break
+    fi
+done
+
+echo "${GREEN}INFO${STOP}: ""OK, now commit and push"
 git commit -m "$MEG"
-git log HEAD -n2 --stat
-git push 
+git log HEAD -n2 --stat --oneline 
 echo "${GREEN}INFO${STOP}: ""Push to git"
-cd ~
+git push 
