@@ -35,8 +35,12 @@ while true; do
     fi
 done
 
+echo 
 echo "${GREEN}INFO${STOP}: ""OK, now commit and push"
+echo 
 git commit -m "$MEG"
 git log HEAD -n2 --stat --oneline 
+echo
 echo "${GREEN}INFO${STOP}: ""Push to git"
+echo
 git push 
