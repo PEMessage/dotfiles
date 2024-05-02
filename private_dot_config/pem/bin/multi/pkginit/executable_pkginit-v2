@@ -1,0 +1,186 @@
+#!/bin/bash
+# ---------------------------------
+# Some basic setting
+# ---------------------------------
+    SCRIPT_PATH="$(readlink -f $0)"
+    SCRIPT_DIR="$(dirname "$THIS_SCRIPT")"
+    INDENT="    "
+# ---------------------------------
+# Some Helper function here
+# ---------------------------------
+    trim() {
+        local var="$*"
+        # remove leading whitespace characters
+        var="${var#"${var%%[![:space:]]*}"}"
+        # remove trailing whitespace characters
+        var="${var%"${var##*[![:space:]]}"}"
+        printf '%s' "$var"
+    }
+
+    # echo that respect CONF_PREFIX
+    echo_i() {
+       echo -n "${CONF_PREFIX}"  
+       echo "$@"
+    }
+
+    # OVERVIEW:
+    # EXAMPLE:
+    #   A=""
+    #   B=""
+    #   unpack_ddash A B += 123 456 -- 789
+    #   echo "$A"
+    #   echo "$B"
+    #
+    unpack_ddash() {
+        [ -n "$1" ] || return 1
+        declare -n ddash_before="$1"
+
+        [ -n "$2" ] || return 2
+        declare -n ddash_after="$2"
+
+        [  "$3" = '+=' ]  || return 3
+
+        shift 3
+
+        local ddflag=0
+        for x in "$@"
+        do
+            if [ "$x" = '--' ] && [ "$ddflag" -eq 0 ] ; then
+                ddflag=1
+                continue
+            fi
+
+            if [ "$ddflag" -eq 0 ] ; then
+                ddash_before="$(trim "$ddash_before $x")"
+            else
+                ddash_after="$(trim "$ddash_after $x")"
+            fi
+        done
+
+    }
+
+    # EXAMPLE:
+    #   A="" ; B="" ; C="" ;
+    #   unpack_multi A B C += 123 -- 456
+    unpack_multi() {
+        local post_str=""
+        while [ "$#" -gt 0  ] ; do
+            if  [ "$1" = "+=" ] ; then
+                post_str="$post_str --"
+                shift
+                break
+            else
+                post_str="$post_str $1"
+                shift
+            fi
+        done
+        post_str="$post_str $*"
+        # echo $post_str
+
+        local varlist=""
+        local after_part=""
+        unpack_ddash varlist after_part += $post_str
+        # echo "$varlist"
+        # echo "$after_part"
+
+        for x in $varlist
+        do
+            local remain=""
+            unpack_ddash "$x" remain += $after_part || return $?
+            after_part="$remain"
+        done
+    }
+    # OVERVIEW:
+    #
+    # EXAMPLE:
+    #   A=1
+    #   ( step_header HOME  UNKNOW PEM_HOME -- HOME UNKNOW A )
+    step_header() {
+        echo_i "-------------------------------------------"
+        echo_i "[Info]: Step ${FUNCNAME[1]}"
+        echo_i 
+        local before="" ;\
+            local after="" ;\
+            unpack_ddash before after += "$@"
+        local ret=0
+        echo_i "assert part:"
+        ( CONF_PREFIX="$INDENT$CONF_PREFIX" \
+            checkvars -- "$before" ) || ret=1
+        echo_i
+        echo_i "check part:"
+        ( CONF_PREFIX="$INDENT$CONF_PREFIX" \
+            checkvars -- "$after" )
+        echo_i "-------------------------------------------"
+        [ "$ret" -eq 1 ] &&
+            exit 1
+    }
+
+    checkvars() {
+        # if all var pass
+        local config=""
+        local varlist=""
+        unpack_ddash config varlist += "$@" 
+
+        set -- $config
+        # echo $config
+
+        # default config
+        testexpr="-n"
+        while [ "$#" -gt 0 ] ; do
+            case "$1" in
+                --test|-t)
+                    shift
+                    local testexpr="$1"
+                    shift
+                    ;;
+            esac
+        done
+
+        local nfail=0
+        local npass=0
+        local nall=0
+        local x ; for x in $varlist 
+        do
+            declare -n p="$x"
+            echo_i "[Info]: Var '$x' is '$p'"
+            # assert p is not empty
+            # ret minus 1
+            if [ $testexpr "$p" ] ; then 
+                npass="$((npass + 1))"
+            else
+                ( CONF_PREFIX="$INDENT$CONF_PREFIX" \
+                    echo_i "[Warn]: testexpr '[ $testexpr $p ]' not pass" )
+
+
+                nfail="$((nfail + 1))"
+            fi
+            nall="$((nall + 1))"
+        done
+
+        # if all arguemnt not empty
+        if [ "$npass" -eq "$nall" ] ; then
+            # return true
+            return 0
+        else
+            return 1
+        fi
+    }
+
+    # # EXAMPE: assertvars PATH HOME 
+    # # BEHAVE: if any var is empty, prompt and exit
+    # # ENV: CONF_PREFIX -> echo PREFIX 
+    # assertvars() {
+    #     while [ ! "$#" -eq '0' ]  ; do
+    #         checkvars "$1" || {
+    #             exit 1
+    #         }
+    #         shift
+    #     done
+    # }
+
+    extract() {
+        local zipfile="$1"
+        local directory="$1"
+        checkvars --test -f --  zipfile || return 0
+        checkvars --test -d --  directory || return 0
+    }
