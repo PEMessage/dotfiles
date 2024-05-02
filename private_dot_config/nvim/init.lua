@@ -10,14 +10,24 @@
 -- ===========================================
 
 PE = {}  -- Global Options Var
+-- From https://github.com/PhMajerus/FIGfonts/tree/main/fonts
+-- phm-rounded.flf figlet font
 PE.logo = {
-'   ██████╗ ███████╗███╗   ███╗███████╗███████╗███████╗ █████╗  ██████╗ ███████╗ ',
-'   ██╔══██╗██╔════╝████╗ ████║██╔════╝██╔════╝██╔════╝██╔══██╗██╔════╝ ██╔════╝ ',
-'   ██████╔╝█████╗  ██╔████╔██║█████╗  ███████╗███████╗███████║██║  ███╗█████╗   ',
-'   ██╔═══╝ ██╔══╝  ██║╚██╔╝██║██╔══╝  ╚════██║╚════██║██╔══██║██║   ██║██╔══╝   ',
-'   ██║     ███████╗██║ ╚═╝ ██║███████╗███████║███████║██║  ██║╚██████╔╝███████╗ ',
-'   ╚═╝     ╚══════╝╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝ ',
+'════════════════════════════ ',
+'┌─╮┌─╴╷  ╷                   ',
+'├─╯├─ │╲╱│╭─╮╭─╴╭─╴╭─┐╭─┐╭─╮ ',
+'╵  └─╴╵  ╵╰─╴╶─╯╶─╯╰─┘╰─┤╰──╴',
+'----------            ╶─╯    ',
+'════════════════════════════ ',
 }
+-- PE.logo = {
+-- '   ██████╗ ███████╗███╗   ███╗███████╗███████╗███████╗ █████╗  ██████╗ ███████╗ ',
+-- '   ██╔══██╗██╔════╝████╗ ████║██╔════╝██╔════╝██╔════╝██╔══██╗██╔════╝ ██╔════╝ ',
+-- '   ██████╔╝█████╗  ██╔████╔██║█████╗  ███████╗███████╗███████║██║  ███╗█████╗   ',
+-- '   ██╔═══╝ ██╔══╝  ██║╚██╔╝██║██╔══╝  ╚════██║╚════██║██╔══██║██║   ██║██╔══╝   ',
+-- '   ██║     ███████╗██║ ╚═╝ ██║███████╗███████║███████║██║  ██║╚██████╔╝███████╗ ',
+-- '   ╚═╝     ╚══════╝╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝ ',
+-- }
 
 -- 2. LazyNvim Auto Install
 -- ===========================================
@@ -495,10 +505,11 @@ require("lazy").setup({
     "christoomey/vim-tmux-navigator",
     config = function()
         vim.g.tmux_navigator_no_mappings = 1
-        vim.keymap.set( 'n',  '<M-S-h>', ':<C-U>TmuxNavigateLeft<cr>' , { silent = true, desc = "Navigate Left"  } )
-        vim.keymap.set( 'n',  '<M-S-j>', ':<C-U>TmuxNavigateDown<cr>' , { silent = true, desc = "Navigate Down"  } )
-        vim.keymap.set( 'n',  '<M-S-k>', ':<C-U>TmuxNavigateUp<cr>'   , { silent = true, desc = "Navigate Up"    } )
-        vim.keymap.set( 'n',  '<M-S-l>', ':<C-U>TmuxNavigateRight<cr>', { silent = true, desc = "Navigate Right" } )
+        vim.keymap.set( {'n','i','v','t'},  '<M-S-h>', '<cmd>TmuxNavigateLeft<cr>' , { silent = true, desc = "Navigate Left"  } )
+        vim.keymap.set( {'n','i','v','t'},  '<M-S-j>', '<cmd>TmuxNavigateDown<cr>' , { silent = true, desc = "Navigate Down"  } )
+        vim.keymap.set( {'n','i','v','t'},  '<M-S-k>', '<cmd>TmuxNavigateUp<cr>'   , { silent = true, desc = "Navigate Up"    } )
+        vim.keymap.set( {'n','i','v','t'},  '<M-S-l>', '<cmd>TmuxNavigateRight<cr>', { silent = true, desc = "Navigate Right" } )
+
 
         -- vim.keymap.set( 'n',  '<leader>`pon', ':set mouse=a<CR>', { silent = true, desc = "Mouse on" } )
         -- vim.keymap.set( 'n',  '<leader>`pof', ':set mouse=<CR>', { silent = true, desc = "Mouse off" } )
