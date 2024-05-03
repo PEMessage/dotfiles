@@ -29,6 +29,7 @@ echo "    $MEG"
 echo
 
 while true; do
+    echo "Are you sure to commit?"
     read -p "pls input (y) to continue: " input
     if [ "$input" = "y" ]; then
         break
@@ -39,8 +40,17 @@ echo
 echo "${GREEN}INFO${STOP}: ""OK, now commit and push"
 echo 
 git commit -m "$MEG"
-git log HEAD -n2 --stat --oneline 
+git log HEAD -n1 --stat --oneline 
+
+
 echo
 echo "${GREEN}INFO${STOP}: ""Push to git"
 echo
+while true; do
+    echo "Are you sure to push?"
+    read -p "pls input (y) to continue: " input
+    if [ "$input" = "y" ]; then
+        break
+    fi
+done
 git push 
