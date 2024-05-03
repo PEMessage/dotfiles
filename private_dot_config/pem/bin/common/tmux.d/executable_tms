@@ -1,8 +1,38 @@
 #!/bin/sh
 
+genalias() {
+    for i in 0 1 2 3 4 5 6 7 8 9
+    do
+        echo "alias tm${i}='$(basename $0) $i'"
+    done
+}
+usage() {
+    echo "PARAMETER:"
+    echo "      --alias|-a)     : gen tm{0..9} alias which can be use by eval \`$(basename $0) -a\`"
+    echo "      --help |-h)     : print this infomation                                            "
+    echo "      [session name]) : session name                                                     "
+    echo "EXAMPE:"
+    echo "      eval \$($(basename $0) --alias) "
+    echo "      tm1   # attach to session_name=1"
+    echo "      tm2   # attach to session_name=2"
+    echo "      $(basename $0) 5 # attach to session_name=5"
+    echo "VERSION:"
+    echo "      1.0.0"
 
+}
+
+if [ "$1" = "-h" -o "$1" = "--help" -o "$#" -eq 0  ] ; then
+    usage 
+    exit 0
+elif [ "$1" = "-a" -o "$1" = "--alias" ]  ; then
+    genalias
+    exit 0
+fi
+
+
+
+# Credit: GPT-3.5
 PEM_TMUX_SESSION_NAME="$1"
-
 # Check if the session exists
 if tmux has-session -t $PEM_TMUX_SESSION_NAME 2>/dev/null; then
     # If the session exists, attach to it
