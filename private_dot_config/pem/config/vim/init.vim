@@ -760,7 +760,12 @@ call plug#begin(pe_runtimepath . '/plugged')
     " the file and line number where the option was last set.
     " Can you do the following after opening a kotlin file?
     " verbose set commentstring?
-        autocmd FileType c setlocal commentstring=//\ %s
+        aug VIMCOMMENT
+            autocmd!
+            autocmd FileType apache setlocal commentstring=#\ %s
+            autocmd FileType python setlocal commentstring=#\ %s
+            autocmd FileType c setlocal commentstring=//\ %s
+        aug VIMCOMMENT
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-fugitive'
     Plug 'tpope/vim-vinegar'
@@ -836,10 +841,15 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:floaterm_opener = 'tabe'
     Plug 'christoomey/vim-tmux-navigator'
         let g:tmux_navigator_no_mappings = 1
-        noremap  <silent><M-S-h> :<C-U>TmuxNavigateLeft<cr>
-        noremap  <silent><M-S-j> :<C-U>TmuxNavigateDown<cr>
-        noremap  <silent><M-S-k> :<C-U>TmuxNavigateUp<cr>
-        noremap  <silent><M-S-l> :<C-U>TmuxNavigateRight<cr>
+        noremap  <silent><M-S-h> <cmd>TmuxNavigateLeft<cr>
+        noremap  <silent><M-S-j> <cmd>TmuxNavigateDown<cr>
+        noremap  <silent><M-S-k> <cmd>TmuxNavigateUp<cr>
+        noremap  <silent><M-S-l> <cmd>TmuxNavigateRight<cr>
+
+        tnoremap  <silent><M-S-h> <cmd>TmuxNavigateLeft<cr>
+        tnoremap  <silent><M-S-j> <cmd>TmuxNavigateDown<cr>
+        tnoremap  <silent><M-S-k> <cmd>TmuxNavigateUp<cr>
+        tnoremap  <silent><M-S-l> <cmd>TmuxNavigateRight<cr>
         " Tmux Like
         nnoremap <silent><M-S-C> :vsplit<CR>
         nnoremap <silent><M-S-X> :confirm q<CR>

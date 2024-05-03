@@ -1,0 +1,19 @@
+" PEM vimrc select and load
+" $PEM_HOME/config/vim/init.vim
+" $PEM_HOME/config/vim/lite.vim
+let g:pe_rc = {}
+let g:pe_rc['files'] =  [
+  \  $PEM_HOME .. '/config/vim/init.vim',
+  \  $PEM_HOME .. '/config/vim/lite.vim',
+               \ ]
+
+for pfile in g:pe_rc['files']
+    " 检查文件是否可读
+    if filereadable(pfile)
+        " 如果文件可读，打印文件名并跳出循环
+        let g:pe_rc['file'] = pfile
+        execute 'source ' .. g:pe_rc['file'] 
+        break
+    endif
+endfor
+
