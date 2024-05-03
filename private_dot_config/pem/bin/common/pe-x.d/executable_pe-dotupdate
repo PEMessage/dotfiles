@@ -13,7 +13,7 @@ echo "${GREEN}INFO${STOP}: ""Add File to source"
 # exit
 temp=$(chezmoi source-path)
 cd $temp
-git add . 
+git add .
 
 echo "${GREEN}INFO${STOP}: ""Are you sure commit with this change?"
 if [ -z "$1" ]; then
@@ -36,11 +36,11 @@ while true; do
     fi
 done
 
-echo 
-echo "${GREEN}INFO${STOP}: ""OK, now commit and push"
-echo 
+echo
+echo "${GREEN}INFO${STOP}: ""OK, now commit "
+echo
 git commit -m "$MEG"
-git log HEAD -n1 --stat --oneline 
+git log HEAD -n1 --stat --oneline
 
 
 echo
@@ -53,4 +53,7 @@ while true; do
         break
     fi
 done
-git push 
+echo
+echo "${GREEN}INFO${STOP}: ""OK, now commit "
+echo
+git push
