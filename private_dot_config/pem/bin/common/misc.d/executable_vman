@@ -1,2 +1,12 @@
 #!/bin/sh
-MANPAGER='vim +MANPAGER "+set nonumber" -'  man $@
+
+case $- in
+  *i*)  # assume being sourced 
+    vman() {
+        MANPAGER='vim +MANPAGER "+set nonumber" -c "silent! IndentLinesDisable"  -'  man $@
+    }
+    ;;
+  *) # assume being executed as an executable
+        MANPAGER='vim +MANPAGER "+set nonumber" -c "silent! IndentLinesDisable"  -'  man $@
+    ;;
+esac
