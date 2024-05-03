@@ -18,7 +18,6 @@ usage() {
     echo "      $(basename $0) 5 # attach to session_name=5"
     echo "VERSION:"
     echo "      1.0.0"
-
 }
 
 if [ "$1" = "-h" -o "$1" = "--help" -o "$#" -eq 0  ] ; then

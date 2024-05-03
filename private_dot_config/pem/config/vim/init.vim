@@ -402,7 +402,15 @@ let g:startify_custom_header = [
 " 4.3 Extend mapping and command
 " -------------------------------------------
     nnoremap <leader>rcc  :w<CR> :source %<CR> " Re:Configuration
-    nnoremap <leader>rce  :tabe ~/.vimrc <CR>
+
+    function PERcEdit() 
+        if exists('g:pe_rc["file"]') && !empty(g:pe_rc['file'])
+            execute 'tabedit ' .. g:pe_rc['file']
+        else 
+            execute 'tabedit ' .. '~/.vimrc'
+        endif
+    endfunction
+    nnoremap <leader>rce  <cmd>call PERcEdit()<CR>
 
     nnoremap <leader>``   :nohlsearch<CR>
     nnoremap <leader>`1   :set! virtualedit=onemore<CR>
