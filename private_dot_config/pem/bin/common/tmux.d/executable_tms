@@ -1,0 +1,14 @@
+#!/bin/sh
+
+
+PEM_TMUX_SESSION_NAME="$1"
+
+# Check if the session exists
+if tmux has-session -t $PEM_TMUX_SESSION_NAME 2>/dev/null; then
+    # If the session exists, attach to it
+    tmux attach-session -t $PEM_TMUX_SESSION_NAME
+else
+    # If the session doesn't exist, create a new session with the specified name
+    tmux new-session -s $PEM_TMUX_SESSION_NAME
+fi
+
