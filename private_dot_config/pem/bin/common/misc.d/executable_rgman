@@ -1,0 +1,16 @@
+#!/bin/sh
+
+command -v manpath >/dev/null 2>&1 || {
+    echo "manpath dont find"
+    exit 0
+}
+
+command -v rg >/dev/null 2>&1 || {
+    echo "rg dont find"
+    exit 0
+}
+
+for x in $(manpath 2>/dev/null | tr ':' '\n' | uniq | sort)
+ do
+   rg -z "$@" "$x"
+done
