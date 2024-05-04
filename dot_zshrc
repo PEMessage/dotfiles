@@ -70,6 +70,11 @@
     zstyle ':completion:*:*:*:*:corrections' format '%F{yellow}!- %d (errors: %e) -!%f'
     command -v foo >/dev/null 2>&1  && eval "$(dircolors)"
     zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+    # See: https://unix.stackexchange.com/questions/84867/zsh-completion-enabling-shift-tab
+    # bindkey '^[[Z' reverse-menu-complete
+    # Or(might crash but better)
+    zmodload zsh/complist
+    bindkey -M menuselect '^[[Z' reverse-menu-complete
     # zstyle ':chpwd:*' recent-dirs-max 50
 
     # zstyle ':autocomplete:tab:*' insert-unambiguous yes
