@@ -677,6 +677,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     endif
 
     Plug 'Yggdroot/indentLine'
+        let g:indentLine_fileTypeExclude = ['man']
     Plug 'mhinz/vim-startify'
         nnoremap <leader>st :tab new<CR>:Startify<CR> " Most Recent File MRF
         nnoremap <leader>sb :Startify<CR> " Most Recent File MRF
