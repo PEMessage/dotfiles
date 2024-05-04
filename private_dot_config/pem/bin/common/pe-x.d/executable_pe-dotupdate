@@ -2,6 +2,10 @@
 GREEN='\e[092m'
 STOP='\e[0m'
 
+if [ "$1" = "-d" ] ; then 
+    chezmoi git diff --staged
+    exit 0
+fi
 
 
 echo "${GREEN}INFO${STOP}: ""chezmoi re-add all trackfile"
