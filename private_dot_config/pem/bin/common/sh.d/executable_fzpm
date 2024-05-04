@@ -93,9 +93,9 @@ main() {
 # =============================================================================
 
 install() {
-    if [ ! -f "$PM_CACHE_DIR/last-fetch" ] || [ "$(cat "$PM_CACHE_DIR/last-fetch")" != "$(current_date)" ]; then
-        # pm_fetch
-    fi
+    # if [ ! -f "$PM_CACHE_DIR/last-fetch" ] || [ "$(cat "$PM_CACHE_DIR/last-fetch")" != "$(current_date)" ]; then
+    #     # pm_fetch
+    # fi
     if [ $# -eq 0 ]; then
         search all | PM=$PM PM_COLOR=$PM_COLOR xargs -ro "$0" install
     else
