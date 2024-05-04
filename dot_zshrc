@@ -1,0 +1,131 @@
+# -----------------------------------------
+# Init Process
+# -----------------------------------------
+    
+
+
+    # Prvent loading twice
+    # if [ -z "$_DOTZSHRC_LOADED" ]; then
+    #     _DOTZSHRC_LOADED=1
+    # else
+    #     return
+    # fi
+    # Exit for non-interactive shell
+    [[ $- != *i* ]] && return
+
+    # [[ -e ~/.profile ]] && emulate sh -c 'source ~/.profile'
+    # Ubuntu temp fix for snap format package
+    if [ -f "/etc/profile.d/apps-bin-path.sh" ] ; then
+        source /etc/profile.d/apps-bin-path.sh
+    fi
+
+    # Auto Install zinit
+    ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+    [ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
+    [ ! -d $ZINIT_HOME/.git ] &&
+        git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+    source "${ZINIT_HOME}/zinit.zsh"
+
+# -----------------------------------------
+# Option Setting Zone
+# -----------------------------------------
+    # emulate -lLR zsh  -> list all opt
+    # setopt -> list opt differnt to default
+    # setopt AUTO_CD #No exec -> cd to it
+    setopt no_nomatch
+    bindkey -e
+
+# -----------------------------------------
+# History Setting Zone
+# -----------------------------------------
+    # HISTFILE=$HOME/.local/share/zsh/zsh_history
+    HISTFILE=${XDG_CONFIG_HOME:-${HOME}/.local/share}/zsh/zsh_history
+    HISTSIZE=9000
+    SAVEHIST=9000
+    [ -e "$HISTFILE" ] || mkdir -p `dirname $HISTFILE` ; touch "$HISTFILE"
+        
+
+    setopt SHARE_HISTORY          # 多个会话共享历史记录文件
+    setopt APPEND_HISTORY         # 添加历史记录，而非覆盖
+    setopt INC_APPEND_HISTORY     # 立即更新历史记录
+    setopt HIST_EXPIRE_DUPS_FIRST # 去除第一个重复记录
+    setopt HIST_IGNORE_DUPS       # 去除重复记录
+    setopt HIST_REDUCE_BLANKS     # 去除空白记录
+    setopt HIST_FIND_NO_DUPS      # 浏览时跳过重复记录
+    
+# -----------------------------------------
+# Complete Setting Zone
+# -----------------------------------------
+    # Complete and Prompt 
+    # See: https://thevaluable.dev/zsh-completion-guide-examples/
+    # :completion:<function>:<completer>:<command>:<argument>:<tag>
+    autoload -Uz compinit && compinit
+
+    # Part 1 zsytle
+    # man zshcompsys - Search for “Standard Tags”
+    # ------------------------------------
+    # zstyle ':completion:*:*:cdr:*:*' menu selection
+    zstyle ':completion:*' menu select
+    zstyle ':completion:*:*:*:*:descriptions' format '%F{green}-- %d --%f'
+    zstyle ':completion:*:*:*:*:corrections' format '%F{yellow}!- %d (errors: %e) -!%f'
+    command -v foo >/dev/null 2>&1  && eval "$(dircolors)"
+    zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+    # zstyle ':chpwd:*' recent-dirs-max 50
+
+    # zstyle ':autocomplete:tab:*' insert-unambiguous yes
+    # # zstyle ':autocomplete:tab:*' widget-style menu-select
+    # zstyle ':autocomplete:*' max-lines 100%
+    # zstyle ':completion:*' list-rows-first yes
+    # zstyle ':completion:*' group-name ''
+    # zstyle ':autocomplete:*' min-input 2
+
+
+
+
+    # 设置 walters 主题的默认命令行提示符
+    autoload -Uz color && colors
+    export PS1="[%{$fg_bold[cyan]%}%n@%m%{$reset_color%}:%{$fg_bold[green]%}%~%{$reset_color%}]%# "
+    # export PS1="[%n@%m:%~]%# "
+
+    # zsh内置的cdr命令可以跳转至之前访问过的文件夹，开启方法：
+    # See: https://www.zhihu.com/question/21418449/answer/2876818699
+    autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
+    add-zsh-hook chpwd chpwd_recent_dirs
+    # zstyle ':completion:*:*:cdr:*:*' menu selection
+
+# -----------------------------------------
+# Plug-In Setting Zone
+# -----------------------------------------
+    zinit wait lucid light-mode for \
+      atinit"zicompinit; zicdreplay" \
+      atload"_zsh_autosuggest_start" \
+          zsh-users/zsh-autosuggestions \
+      blockf atpull'zinit creinstall -q .' \
+          zsh-users/zsh-completions
+
+
+    # zinit ice as"command" from"gh-r" \
+    #           atclone"./starship init zsh > init.zsh; ./starship completions zsh > _starship" \
+    #           atpull"%atclone" src"init.zsh"
+    # zinit light starship/starship
+
+
+    bindkey '^F' autosuggest-accept
+    autoload -z edit-command-line
+    zle -N edit-command-line
+    bindkey "^X^E" edit-command-line
+
+
+
+# -----------------------------------------
+# Function Setting Zone
+# -----------------------------------------
+
+    source ~/.config/pem/init.sh
+    [ -f "$HOME/.pe_profile" ] && source "$HOME/.pe_profile"
+
+    # source ~/.config/chezmoi/chezmoi.zsh
+    # source ~/.config/pem/shell/fzf/fzf-ff.sh
+    # source ~/.config/pem/shell/vless/vless.sh
+
+
