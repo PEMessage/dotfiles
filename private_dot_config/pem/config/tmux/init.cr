@@ -152,10 +152,25 @@ run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | cut -c 6-8)"
        tmux-plugins/tpm             \
        fcsonline/tmux-thumbs        \
        tmux-plugins/tmux-copycat    \
-       fmount/tmux-quickfix         \
-     '
-    set -g @thumbs-select-fg-color \#3e444e
+    '
 
+    # Plugin fcsonline/tmux-thumbs
+    # ----------------------------
+    set -g @thumbs-fg-color green
+    set -g @thumbs-hint-fg-color \#d76971
+    set -g @thumbs-select-fg-color \#d76971
+    set -g @thumbs-multi-fg-color \#ffff00
+
+    # Plugin tmux-plugins/tmux-copycat
+    # ----------------------------
+    # This remap not work, I dont why, use M-h instead(default)
+    set -g @copycat_hash_search 'C-h'
+
+    # Plugin fmount/tmux-quickfix
+       # fmount/tmux-quickfix         \
+    # ----------------------------
+    # C-b z to open quickfix
+    # set -g @quickfix-key `
 
 # --------------------------------
 # .tmux.conf ref start
