@@ -9,8 +9,7 @@
     set -g base-index 1 # 设置窗口的起始下标为1
     set -g pane-base-index 1 # 设置面板的起始下标为1
     set-window-option -g automatic-rename on # 自动重命名
-    set-option -g renumber-windows on
-    bind-key -n T swap-window -t 0
+    # set-option -g renumber-windows on 
 
     # Ture Color support
     set -g default-terminal "xterm-256color"
@@ -18,6 +17,10 @@
 
     # From: tmux-plugins/tmux-sensible
     set-option -g history-limit 50000
+
+    # Title
+    set -g set-titles on
+    set -g set-titles-string '#(whoami)@#H:#W(#S)'
 
 
 
@@ -45,7 +48,7 @@
     bind-key -T copy-mode-vi r send-keys -X rectangle-toggle
 
     # exit copy mode after 'y'
-    bind-key -T copy-mode-vi 'y' send -X copy-pipe-and-cancel 
+    bind-key -T copy-mode-vi y send -X copy-pipe-and-cancel 
     # bind-key -T copy-mode-vi y send-keys -X copy-selection
 
     # prevent tmux from exiting copy mode after selection with mouse
@@ -69,6 +72,7 @@
     bind -n C-M-k select-pane -U
     bind -n C-M-l select-pane -R
     # See: https://superuser.com/questions/343572/how-do-i-reorder-tmux-windows
+    # bind-key -n T swap-window -t 1
     bind-key -n C-M-Left swap-window -t -1 \; previous-window
     bind-key -n C-M-Right swap-window -t +1 \; next-window
 
@@ -140,24 +144,28 @@ run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | cut -c 6-8)"
 # --------------------------------
     # This tmux statusbar config was created by tmuxline.vim
     # on Thu, 15 Jun 2023
-    set -g status-justify "left"
-    set -g status "on"
-    set -g status-left-style "none"
-    set -g message-command-style "fg=#3fc5b7,bg=#3b3b3b"
-    set -g status-right-style "none"
-    set -g pane-active-border-style "fg=#368aeb"
-    set -g status-style "none,bg=#252525"
-    set -g message-style "fg=#3fc5b7,bg=#3b3b3b"
-    set -g pane-border-style "fg=#3b3b3b"
-    set -g status-right-length "100"
-    set -g status-left-length "100"
-    setw -g window-status-activity-style "none"
-    setw -g window-status-separator ""
-    setw -g window-status-style "none,fg=#777777,bg=#252525"
-    set -g status-left "#[fg=#252525,bg=#368aeb] #S #[fg=#368aeb,bg=#252525,nobold,nounderscore,noitalics]"
-    set -g status-right "#[fg=#3b3b3b,bg=#252525,nobold,nounderscore,noitalics]#[fg=#3fc5b7,bg=#3b3b3b] %Y-%m-%d | %H:%M #[fg=#368aeb,bg=#3b3b3b,nobold,nounderscore,noitalics]#[fg=#252525,bg=#368aeb] #h "
-    setw -g window-status-format "#[fg=#777777,bg=#252525] #I |#[fg=#777777,bg=#252525] #W "
-    setw -g window-status-current-format "#[fg=#252525,bg=#3b3b3b,nobold,nounderscore,noitalics]#[fg=#3fc5b7,bg=#3b3b3b] #I |#[fg=#3fc5b7,bg=#3b3b3b] #W #[fg=#3b3b3b,bg=#252525,nobold,nounderscore,noitalics]"
+    # set -g status-justify "left"
+    # set -g status "on"
+    # set -g status-left-style "none"
+    # set -g status-right-style "none"
+    # set -g status-right-length "100"
+    # set -g status-left-length "100"
+    # set -g status-style "none,bg=#252525"
+    # set -g status-left "#[fg=#252525,bg=#368aeb] #S #[fg=#368aeb,bg=#252525,nobold,nounderscore,noitalics]"
+    # set -g status-right "#[fg=#3b3b3b,bg=#252525,nobold,nounderscore,noitalics]#[fg=#3fc5b7,bg=#3b3b3b] %Y-%m-%d | %H:%M #[fg=#368aeb,bg=#3b3b3b,nobold,nounderscore,noitalics]#[fg=#252525,bg=#368aeb] #h "
+
+
+    # set -g message-command-style "fg=#3fc5b7,bg=#3b3b3b"
+    # set -g message-style "fg=#3fc5b7,bg=#3b3b3b"
+
+    # set -g pane-border-style "fg=#3b3b3b"
+    # set -g pane-active-border-style "fg=#368aeb"
+
+    # setw -g window-status-activity-style "none"
+    # setw -g window-status-separator ""
+    # setw -g window-status-style "none,fg=#777777,bg=#252525"
+    # setw -g window-status-format "#[fg=#777777,bg=#252525] #I |#[fg=#777777,bg=#252525] #W "
+    # setw -g window-status-current-format "#[fg=#252525,bg=#3b3b3b,nobold,nounderscore,noitalics]#[fg=#3fc5b7,bg=#3b3b3b] #I |#[fg=#3fc5b7,bg=#3b3b3b] #W #[fg=#3b3b3b,bg=#252525,nobold,nounderscore,noitalics]"
 
 # --------------------------------
 # Plug List
