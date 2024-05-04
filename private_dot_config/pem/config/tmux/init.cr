@@ -1,4 +1,85 @@
 
+# - set is the alias of set-option
+# - setw is the alias of set-window-option
+# See: https://github.com/zaiste/tmuxed.git
+
+# --------------------------------
+# Basic Setting Zone
+# --------------------------------
+    set -g base-index 1 # 设置窗口的起始下标为1
+    set -g pane-base-index 1 # 设置面板的起始下标为1
+    set-window-option -g automatic-rename on # 自动重命名
+    set-option -g renumber-windows on
+    bind-key -n T swap-window -t 0
+
+    # Ture Color support
+    set -g default-terminal "xterm-256color"
+    set -ga terminal-overrides ",xterm*:Tc"
+
+    # From: tmux-plugins/tmux-sensible
+    set-option -g history-limit 50000
+
+
+
+# --------------------------------
+# Basic Key map
+# --------------------------------
+    # misc map
+    # ----------------------------
+    bind r source-file ~/.tmux.conf \; display "Reload!"
+
+    # copy mode 
+    # ----------------------------
+    # bind P paste-buffer
+    # bind C-v paste-buffer
+    bind -n C-M-v copy-mode
+    bind ] paste-buffer -p # prevent run command
+    bind -n C-M-b choose-buffer # yank ring
+
+    # vi copy mode
+    # ----------------------------
+    # setw -g mode-keys vi 
+    set-window-option -g mode-keys vi # 开启vi风格后，支持vi的C-d、C-u、hjkl等快捷键
+
+    bind-key -T copy-mode-vi v send-keys -X begin-selection
+    bind-key -T copy-mode-vi r send-keys -X rectangle-toggle
+
+    # exit copy mode after 'y'
+    bind-key -T copy-mode-vi 'y' send -X copy-pipe-and-cancel 
+    # bind-key -T copy-mode-vi y send-keys -X copy-selection
+
+    # prevent tmux from exiting copy mode after selection with mouse
+    # bind-key -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-selection -x
+    bind-key -T copy-mode-vi MouseDown2Pane paste-buffer -p
+
+    # another setup by may report error 
+    # ----------------------------
+    # bind -n vi-copy v begin-selection # 绑定v键为开始选择文本
+    # bind -n vi-copy y copy-selection # 绑定y键为复制选中文本
+    # bind-key -T copy-mode-vi 'v' send -X begin-selection
+    # bind-key -T copy-mode-vi 'y' send -X copy-selection-and-cancel
+    # bind-key -t vi-copy 'v' begin-selection
+    # bind-key -t vi-copy 'y' copy-selection
+
+# --------------------------------
+# Fast window navigation
+# --------------------------------
+    bind -n C-M-h select-pane -L
+    bind -n C-M-j select-pane -D
+    bind -n C-M-k select-pane -U
+    bind -n C-M-l select-pane -R
+    # See: https://superuser.com/questions/343572/how-do-i-reorder-tmux-windows
+    bind-key -n C-M-Left swap-window -t -1 \; previous-window
+    bind-key -n C-M-Right swap-window -t +1 \; next-window
+
+    bind -n C-M-e next-window
+    # Credit: https://nju-projectn.github.io/ics-pa-gitbook/ics2023/0.5.html
+    bind -n C-M-w new-window -c "#{pane_current_path}"
+    bind -n C-M-q previous-window
+    
+    bind -n C-M-c splitw -h -c '#{pane_current_path}' # 水平方向新增面板，默认进入当前目录
+    bind -n C-M-x confirm-before -p "kill-pane #P? (y/n)" kill-pane
+
 # --------------------------------
 # Function List
 # --------------------------------
@@ -28,73 +109,11 @@ run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | cut -c 6-8)"
 # --------------------------------
 # Mouse support
 # --------------------------------
+    # mouse support
     set-option -g mouse on
-    # 绑定快捷键来切换鼠标状态
     bind-key -n C-M-M run-shell 'tmux-toggle-mouse toggle'
 
-    # setw -g mode-keys vi 
-    set-window-option -g mode-keys vi # 开启vi风格后，支持vi的C-d、C-u、hjkl等快捷键
 
-
-    bind P paste-buffer
-    bind C-v paste-buffer
-    bind-key -T copy-mode-vi v send-keys -X begin-selection
-    bind-key -T copy-mode-vi y send-keys -X copy-selection
-    bind-key -T copy-mode-vi r send-keys -X rectangle-toggle
-
-    # prevent tmux from exiting copy mode after selection with mouse
-    # bind-key -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-selection -x
-    bind-key -T copy-mode-vi MouseDown2Pane paste-buffer -p
-
-    # prevent run command
-    bind ] paste-buffer -p
-
-
-    # unbind mouse2
-
-    bind -n C-M-v copy-mode
-    bind -n C-M-b choose-buffer
-
-    bind-key -T copy-mode-vi 'v' send -X begin-selection
-    bind-key -T copy-mode-vi 'y' send -X copy-pipe-and-cancel
-    # bind -n vi-copy v begin-selection # 绑定v键为开始选择文本
-    # bind -n vi-copy y copy-selection # 绑定y键为复制选中文本
-    # bind-key -T copy-mode-vi 'v' send -X begin-selection
-    # bind-key -T copy-mode-vi 'y' send -X copy-selection-and-cancel
-    # bind-key -t vi-copy 'v' begin-selection
-    # bind-key -t vi-copy 'y' copy-selection
-
-
-# --------------------------------
-# Setting Zone
-# --------------------------------
-    set -g base-index 1 # 设置窗口的起始下标为1
-    set -g pane-base-index 1 # 设置面板的起始下标为1
-
-    # Ture Color support
-    set -g default-terminal "xterm-256color"
-    set -ga terminal-overrides ",xterm*:Tc"
-
-    # From: tmux-plugins/tmux-sensible
-    set-option -g history-limit 50000
-
-    bind r source-file ~/.tmux.conf \; display "Reload!"
-
-# --------------------------------
-# Fast window navigation
-# --------------------------------
-    bind -n C-M-h select-pane -L
-    bind -n C-M-j select-pane -D
-    bind -n C-M-k select-pane -U
-    bind -n C-M-l select-pane -R
-
-    bind -n C-M-e next-window
-    # Credit: https://nju-projectn.github.io/ics-pa-gitbook/ics2023/0.5.html
-    bind -n C-M-w new-window -c "#{pane_current_path}"
-    bind -n C-M-q previous-window
-    
-    bind -n C-M-c splitw -h -c '#{pane_current_path}' # 水平方向新增面板，默认进入当前目录
-    bind -n C-M-x confirm-before -p "kill-pane #P? (y/n)" kill-pane
 
 # --------------------------------
 # vim-tmux-navigator
@@ -115,11 +134,6 @@ run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | cut -c 6-8)"
         "bind-key -n 'M-\\' if-shell \"$is_vim\" 'send-keys M-\\'  'select-pane -l'"
     if-shell -b '[ "$(echo "$tmux_version >= 3.0" | bc)" = 1 ]' \
         "bind-key -n 'M-\\' if-shell \"$is_vim\" 'send-keys M-\\\\'  'select-pane -l'"
-
-
-
-
-
 
 # --------------------------------
 # Statue Line Theme
