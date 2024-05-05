@@ -1,0 +1,123 @@
+#
+# ~/.bashrc
+#
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
+
+HISTSIZE=2500
+HISTFILESIZE=2500
+HISTCONTROL=ignoredups:erasedups
+shopt -s histappend
+PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
+
+# -----------------------------------------
+# PS1 Setting
+# ----------------------------------------- 
+    # parse_git_branch() {
+    #     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+    # }
+
+    # _parse_git_branch_v2() {
+    #     rev="$(git symbolic-ref --short HEAD 2> /dev/null)"
+    #     [ "$rev" != "" ] && echo "($rev)"
+    # }
+
+    # From: https://gist.github.com/bingzhangdai/dd4e283a14290c079a76c4ba17f19d69
+    _parse_git_branch_v3() {
+        local _head_file _head
+        local _dir="$PWD"
+
+        while [[ -n "$_dir" ]]; do
+            _head_file="$_dir/.git/HEAD"
+            if [[ -f "$_dir/.git" ]]; then
+                read -r _head_file < "$_dir/.git" && _head_file="$_dir/${_head_file#gitdir: }/HEAD"
+            fi
+            [[ -e "$_head_file" ]] && break
+            _dir="${_dir%/*}"
+        done
+
+        if [[ -e "$_head_file" ]]; then
+            read -r _head < "$_head_file" || return
+            case "$_head" in
+                ref:*) printf "(${_head#ref: refs/heads/})" ;;
+                "") ;;
+                # HEAD detached
+                *) printf "(${_head:0:9})" ;;
+            esac
+            return 0
+        fi
+
+        return 1
+    }
+
+
+    _pe_last3dir() {
+        local pwd="${PWD//~/\~}"
+        echo "${pwd#${pwd%/*/*/*}/}"
+    }
+
+    _pe_prompt() {
+
+        # local exit_code="\$(VALU="\$?" ; echo -n \$VALU)"
+        # local exit_code='$(code=${?##0};echo ${code:+:${code}})'
+        case "$TERM" in 
+            xterm-color|*-256color) color_prompt=yes;;
+        esac
+        if [ "$color_prompt" = yes ]; then
+            local blackF="\[\e[30m\]" # Fonts color
+            local redF="\[\e[1;31m\]" 
+            local yellowF="\[\e[1;33m\]" 
+            local magentaF="\[\e[1;35m\]" 
+            local cyanF="\[\e[1;36m\]" 
+            local blueF="\[\e[1;34m\]" 
+            local greenF="\[\e[1;32m\]" 
+            local whiteF="\[\e[37m\]" 
+            local blackB="\[\e[30m\]" # Background color
+            local redB="\[\e[41m\]" 
+            local greenB="\[\e[42m\]" 
+            local yellowB="\[\e[43m\]" 
+            local blueB="\[\e[44m\]" 
+            local magentaB="\[\e[45m\]" 
+            local cyanB="\[\e[46m\]" 
+            local whiteB="\[\e[47m\]" 
+            local colorEnd="\[\e[00m\]"
+        fi
+
+        # if [ "$color_prompt" = yes ]; then
+        PS1=""
+        PS1+="["
+        PS1+="$blueF\u@\h$colorEnd"
+        PS1+=":"
+
+        # PS1+="$greenF\w$colorEnd"
+        PS1+="$greenF\$(_pe_last3dir)$colorEnd"
+        
+        PS1+="]"
+        PS1+="$yellowF\$(_parse_git_branch_v3)$colorEnd"
+        # PS1+="$exit_code"
+        PS1+="\$ "
+        # else
+        #     PS1="[\u@\h \w]\$ "
+        # fi
+    }
+    _pe_prompt
+
+# -----------------------------------------
+# Alias and Path Config Zone
+# -----------------------------------------
+    # pe_prompt
+
+    # export AM_HOME=/home/pem/learn-ics/abstract-machine
+    # export NEMU_HOME=/home/pem/learn-ics/nemu
+
+
+
+# -----------------------------------------
+# Source Zone
+# -----------------------------------------
+    bind '"\e[A": history-search-backward'
+    bind '"\e[B": history-search-forward'
+    # bind 'TAB:menu-complete'
+
+    source ~/.config/pem/init.sh
