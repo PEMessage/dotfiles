@@ -258,3 +258,5 @@ run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | cut -c 6-8)"
 # --------------------------------
 # .tmux.conf ref end
 # --------------------------------
+#
+# vim: set syntax=tmux:
