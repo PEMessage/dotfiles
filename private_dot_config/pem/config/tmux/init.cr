@@ -181,7 +181,7 @@ run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | cut -c 6-8)"
     PEM_TMUX_HIGHTLIGHT="#3fcfff"
     PEM_TMUX_HIGHTLIGHT_MINUS="#32a5cc"
 
-    PEM_TMUX_HIGHTLIGHT2="#eb6eb7"
+    PEM_TMUX_HIGHTLIGHT2="#ff7f4b"
     # Pane
     set -g pane-border-style "fg=$PEM_TMUX_INACTIVITY"
     set -g pane-active-border-style "fg=$PEM_TMUX_HIGHTLIGHT_MINUS,bg=default"
