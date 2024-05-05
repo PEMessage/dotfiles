@@ -22,6 +22,9 @@
     set -g set-titles on
     set -g set-titles-string '#(whoami)@#H:#W(#S)'
 
+    # Clock
+    set -g clock-mode-style 24
+    set -g clock-mode-colour white
 
 
 # --------------------------------
@@ -140,7 +143,7 @@ run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | cut -c 6-8)"
         "bind-key -n 'M-\\' if-shell \"$is_vim\" 'send-keys M-\\\\'  'select-pane -l'"
 
 # --------------------------------
-# Statue Line Theme
+# Statue Line Theme(Onedrak)
 # --------------------------------
     # This tmux statusbar config was created by tmuxline.vim
     # on Thu, 15 Jun 2023
@@ -166,6 +169,44 @@ run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | cut -c 6-8)"
     # setw -g window-status-style "none,fg=#777777,bg=#252525"
     # setw -g window-status-format "#[fg=#777777,bg=#252525] #I |#[fg=#777777,bg=#252525] #W "
     # setw -g window-status-current-format "#[fg=#252525,bg=#3b3b3b,nobold,nounderscore,noitalics]#[fg=#3fc5b7,bg=#3b3b3b] #I |#[fg=#3fc5b7,bg=#3b3b3b] #W #[fg=#3b3b3b,bg=#252525,nobold,nounderscore,noitalics]"
+# --------------------------------
+# Statue Line Theme(pimux)
+# --------------------------------
+
+    PEM_TMUX_INACTIVITY="#3b3b3b"
+    PEM_INACTIVITY_MINUS="#252525"
+
+    
+    PEM_TMUX_HIGHTLIGHT_PLUS="#a0d0f0"
+    PEM_TMUX_HIGHTLIGHT="#3fcfff"
+    PEM_TMUX_HIGHTLIGHT_MINUS="#32a5cc"
+
+    PEM_TMUX_HIGHTLIGHT2="#eb6eb7"
+    # Pane
+    set -g pane-border-style "fg=$PEM_TMUX_INACTIVITY"
+    set -g pane-active-border-style "fg=$PEM_TMUX_HIGHTLIGHT_MINUS,bg=default"
+
+    # Window
+    setw -g window-status-format " #I|#W "
+    setw -g window-status-current-format "  #S|#W  "
+    setw -g window-status-separator ""
+
+    setw -g window-status-current-style "bg=$PEM_TMUX_INACTIVITY,fg=$PEM_TMUX_HIGHTLIGHT,bold"
+    setw -g window-status-style bg=default,fg=$PEM_TMUX_HIGHTLIGHT_PLUS,dim
+
+    # Status
+    set -g status-position bottom
+    set -g status-left "#[fg=$PEM_INACTIVITY_MINUS]#{?client_prefix,#[bg=$PEM_TMUX_HIGHTLIGHT2] ... ,#[bg=$PEM_TMUX_HIGHTLIGHT] NOR }"
+    set -g status-right "#[fg=$PEM_TMUX_HIGHTLIGHT_PLUS,dim] %Y-%m-%d | %H:%M | #S:#I.#P | 𝅘𝅥𝅮 "
+
+    set -g status-style "none,bg=$PEM_INACTIVITY_MINUS"
+
+    # Message(command and echo style)
+    set -g message-style fg=$PEM_TMUX_HIGHTLIGHT,bg=black,bright
+
+    # Copymode color(default yellow)
+    set -g mode-style bg=$PEM_TMUX_HIGHTLIGHT,fg=black
+
 
 # --------------------------------
 # Plug List
