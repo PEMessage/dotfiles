@@ -196,10 +196,10 @@ run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | cut -c 6-8)"
 
     # Status
     set -g status-position bottom
-    set -g status-left "#[fg=$PEM_INACTIVITY_MINUS]#{?client_prefix,#[bg=$PEM_TMUX_HIGHTLIGHT2] ... ,#[bg=$PEM_TMUX_HIGHTLIGHT] NOR }"
+    set -g status-left "#[fg=black]#{?client_prefix,#[bg=$PEM_TMUX_HIGHTLIGHT2] ... ,#[bg=$PEM_TMUX_HIGHTLIGHT] NOR }"
     set -g status-right "#[fg=$PEM_TMUX_HIGHTLIGHT_PLUS,dim] %Y-%m-%d | %H:%M | #S:#I.#P | 𝅘𝅥𝅮 "
 
-    set -g status-style "none,bg=$PEM_INACTIVITY_MINUS"
+    set -g status-style "none,bg=black"
 
     # Message(command and echo style)
     set -g message-style fg=$PEM_TMUX_HIGHTLIGHT,bg=black,bright
