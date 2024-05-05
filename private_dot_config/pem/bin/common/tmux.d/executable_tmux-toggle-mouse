@@ -20,16 +20,21 @@ tmux_ismouse() {
 
 tmux_isvim() {
 
-    local is_vim="ps -o state= -o comm= -t '#{pane_tty}' \
-        | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?)(diff)?$'"
+    # local is_vim="ps -o state= -o comm= -t '#{pane_tty}' \
+    #     | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?)(diff)?$'"
     # Method 1: 
     # tmux run-shell "$is_vim" > /dev/null
 
     # Method 2: older tmux, will always return 0.
     # you need to parse youself
-    local ret=$( tmux run-shell "$is_vim" )
-    ret=${ret##*returned}
-    return $ret
+    # local ret=$( tmux run-shell "$is_vim" )
+    # ret=${ret##*returned}
+    # return $ret
+    
+    # Method 3: get tty by arguement
+    ps -o state= -o comm= -t "$TMUX_TTY" |
+        grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?)(diff)?$' > /dev/null 2>&1
+    return $?
 }
 
 mouse_on() {
@@ -55,6 +60,16 @@ mouse_toggle() {
     fi
 }
 
+case "$2" in 
+    '/dev/pts/'*)
+        TMUX_TTY="$2"
+        ;;
+    *)
+        echo "unknow tty '$2', use tty or #{pane_tty} to pass"
+        exit 1
+        ;;
+esac
+
 case "$1" in
     on) 
         mouse_on
@@ -71,5 +86,6 @@ case "$1" in
         exit 1
         ;;
 esac
+
 tmux display "Mouse #{?mouse,ON,OFF}!" > /dev/null
 # tmux run-shell "is_vim"
