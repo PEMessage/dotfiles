@@ -188,7 +188,7 @@ run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | cut -c 6-8)"
 
     # Window
     setw -g window-status-format " #I|#W "
-    setw -g window-status-current-format "  #S|#W  "
+    setw -g window-status-current-format "  #I|#W  "
     setw -g window-status-separator ""
 
     setw -g window-status-current-style "bg=$PEM_TMUX_INACTIVITY,fg=$PEM_TMUX_HIGHTLIGHT,bold"
