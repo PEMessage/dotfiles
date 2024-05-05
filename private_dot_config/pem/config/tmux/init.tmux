@@ -220,9 +220,9 @@ run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | cut -c 6-8)"
     # Plugin fcsonline/tmux-thumbs
     # ----------------------------
     set -g @thumbs-fg-color green
-    set -g @thumbs-hint-fg-color \#d76971
-    set -g @thumbs-select-fg-color \#d76971
-    set -g @thumbs-multi-fg-color \#ffff00
+    set -g @thumbs-hint-fg-color '#d76971'
+    set -g @thumbs-select-fg-color '#d76971'
+    set -g @thumbs-multi-fg-color '#ffff00'
 
     # Plugin tmux-plugins/tmux-copycat
     # ----------------------------
