@@ -30,6 +30,13 @@ tmux_isvim() {
     # local ret=$( tmux run-shell "$is_vim" )
     # ret=${ret##*returned}
     # return $ret
+    # 
+    # Fail problem:
+    #   In tmux 3.2a, `tmux run-shell 'false'` 
+    #   will output it's command to stdout(if fail)
+    #   if any output to stdout, it will enter copymode to display
+    #
+    #   but in tmux3.3a, both will enter stdout
     
     # Method 3: get tty by arguement
     ps -o state= -o comm= -t "$TMUX_TTY" |
