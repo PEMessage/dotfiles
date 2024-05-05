@@ -191,12 +191,12 @@ run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | cut -c 6-8)"
     setw -g window-status-current-format "  #I|#W  "
     setw -g window-status-separator ""
 
-    setw -g window-status-current-style "bg=$PEM_TMUX_INACTIVITY,fg=$PEM_TMUX_HIGHTLIGHT,bold"
+    setw -g window-status-current-style "bg=$PEM_TMUX_INACTIVITY,fg=$PEM_TMUX_HIGHTLIGHT_PLUS,bold"
     setw -g window-status-style bg=default,fg=$PEM_TMUX_HIGHTLIGHT_PLUS,dim
 
     # Status
     set -g status-position bottom
-    set -g status-left "#[fg=black]#{?client_prefix,#[bg=$PEM_TMUX_HIGHTLIGHT2] ... ,#[bg=$PEM_TMUX_HIGHTLIGHT] NOR }"
+    set -g status-left "#[fg=black]#{?client_prefix,#[bg=$PEM_TMUX_HIGHTLIGHT2] ... ,#[bg=$PEM_TMUX_HIGHTLIGHT_PLUS] NOR }"
     set -g status-right "#[fg=$PEM_TMUX_HIGHTLIGHT_PLUS,dim] %Y-%m-%d | %H:%M | #S:#I.#P | 𝅘𝅥𝅮 "
 
     set -g status-style "none,bg=black"
