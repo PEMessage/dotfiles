@@ -30,6 +30,7 @@ let g:startify_custom_header = [
     " TrueColor
     set termguicolors
     set nocompatible
+    set viminfo='1000,<50,s10,h
 
 
     " Comment Color
@@ -247,18 +248,18 @@ let g:startify_custom_header = [
     " See: source $VIMRUNTIME/defaults.vim for more
     " Put these in an autocmd group, so that you can revert them with:
     " ":augroup vimStartup | exe 'au!' | augroup END"
+
+
+    " When editing a file, always jump to the last known cursor position.
+    " Don't do it when the position is invalid, when inside an event handler
+    " (happens when dropping a file on gvim) and for a commit message (it's
+    " likely a different one than last time).
     augroup vimStartup
         au!
-
-        " When editing a file, always jump to the last known cursor position.
-        " Don't do it when the position is invalid, when inside an event handler
-        " (happens when dropping a file on gvim) and for a commit message (it's
-        " likely a different one than last time).
         autocmd BufReadPost *
                     \ if line("'\"") >= 1 && line("'\"") <= line("$") && &ft !~# 'commit'
                     \ |   exe "normal! g`\""
                     \ | endif
-
     augroup END
 
 " -------------------------------------------
@@ -679,10 +680,12 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'Yggdroot/indentLine'
         let g:indentLine_fileTypeExclude = ['man']
     Plug 'mhinz/vim-startify'
-        nnoremap <leader>st :tab new<CR>:Startify<CR> " Most Recent File MRF
-        nnoremap <leader>sb :Startify<CR> " Most Recent File MRF
+        nnoremap <leader>st :tab new<CR>:Startify<CR> 
+        " Most Recent File MRF
+        nnoremap <leader>sb :Startify<CR> 
+        " Most Recent File MRF
         let g:startify_session_dir = pe_cachedir . "/session"
-    " Plug 'ap/vim-buftabline'
+        " Plug 'ap/vim-buftabline'
 
     Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
     Plug 'itchyny/vim-cursorword'
@@ -870,7 +873,7 @@ call plug#begin(pe_runtimepath . '/plugged')
 " -------------------------------------------
 " 6.8 Tag Plugin
 " -------------------------------------------
-    Plug 'PEMessage/vim-gutentags'
+    " Plug 'PEMessage/vim-gutentags'
         set tags=./.tags;,.tags
         let g:gutentags_project_root = ['.root','.project']
         let g:gutentags_add_default_project_roots = 1
@@ -918,7 +921,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         " 7 or f: Find this file
         " 8 or i: Find files #including this file
         " 9 or a: Find places where this symbol is assigned a value
-    Plug 'PEMessage/gutentags_plus'
+    " Plug 'PEMessage/gutentags_plus'
         let g:gutentags_plus_nomap = 1
         let g:gutentags_plus_height = 5
         let g:gutentags_plus_native = 0
