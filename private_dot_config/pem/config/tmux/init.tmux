@@ -146,6 +146,12 @@ run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | cut -c 6-8)"
     if-shell -b '[ "$(echo "$tmux_version >= 3.0" | bc)" = 1 ]' \
         "bind-key -n 'M-\\' if-shell \"$is_vim\" 'send-keys M-\\\\'  'select-pane -l'"
 
+    # Credit: https://hackmd.io/@DailyOops/persistent-tmux-popup?type=view
+    # Credit: https://stackoverflow.com/questions/229551/how-to-check-if-a-string-contains-a-substring-in-bash
+    bind -n "C-M-i" if-shell 'case "$(tmux display-message -p #S)" in float* ) exit 0;; *) exit 1;; esac ; ' \
+        "detach-client" \
+        "run-shell 'tmux-popup'"
+
 # --------------------------------
 # Statue Line Theme(Onedrak)
 # --------------------------------

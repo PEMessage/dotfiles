@@ -840,7 +840,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     "     let g:terminal_key = '<leader>='
         " let g:terminal_key = '<M-`>'
     Plug 'voldikss/vim-floaterm'
-        let g:floaterm_keymap_toggle = '<M-`>'
+        let g:floaterm_keymap_toggle = '<M-S-i>'
         let g:floaterm_position = 'bottomright'
         let g:floaterm_opener = 'tabe'
     Plug 'christoomey/vim-tmux-navigator'
