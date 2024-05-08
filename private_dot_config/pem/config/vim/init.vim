@@ -1390,7 +1390,10 @@ au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#source
     endfunction
 
 
+" 9 Some others Funtion snippet
+" ===========================================
     " copy to attached terminal using the yank(1) script:
+    " Credit:
     " https://github.com/sunaku/home/blob/master/bin/yank
     function! Yank(text) abort
         let escape = system('yank', a:text)
@@ -1402,6 +1405,8 @@ au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#source
     endfunction
     noremap <silent> <Leader>y y:<C-U>call Yank(@0)<CR>
 
+    " Credit: 
+    " https://stackoverflow.com/questions/13194428/is-better-way-to-zoom-windows-in-vim-than-zoomwin
     function! s:ZoomToggle() abort
         if exists('t:zoomed') && t:zoomed
             execute t:zoom_winrestcmd
