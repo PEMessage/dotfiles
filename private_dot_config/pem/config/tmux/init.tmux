@@ -32,7 +32,9 @@
 # --------------------------------
     # misc map
     # ----------------------------
-    bind r source-file ~/.tmux.conf \; display "Reload!"
+    if-shell 'test -e ~/.tmux.conf' \
+    'bind r source-file ~/.tmux.conf \; display "Reload!"' \
+    'bind r source-file ~/.config/tmux/tmux.conf \; display "Reload!"'
 
     # copy mode 
     # ----------------------------
@@ -41,6 +43,7 @@
     bind -n C-M-v copy-mode
     bind ] paste-buffer -p # prevent run command
     bind -n C-M-b choose-buffer # yank ring
+    bind -n C-M-z resize-pane -Z # yank ring
 
     # vi copy mode
     # ----------------------------

@@ -1401,3 +1401,18 @@ au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#source
     endif
     endfunction
     noremap <silent> <Leader>y y:<C-U>call Yank(@0)<CR>
+
+    function! s:ZoomToggle() abort
+        if exists('t:zoomed') && t:zoomed
+            execute t:zoom_winrestcmd
+            let t:zoomed = 0
+        else
+            let t:zoom_winrestcmd = winrestcmd()
+            resize
+            vertical resize
+            let t:zoomed = 1
+        endif
+    endfunction
+    command! ZoomToggle call s:ZoomToggle()
+    nnoremap <silent> ZO :ZoomToggle<CR>
+
