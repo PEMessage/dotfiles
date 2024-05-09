@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-myip()
+function q-myip()
 {
 	case $(uname) in
 	Darwin|*BSD)
@@ -10,11 +10,11 @@ myip()
 		local ip=$(hostname --all-ip-addresses | tr " " "\n" | grep -v "0.0.0.0" | grep -v "127.0.0.1")
 		;;
 	esac
-
 	echo "${ip}"
 }
 
-for x in `myip`
+function q-pwd() {
+for x in `q-myip`
 do
     if [ -z "$1" ]; then 
         echo "'"`whoami`@$x:`pwd`"'"
@@ -23,3 +23,7 @@ do
         echo "'"`whoami`@$x:"$path""'"
     fi
 done
+}
+
+
+q-pwd "$@"
