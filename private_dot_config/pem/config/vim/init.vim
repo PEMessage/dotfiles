@@ -30,7 +30,7 @@ let g:startify_custom_header = [
     " TrueColor
     set termguicolors
     set nocompatible
-    set viminfo='1000,<50,s10,h
+    " set viminfo='20,<50,s10,h
 
 
     " Comment Color
@@ -686,6 +686,8 @@ call plug#begin(pe_runtimepath . '/plugged')
         " Most Recent File MRF
         let g:startify_session_dir = pe_cachedir . "/session"
         " Plug 'ap/vim-buftabline'
+        let g:startify_enable_unsafe = 1
+        let g:startify_files_number = 8
 
     Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
     Plug 'itchyny/vim-cursorword'
