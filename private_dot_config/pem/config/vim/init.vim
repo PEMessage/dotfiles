@@ -481,7 +481,7 @@ let g:startify_custom_header = [
 
     nnoremap <silent><leader>b  :Lexplore<CR>
 
-    command! PEWrite w! sudo tee %
+    command! PEWrite w !sudo tee %
 
 
 " 6. VIM Plug-in Zone (Part1)
