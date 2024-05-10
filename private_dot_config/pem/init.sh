@@ -165,7 +165,8 @@
         for xbin in \
             "$x/bin"/*.d \
             "$x/bin/arch/${PEM_OS}-${PEM_ARCH}"/*.d \
-            "$x/bin/common"/*.d 
+            "$x/bin/common"/*.d \
+            "$x/bin/multi"/*.d 
         do
             [ -d "$xbin" ] && {
                 case "$xbin" in
@@ -226,5 +227,21 @@
     done ; unset x
 
 
-
-
+# -----------------------------------------
+# Some clean work (at very end)
+# -----------------------------------------
+    # remove duplicate path
+    # From skywind3000/vim/etc init.sh
+    if [ -n "$PATH" ]; then
+        PEM_TMEP_OLD_PATH=$PATH:; PATH=
+        while [ -n "$PEM_TMEP_OLD_PATH" ]; do
+            x=${PEM_TMEP_OLD_PATH%%:*}        # the first remaining entry
+            case $PATH: in
+                *:"$x":*) ;;         # already there
+                *) PATH=$PATH:$x;;   # not there yet
+            esac
+            PEM_TMEP_OLD_PATH=${PEM_TMEP_OLD_PATH#*:}
+        done
+        PATH=${PATH#:}
+        unset PEM_TMEP_OLD_PATH x
+    fi
