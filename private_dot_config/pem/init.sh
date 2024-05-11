@@ -132,6 +132,8 @@
 # configuration
 # -----------------------------------------
     PEM_Z_BACKEND="fasd"
+    PEM_EDITOR="vim"
+    export EDITOR="vim"
 # -----------------------------------------
 # load other setup 
 # Step 1: mkdir and add to path
@@ -245,3 +247,5 @@
         PATH=${PATH#:}
         unset PEM_TMEP_OLD_PATH x
     fi
+
+    source ~/.peprofile

@@ -363,7 +363,11 @@ require("lazy").setup({
 {
     'akinsho/toggleterm.nvim',
     opts = {
-        open_mapping = [[<M-=>]],
+        open_mapping = [[<M-S-i>]],
+        direction = 'float',
+        float_opts = {
+            border = 'curved',
+        }
     }
 },
 -- {
@@ -439,6 +443,15 @@ require("lazy").setup({
         -- vim.api.nvim_command('highlight default link HopPreview HopNextKey' )
     end
 },
+-- {
+--     "willothy/flatten.nvim",
+--     config = true,
+--     -- or pass configuration with
+--     -- opts = {  }
+--     -- Ensure that it runs first to minimize delay when opening file from terminal
+--     lazy = false,
+--     priority = 1001,
+-- },
 
 -- -------------------------------------------
 -- 5.3 Leagcy Plugin
