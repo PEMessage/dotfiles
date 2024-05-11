@@ -26,6 +26,8 @@
     set -g clock-mode-style 24
     set -g clock-mode-colour white
 
+    set -g xterm-keys on
+
 
 # --------------------------------
 # Basic Key map
@@ -41,7 +43,19 @@
     # bind P paste-buffer
     # bind C-v paste-buffer
     bind -n C-M-v copy-mode
+
+    # Trouble shooting with `tmux bind -n TheKey lsk`
+    # https://github.com/tmux/tmux/wiki/Modifier-Keys
     bind ] paste-buffer -p # prevent run command
+    bind -n M-S-DC paste-buffer -p
+    bind -n C-M-p paste-buffer -p
+
+    # Credit: https://stackoverflow.com/questions/12524308/bash-strip-trailing-linebreak-from-output
+    bind -n C-M-o \
+        run-shell "echo '#{pane_current_path}'  | sed -Ez '\$ s/\\n+$//' | tmux load-buffer -" \; \
+        display "Copy to buffer: sed '\$ s/\\n+$//'"
+
+
     bind -n C-M-b choose-buffer # yank ring
     bind -n C-M-z resize-pane -Z # yank ring
 
