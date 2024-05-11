@@ -49,11 +49,16 @@
     bind ] paste-buffer -p # prevent run command
     bind -n M-S-DC paste-buffer -p
     bind -n C-M-p paste-buffer -p
+    bind -n M-P paste-buffer -p
 
     # Credit: https://stackoverflow.com/questions/12524308/bash-strip-trailing-linebreak-from-output
+
+    bind -n M-O \
+        run-shell "echo '#{pane_current_path}'  | sed -Ez '\$ s/\\n+$//' | tmux load-buffer -" \; \
+        display "Copy to buffer: '#{pane_current_path}'"
     bind -n C-M-o \
         run-shell "echo '#{pane_current_path}'  | sed -Ez '\$ s/\\n+$//' | tmux load-buffer -" \; \
-        display "Copy to buffer: sed '\$ s/\\n+$//'"
+        display "Copy to buffer: '#{pane_current_path}'"
 
 
     bind -n C-M-b choose-buffer # yank ring
