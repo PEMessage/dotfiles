@@ -120,4 +120,4 @@ PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
     bind '"\e[B": history-search-forward'
     # bind 'TAB:menu-complete'
 
-    source ~/.config/pem/init.sh
+    [ -f "~/.config/pem/init.sh" ] && source ~/.config/pem/init.sh
