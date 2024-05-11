@@ -248,4 +248,4 @@
         unset PEM_TMEP_OLD_PATH x
     fi
 
-    source ~/.peprofile
+    [ -f "$HOME/.peprofile" ] && . ~/.peprofile
