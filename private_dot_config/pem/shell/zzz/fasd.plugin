@@ -32,6 +32,7 @@ cdd(){
         `
     cd "$temp"
 }
+alias ccd='cdd'
 
 cdt(){
     local fnd="$*"
