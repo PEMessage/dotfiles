@@ -443,15 +443,19 @@ require("lazy").setup({
         -- vim.api.nvim_command('highlight default link HopPreview HopNextKey' )
     end
 },
--- {
---     "willothy/flatten.nvim",
---     config = true,
---     -- or pass configuration with
---     -- opts = {  }
---     -- Ensure that it runs first to minimize delay when opening file from terminal
---     lazy = false,
---     priority = 1001,
--- },
+{
+    "willothy/flatten.nvim",
+    -- config = true,
+    -- or pass configuration with
+    opts = {
+        window = {
+            open = "alternate",
+        },
+    },
+    -- Ensure that it runs first to minimize delay when opening file from terminal
+    lazy = false,
+    priority = 1001,
+},
 
 -- -------------------------------------------
 -- 5.3 Leagcy Plugin
@@ -1343,6 +1347,8 @@ function PE.CurrentFile()
     print( vim.api.nvim_buf_get_name(0))
 end
 vim.cmd('command! PFile lua PE.CurrentFile()')
+
+vim.cmd('command! PCD :cd %:p:h')
 
 
 
