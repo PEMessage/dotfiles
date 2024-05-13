@@ -875,7 +875,7 @@ call plug#begin(pe_runtimepath . '/plugged')
 " -------------------------------------------
 " 6.8 Tag Plugin
 " -------------------------------------------
-    " Plug 'PEMessage/vim-gutentags'
+    Plug 'PEMessage/vim-gutentags'
         set tags=./.tags;,.tags
         let g:gutentags_project_root = ['.root','.project']
         let g:gutentags_add_default_project_roots = 1
@@ -932,9 +932,13 @@ call plug#begin(pe_runtimepath . '/plugged')
         noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr>
         noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
 
+        " search symbol under cursor
         noremap <silent> gn         :GscopeFind g <C-R><C-W><cr>
+        " search symbol under cursor, and preview
         noremap <silent> gy         :GscopeFind g <C-R><C-W><cr>:call QuickfixArrowPreview('j')<cr>
+        " search symbol under cursor, and open
         noremap <silent> gh         :GscopeFind g <C-R><C-W><cr>:cnext<cr>
+        " go back
         noremap <silent> gb         <C-o>
 
         noremap <silent> <leader>gc :GscopeFind c <C-R><C-W><cr>
@@ -963,7 +967,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'liuchengxu/vista.vim'
         let g:vista#renderer#enable_icon = 0
         let g:vista_echo_cursor_strategy = "scroll"
-        nnoremap <leader>at :TagbarToggle<CR>
+        " nnoremap <leader>at :TagbarToggle<CR>
         nnoremap <leader>av :Vista!!<CR>
     Plug 'Shougo/vinarise.vim'
 
