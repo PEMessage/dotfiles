@@ -877,7 +877,17 @@ call plug#begin(pe_runtimepath . '/plugged')
 " -------------------------------------------
     " GTAGS for jump
     " Changelog: compare to origin one
-    " 1. Only add g:gutentags_gtags_extra_args for extra gtags flag
+    "   1. Only add g:gutentags_gtags_extra_args for extra gtags flag
+    " Debug:
+    "   1. let g:gutentags_define_advanced_commands = 1 (already set)
+    "   2. GutentagsToggleTrace
+    "       Example update cmdline
+    "       vim/plugged/vim-gutentags/plat/unix/update_gtags.sh -e gtags --incremental /abs/path/to/subcache
+    "   3. :messages
+    " Usage:
+    "   1. GutentagsUpdate
+    "   2. execute 'cs add ' .. b:gutentags_files['gtags_cscope']
+    "   3. echo b:gutentags_root
     Plug 'PEMessage/vim-gutentags'
         " 1. Project Root option
         " ----------------------------------
@@ -922,6 +932,9 @@ call plug#begin(pe_runtimepath . '/plugged')
             let g:gutentags_auto_add_gtags_cscope = 0
             let g:gutentags_auto_add_cscope = 0
             let g:gutentags_define_advanced_commands = 1
+        command Gsadd
+                    \ execute 'cs add ' .. b:gutentags_files['gtags_cscope'] <bar>
+                    \ echo 'Add "' .. b:gutentags_files['gtags_cscope'] .. '" to cscsope db'
         set cscopetag
 
         " 0 or s: Find this symbol
@@ -933,6 +946,8 @@ call plug#begin(pe_runtimepath . '/plugged')
         " 7 or f: Find this file
         " 8 or i: Find files #including this file
         " 9 or a: Find places where this symbol is assigned a value
+    " Changelog: 
+    "   only set cscopequickfix in native mode
     Plug 'PEMessage/gutentags_plus'
         let g:gutentags_plus_nomap = 1
         let g:gutentags_plus_height = 5
