@@ -892,12 +892,18 @@ call plug#begin(pe_runtimepath . '/plugged')
         " 1. Project Root option
         " ----------------------------------
             set tags=./.tags;,.tags
-            let g:gutentags_project_root = ['.root','.project']
+            " Conflict with zzz .root mark
+            " let g:gutentags_project_root = ['.root','.project']
+            " Pls gen tag yourself to avoid any performance delay
+            let g:gutentags_generate_on_new = 0
+            let g:gutentags_generate_on_missing = 0
+            let g:gutentags_generate_on_write = 0
+            let g:gutentags_background_update = 0
+
+            let g:gutentags_project_root = ['.gentag']
             let g:gutentags_add_default_project_roots = 0
             let g:gutentags_add_ctrlp_root_markers = 0
             " Pls manully gen tags, using :GutentagsUpdate
-            let g:gutentags_background_update = 0
-            let g:gutentags_generate_on_write = 0
 
         " 2. Cache dir
         " ----------------------------------
@@ -935,6 +941,9 @@ call plug#begin(pe_runtimepath . '/plugged')
         command Gsadd
                     \ execute 'cs add ' .. b:gutentags_files['gtags_cscope'] <bar>
                     \ echo 'Add "' .. b:gutentags_files['gtags_cscope'] .. '" to cscsope db'
+        " Gs"a"top a is for higher priority in wildmenu
+        command Gsatop
+                    \ echo 'Top is "' .. b:gutentags_root .. '"'
         set cscopetag
 
         " 0 or s: Find this symbol
