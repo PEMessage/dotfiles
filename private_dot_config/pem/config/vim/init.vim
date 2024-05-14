@@ -319,6 +319,19 @@ let g:startify_custom_header = [
     " 最右边显示文件编码和行号等信息，并且固定在一个 group 中，优先占位
     set statusline+=\ %0(%{&fileformat}\ [%{(&fenc==\"\"?&enc:&fenc).(&bomb?\",BOM\":\"\")}]\ %v:%l/%L%)
 
+" -------------------------------------------
+" 3.8 Basic Tag setting
+" -------------------------------------------
+    " See: https://www.zhihu.com/question/35808196/answer/130915301
+    " './' 的意思是，vim解析时，碰到 "./" 会被替换成当前编辑文件的文件夹
+    " 注意第一个 tags后面有一个分号，代表 “向上搜索”
+    " 第二个tags才是代表在 “当前文件夹”
+    " Also:
+    "   能新split出一个窗口来再跳转到定义，
+    "   比会把当前窗口切换走了的 <C-]> 好用。
+    "   use <C-W>] 
+    "       <C-W>}
+    set tags=./.tags;,.tags
 
 
 
@@ -891,7 +904,10 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'PEMessage/vim-gutentags'
         " 1. Project Root option
         " ----------------------------------
-            set tags=./.tags;,.tags
+    
+
+
+
             " Conflict with zzz .root mark
             " let g:gutentags_project_root = ['.root','.project']
             " Pls gen tag yourself to avoid any performance delay
@@ -938,6 +954,11 @@ call plug#begin(pe_runtimepath . '/plugged')
             let g:gutentags_auto_add_gtags_cscope = 0
             let g:gutentags_auto_add_cscope = 0
             let g:gutentags_define_advanced_commands = 1
+        " See: https://stackoverflow.com/questions/3249275/multiple-commands-on-same-line
+        " for <bar>
+        command Csadd
+                    \ execute 'set tags+=' .. b:gutentags_files['ctags'] ',' <bar>
+                    \ echo 'Add "' .. b:gutentags_files['ctags'] .. '" to tags'
         command Gsadd
                     \ execute 'cs add ' .. b:gutentags_files['gtags_cscope'] <bar>
                     \ echo 'Add "' .. b:gutentags_files['gtags_cscope'] .. '" to cscsope db'
@@ -1459,4 +1480,5 @@ au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#source
     endfunction
     command! ZoomToggle call s:ZoomToggle()
     nnoremap <silent> ZO :ZoomToggle<CR>
+    nnoremap <silent> <M-S-z> :ZoomToggle<CR>
 
