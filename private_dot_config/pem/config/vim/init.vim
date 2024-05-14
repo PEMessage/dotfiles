@@ -904,10 +904,6 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'PEMessage/vim-gutentags'
         " 1. Project Root option
         " ----------------------------------
-    
-
-
-
             " Conflict with zzz .root mark
             " let g:gutentags_project_root = ['.root','.project']
             " Pls gen tag yourself to avoid any performance delay
@@ -953,7 +949,11 @@ call plug#begin(pe_runtimepath . '/plugged')
             " 禁用 gutentags 自动加载 gtags 数据库的行为
             let g:gutentags_auto_add_gtags_cscope = 0
             let g:gutentags_auto_add_cscope = 0
+
+        " 4. Debug extra command
+        " ----------------------------------
             let g:gutentags_define_advanced_commands = 1
+            let g:gutentags_debug = 1
         " See: https://stackoverflow.com/questions/3249275/multiple-commands-on-same-line
         " for <bar>
         command Csadd
