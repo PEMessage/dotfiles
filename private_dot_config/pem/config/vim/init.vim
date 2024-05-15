@@ -36,7 +36,8 @@ let g:startify_custom_header = [
     " Comment Color
     let s:PECommentColor = {"gui": "#00af87", "cterm": "246", "cterm16": "7"}
     " let s:PECompleteSys  = "asyncomplete"
-    " let s:PECompleteSys  = "apt"
+    let g:pe_competesys=""
+    
     let g:lightline = {
                 \ 'colorscheme': 'selenized_black',
                 \ 'active': {
@@ -248,6 +249,8 @@ let g:startify_custom_header = [
     " See: source $VIMRUNTIME/defaults.vim for more
     " Put these in an autocmd group, so that you can revert them with:
     " ":augroup vimStartup | exe 'au!' | augroup END"
+    
+    
 
 
     " When editing a file, always jump to the last known cursor position.
@@ -500,12 +503,18 @@ let g:startify_custom_header = [
 " 6. VIM Plug-in Zone (Part1)
 " ===========================================
 call plug#begin(pe_runtimepath . '/plugged')
+    " helper 
+    function! Cond(cond, ...)
+        let opts = get(a:000, 0, {})
+        return a:cond ? opts : extend(opts, { 'on': [], 'for': [] })
+    endfunction
 
 " -------------------------------------------
 " 6.1 Basic Funtion
 " -------------------------------------------
     " Some little tweak
     " Plug 'drmikehenry/vim-fixkey'
+    Plug 'junegunn/vim-plug'
     Plug 'PEMessage/vim-fixkey'
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
@@ -1135,21 +1144,39 @@ call plug#begin(pe_runtimepath . '/plugged')
         " endif
 
 " -------------------------------------------
-" 6.11 Complete Engine (async complete)
+" 6.11 Complete Engine (All)
 " -------------------------------------------
     set pumheight=5
-    Plug 'prabirshrestha/async.vim'
-    Plug 'prabirshrestha/asyncomplete.vim'
-    Plug 'prabirshrestha/asyncomplete-buffer.vim'
-    Plug 'wellle/tmux-complete.vim'
+
+    if v:version >= 900
+        let g:pe_competesys = 'vim'
+    elseif v:version >= 802
+        let g:pe_competesys = 'easy'
+    elseif has('win32') && v:version >= 800 
+        let g:pe_competesys = 'async'
+    else
+        let g:pe_competesys = 'apt'
+    endif
+    let g:pe_competesys = 'async'
+
+" -------------------------------------------
+" 6.11.1 Complete Engine (async)
+" -------------------------------------------
+
+    Plug 'prabirshrestha/async.vim' , Cond(g:pe_competesys == 'async')
+    Plug 'prabirshrestha/asyncomplete.vim' , Cond(g:pe_competesys == 'async')
+    Plug 'prabirshrestha/asyncomplete-buffer.vim' , Cond(g:pe_competesys == 'async')
+
+        Plug 'wellle/tmux-complete.vim' , Cond(g:pe_competesys == 'async')
+        Plug 'rafamadriz/friendly-snippets' , Cond(g:pe_competesys == 'async')
+        Plug 'prabirshrestha/asyncomplete-file.vim' , Cond(g:pe_competesys == 'async')
+    if g:pe_competesys == 'async' 
         let g:asyncomplete_auto_popup = 1
-        
 
         function! s:check_back_space() abort
             let col = col('.') - 1
             return !col || getline('.')[col - 1]  =~ '\s'
         endfunction
-
 
         inoremap <silent><expr> <TAB>
                     \ pumvisible() ? "\<C-n>" :
@@ -1159,15 +1186,30 @@ call plug#begin(pe_runtimepath . '/plugged')
 
         inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
         imap <c-space> <Plug>(asyncomplete_force_refresh)
-    if has('patch-8.0.1494')
-        Plug 'hrsh7th/vim-vsnip'
-        Plug 'hrsh7th/vim-vsnip-integ'
+
+        if has('patch-8.0.1494')
+            Plug 'hrsh7th/vim-vsnip'
+            Plug 'hrsh7th/vim-vsnip-integ'
+        endif
     endif
-    Plug 'rafamadriz/friendly-snippets'
-    Plug 'prabirshrestha/asyncomplete-file.vim'
+
+" -------------------------------------------
+" 6.11.2 Complete Engine (easy)
+" -------------------------------------------
+    Plug 'jayli/vim-easycomplete', Cond(g:pe_competesys == 'easy')
+        Plug 'SirVer/ultisnips' , Cond(g:pe_competesys == 'easy' && has('python3'))
+        
+        let g:easycomplete_nerd_font = 0
+        " See: https://github.com/jayli/vim-easycomplete/issues/131
+        let g:easycomplete_lsp_checking = 0
+" -------------------------------------------
+" 6.11.2 Complete Engine (easy)
+" -------------------------------------------
+
+
+        
     
-    
-    
+        
 
 
 
@@ -1182,21 +1224,23 @@ call plug#end()
 " -------------------------------------------
 " 7.2 Async complete
 " -------------------------------------------
-call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options({
-    \ 'name': 'buffer',
-    \ 'allowlist': ['*'],
-    \ 'blocklist': ['go'],
-    \ 'completor': function('asyncomplete#sources#buffer#completor'),
-    \ 'config': {
-    \    'max_buffer_size': 5000000,
-    \  },
-    \ }))
-au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#file#get_source_options({
-    \ 'name': 'file',
-    \ 'allowlist': ['*'],
-    \ 'priority': 10,
-    \ 'completor': function('asyncomplete#sources#file#completor')
-    \ }))
+if exists('*asyncomplete#register_source')
+    call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options({
+                \ 'name': 'buffer',
+                \ 'allowlist': ['*'],
+                \ 'blocklist': ['go'],
+                \ 'completor': function('asyncomplete#sources#buffer#completor'),
+                \ 'config': {
+                \    'max_buffer_size': 5000000,
+                \  },
+                \ }))
+    au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#file#get_source_options({
+                \ 'name': 'file',
+                \ 'allowlist': ['*'],
+                \ 'priority': 10,
+                \ 'completor': function('asyncomplete#sources#file#completor')
+                \ }))
+endif
 
 
 " -------------------------------------------
