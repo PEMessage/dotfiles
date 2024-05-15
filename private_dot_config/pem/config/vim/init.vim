@@ -1157,7 +1157,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     else
         let g:pe_competesys = 'apt'
     endif
-    let g:pe_competesys = 'async'
+    let g:pe_competesys = 'mu'
 
 " -------------------------------------------
 " 6.11.1 Complete Engine (async)
@@ -1203,8 +1203,26 @@ call plug#begin(pe_runtimepath . '/plugged')
         " See: https://github.com/jayli/vim-easycomplete/issues/131
         let g:easycomplete_lsp_checking = 0
 " -------------------------------------------
-" 6.11.2 Complete Engine (easy)
+" 6.11.3 Complete Engine (mu)
 " -------------------------------------------
+
+    Plug 'lifepillar/vim-mucomplete' , Cond(g:pe_competesys == 'mu')
+    if g:pe_competesys == 'mu' 
+        set completeopt+=menuone
+        set completeopt+=noselect
+        set completeopt+=noinsert
+
+        set completeopt+=longest
+        set completeopt-=preview
+
+        set shortmess+=c   " Shut off completion messages
+        set belloff+=ctrlg " Add only if Vim beeps during completion
+        let g:mucomplete#enable_auto_at_startup = 1
+        let g:mucomplete#completion_delay = 1
+    endif
+    
+    
+    
 
 
         
