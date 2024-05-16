@@ -360,7 +360,7 @@ let g:startify_custom_header = [
 " -------------------------------------------
 " 4.1 Basic Setting Zone ( Input Mode  )
 " -------------------------------------------
-    inoremap jj <ESC>
+    " inoremap jj <ESC>
     nnoremap <silent> j gj
     nnoremap <silent> k gk
     nnoremap <C-c> <ESC>
@@ -1148,65 +1148,76 @@ call plug#begin(pe_runtimepath . '/plugged')
 " -------------------------------------------
     set pumheight=5
 
-    if v:version >= 900
-        let g:pe_competesys = 'vim'
-    elseif v:version >= 802
-        let g:pe_competesys = 'easy'
-    elseif has('win32') && v:version >= 800 
-        let g:pe_competesys = 'async'
-    else
+    " if v:version >= 9000
+    "     let g:pe_competesys = 'vim'
+    " elseif v:version >= 802 && ! has('win32') 
+    "     let g:pe_competesys = 'easy'
+    " if has('win32') && v:version >= 800 
+    "     let g:pe_competesys = 'async'
+    if has('patch-7.4.775')
+        " Good enought for buffer
+        let g:pe_competesys = 'mu'
+    else 
         let g:pe_competesys = 'apt'
     endif
-    let g:pe_competesys = 'mu'
+    " let g:pe_competesys = 'apt'
+    
 
 " -------------------------------------------
 " 6.11.1 Complete Engine (async)
 " -------------------------------------------
 
-    Plug 'prabirshrestha/async.vim' , Cond(g:pe_competesys == 'async')
-    Plug 'prabirshrestha/asyncomplete.vim' , Cond(g:pe_competesys == 'async')
-    Plug 'prabirshrestha/asyncomplete-buffer.vim' , Cond(g:pe_competesys == 'async')
+    " Buggy buffer 
+    " Plug 'prabirshrestha/async.vim' , Cond(g:pe_competesys == 'async')
+    " Plug 'prabirshrestha/asyncomplete.vim' , Cond(g:pe_competesys == 'async')
+    " Plug 'prabirshrestha/asyncomplete-buffer.vim' , Cond(g:pe_competesys == 'async')
 
-        Plug 'wellle/tmux-complete.vim' , Cond(g:pe_competesys == 'async')
-        Plug 'rafamadriz/friendly-snippets' , Cond(g:pe_competesys == 'async')
-        Plug 'prabirshrestha/asyncomplete-file.vim' , Cond(g:pe_competesys == 'async')
-    if g:pe_competesys == 'async' 
-        let g:asyncomplete_auto_popup = 1
+    "     Plug 'wellle/tmux-complete.vim' , Cond(g:pe_competesys == 'async')
+    "     Plug 'rafamadriz/friendly-snippets' , Cond(g:pe_competesys == 'async')
+    "     Plug 'prabirshrestha/asyncomplete-file.vim' , Cond(g:pe_competesys == 'async')
+    " if g:pe_competesys == 'async' 
+    "     let g:asyncomplete_auto_popup = 1
 
-        function! s:check_back_space() abort
-            let col = col('.') - 1
-            return !col || getline('.')[col - 1]  =~ '\s'
-        endfunction
+    "     function! s:check_back_space() abort
+    "         let col = col('.') - 1
+    "         return !col || getline('.')[col - 1]  =~ '\s'
+    "     endfunction
 
-        inoremap <silent><expr> <TAB>
-                    \ pumvisible() ? "\<C-n>" :
-                    \ <SID>check_back_space() ? "\<TAB>" :
-                    \ asyncomplete#force_refresh()
-        inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+    "     inoremap <silent><expr> <TAB>
+    "                 \ pumvisible() ? "\<C-n>" :
+    "                 \ <SID>check_back_space() ? "\<TAB>" :
+    "                 \ asyncomplete#force_refresh()
+    "     inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
-        inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
-        imap <c-space> <Plug>(asyncomplete_force_refresh)
+    "     inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
+    "     imap <c-space> <Plug>(asyncomplete_force_refresh)
 
-        if has('patch-8.0.1494')
-            Plug 'hrsh7th/vim-vsnip'
-            Plug 'hrsh7th/vim-vsnip-integ'
-        endif
-    endif
+    "     if has('patch-8.0.1494')
+    "         Plug 'hrsh7th/vim-vsnip'
+    "         Plug 'hrsh7th/vim-vsnip-integ'
+    "     endif
+    " endif
 
 " -------------------------------------------
 " 6.11.2 Complete Engine (easy)
 " -------------------------------------------
-    Plug 'jayli/vim-easycomplete', Cond(g:pe_competesys == 'easy')
-        Plug 'SirVer/ultisnips' , Cond(g:pe_competesys == 'easy' && has('python3'))
+    " Disable due to casully eatting some keyhit
+    " Plug 'jayli/vim-easycomplete', Cond(g:pe_competesys == 'easy')
+    "     Plug 'SirVer/ultisnips' , Cond(g:pe_competesys == 'easy' && has('python3'))
         
-        let g:easycomplete_nerd_font = 0
-        " See: https://github.com/jayli/vim-easycomplete/issues/131
-        let g:easycomplete_lsp_checking = 0
+    "     let g:easycomplete_nerd_font = 0
+    "     " See: https://github.com/jayli/vim-easycomplete/issues/131
+    "     let g:easycomplete_lsp_checking = 0
 " -------------------------------------------
 " 6.11.3 Complete Engine (mu)
 " -------------------------------------------
 
+    
+    
+
+    " See: ins-completion for origin complete help
     Plug 'lifepillar/vim-mucomplete' , Cond(g:pe_competesys == 'mu')
+    Plug 'skywind3000/vim-dict' , Cond(g:pe_competesys == 'mu')
     if g:pe_competesys == 'mu' 
         set completeopt+=menuone
         set completeopt+=noselect
@@ -1217,19 +1228,63 @@ call plug#begin(pe_runtimepath . '/plugged')
 
         set shortmess+=c   " Shut off completion messages
         set belloff+=ctrlg " Add only if Vim beeps during completion
+        set cpt=.,w,b
+
+        " Credit:
+        " https://stackoverflow.com/questions/1830221/how-to-remove-file-name-from-vim-dictionary-menu
+        function! PEDictGrep( leader, file )
+            try
+                exe "vimgrep /^" . a:leader . ".*/j " . a:file
+            catch /.*/
+                echo "no matches"
+            endtry
+        endfunction
+
+        function! PEDictComp( findstart, base )
+            if a:findstart
+                let line = getline('.')
+                let start = col('.') - 1
+                while start > 0 && line[start - 1] =~ '[A-Za-z_]'
+                    let start -= 1
+                endwhile
+                return start
+            else
+                silent call PEDictGrep( a:base, &dictionary )
+                let matches = []
+                for thismatch in getqflist()
+                    let obj = {
+                                \ 'word': thismatch.text,
+                                \ 'menu': '[dict]',
+                                \}
+                    call add(matches, obj )
+
+                endfor
+                return matches
+            endif
+        endfunction
+        set completefunc=PEDictComp
+        
         let g:mucomplete#enable_auto_at_startup = 1
-        let g:mucomplete#completion_delay = 1
+        let g:mucomplete#chains = {
+                    \ 'default' : ['path','incl','user'],
+                    \ 'vim' : ['path','incl','user'],
+                    \ }
     endif
     
     
     
-
-
-        
     
-        
-
-
+" -------------------------------------------
+" 6.11.3 Complete Engine (apt)
+" -------------------------------------------
+"  se
+    Plug 'skywind3000/vim-auto-popmenu' , Cond(g:pe_competesys == 'apt')
+    if g:pe_competesys == 'apt' 
+        let g:apc_enable_ft = {'text':1, '*':1, 'vim':1}
+        set cpt=.,k,w,b
+        set completeopt=menu,menuone,noselect
+        set shortmess+=c
+    endif
 
 call plug#end()
 
