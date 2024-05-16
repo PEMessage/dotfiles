@@ -40,3 +40,5 @@ bcd()
 }
 
 wcd () { cd "`wslpath "$1"`"; }
+gcd () { cd "$(git rev-parse --show-toplevel)" } 
+
