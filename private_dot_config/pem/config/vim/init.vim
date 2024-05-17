@@ -13,7 +13,7 @@ let g:startify_custom_header = [
 " Description: This is my VIM8+/NeoVIM configuration
 " Last Modified:  2024-03-12 19:39
 " +++++++++++++++++++++++++++++++++++++++++++
-"
+" 
 
 
 
@@ -186,11 +186,14 @@ let g:startify_custom_header = [
 " -------------------------------------------
 " 3.5 Window Setting
 " -------------------------------------------
-    autocmd FileType help wincmd L
-    autocmd FileType man wincmd L
     augroup vimrc_help
         autocmd!
-        autocmd BufEnter *.* if &buftype == 'help' | wincmd L | endif
+        autocmd FileType help wincmd L
+        autocmd FileType man wincmd L
+        " Bug: using Vista!! close panel to help page will cause errormsg
+        " autocmd BufEnter *.* if &buftype == 'help' | wincmd L | endif
+        " Fix: ignore v:errmsg
+        autocmd BufEnter *.* if &buftype == 'help' | silent! wincmd L | endif
     augroup END
 
 
@@ -1209,7 +1212,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     "     " See: https://github.com/jayli/vim-easycomplete/issues/131
     "     let g:easycomplete_lsp_checking = 0
 " -------------------------------------------
-" 6.11.3 Complete Engine (mu)
+" 6.11.3 Complete Engine (*mu*)
 " -------------------------------------------
     " |1. 整行                                                 i_CTRL-X_CTRL-L
     " |2. 当前文件内的关键字                                   i_CTRL-X_CTRL-N
