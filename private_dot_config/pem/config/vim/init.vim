@@ -1211,8 +1211,19 @@ call plug#begin(pe_runtimepath . '/plugged')
 " -------------------------------------------
 " 6.11.3 Complete Engine (mu)
 " -------------------------------------------
-
-    
+    " |1. 整行                                                 i_CTRL-X_CTRL-L
+    " |2. 当前文件内的关键字                                   i_CTRL-X_CTRL-N
+    " |3. 'dictionary' 的关键字                                i_CTRL-X_CTRL-K
+    " |4. 'thesaurus' 的关键字，同义词风格                     i_CTRL-X_CTRL-T
+    " |5. 当前文件及其头文件内的关键字                         i_CTRL-X_CTRL-I
+    " |6. 标签                                                 i_CTRL-X_CTRL-]
+    " |7. 文件名                                               i_CTRL-X_CTRL-F
+    " |8. 定义或宏                                             i_CTRL-X_CTRL-D
+    " |9. Vim 命令                                             i_CTRL-X_CTRL-V
+    " |10. 用户定义的补全                                      i_CTRL-X_CTRL-U
+    " |11. 全能 (omni) 补全                                    i_CTRL-X_CTRL-O
+    " |12. 拼写建议                                            i_CTRL-X_s
+    " |13. 'complete' 的关键字                                 i_CTRL-N i_CTRL-P
     
 
     " See: ins-completion for origin complete help
@@ -1264,12 +1275,14 @@ call plug#begin(pe_runtimepath . '/plugged')
         endfunction
         set completefunc=PEDictComp
         
+        
         let g:mucomplete#enable_auto_at_startup = 1
         let g:mucomplete#chains = {
                     \ 'default' : ['path','incl','user'],
                     \ 'vim' : ['path','incl','user'],
                     \ }
     endif
+    
     
 " -------------------------------------------
 " 6.11.3 Complete Engine (apt)
