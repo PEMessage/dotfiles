@@ -613,8 +613,6 @@ call plug#begin(pe_runtimepath . '/plugged')
 
 
 
-
-
 " -------------------------------------------
 " 6.2 Textobj
 " -------------------------------------------
@@ -627,28 +625,42 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'kana/vim-textobj-user'
     Plug 'kana/vim-textobj-indent'
     Plug 'kana/vim-textobj-syntax'
+    Plug 'rhysd/vim-textobj-anyblock'
     Plug 'kana/vim-textobj-line'
-    Plug 'sgur/vim-textobj-parameter'
-    Plug 'jceb/vim-textobj-uri'
+    Plug 'thinca/vim-textobj-between'
     Plug 'terryma/vim-expand-region'
     let g:expand_region_text_objects = {
-                \ 'iw'  :0,
-                \ 'iW'  :0,
-                \ 'i"'  :0,
-                \ 'i''' :0,
-                \ 'i]'  :1,
-                \ 'ib'  :1,
-                \ 'iB'  :1,
-                \ 'il'  :0,
-                \ 'ip'  :0,
-                \ 'ab' :1,
-                \ 'aB' :1,
-                \ 'ii' :0,
-                \ 'ai' :0,
-    \ }
+          \ 'iw'  :0,
+          \ 'iy'  :0,
+          \ 'iW'  :0,
+          \ 'i"'  :0,
+          \ 'a"'  :0,
+          \ 'i''' :0,
+          \ 'a''' :0,
+          \ 'i]'  :0, 
+          \ 'a]'  :0, 
+          \ 'i)'  :0, 
+          \ 'a)'  :0, 
+          \ 'i}'  :0, 
+          \ 'a}'  :0, 
+          \ 'iB'  :0, 
+          \ 'il'  :0, 
+          \ 'iF'  :0, 
+          \ }
         map <CR> <Plug>(expand_region_expand)
         map <BS> <Plug>(expand_region_shrink)
 
+    Plug 'kana/vim-textobj-function'
+    Plug 'bps/vim-textobj-python'
+
+                " \ 'i"'  :1,
+                " \ 'i''' :1,
+                " \ 'i]'  :1,
+                " \ 'iB'  :1,
+          " \ 'ib'  :0, 
+          " \ 'ab'  :0, 
+          " \ 'ii'  :0, 
+          " \ 'ai'  :0, 
 
 
 " -------------------------------------------
@@ -1332,7 +1344,16 @@ endif
 " -------------------------------------------
 " 7.3 Expand region
 " -------------------------------------------
-    call expand_region#custom_text_objects()
+    " call expand_region#custom_text_objects()
+    " call expand_region#custom_text_objects('java', {
+    "             \ 'iF' :0,
+    "             \ })
+    " call expand_region#custom_text_objects('c', {
+    "             \ 'iF' :0,
+    "             \ })
+    " call expand_region#custom_text_objects('python', {
+    "             \ 'if' :0,
+    "             \ })
 
 " -------------------------------------------
 " 7.4 Submode Map
