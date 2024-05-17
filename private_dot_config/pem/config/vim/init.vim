@@ -628,6 +628,9 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'rhysd/vim-textobj-anyblock'
     Plug 'kana/vim-textobj-line'
     Plug 'thinca/vim-textobj-between'
+        Plug 'kana/vim-textobj-function'
+        Plug 'bps/vim-textobj-python'
+
     Plug 'terryma/vim-expand-region'
     let g:expand_region_text_objects = {
           \ 'iw'  :0,
@@ -644,14 +647,13 @@ call plug#begin(pe_runtimepath . '/plugged')
           \ 'i}'  :0, 
           \ 'a}'  :0, 
           \ 'iB'  :0, 
+          \ 'i='  :0, 
           \ 'il'  :0, 
           \ 'iF'  :0, 
           \ }
         map <CR> <Plug>(expand_region_expand)
         map <BS> <Plug>(expand_region_shrink)
 
-    Plug 'kana/vim-textobj-function'
-    Plug 'bps/vim-textobj-python'
 
                 " \ 'i"'  :1,
                 " \ 'i''' :1,
@@ -1354,7 +1356,17 @@ endif
     " call expand_region#custom_text_objects('python', {
     "             \ 'if' :0,
     "             \ })
+	call textobj#user#plugin('equal', {
+	\   'angle': {
+    \     'pattern': ['=', ' '],
+	\     'select-a': 'a=',
+	\     'select-i': 'i=',
+	\   },
+	\ })
 
+    call expand_region#custom_text_objects('java', {
+                \ 'iF' :0,
+                \ })
 " -------------------------------------------
 " 7.4 Submode Map
 " -------------------------------------------
