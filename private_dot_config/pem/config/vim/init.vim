@@ -1593,7 +1593,8 @@ endif
         call writefile([escape], '/dev/tty', 'b')
     endif
     endfunction
-    noremap <silent> <Leader>y y:<C-U>call Yank(@0)<CR>
+    " using map rather then noremap to compatible with yankring
+    map <silent> <Leader>y y:<C-U>call Yank(@0)<CR>
 
     " Credit: 
     " https://stackoverflow.com/questions/13194428/is-better-way-to-zoom-windows-in-vim-than-zoomwin
