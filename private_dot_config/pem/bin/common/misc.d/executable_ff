@@ -1,0 +1,60 @@
+#!/bin/sh
+ff_path() {
+    echo $PATH | tr : '\n' | xargs -I{} find {} -maxdepth 1 -type f 2>/dev/null | fzf --query="$1"
+}
+
+ff_ffpm(){
+    ffpm i "$@"
+}
+
+ff_man() {
+    for x in 1 2 3 4 5 6 7 8
+    do
+        LIST="
+        $LIST
+        $(man --apropos --sections=${x} . 2>/dev/null)
+        "
+    done
+
+    pagename="$(echo "$LIST" | sed '/^[[:blank:]]*$/d'  | fzf --query="$1" | cut -d ' ' -f 1 )"
+    [ ! "$?" -eq 0 ] && exit 0
+    [ -z "$pagename" ] && exit 0
+
+    if which vman >/dev/null 2>&1 ; then
+        vman $pagename
+    else
+        man $pagename
+    fi
+}
+
+
+
+usage() {
+    echo "USAGE:"
+    echo "       ff path            : search all path bin"
+    echo "       ff man             : alias all of MANPATH"
+    echo "       ff [apt|pacman|rpm]: alias of \`ffpm i\`"
+}
+
+
+main() {
+    case "$1" in
+        path)
+            shift
+            ff_path "$@"
+            ;;
+        apt|pacman|rpm)
+            shift
+            ff_ffpm "$@"
+            ;;
+        man)
+            shift
+            ff_man "$@"
+            ;;
+        *)
+            usage
+    esac
+}
+
+
+main "$@"
