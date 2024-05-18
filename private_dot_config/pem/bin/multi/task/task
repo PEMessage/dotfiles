@@ -1,0 +1,43 @@
+#!/bin/bash
+LOCAL_SCRIPT_PATH="$(readlink -f $0)"
+LOCAL_SCRIPT_DIR="$(dirname $LOCAL_SCRIPT_PATH)"
+
+[ -d "$CONF_BUCKET_DIR" ] &&
+    CONF_BUCKET_DIR="$LOCAL_SCRIPT_DIR/bucket"
+
+[ -d "$CONF_DBEUG" ] &&
+    CONF_DBEUG=false
+usage() {
+    echo "USAGE:"
+    echo "-l: print all task list"
+    echo "-h: print this help page"
+}
+
+
+main() {
+    [ -n "$1" ] || {
+        usgae
+        exit
+    }
+
+    case "$1" in
+        -h)
+            usage
+            ;;
+        -l)
+            (
+                cd "$CONF_BUCKET_DIR"
+                find . -type f -name '*sh'
+            )
+            ;;
+        *)
+            [ -f "$1" ] && bash "$CONF_BUCKET_DIR/$1" || {
+                echo "[Err]: Unknow task(file not exist)"
+                echo "[Err]: use '-l' to check all task"
+            }
+    esac
+
+}
+
+
+main "$@"
