@@ -194,6 +194,7 @@ interactive_filter() {
             --layout=reverse \
             --exact \
             --cycle \
+            --preview-window wrap \
             --preview="PM=$PM PM_COLOR=$PM_COLOR $0 info {1}" |
             cut -d" " -f1
     else

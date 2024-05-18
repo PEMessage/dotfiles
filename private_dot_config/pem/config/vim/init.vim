@@ -596,8 +596,8 @@ call plug#begin(pe_runtimepath . '/plugged')
         " endif
         let g:yankring_history_dir = pe_cachedir
         " nnoremap <silent> <leader>yy :YRShow<CR>
-        nnoremap <silent> <C-y> :YRShow<CR>
-        inoremap <silent> <C-y> <ESC>:YRShow<CR>
+        " nnoremap <silent> <C-y> :YRShow<CR>
+        " inoremap <silent> <C-y> <ESC>:YRShow<CR>
 
 
         let g:yankring_replace_n_pkey = ''
@@ -624,10 +624,12 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:submode_always_show_submode = 1
     Plug 'kana/vim-textobj-user'
     Plug 'kana/vim-textobj-indent'
+    Plug 'saihoooooooo/vim-textobj-space'
     Plug 'kana/vim-textobj-syntax'
     Plug 'rhysd/vim-textobj-anyblock'
     Plug 'kana/vim-textobj-line'
     Plug 'thinca/vim-textobj-between'
+    Plug 'skywind3000/vim-textobj-parameter'
         Plug 'kana/vim-textobj-function'
         Plug 'bps/vim-textobj-python'
 
@@ -644,15 +646,15 @@ call plug#begin(pe_runtimepath . '/plugged')
           \ 'a]'  :0, 
           \ 'i)'  :0, 
           \ 'a)'  :0, 
-          \ 'i}'  :0, 
-          \ 'a}'  :0, 
+          \ 'i}'  :1, 
+          \ 'a}'  :1, 
           \ 'iB'  :0, 
-          \ 'i='  :0, 
           \ 'il'  :0, 
           \ 'iF'  :0, 
           \ }
         map <CR> <Plug>(expand_region_expand)
         map <BS> <Plug>(expand_region_shrink)
+        
 
 
                 " \ 'i"'  :1,
@@ -1163,6 +1165,19 @@ call plug#begin(pe_runtimepath . '/plugged')
 " -------------------------------------------
 " 6.11 Complete Engine (All)
 " -------------------------------------------
+    " |1. 整行                                                 i_CTRL-X_CTRL-L
+    " |2. 当前文件内的关键字                                   i_CTRL-X_CTRL-N
+    " |3. 'dictionary' 的关键字                                i_CTRL-X_CTRL-K
+    " |4. 'thesaurus' 的关键字，同义词风格                     i_CTRL-X_CTRL-T
+    " |5. 当前文件及其头文件内的关键字                         i_CTRL-X_CTRL-I
+    " |6. 标签                                                 i_CTRL-X_CTRL-]
+    " |7. 文件名                                               i_CTRL-X_CTRL-F
+    " |8. 定义或宏                                             i_CTRL-X_CTRL-D
+    " |9. Vim 命令                                             i_CTRL-X_CTRL-V
+    " |10. 用户定义的补全                                      i_CTRL-X_CTRL-U
+    " |11. 全能 (omni) 补全                                    i_CTRL-X_CTRL-O
+    " |12. 拼写建议                                            i_CTRL-X_s
+    " |13. 'complete' 的关键字                                 i_CTRL-N i_CTRL-P
     set pumheight=5
 
     " if v:version >= 9000
@@ -1228,30 +1243,29 @@ call plug#begin(pe_runtimepath . '/plugged')
 " -------------------------------------------
 " 6.11.3 Complete Engine (*mu*)
 " -------------------------------------------
-    " |1. 整行                                                 i_CTRL-X_CTRL-L
-    " |2. 当前文件内的关键字                                   i_CTRL-X_CTRL-N
-    " |3. 'dictionary' 的关键字                                i_CTRL-X_CTRL-K
-    " |4. 'thesaurus' 的关键字，同义词风格                     i_CTRL-X_CTRL-T
-    " |5. 当前文件及其头文件内的关键字                         i_CTRL-X_CTRL-I
-    " |6. 标签                                                 i_CTRL-X_CTRL-]
-    " |7. 文件名                                               i_CTRL-X_CTRL-F
-    " |8. 定义或宏                                             i_CTRL-X_CTRL-D
-    " |9. Vim 命令                                             i_CTRL-X_CTRL-V
-    " |10. 用户定义的补全                                      i_CTRL-X_CTRL-U
-    " |11. 全能 (omni) 补全                                    i_CTRL-X_CTRL-O
-    " |12. 拼写建议                                            i_CTRL-X_s
-    " |13. 'complete' 的关键字                                 i_CTRL-N i_CTRL-P
-    
 
     " See: ins-completion for origin complete help
     Plug 'lifepillar/vim-mucomplete' , Cond(g:pe_competesys == 'mu')
     Plug 'skywind3000/vim-dict' , Cond(g:pe_competesys == 'mu')
+    " Plug 'Konfekt/complete-common-words.vim' , Cond(g:pe_competesys == 'mu')
+    " let g:common_words_dicts_dir = g:plug_home .. 'complete-common-words.vim/dicts'
+    " set dictionary+=spell
+
+    Plug 'Shougo/neosnippet.vim' , Cond(g:pe_competesys == 'mu')
+    Plug 'Shougo/neosnippet-snippets' , Cond(g:pe_competesys == 'mu')
+    Plug 'honza/vim-snippets' , Cond(g:pe_competesys == 'mu')
+    " Plug 'garbas/vim-snipmate' , Cond(g:pe_competesys == 'mu')
+    " Plug 'MarcWeber/vim-addon-mw-utils' , Cond(g:pe_competesys == 'mu')
+    
     if g:pe_competesys == 'mu' 
         set completeopt+=menuone
         set completeopt+=noselect
         set completeopt+=noinsert
 
-        set completeopt+=longest
+        " See: https://github.com/lifepillar/vim-mucomplete/issues/153
+        " Mucomplete is automatically inserting completions without trigger
+        " set completeopt+=longest
+        
         set completeopt-=preview
 
         set shortmess+=c   " Shut off completion messages
@@ -1268,6 +1282,7 @@ call plug#begin(pe_runtimepath . '/plugged')
             endtry
         endfunction
 
+        " Slight modified one
         function! PEDictComp( findstart, base )
             if a:findstart
                 let line = getline('.')
@@ -1291,14 +1306,33 @@ call plug#begin(pe_runtimepath . '/plugged')
             endif
         endfunction
         set completefunc=PEDictComp
-        
-        
+
+        " General Setting
+        " let g:mucomplete#chains = {
+        "             \ 'default' : ['path',dict','incl'],
+        "             \ }
+
+        " Sub Setting for neosnippet
+        let g:neosnippet#enable_snipmate_compatibility = 1
         let g:mucomplete#enable_auto_at_startup = 1
+        let g:mucomplete#always_use_completeopt = 1
+        inoremap <silent> <expr> <plug><MyCR>
+                    \ mucomplete#neosnippet#expand_snippet("\<cr>")
+        imap <cr> <plug><MyCR>
+        imap <C-k>     <Plug>(neosnippet_expand_or_jump)
+        smap <C-k>     <Plug>(neosnippet_expand_or_jump)
+        xmap <C-k>     <Plug>(neosnippet_expand_target)
         let g:mucomplete#chains = {
-                    \ 'default' : ['path','incl','user'],
-                    \ 'vim' : ['path','incl','user'],
+                    \ 'default' : ['path','nsnp','user','tags','incl'],
                     \ }
+        autocmd InsertLeave * NeoSnippetClearMarkers
+        imap <C-c> <ESC>
+        snoremap <silent><ESC>  <ESC>:NeoSnippetClearMarkers<CR>
+
     endif
+    
+    
+                    " \ 'default' : ['nsnp'],
     
     
 " -------------------------------------------
@@ -1358,7 +1392,7 @@ endif
     "             \ })
 	call textobj#user#plugin('equal', {
 	\   'angle': {
-    \     'pattern': ['=', ' '],
+    \     'pattern': ['=', '.'],
 	\     'select-a': 'a=',
 	\     'select-i': 'i=',
 	\   },
