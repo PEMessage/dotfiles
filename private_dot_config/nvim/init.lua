@@ -79,7 +79,7 @@ vim.keymap.set('i', 'jj', '<C-[>')
 -- -------------------------------------------
 -- 3.5 Windows Setting
 -- -------------------------------------------
-    vim.o.completeopt = 'menu,menuone,noselect' -- Better Complete
+    vim.o.completeopt = 'menu,menuone,noselect,noinsert' -- Better Complete
     vim.o.number      = true -- Print line number
     vim.o.splitright  = true -- Put new windows right of current
 
@@ -286,7 +286,7 @@ require("lazy").setup({
 },
 {
     'PEMessage/alpha-nvim',
-    -- event = "VimEnter",
+    event = "VimEnter",
     -- dependencies = { 'nvim-tree/nvim-web-devicons' },
     config = function ()
         local startify = require('alpha.themes.startify')
@@ -541,6 +541,7 @@ require("lazy").setup({
 },
 {
     "christoomey/vim-tmux-navigator",
+    event = 'VeryLazy',
     config = function()
         vim.g.tmux_navigator_no_mappings = 1
         vim.keymap.set( {'n','i','v','t'},  '<M-S-h>', '<cmd>TmuxNavigateLeft<cr>' , { silent = true, desc = "Navigate Left"  } )
@@ -969,6 +970,32 @@ require("lazy").setup({
                 lspconfig.gopls.setup({
                     autostart = true
                 })
+            end,
+            ["pylsp"] = function ()
+                lspconfig.pylsp.setup({
+                    autostart = true,
+                    settings = {
+                        -- @See:
+                        -- https://neovim.discourse.group/t/pylsp-config-is-not-taken-into-account/1846
+                        -- Like I mentioned on your issue,
+                        -- you need to have a nested pylsp table under settings
+                        -- (according to their documentation)
+                        pylsp = {
+                            plugins = {
+                                pycodestyle = {
+                                    enabled = true,
+                                    ignore = {
+                                        -- 'W391',
+                                        'E111', -- E111 indentation is not a multiple of 4
+                                        'E114', -- E114 indentation is not a multiple of 4 (comment)
+                                        'W504', -- W504 line break after binary operator
+                                        'E501', -- E501 line too long (80 > 79 characters)
+                                    },
+                                }
+                            }
+                        }
+                    }
+                })
             end
 
         })
@@ -1117,6 +1144,16 @@ require("lazy").setup({
         -- 'nvim-tree/nvim-web-devicons'     -- optional
     },
 },
+{
+    'liuchengxu/vista.vim',
+    config = function ()
+        vim.g.vista_echo_cursor_strategy = 'scroll'
+        vim.cmd [[ let g:vista#renderer#enable_icon = 0 ]]
+    end,
+    keys = {
+        { "<leader>av", "<cmd>Vista!!<cr>", desc = "Open Vista bar" },
+    }
+},
 -- {
 --     'roobert/search-replace.nvim',
 -- },
@@ -1129,6 +1166,9 @@ install = {
     missing = true,
     -- try to load one of these colorschemes when starting an installation during startup
     colorscheme = { "habamax" },
+},
+defaults = {
+    -- lazy = true
 },
 ui = {
     icons = {
