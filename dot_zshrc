@@ -130,7 +130,7 @@
 # -----------------------------------------
 
     source ~/.config/pem/init.sh
-    [ -f "$HOME/.pe_profile" ] && source "$HOME/.pe_profile"
+    [ -f "$HOME/.peprofile" ] && source "$HOME/.peprofile"
 
     # source ~/.config/chezmoi/chezmoi.zsh
     # source ~/.config/pem/shell/fzf/fzf-ff.sh

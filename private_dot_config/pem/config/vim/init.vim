@@ -173,6 +173,14 @@ let g:startify_custom_header = [
     set cinkeys-=0#
     set indentkeys-=0#
 
+    set conceallevel=2
+    set concealcursor=inc
+    " Disable json filetype conceal
+    " (hide special char for better read)
+    " But I dont need this
+    let g:vim_json_conceal = 0
+    
+
 
     set backspace=eol,start,indent " 类似所有编辑器的删除键
 
@@ -267,6 +275,7 @@ let g:startify_custom_header = [
                     \ |   exe "normal! g`\""
                     \ | endif
     augroup END
+
 
 " -------------------------------------------
 " 3.6 Meta Setting
@@ -596,8 +605,8 @@ call plug#begin(pe_runtimepath . '/plugged')
         " endif
         let g:yankring_history_dir = pe_cachedir
         " nnoremap <silent> <leader>yy :YRShow<CR>
-        " nnoremap <silent> <C-y> :YRShow<CR>
-        " inoremap <silent> <C-y> <ESC>:YRShow<CR>
+        nnoremap <silent> <C-y> :YRShow<CR>
+        inoremap <silent> <C-y> <ESC>:YRShow<CR>
 
 
         let g:yankring_replace_n_pkey = ''
@@ -720,6 +729,9 @@ call plug#begin(pe_runtimepath . '/plugged')
 
     Plug 'Yggdroot/indentLine'
         let g:indentLine_fileTypeExclude = ['man']
+        " Do not change concealcursor
+        let g:indentLine_concealcursor='in'
+        let g:indentLine_conceallevel=1
     Plug 'mhinz/vim-startify'
         nnoremap <leader>st :tab new<CR>:Startify<CR> 
         " Most Recent File MRF
@@ -883,6 +895,11 @@ call plug#begin(pe_runtimepath . '/plugged')
     "     let g:terminal_key = '<leader>='
         " let g:terminal_key = '<M-`>'
     Plug 'voldikss/vim-floaterm'
+        set termwinkey=<C-[> 
+        autocmd User FloatermOpen
+                    \ if exists('&termwinkey') 
+                    \ | call setbufvar(bufnr('%'), '&termwinkey', '<c-z>') 
+                    \ | endif
         let g:floaterm_keymap_toggle = '<M-S-i>'
         let g:floaterm_position = 'bottomright'
         let g:floaterm_opener = 'tabe'
@@ -1251,13 +1268,12 @@ call plug#begin(pe_runtimepath . '/plugged')
     " let g:common_words_dicts_dir = g:plug_home .. 'complete-common-words.vim/dicts'
     " set dictionary+=spell
 
-    Plug 'Shougo/neosnippet.vim' , Cond(g:pe_competesys == 'mu')
-    Plug 'Shougo/neosnippet-snippets' , Cond(g:pe_competesys == 'mu')
-    Plug 'honza/vim-snippets' , Cond(g:pe_competesys == 'mu')
     " Plug 'garbas/vim-snipmate' , Cond(g:pe_competesys == 'mu')
     " Plug 'MarcWeber/vim-addon-mw-utils' , Cond(g:pe_competesys == 'mu')
     
     if g:pe_competesys == 'mu' 
+        " 6.11.3.1 Gernal Setting
+        " -------------------------------------------
         set completeopt+=menuone
         set completeopt+=noselect
         set completeopt+=noinsert
@@ -1270,8 +1286,10 @@ call plug#begin(pe_runtimepath . '/plugged')
 
         set shortmess+=c   " Shut off completion messages
         set belloff+=ctrlg " Add only if Vim beeps during completion
-        set cpt=.,w,b
+        set cpt=.,w,b,u,U
 
+        " 6.11.3.1 Better dict complete setting(disable file path)
+        " -------------------------------------------
         " Credit:
         " https://stackoverflow.com/questions/1830221/how-to-remove-file-name-from-vim-dictionary-menu
         function! PEDictGrep( leader, file )
@@ -1306,28 +1324,34 @@ call plug#begin(pe_runtimepath . '/plugged')
             endif
         endfunction
         set completefunc=PEDictComp
-
         " General Setting
         " let g:mucomplete#chains = {
-        "             \ 'default' : ['path',dict','incl'],
+        "             \ 'default' : ['path','user','incl'],
         "             \ }
 
-        " Sub Setting for neosnippet
+        " 6.11.3.2 Sub Setting for neosnippet
+        " -------------------------------------------
+        Plug 'Shougo/neosnippet.vim' , Cond(g:pe_competesys == 'mu')
+        Plug 'Shougo/neosnippet-snippets' , Cond(g:pe_competesys == 'mu')
+        Plug 'honza/vim-snippets' , Cond(g:pe_competesys == 'mu')
         let g:neosnippet#enable_snipmate_compatibility = 1
         let g:mucomplete#enable_auto_at_startup = 1
-        let g:mucomplete#always_use_completeopt = 1
+        " Do not use conceal marker(hide some visiable text)
+        let g:neosnippet#enable_conceal_markers = 1
+        let g:neosnippet#expand_word_boundary = 1
         inoremap <silent> <expr> <plug><MyCR>
                     \ mucomplete#neosnippet#expand_snippet("\<cr>")
         imap <cr> <plug><MyCR>
-        imap <C-k>     <Plug>(neosnippet_expand_or_jump)
-        smap <C-k>     <Plug>(neosnippet_expand_or_jump)
-        xmap <C-k>     <Plug>(neosnippet_expand_target)
         let g:mucomplete#chains = {
                     \ 'default' : ['path','nsnp','user','tags','incl'],
                     \ }
-        autocmd InsertLeave * NeoSnippetClearMarkers
-        imap <C-c> <ESC>
-        snoremap <silent><ESC>  <ESC>:NeoSnippetClearMarkers<CR>
+        " In order to trigger InsertLeave autocmd
+        " inoremap <C-c> <ESC>
+        " autocmd InsertLeave * NeoSnippetClearMarkers
+        " snoremap <silent><ESC>  <ESC>:NeoSnippetClearMarkers<CR>
+
+        " Another usage
+        autocmd ModeChanged * NeoSnippetClearMarkers
 
     endif
     
@@ -1679,4 +1703,4 @@ endif
     command! ZoomToggle call s:ZoomToggle()
     nnoremap <silent> ZO :ZoomToggle<CR>
     nnoremap <silent> <M-S-z> :ZoomToggle<CR>
-
+    
