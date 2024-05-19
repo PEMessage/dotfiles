@@ -1,0 +1,22 @@
+#!/bin/bash
+# create temporary file
+TMPFILE1=`mktemp /tmp/vpath.sh1.XXXXXXXX`
+TMPFILE2=`mktemp /tmp/vpath.sh2.XXXXXXXX`
+
+echo "$PATH" | tr ':' '\n'  > "${TMPFILE1}"
+$SHELL -ic 'echo "$PATH" ; exit' | tr ':' '\n'  > "${TMPFILE2}"
+
+TEPFILE_MD5_BEFORE="$(md5sum "${TMPFILE1}")"
+    # See: https://superuser.com/questions/545047/how-do-i-supress-the-2-files-to-edit-message-in-vimdiff
+    vim "${TMPFILE1}" -c "vert diffsplit ${TMPFILE2} | normal zi" < /dev/tty > /dev/tty
+TEPFILE_MD5_AFTER="$(md5sum "${TMPFILE1}")"
+
+if [ "$TEPFILE_MD5_BEFORE" = "$TEPFILE_MD5_AFTER" ] ; then
+    exit
+fi
+
+
+NEW_PATH="$(cat "${TMPFILE1}" | tr '\n' ':'  )"
+echo "PATH='$NEW_PATH'"
+rm ${TMPFILE1}
+rm ${TMPFILE2}

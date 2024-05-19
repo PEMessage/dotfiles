@@ -1,4 +1,4 @@
- #!/bin/bash
+#!/bin/sh
  # create temporary file
  TMPFILE=`mktemp /tmp/vipe.bashXXXXXXXX`
  cat > ${TMPFILE}
