@@ -1,1 +1,0 @@
-alias ffapt='ffpm i'
