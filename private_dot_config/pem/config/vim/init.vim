@@ -138,6 +138,7 @@ let g:startify_custom_header = [
 
     if has('mouse')
         set mouse+=a
+        vnoremap RightMouse "+y
     endif
 
     if has("patch-8.1.0360")
@@ -145,7 +146,6 @@ let g:startify_custom_header = [
     endif
     set diffopt+=iwhite
 
-    vnoremap RightMouse "+y
 
 
 
@@ -461,6 +461,11 @@ let g:startify_custom_header = [
 
     " vnoremap <cr> iwoiwo
 
+
+    vnoremap tt :s/\s\+$//e<CR>
+    " See: v_p v_P
+    vnoremap p P
+    vnoremap P p
 " 5. Netrw Setting
 " ===========================================
 
@@ -476,7 +481,7 @@ let g:startify_custom_header = [
 
     let g:netrw_preview = 1                     " 指针保留于Netrw
     let g:netrw_winsize = 25                    " %25的窗口大小
-    let g:netrw_liststyle = 2                   " 设置目录列表的样式：树形
+    let g:netrw_liststyle = 0                   " 设置目录列表的样式：树形
     let g:netrw_sort_sequence = '[\/]$,*'
     let g:netrw_hide = 1
 
@@ -489,6 +494,7 @@ let g:startify_custom_header = [
         " Unmap Netrw Keybind
             unmap <buffer> <C-I>
             unmap <buffer> <C-O>
+            " unmap <buffer> cd
 
         " map Netrw Keybind
             " Forward dir
@@ -607,6 +613,14 @@ call plug#begin(pe_runtimepath . '/plugged')
         " nnoremap <silent> <leader>yy :YRShow<CR>
         nnoremap <silent> <C-y> :YRShow<CR>
         inoremap <silent> <C-y> <ESC>:YRShow<CR>
+        " Swap p and P (do not copy delete item in visual)
+        " See: v_P and v_p
+        let g:yankring_paste_v_akey = 'P'
+        let g:yankring_paste_v_bkey = 'p'
+        " function! YRRunAfterMaps()
+        "     vnoremap p  <C-U>YRPaste 'P', 'v'<CR>
+        "     vnoremap P  <C-U>YRPaste 'p', 'v'<CR>
+        " endfunction
 
 
         let g:yankring_replace_n_pkey = ''
@@ -616,8 +630,8 @@ call plug#begin(pe_runtimepath . '/plugged')
         vmap <leader>c <Plug>OSCYankVisual
     " Plug 'dylanaraps/fff.vim'
     "     nnoremap f :F<CR>
-    Plug 'preservim/nerdtree'
-        nnoremap <leader>n :NERDTreeFocus<CR>
+    " Plug 'preservim/nerdtree'
+    "     nnoremap <leader>n :NERDTreeFocus<CR>
 
 
 
@@ -1620,8 +1634,6 @@ endif
     "     call winrestview(l:save)
     " endfun
     " autocmd BufWritePre * %s/\s\+$//e
-    vnoremap tt :s/\s\+$//e<CR>
-    vnoremap p pgvy
 
 
     function! s:DiffWithSaved()
