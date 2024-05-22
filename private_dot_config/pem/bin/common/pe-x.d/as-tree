@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+
+
+class TreeNode:
+    def __init__(self, data, parent=None):
+        self.data = data
+        self.children = []
+        self.parent = parent
+
+    def add_child(self, child_node):
+        if child_node not in self.children:
+            self.children.append(child_node)
+            child_node.parent = self
+
+    def __eq__(self, other):
+        if hasattr(self.data, "__eq__"):
+            return self.data.__eq__(other.data)
+        else:
+            return self.data == other.data
+
+    def __contains__(self, item):
+        return any(item == child for child in self.children)
+
+    @property
+    def name(self):
+        if hasattr(self.data, "name"):
+            return self.data.name
+        else:
+            return str(id(self))
