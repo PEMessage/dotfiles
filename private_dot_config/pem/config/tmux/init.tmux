@@ -245,10 +245,10 @@ run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | cut -c 6-8)"
      set -g @tpm_plugins '          \
        tmux-plugins/tpm             \
        fcsonline/tmux-thumbs        \
-       RTBHOUSE/tmux-picker \
-       ddzero2c/tmux-easymotion \
     '
 
+       # RTBHOUSE/tmux-picker \
+       # ddzero2c/tmux-easymotion \
        # tmux-plugins/tmux-copycat    \
     # Plugin fcsonline/tmux-thumbs
     # ----------------------------

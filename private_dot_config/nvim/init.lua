@@ -990,6 +990,10 @@ require("lazy").setup({
                                         'E114', -- E114 indentation is not a multiple of 4 (comment)
                                         'W504', -- W504 line break after binary operator
                                         'E501', -- E501 line too long (80 > 79 characters)
+                                        'W391', -- W391 blank line at end of file
+                                        'E302', -- E302 expected 2 blank lines, found 1
+                                        'E303', -- E303 too many blank lines (3)
+                                        -- 'E261', -- E261 at least two spaces before inline comment
                                     },
                                 }
                             }
