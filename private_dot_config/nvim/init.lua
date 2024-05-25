@@ -425,6 +425,7 @@ require("lazy").setup({
 {
     'phaazon/hop.nvim',
     branch = 'v2', -- optional but strongly recommended
+    enabled = true,
     event = "VeryLazy",
     config = function(_,opts)
         local hop = require('hop')
@@ -442,6 +443,20 @@ require("lazy").setup({
         end, {remap=true, desc='Hop Pattern'})
         -- vim.api.nvim_command('highlight default link HopPreview HopNextKey' )
     end
+},
+{
+    'folke/flash.nvim',
+    event = "VeryLazy",
+    enabled = false,
+    opts = {},
+
+    keys = {
+        { "<space>", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+        -- { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
+        -- { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+        -- { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
+    },
+
 },
 {
     "willothy/flatten.nvim",
@@ -466,6 +481,7 @@ require("lazy").setup({
 {
     "mg979/vim-visual-multi",
     event = 'VeryLazy',
+    enabled = true,
     init  = function()
         vim.g.M_default_mappings = 0
         vim.g.VM_mouse_mappings  = 1
@@ -493,6 +509,7 @@ require("lazy").setup({
 {
     'easymotion/vim-easymotion',
     event = 'VeryLazy',
+    enabled = true,
     init = function()
         vim.g.EasyMotion_smartcase        = 1
         vim.g.EasyMotion_do_mapping       = 0

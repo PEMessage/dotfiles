@@ -144,6 +144,10 @@ let g:startify_custom_header = [
     if has("patch-8.1.0360")
         set diffopt+=internal,algorithm:patience,iwhite
     endif
+
+    if has("patch-8.1.1270")
+        " set shortmess-=S
+    endif
     set diffopt+=iwhite
 
 
@@ -428,7 +432,7 @@ let g:startify_custom_header = [
 
 
 " -------------------------------------------
-" 4.3 Extend mapping and command
+" 4.4 Extend mapping and command
 " -------------------------------------------
     nnoremap <leader>rcc  :w<CR> :source %<CR> " Re:Configuration
 
@@ -461,9 +465,24 @@ let g:startify_custom_header = [
 
     " vnoremap <cr> iwoiwo
 
+" -------------------------------------------
+" 4.4 Extend mapping on cmap and vmap
+" -------------------------------------------
+    " 1. There is no such thing as "search mode": / and ? are like :,
+    "    they start command-line mode so you need a command-line mode mapping.
+    " 2. It is an expression mapping because we want the right-hand
+    "    side of the mapping to be context-specific.
+    " 3. We want <Tab> to do <C-g> and <S-Tab> to do <C-t> only when command-line mode was started with / or ?.
+    "    In other scenarios, we want them to keep their default meaning.
+    " 4. <Tab> can't be used directly in the right-hand side of a command-line mode mapping
+    "    so we use :help 'wildcharm' as a workaround.
+    " See: https://www.reddit.com/r/vim/comments/hyxo4u/usefulness_of_ctrlg_and_ctrlt_while_searching/
+    set wildcharm=<C-z>
+    cnoremap <expr> <Tab>   getcmdtype() =~ '[\/?]' ? "<C-g>" : "<C-z>"
+    cnoremap <expr> <S-Tab> getcmdtype() =~ '[\/?]' ? "<C-t>" : "<S-Tab>"
 
     vnoremap tt :s/\s\+$//e<CR>
-    " See: v_p v_P
+    " See: v_p v_P swap function between these
     vnoremap p P
     vnoremap P p
 " 5. Netrw Setting
@@ -596,9 +615,11 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:EasyMotion_space_jump_first = 1
         let g:EasyMotion_use_upper = 1
 
-        nmap / <Plug>(easymotion-sn)
-        nnoremap <leader>/ /
+    "     nmap / <Plug>(easymotion-sn)
+    "     nnoremap <leader>/ /
         map <space> <Plug>(easymotion-s)
+
+
         " See: https://www.reddit.com/r/vim/comments/lhohqd/remap_after_searching/
         " https://github.com/romainl/vim-cool
         " cnoremap <expr> <silent> <cr> getcmdtype() =~ '[?/]' ? "\<cr>:noh\<cr>" : "\<cr>"
@@ -694,7 +715,8 @@ call plug#begin(pe_runtimepath . '/plugged')
 " 6.3 Style PlugIn
 " -------------------------------------------
     Plug 'itchyny/lightline.vim'
-    Plug 'google/vim-searchindex'
+    Plug 'google/vim-searchindex' , Cond( stridx(&shortmess, 'S')  != -1)
+
     Plug 'edkolev/tmuxline.vim'
 
     Plug 'romgrk/github-light.vim'
@@ -733,8 +755,8 @@ call plug#begin(pe_runtimepath . '/plugged')
         augroup colorextend
             autocmd!
             " Override the `Identifier` background color in GUI mode
-            autocmd ColorScheme * call onedark#extend_highlight("Search", { "gui" : "underline,bold,italic,standout",  "bg": { "gui": "#444959" } , "fg" : {"gui":"yellow" }})
-            autocmd ColorScheme * call onedark#extend_highlight("IncSearch", { "gui" : "underline,bold,italic,standout",  "bg": { "gui": "#444959" } , "fg" : {"gui":"yellow" }})
+            autocmd ColorScheme * call onedark#extend_highlight("Search", { "gui" : "underline,bold,italic,standout",  "bg": { "gui": "#444959" } , "fg" : {"gui":"#ffde87" }})
+            autocmd ColorScheme * call onedark#extend_highlight("IncSearch", { "gui" : "underline,bold,italic,standout",  "bg": { "gui": "#ffde87" } , "fg" : {"gui":"#444959" }})
             autocmd ColorScheme * call onedark#extend_highlight("QuickFixLine", { "gui" : "underline",  "bg": { "gui": "NONE" } , "fg" : {"gui":"yellow" }})
             autocmd ColorScheme * highlight QuickFixLineScope gui=underline guifg=#e5c07b
 
