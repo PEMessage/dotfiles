@@ -608,7 +608,7 @@ require("lazy").setup({
         --     -- colors = {}, -- table of hex strings
         --     -- termcolors = {} -- table of colour name strings
         -- },
-        indent = { enable = false },
+        indent = { enable = { 'python'  } },
         ensure_installed = {
             'json',
             'css',
@@ -1315,7 +1315,8 @@ local wk = PE.WkCheck()
         function() PE.ToggleOpts("relativenumber") end,
         { desc = "Toggle Relative Numbers" })
 
-    vim.keymap.set('v','tt','<cmd>s/\\s\\+$//e<cr>',{ desc = 'Clean tail spaces'})
+    -- vim.keymap.set('v','tt','<cmd>s/\\s\\+$//e<cr>',{ desc = 'Clean tail spaces'})
+    vim.cmd [[ vnoremap tt :s/\s\+$//e<CR> ]]
 
     wk.register({
         ["<leader>t"] = { name = "+Tabe Options" }
