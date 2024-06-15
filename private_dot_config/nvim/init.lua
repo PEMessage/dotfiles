@@ -558,7 +558,8 @@ require("lazy").setup({
 },
 {
     "christoomey/vim-tmux-navigator",
-    event = 'VeryLazy',
+    -- Do not use very lazy prevent not init
+    -- event = 'VeryLazy',
     config = function()
         vim.g.tmux_navigator_no_mappings = 1
         vim.keymap.set( {'n','i','v','t'},  '<M-S-h>', '<cmd>TmuxNavigateLeft<cr>' , { silent = true, desc = "Navigate Left"  } )
