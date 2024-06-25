@@ -457,7 +457,8 @@ let g:startify_custom_header = [
     nnoremap <leader>gp  `[v`]
     nnoremap gp  `[v`]
 
-    command! PCD execute 'cd' .. expand('%:p:h')
+    command! PCD execute 'cd ' . expand('%:p:h')
+    " command! PCD execute 'cd' .. expand('%:p:h')
     command! PFile echo  expand('%:p')
     " See: https://www.cyberciti.biz/faq/vim-vi-text-editor-save-file-without-root-permission/
     command Psudow :execute ':silent w !sudo tee % > /dev/null' | :edit!
