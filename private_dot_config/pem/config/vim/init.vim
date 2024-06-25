@@ -562,9 +562,9 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:ctrlp_map = ''
         let g:ctrlp_root_markers = ['.root', 'repo', '.git']
         let g:ctrlp_max_depth = 3
-        nnoremap <c-f> :CtrlPFunky<Cr>
+        " nnoremap <c-f> :CtrlPFunky<Cr>
 
-        noremap <silent> <C-r> :History<CR>
+        noremap <silent> <C-r> :CtrlPMRU<CR>
         noremap <silent> <C-p> :CtrlPBuffer<CR>
         " nnoremap <leader>cm :\<C-U>FzfxCommands<CR>
         noremap <silent> <C-e> :FZF<CR>
@@ -637,8 +637,8 @@ call plug#begin(pe_runtimepath . '/plugged')
         inoremap <silent> <C-y> <ESC>:YRShow<CR>
         " Swap p and P (do not copy delete item in visual)
         " See: v_P and v_p
-        let g:yankring_paste_v_akey = 'P'
-        let g:yankring_paste_v_bkey = 'p'
+        let g:yankring_paste_v_akey = 'P'   " uppercase
+        let g:yankring_paste_v_bkey = 'p'   " lowercase
         " function! YRRunAfterMaps()
         "     vnoremap p  <C-U>YRPaste 'P', 'v'<CR>
         "     vnoremap P  <C-U>YRPaste 'p', 'v'<CR>
