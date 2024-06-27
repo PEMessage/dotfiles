@@ -17,10 +17,10 @@ function q-pwd() {
 for x in `q-myip`
 do
     if [ -z "$1" ]; then 
-        echo "'"`whoami`@$x:`pwd`"'"
+        echo `whoami`@$x:`pwd`
     else
         path="$(readlink -f "$1")"
-        echo "'"`whoami`@$x:"$path""'"
+        echo `whoami`@$x:"$path"
     fi
 done
 }
