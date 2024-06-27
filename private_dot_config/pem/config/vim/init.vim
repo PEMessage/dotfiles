@@ -933,7 +933,9 @@ call plug#begin(pe_runtimepath . '/plugged')
         " let g:terminal_key = '<M-`>'
     if has('terminal')
         Plug 'voldikss/vim-floaterm'
-            set termwinkey=<C-[> 
+            if exists('&termwinkey')
+                set termwinkey=<C-[> 
+            endif
             autocmd User FloatermOpen
                         \ if exists('&termwinkey') 
                         \ | call setbufvar(bufnr('%'), '&termwinkey', '<c-z>') 
@@ -1390,7 +1392,12 @@ call plug#begin(pe_runtimepath . '/plugged')
         " snoremap <silent><ESC>  <ESC>:NeoSnippetClearMarkers<CR>
 
         " Another usage
-        autocmd ModeChanged * NeoSnippetClearMarkers
+        if exists('##ModeChanged')
+            autocmd ModeChanged * NeoSnippetClearMarkers
+        else
+            autocmd InsertLeave * NeoSnippetClearMarkers
+            snoremap <silent><ESC>  <ESC>:NeoSnippetClearMarkers<CR>
+        endif
 
     endif
     
