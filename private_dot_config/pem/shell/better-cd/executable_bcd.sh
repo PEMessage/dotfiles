@@ -46,3 +46,26 @@ gcd(){
     cd "$(git rev-parse --show-toplevel)"
 } 
 
+tcd() {
+    local target="$1"
+    local current_dir="$(pwd)"
+
+    while [ "$current_dir" != "/" ]; do
+        if [ -e "$current_dir/$target" ]; then
+            cd "$current_dir"
+            return 0
+        elif [ "$(basename "$current_dir")" = "$target" ] ; then
+            cd "$current_dir"
+            return 0
+        fi
+        current_dir="$(dirname "$current_dir")"
+    done
+
+    echo "No parent directory containing $target found; staying in $(pwd)."
+}
+
+alias rcd='__top_cd .repo'
+
+
+
+

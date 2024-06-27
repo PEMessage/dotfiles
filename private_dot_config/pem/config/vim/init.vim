@@ -482,7 +482,7 @@ let g:startify_custom_header = [
     cnoremap <expr> <Tab>   getcmdtype() =~ '[\/?]' ? "<C-g>" : "<C-z>"
     cnoremap <expr> <S-Tab> getcmdtype() =~ '[\/?]' ? "<C-t>" : "<S-Tab>"
 
-    vnoremap tt :s/\s\+$//e<CR>
+    vnoremap tt :s/\s\+$//e<CR>:set nohls<CR>
     " See: v_p v_P swap function between these
     vnoremap p P
     vnoremap P p
