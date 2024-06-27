@@ -438,9 +438,9 @@ let g:startify_custom_header = [
 
     function PERcEdit() 
         if exists('g:pe_rc["file"]') && !empty(g:pe_rc['file'])
-            execute 'tabedit ' .. g:pe_rc['file']
+            execute 'tabedit ' . g:pe_rc['file']
         else 
-            execute 'tabedit ' .. '~/.vimrc'
+            execute 'tabedit ' . '~/.vimrc'
         endif
     endfunction
     nnoremap <leader>rce  <cmd>call PERcEdit()<CR>
@@ -458,7 +458,7 @@ let g:startify_custom_header = [
     nnoremap gp  `[v`]
 
     command! PCD execute 'cd ' . expand('%:p:h')
-    " command! PCD execute 'cd' .. expand('%:p:h')
+    " command! PCD execute 'cd' . expand('%:p:h')
     command! PFile echo  expand('%:p')
     " See: https://www.cyberciti.biz/faq/vim-vi-text-editor-save-file-without-root-permission/
     command Psudow :execute ':silent w !sudo tee % > /dev/null' | :edit!
@@ -1039,14 +1039,14 @@ call plug#begin(pe_runtimepath . '/plugged')
         " See: https://stackoverflow.com/questions/3249275/multiple-commands-on-same-line
         " for <bar>
         command Csadd
-                    \ execute 'set tags+=' .. b:gutentags_files['ctags'] ',' <bar>
-                    \ echo 'Add "' .. b:gutentags_files['ctags'] .. '" to tags'
+                    \ execute 'set tags+=' . b:gutentags_files['ctags'] ',' <bar>
+                    \ echo 'Add "' . b:gutentags_files['ctags'] . '" to tags'
         command Gsadd
-                    \ execute 'cs add ' .. b:gutentags_files['gtags_cscope'] <bar>
-                    \ echo 'Add "' .. b:gutentags_files['gtags_cscope'] .. '" to cscsope db'
+                    \ execute 'cs add ' . b:gutentags_files['gtags_cscope'] <bar>
+                    \ echo 'Add "' . b:gutentags_files['gtags_cscope'] . '" to cscsope db'
         " Gs"a"top a is for higher priority in wildmenu
         command Gsatop
-                    \ echo 'Top is "' .. b:gutentags_root .. '"'
+                    \ echo 'Top is "' . b:gutentags_root . '"'
         set cscopetag
 
         " 0 or s: Find this symbol
