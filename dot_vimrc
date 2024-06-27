@@ -3,8 +3,11 @@
 " $PEM_HOME/config/vim/lite.vim
 let g:pe_rc = {}
 let g:pe_rc['files'] =  [
+  \  $PEM_MYVIMRC ,
   \  $PEM_HOME . '/config/vim/init.vim',
+  \  $HOME . '/.config/pem/config/vim/init.vim',
   \  $PEM_HOME . '/config/vim/lite.vim',
+  \  $HOME . '/.config/pem/config/vim/lite.vim',
                \ ]
 
 for pfile in g:pe_rc['files']
