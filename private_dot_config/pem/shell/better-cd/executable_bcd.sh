@@ -39,6 +39,10 @@ bcd()
     return 1
 }
 
-wcd () { cd "`wslpath "$1"`"; }
-gcd () { cd "$(git rev-parse --show-toplevel)" } 
+wcd(){
+    cd "`wslpath "$1"`"
+}
+gcd(){
+    cd "$(git rev-parse --show-toplevel)"
+} 
 
