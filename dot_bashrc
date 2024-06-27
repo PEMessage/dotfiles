@@ -90,8 +90,8 @@ PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
         PS1+="$blueF\u@\h$colorEnd"
         PS1+=":"
 
-        # PS1+="$greenF\w$colorEnd"
-        PS1+="$greenF\$(_pe_last3dir)$colorEnd"
+        PS1+="$greenF\w$colorEnd"
+        # PS1+="$greenF\$(_pe_last3dir)$colorEnd"
         
         PS1+="]"
         PS1+="$yellowF\$(_parse_git_branch_v3)$colorEnd"
