@@ -443,7 +443,7 @@ let g:startify_custom_header = [
             execute 'tabedit ' . '~/.vimrc'
         endif
     endfunction
-    nnoremap <leader>rce  <cmd>call PERcEdit()<CR>
+    nnoremap <leader>rce  :call PERcEdit()<CR>
 
     nnoremap <leader>``   :nohlsearch<CR>
     nnoremap <leader>`1   :set! virtualedit=onemore<CR>
@@ -931,21 +931,23 @@ call plug#begin(pe_runtimepath . '/plugged')
     "     tnoremap <C-[><C-[> <c-\><c-n>:bdelete! %<CR>
     "     let g:terminal_key = '<leader>='
         " let g:terminal_key = '<M-`>'
-    Plug 'voldikss/vim-floaterm'
-        set termwinkey=<C-[> 
-        autocmd User FloatermOpen
-                    \ if exists('&termwinkey') 
-                    \ | call setbufvar(bufnr('%'), '&termwinkey', '<c-z>') 
-                    \ | endif
-        let g:floaterm_keymap_toggle = '<M-S-i>'
-        let g:floaterm_position = 'bottomright'
-        let g:floaterm_opener = 'tabe'
+    if has('terminal')
+        Plug 'voldikss/vim-floaterm'
+            set termwinkey=<C-[> 
+            autocmd User FloatermOpen
+                        \ if exists('&termwinkey') 
+                        \ | call setbufvar(bufnr('%'), '&termwinkey', '<c-z>') 
+                        \ | endif
+            let g:floaterm_keymap_toggle = '<M-S-i>'
+            let g:floaterm_position = 'bottomright'
+            let g:floaterm_opener = 'tabe'
+    endif
     Plug 'christoomey/vim-tmux-navigator'
         let g:tmux_navigator_no_mappings = 1
-        noremap  <silent><M-S-h> <cmd>TmuxNavigateLeft<cr>
-        noremap  <silent><M-S-j> <cmd>TmuxNavigateDown<cr>
-        noremap  <silent><M-S-k> <cmd>TmuxNavigateUp<cr>
-        noremap  <silent><M-S-l> <cmd>TmuxNavigateRight<cr>
+        noremap  <silent><M-S-h> :TmuxNavigateLeft<cr>
+        noremap  <silent><M-S-j> :TmuxNavigateDown<cr>
+        noremap  <silent><M-S-k> :TmuxNavigateUp<cr>
+        noremap  <silent><M-S-l> :TmuxNavigateRight<cr>
 
         tnoremap  <silent><M-S-h> <cmd>TmuxNavigateLeft<cr>
         tnoremap  <silent><M-S-j> <cmd>TmuxNavigateDown<cr>
