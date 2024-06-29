@@ -3,10 +3,10 @@ LOCAL_SCRIPT_PATH="$(readlink -f $0)"
 LOCAL_SCRIPT_DIR="$(dirname $LOCAL_SCRIPT_PATH)"
 
 [ -d "$CONF_BUCKET_DIR" ] &&
-    CONF_BUCKET_DIR="$LOCAL_SCRIPT_DIR/bucket"
+    export CONF_BUCKET_DIR="$LOCAL_SCRIPT_DIR/bucket"
 
 [ -d "$CONF_DBEUG" ] &&
-    CONF_DBEUG=false
+    export CONF_DBEUG=false
 usage() {
     echo "USAGE:"
     echo "-l: print all task list"
@@ -16,7 +16,7 @@ usage() {
 
 main() {
     [ -n "$1" ] || {
-        usgae
+        usage
         exit
     }
 
