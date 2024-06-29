@@ -2,15 +2,22 @@
 LOCAL_SCRIPT_PATH="$(readlink -f $0)"
 LOCAL_SCRIPT_DIR="$(dirname $LOCAL_SCRIPT_PATH)"
 
-[ -d "$CONF_BUCKET_DIR" ] &&
+[ -d "$CONF_BUCKET_DIR" ] ||
     export CONF_BUCKET_DIR="$LOCAL_SCRIPT_DIR/bucket"
 
-[ -d "$CONF_DBEUG" ] &&
+[ -d "$CONF_DBEUG" ] ||
     export CONF_DBEUG=false
+
 usage() {
     echo "USAGE:"
+    echo
     echo "-l: print all task list"
     echo "-h: print this help page"
+    echo
+    echo "CONF:"
+    echo
+    echo "CONF_BUCKET_DIR : $CONF_BUCKET_DIR"
+    echo "CONF_DBEUG      : $CONF_DBEUG"
 }
 
 
@@ -31,7 +38,7 @@ main() {
             )
             ;;
         *)
-            [ -f "$1" ] && bash "$CONF_BUCKET_DIR/$1" || {
+            [ -f "$CONF_BUCKET_DIR/$1" ] && bash "$CONF_BUCKET_DIR/$1" || {
                 echo "[Err]: Unknow task(file not exist)"
                 echo "[Err]: use '-l' to check all task"
             }
