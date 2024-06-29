@@ -64,7 +64,7 @@ tcd() {
     echo "No parent directory containing $target found; staying in $(pwd)."
 }
 
-alias rcd='__top_cd .repo'
+alias rcd='top_cd .repo'
 
 
 
