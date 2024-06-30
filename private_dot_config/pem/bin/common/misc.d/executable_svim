@@ -1,0 +1,2 @@
+#!/bin/sh
+PEM_MYVIMRC=$PEM_HOME/config/vim/lite.vim "$@"

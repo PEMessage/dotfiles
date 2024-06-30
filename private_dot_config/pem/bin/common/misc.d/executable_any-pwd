@@ -1,0 +1,15 @@
+#!/bin/sh
+
+if [ -n "$1" ] ; then
+    ANYPATH="$1"
+else
+    ANYPATH="$(pwd)"
+fi
+
+REALPATH="$(readlink -f "$ANYPATH")"
+POSTPATH="$(echo "$REALPATH" | sed 's@^/mnt/c/ShareCache/@AnyShare://@' )"
+if [ "$REALPATH" = "$POSTPATH" ] ; then
+    echo 'cd /mnt/c/ShareCache'
+else 
+    echo "$POSTPATH"
+fi
