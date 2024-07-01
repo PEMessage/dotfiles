@@ -20,7 +20,7 @@ bcd()
     }
 
     local dirname_input="$(dirname "$input")"
-    [ -d "$input_base" ] && {
+    [ -d "$dirname_input" ] && {
         "$op" "$dirname_input"
         return 0
     }
