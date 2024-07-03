@@ -6,6 +6,7 @@ command() {
 command git config --global alias.pk cherry-pick
 command git config --global alias.cm commit
 command git config --global alias.co checkout
+command git config --global alias.fw merge --ff-only
 command git config --global alias.re 'remote -v'
 command git config --global alias.st 'status --short --branch'
 command git config --global alias.lg 'log --oneline --graph'
