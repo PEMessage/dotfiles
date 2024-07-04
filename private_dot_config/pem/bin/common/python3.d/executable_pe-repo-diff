@@ -1,0 +1,119 @@
+#!/usr/bin/env python3
+
+import xml.etree.ElementTree as ET
+import subprocess
+import itertools
+import pprint
+import sys
+import os
+import re
+
+pp = pprint.PrettyPrinter(indent=2)
+
+
+def get_xmllist(entry: str):
+    filelist = set()
+    pathlist = set()
+    filelist.add(entry)
+    xmltree = ET.parse(entry).getroot()
+    for obj in xmltree:
+        if obj.tag == "include":
+            f1, p1 = get_xmllist(".repo/manifests/" + obj.attrib["name"])
+            filelist = filelist.union(f1)
+            pathlist = pathlist.union(p1)
+        if obj.tag == "project":
+            if "path" in obj.attrib:
+                realpath = obj.attrib["path"]
+            else:
+                realpath = obj.attrib["name"]
+
+            if os.path.isdir(realpath):
+                pathlist.add(realpath)
+            else:
+                print("invalid project " + realpath)
+
+    return filelist, pathlist
+
+
+def get_gitlog(dir, refA, refB):
+    # 在指定目录中运行git log命令
+    cmd = ['git', 'log', refA + '..' + refB,
+           '--no-merges',
+           '--format="<<<<%h[[[]]]%s[[[]]]%d[[[]]]%b[[[]]]%ae[[[]]]%at>>>>"']
+    try: 
+        raw_gitlog = subprocess.check_output(
+            cmd,
+            cwd=dir,
+        ).decode(sys.stdout.encoding)
+    except subprocess.CalledProcessError as e:
+        print(dir + " is not able to get log" )
+        print("cmd is:"+" ".join(cmd))
+        return None
+        
+        
+
+    if not raw_gitlog:
+        return None
+
+    # outputlist = raw_gitlog.split("<<<<")
+    outputlist = re.findall(r'<<<<([^"]*)>>>>', raw_gitlog)
+    ret = []
+    for i in range(len(outputlist)):
+        cm = outputlist[i].split('[[[]]]')
+        obj = {
+            'hash': cm[0],
+            'subject': cm[1],
+            'ref': cm[2],
+            'body': cm[3],
+            'author_email': cm[4],
+            'timestamp': cm[5]
+        }
+        changeid = re.search(r'Change-Id: (\w+)', obj["body"])
+        obj["changeid"] = changeid and changeid.group(1)
+        obj["ref"] = obj["ref"].split(',')
+        ret.append(obj)
+    # sorted(
+    # ret, key=lambda v: v["changeid"] or 0
+    # ) # default for changeid: None
+    return ret
+
+
+def get_difference(list1, list2):
+    key = "changeid"
+
+    if list1 is None:
+        list1 = []
+    if list2 is None:
+        list2 = []
+
+    ids1 = set(item[key] for item in list1)
+    ids2 = set(item[key] for item in list2)
+    only_in_list1 = list(
+        itertools.filterfalse(lambda item: item[key] in ids2, list1)
+    )
+    only_in_list2 = list(
+        itertools.filterfalse(lambda item: item[key] in ids1, list2)
+    )
+    return only_in_list1, only_in_list2
+
+filelist, pathlist = get_xmllist(".repo/manifest.xml")
+
+for repopath in pathlist:
+    logA = get_gitlog(repopath, sys.argv[1], sys.argv[2])
+    logB = get_gitlog(repopath, sys.argv[2], sys.argv[1])
+
+    if logA or logB is not None:
+        onlyA, onlyB = get_difference(logA, logB)
+        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+        print(repopath)
+        print("<<<<<<<<<<<<<<Only in A<<<<<<<<<<<<<<<")
+        for item in onlyA:
+            print(item["hash"] + "   " + item["subject"])
+        print("======================================")
+        for item in onlyB:
+            print(item["hash"] + "   " + item["subject"])
+        print(">>>>>>>>>>>>>>Only in B>>>>>>>>>>>>>>>")
+        print()
+    # else:
+    #    print(repopath + "is same") 
+
