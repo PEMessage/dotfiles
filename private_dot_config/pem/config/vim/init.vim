@@ -1272,7 +1272,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     "     let g:pe_competesys = 'async'
     if has('patch-7.4.775')
         " Good enought for buffer
-        let g:pe_competesys = 'mu'
+        let g:pe_competesys = 'apt'
     else 
         let g:pe_competesys = 'apt'
     endif
@@ -1785,3 +1785,14 @@ endif
         echo filename
     endfunction
     command! Duplication call s:Duplication()
+
+    " Credit: skywind3000
+    function! Tapi_TerminalEdit(bid, arglist)
+        let name = (type(a:arglist) == v:t_string)? a:arglist : a:arglist[0]
+        let cmd = get(g:, 'terminal_edit', 'tab drop')
+        silent exec 'FloatermHide'
+        silent exec cmd . ' ' . fnameescape(name)
+        silent exec 'FloatermShow'
+        return ''
+    endfunc
+
