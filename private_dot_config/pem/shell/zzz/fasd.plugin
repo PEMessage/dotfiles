@@ -26,11 +26,13 @@ cdd(){
     local fnd="$*"
     [ -d "$fnd" ] && cd "$fnd" && return
     [ -n "$fnd" ] &&  fasd_cd -d "$fnd" && return
-    local temp=` fasd -sd 2>&1 | sort -rn |
-        awk '{ print substr($0, index($0,$2)) }' |
-        fzf  --no-sort --query="$fnd"
-        `
-    cd "$temp"
+    local temp_fasd_data="$(fasd --var _FASD_DATA)"
+    if [ -f "$temp_fasd_data" ] ; then
+        local temp=` cat "$temp_fasd_data" | cut -d "|" -f 1 |
+            fzf  --no-sort --query="$fnd"
+            `
+        cd "$temp"
+    fi
 }
 alias ccd='cdd'
 
