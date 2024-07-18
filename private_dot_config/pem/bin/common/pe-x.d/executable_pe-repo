@@ -1,0 +1,220 @@
+#!/bin/bash
+
+
+# Usage
+# ===================================================
+usage() {
+echo "
+SUBCMD: 
+    ck \$GROUPS:
+        descibe: check all repo revision vaild
+        example: $(basename $0) ck GROUPS
+
+    r:
+        descibe: print root
+    pm: 
+        cat \$1 | xmlstarlet sel -t -v '//project/@\$2' | sort
+CONFIG:
+    CONF_REPO: $CONF_REPO
+    CONF_RC_DIR: $CONF_RC_DIR
+    CONF_CACHE_DIR: $CONF_CACHE_DIR
+CONFIG for getm:
+    CONF_MANIFEST_URL: $CONF_MANIFEST_URL
+    CONF_REPO_URL: $CONF_REPO_URL
+        
+VERSION:
+    v1.1
+CHANGELOG:
+    v1.0: add ck(check revision)
+    v1.1: add r(print root)
+    v1.2: add pm(xmlstarlet wrapper)
+    v1.4: add getm(repo manifest for any)
+
+"
+}
+
+
+# Helper function
+# ===================================================
+    tcd ()
+    {
+        local target="$1";
+        local current_dir="$(pwd)";
+        while [ "$current_dir" != "/" ]; do
+            if [ -e "$current_dir/$target" ]; then
+                cd "$current_dir";
+                return 0;
+            fi;
+            current_dir="$(dirname "$current_dir")";
+        done;
+        echo "No parent directory containing $target found; staying in $(pwd)."
+    }
+
+    runcmd() {
+        echo "Runing: $@"
+        [ "$CONF_DEBUG" = true  ] && {
+            return 0
+        }
+        "$@"
+    }
+
+    checkvar() {
+        declare -n p="$1"
+        echo "[Info]: Var '$1' is '$p'"
+        [ -n "$1" ] || {
+            PERFIX="$INDENT$PERFIX" echo_i "[Warn]: $1 is empty"
+        return 1
+        }
+        return 0
+    }
+
+    last2base() {
+        local input="$1"
+        local output="${input//~/\~}"
+        echo "${output#${output%/*/*}/}"
+    }
+
+# Subcmds
+# ===================================================
+
+    r() {
+    (
+        tcd .repo 
+        readlink -f .
+    )
+    }
+
+
+
+    ck() {
+    (
+        set -e
+        local groups="$1"
+        [ -z "$groups" ] &&  groups=ing-custom
+        local manifest="$(repo manifest)"
+
+        local path_list="$( echo "$manifest" | xmlstarlet sel -t -v  "//project[contains(@groups,'$groups')]/@path")"
+        # local revision_list="$( echo "$manifest" | xmlstarlet sel -t -v  "//project[contains(@groups,'$groups')]/@revision")"
+        # cd to repo root
+        tcd .repo 
+
+        for x in $path_list
+        do
+            revision="$( echo "$manifest" | xmlstarlet sel -t -v  "//project[@path='$x']/@revision")"
+            echo "[Info]: check '$x' for '$revision'"
+            git -C "$x" log -n1 --oneline "${revision}"  || {
+                echo "[Err]: error on command: git -C $x log -n1 --oneline $revision"
+                exit 1
+            }
+        done
+    )
+    }
+
+    pm() {
+    (
+        local attr="$2"
+        local filename="$1"
+        [ -z "$filename" ] && filename="-"
+        cat "$filename" | xmlstarlet sel -t -v "//project/@$attr" | sort
+    )
+    }
+
+    part() {
+        local key="$1"
+        local split="$2"
+
+        if [ -z "$key" ] ; then
+            key="$CONF_SPLIT_KEY"
+        fi
+
+        if [ -z "$split" ] ; then
+            split="$CONF_SPLIT"
+        fi
+
+        awk "BEGIN{i=0}  /$split$key-close$split/{i=0}  i==1{print} /$split$key-start$split/{i=1}"
+
+
+
+    }
+
+    getm() {
+    (
+        local branch="$1"
+        local manifest="$2"
+
+        checkvar CONF_MANIFEST_URL
+        [ -n "$CONF_MANIFEST_URL" ] || {
+            echo "[Err]: not $CONF_MANIFEST_URL founded"
+            exit 1
+        }
+        checkvar CONF_REPO_URL
+        [ -n "$CONF_REPO_URL" ] || {
+            echo "[Err]: not $CONF_REPO_URL founded"
+            exit 1
+        }
+
+        local manifestname="$(last2base "$CONF_MANIFEST_URL" |  tr '/' '_')"
+        local manifestpath="$CONF_CACHE_DIR/$manifestname"
+
+        checkvar manifestname
+        checkvar manifestpath
+        (
+            # if [ ! -x  "$manifestpath/.repo/manifest.xml" ] ; then
+            echo '[Info]: init process...'
+            runcmd mkdir -p "$manifestpath"
+            runcmd cd "$manifestpath"
+            runcmd repo init --no-repo-verify \
+                -u "$CONF_MANIFEST_URL" \
+                --repo-url "$CONF_REPO_URL" \
+                -b "$branch" \
+                -m "$manifest"
+            # else
+            #     echo  '[Info]:  reuse cache repo'
+            #     runcmd cd "$manifestpath/.repo/manifests"
+            #     runcmd git checkout $branch -f
+            #     runcmd cd -
+
+            #     runcmd cd "$manifestpath/.repo"
+            #     runcmd rm -rf manifest.xml
+            #     runcmd ln -s "manifests/$manifest" manifest.xml
+            #     runcmd cd -
+            # fi
+        )
+
+        (
+            runcmd cd "$manifestpath"
+            echo "${CONF_SPLIT}${CONF_SPLIT_KEY}-start${CONF_SPLIT}"
+            repo manifest
+            echo "${CONF_SPLIT}${CONF_SPLIT_KEY}-close${CONF_SPLIT}"
+        )
+    )
+    }
+
+
+# Entry point
+# ===================================================
+
+CONF_REPO="$(which repo)"
+CONF_RC_DIR="${XDG_CONFIG_HOME:-${HOME}/.config}/pe-repo"
+CONF_CACHE_DIR="${XDG_CACHE_HOME:-${HOME}/.cache}/pe-repo"
+
+CONF_SPLIT='====================' # = * 20
+CONF_SPLIT_KEY='output'
+
+
+mkdir -p "$CONF_RC_DIR"
+mkdir -p "$CONF_CACHE_DIR"
+
+[ -f "$CONF_RC_DIR/config" ] &&
+    source "$CONF_RC_DIR/config"
+
+
+if [ "$1" = '-h' ] || [ "$1" = '-v' ] || [ "$#" -eq 0  ] ; then
+    subcmd=usage
+else
+    subcmd="$1"
+    shift
+fi
+
+"$subcmd" "$@"
+
