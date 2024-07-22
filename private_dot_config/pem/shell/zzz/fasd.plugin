@@ -31,7 +31,11 @@ cdd(){
         local temp=` cat "$temp_fasd_data" | cut -d "|" -f 1 |
             fzf  --no-sort --query="$fnd"
             `
-        cd "$temp"
+        if [ -d "$temp" ] ; then
+            cd "$temp"
+        elif [ -f "$temp" ] ; then
+            cd "$(dirname "$temp")"
+        fi
     fi
 }
 alias ccd='cdd'
