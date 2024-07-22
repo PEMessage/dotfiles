@@ -66,6 +66,23 @@ tcd() {
 
 alias rcd='tcd .repo'
 
+scd() {
+    declare -a pattern_list=(
+        's@/sys/@/vnd/@g'
+        's@/vnd/@/sys/@g'
+    )
+    current_dir="$(readlink -f .)"
+
+    for x in "${pattern_list[@]}"
+    do
+        post_dir="$(echo "$current_dir" | sed "$x")"
+        if [ ! "$post_dir" = "$current_dir" ] && [ -d "$post_dir" ] ; then
+            cd "$post_dir"
+            return 0
+        fi
+    done
+}
+
 
 
 
