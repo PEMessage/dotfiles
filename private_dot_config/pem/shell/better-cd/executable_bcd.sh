@@ -72,6 +72,8 @@ scd() {
     declare -a pattern_list=(
         "s@/sys$end@/vnd/@g"
         "s@/vnd$end@/sys/@g"
+        "s@/qssi$end@/target/@g"
+        "s@/target$end@/qssi/@g"
     )
     current_dir="$(readlink -f .)"
 
