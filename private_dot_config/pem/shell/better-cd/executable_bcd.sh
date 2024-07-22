@@ -67,9 +67,11 @@ tcd() {
 alias rcd='tcd .repo'
 
 scd() {
+
+    local end='\(/\|$\)'
     declare -a pattern_list=(
-        's@/sys/@/vnd/@g'
-        's@/vnd/@/sys/@g'
+        "s@/sys$end@/vnd/@g"
+        "s@/vnd$end@/sys/@g"
     )
     current_dir="$(readlink -f .)"
 
