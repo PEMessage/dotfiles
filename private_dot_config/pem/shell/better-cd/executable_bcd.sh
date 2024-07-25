@@ -74,6 +74,8 @@ scd() {
         "s@/vnd$end@/sys/@g"
         "s@/qssi$end@/target/@g"
         "s@/target$end@/qssi/@g"
+        "s@userdebug@user@g"
+        "s@user@userdebug@g"
     )
     current_dir="$(readlink -f .)"
 
