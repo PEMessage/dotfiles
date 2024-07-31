@@ -38,6 +38,8 @@
 
     Remove-Item alias:curl 
     Set-Alias -Name pnp -Value pnpm
+    Set-Alias -Name cdd -Value z
+    Set-Alias -Name l -Value ls
     
     # Set-Alias -Name spf -Value '. $PROFILE'
 
@@ -46,65 +48,79 @@
 # =========================================
     # Import-Module z # $($PROFILE | bcd)/Module/z
 
-    Invoke-Expression (&scoop-search --hook)
-    Invoke-Expression (&starship init powershell)
+    # Invoke-Expression (&scoop-search --hook)
+    # Invoke-Expression (&starship init powershell)
+    # Set-Alias -Name cdd -Value z
+
 
 # Function Zone
 # =========================================
     # Use fzf as cd
-    function fcd($dir = ''){
-        Set-Location $dir
-        $TEMP = fzf
-        $TEMP = dirname $TEMP
-        Set-Location $TEMP
-    }
-    function wherecd($cmd = '') {
-        $Loc = whereis $cmd
-        if($Loc){
-            Write-Output $("The Location is:"+$Loc ) 
-            $Loc = Split-Path $Loc -Parent
-            Write-Output $("Set Location to:"+$Loc ) 
-            Set-Location $Loc
-        } else {
-            Write-Output "No Such CMD or Shell Internal"
-        }
+    # function fcd($dir = ''){
+    #     Set-Location $dir
+    #     $TEMP = fzf
+    #     $TEMP = dirname $TEMP
+    #     Set-Location $TEMP
+    # }
+    # function wherecd($cmd = '') {
+    #     $Loc = whereis $cmd
+    #     if($Loc){
+    #         Write-Output $("The Location is:"+$Loc ) 
+    #         $Loc = Split-Path $Loc -Parent
+    #         Write-Output $("Set Location to:"+$Loc ) 
+    #         Set-Location $Loc
+    #     } else {
+    #         Write-Output "No Such CMD or Shell Internal"
+    #     }
     
-    }
+    # }
 
-    function bcd($cmd = '', [Parameter(ValueFromPipeline)]$input) {
-        if($cmd -eq ''){
-            # Write-Output $input 
-            $path_arg = $input | Out-String -Stream 
-            # Input 默认是对象，需要转换字符串
-            # Out-String 默认添加回车需要转换
-        } elseif($cmd -eq '--print') {
-            $path_arg = $input | Out-String -Stream 
-        } else {
-            $path_arg = $cmd
-        }
+    # function bcd($cmd = '', [Parameter(ValueFromPipeline)]$input) {
+    #     if($cmd -eq ''){
+    #         # Write-Output $input 
+    #         $path_arg = $input | Out-String -Stream 
+    #         # Input 默认是对象，需要转换字符串
+    #         # Out-String 默认添加回车需要转换
+    #     } elseif($cmd -eq '--print') {
+    #         $path_arg = $input | Out-String -Stream 
+    #     } else {
+    #         $path_arg = $cmd
+    #     }
 
-        if (Test-Path -Path $path_arg -PathType Leaf) {
-            # Write-Output "$path_arg is a file"
-            $path_arg = Split-Path -Parent $path_arg
-        } 
-        elseif (Test-Path -Path $path_arg -PathType Container) {
-            # Write-Output "$path is a directory"
-        }
-        else {
-            return 
-        }
+    #     if (Test-Path -Path $path_arg -PathType Leaf) {
+    #         # Write-Output "$path_arg is a file"
+    #         $path_arg = Split-Path -Parent $path_arg
+    #     } 
+    #     elseif (Test-Path -Path $path_arg -PathType Container) {
+    #         # Write-Output "$path is a directory"
+    #     }
+    #     else {
+    #         return 
+    #     }
 
-        if ($cmd -eq '--print') {
-            Write-Output $path_arg
-        } else {
-            Set-Location $path_arg
-        }
-        return 
-    }
-    function zz(){
-        z -l | fzf | bcd
-    }
+    #     if ($cmd -eq '--print') {
+    #         Write-Output $path_arg
+    #     } else {
+    #         Set-Location $path_arg
+    #     }
+    #     return 
+    # }
+    # function zz(){
+    #     z -l | fzf | bcd
+    # }
     
+    function Add-WSLPortForwarding ($Port = '23333', $Protocol = 'TCP') {
+        $WSLIP = wsl -- hostname -I
+        $WSLIP = $WSLIP.Trim().split()[0]
+        netsh interface portproxy add v4tov4 listenport=$Port connectaddress=$WSLIP connectport=$Port
+        New-NetFirewallRule -DisplayName "Allow ${Protocol} Inbound Port ${Port}" -Direction Inbound -Action Allow -Protocol $Protocol -LocalPort $Port
+    }
+
+    # 移除 WSL 端口转发以及防火墙入站规则
+    function Remove-WSLPortForwarding ($Port = '23333', $Protocol = 'TCP') {
+        netsh interface portproxy delete v4tov4 listenport=$Port
+        Remove-NetFirewallRule -DisplayName "Allow ${Protocol} Inbound Port ${Port}"
+    }
 
 
 # Alias
