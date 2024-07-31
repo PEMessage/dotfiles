@@ -2,10 +2,21 @@
 
 function q-myip()
 {
-	case $(uname) in
+	case $(uname -a) in
 	Darwin|*BSD)
 		local ip=$(ifconfig  | grep -E 'inet.[0-9]' | grep -v '127.0.0.1' | awk '{ print $2}')
 		;;
+    *WSL2*)
+        # local ip=$(ip route show | grep -i default | awk '{ print $3}')
+        local ip
+        if which ipconfig.exe &>/dev/null ; then
+            # Normally ip host do not end with *.*.*.1 or *.*.*.0
+            ip=$(ipconfig.exe /all | grep -a IPv4 | grep -oP '\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}' | grep -v '\.[10]$')
+        fi
+        ip+=" "
+		ip+=$(hostname --all-ip-addresses | tr " " "\n" | grep -v "0.0.0.0" | grep -v "127.0.0.1")
+        ;;
+
 	*)
 		local ip=$(hostname --all-ip-addresses | tr " " "\n" | grep -v "0.0.0.0" | grep -v "127.0.0.1")
 		;;
