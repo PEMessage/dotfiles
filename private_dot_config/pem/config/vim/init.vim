@@ -582,6 +582,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'PEMessage/vim-fixkey'
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
+    " Plug 'Yggdroot/LeaderF'
     " Plug 'linrongbin16/fzfx.vim'
     Plug 'tacahiroy/ctrlp-funky'
     Plug 'ctrlpvim/ctrlp.vim'
