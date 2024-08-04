@@ -582,28 +582,36 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'PEMessage/vim-fixkey'
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
-    " Plug 'Yggdroot/LeaderF'
+        noremap <silent> <C-e> :FZF<CR>
+        noremap <leader>ft :BTags<CR>
+    Plug 'Yggdroot/LeaderF'
+        let g:Lf_ShortcutF = ''
+        let g:Lf_ShortcutF = ''
     " Plug 'linrongbin16/fzfx.vim'
     Plug 'tacahiroy/ctrlp-funky'
     Plug 'ctrlpvim/ctrlp.vim'
         let g:ctrlp_map = ''
         let g:ctrlp_root_markers = ['.root', 'repo', '.git']
         let g:ctrlp_max_depth = 3
-        " nnoremap <c-f> :CtrlPFunky<Cr>
+        let g:ctrlp_mruf_max = 250
+        let g:ctrlp_prompt_mappings = {
+                    \ 'ToggleType(1)':        ['<c-up>'],
+                    \ 'ToggleType(-1)':       ['<c-down>'],
+                    \}
+        nnoremap <c-f> :CtrlPBufTag<Cr>
 
         noremap <silent> <C-r> :CtrlPMRU<CR>
         noremap <silent> <C-p> :CtrlPBuffer<CR>
+        noremap <silent> <C-t> :CtrlPBufTagAll<CR>
+        " nnoremap <Leader>fu :CtrlPFunky<Cr>
         " nnoremap <leader>cm :\<C-U>FzfxCommands<CR>
-        noremap <silent> <C-e> :FZF<CR>
         " nnoremap <C-S-p> :\<C-U>FzfxCommands<CR>
 
 
-        noremap <leader>ft :BTags<CR>
         nnoremap <leader>fbr :\<C-U>FzfxBranches<CR>
 
         " nnoremap <leader>fg :\<C-U>FzfxLiveGrep<CR>
         " nnoremap <leader>ff :\<C-U>FzfxFiles<CR>
-        nnoremap <Leader>fu :CtrlPFunky<Cr>
         " nnoremap <space>fw :\<C-U>FzfxLiveGrep<CR>
         " if has('autocmd')
         "     autocmd filetype fzf
@@ -613,6 +621,8 @@ call plug#begin(pe_runtimepath . '/plugged')
         "     autocmd filetype fzf tnoremap  <buffer> <C-o> <enter>
         " augroup END
         " JUST USE <C-M> AS ENTER
+        
+
     Plug 'mg979/vim-visual-multi', {'branch': 'master'}
         let g:M_default_mappings = 0
         let g:VM_mouse_mappings  = 1
@@ -653,28 +663,29 @@ call plug#begin(pe_runtimepath . '/plugged')
         " cnoremap <expr> <silent> <cr> getcmdtype() =~ '[?/]' ? "\<cr>:noh\<cr>" : "\<cr>"
         " nunmap ds
         " <leader>yr
-    Plug 'vim-scripts/YankRing.vim'
-        " let vimd_path =
-        " if !isdirectory(vimd_path)
-        "     call mkdir(vimd_path, "p")
-        " endif
-        let g:yankring_history_dir = pe_cachedir
-        " nnoremap <silent> <leader>yy :YRShow<CR>
-        nnoremap <silent> <C-y> :YRShow<CR>
-        inoremap <silent> <C-y> <ESC>:YRShow<CR>
-        " Swap p and P (do not copy delete item in visual)
-        " See: v_P and v_p
-        let g:yankring_paste_v_akey = 'P'   " uppercase
-        let g:yankring_paste_v_bkey = 'p'   " lowercase
-        " function! YRRunAfterMaps()
-        "     vnoremap p  <C-U>YRPaste 'P', 'v'<CR>
-        "     vnoremap P  <C-U>YRPaste 'p', 'v'<CR>
-        " endfunction
+    " Plug 'vim-scripts/YankRing.vim'
+    "     " let vimd_path =
+    "     " if !isdirectory(vimd_path)
+    "     "     call mkdir(vimd_path, "p")
+    "     " endif
+    "     let g:yankring_history_dir = pe_cachedir
+    "     " nnoremap <silent> <leader>yy :YRShow<CR>
+    "     nnoremap <silent> <C-y> :YRShow<CR>
+    "     inoremap <silent> <C-y> <ESC>:YRShow<CR>
+    "     " Swap p and P (do not copy delete item in visual)
+    "     " See: v_P and v_p
+    "     let g:yankring_paste_v_akey = 'P'   " uppercase
+    "     let g:yankring_paste_v_bkey = 'p'   " lowercase
+    "     " function! YRRunAfterMaps()
+    "     "     vnoremap p  <C-U>YRPaste 'P', 'v'<CR>
+    "     "     vnoremap P  <C-U>YRPaste 'p', 'v'<CR>
+    "     " endfunction
 
 
-        let g:yankring_replace_n_pkey = ''
-        let yankring_min_element_length = 2
-        let g:yankring_paste_using_g = 0
+    "     let g:yankring_replace_n_pkey = ''
+    "     let yankring_min_element_length = 2
+    "     let g:yankring_paste_using_g = 0
+    Plug 'junegunn/vim-peekaboo'
     Plug 'ojroques/vim-oscyank', {'branch': 'main'}
         vmap <leader>c <Plug>OSCYankVisual
     " Plug 'dylanaraps/fff.vim'
