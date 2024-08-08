@@ -758,7 +758,7 @@ call plug#begin(pe_runtimepath . '/plugged')
 " 6.3 Style PlugIn
 " -------------------------------------------
     Plug 'itchyny/lightline.vim'
-    Plug 'google/vim-searchindex' , Cond( stridx(&shortmess, 'S')  == -1)
+    Plug 'google/vim-searchindex' , Cond( stridx(&shortmess, 'S')  != -1)
 
     Plug 'edkolev/tmuxline.vim'
 
