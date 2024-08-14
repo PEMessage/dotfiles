@@ -1,0 +1,43 @@
+#!/bin/bash
+set -e
+
+
+get_cache_dir() {
+    (
+        # 2. check /mnt/c
+        if [ ! -d "/mnt/c" ] ; then
+            echo "[Err]: can't access /mnt/c"
+            exit 1
+        fi
+        cd '/mnt/c'
+        # 3. check wyank-cache
+        WIN_USER="$(cmd.exe /c echo %USERNAME% | tr -d '\015\n')"
+        DOWNLOAD_PATH="/mnt/c/Users/$WIN_USER/Downloads/wyank-cache"
+        if [ ! -d "$DOWNLOAD_PATH" ] ; then
+            echo "[Err]: pls mkdir '$DOWNLOAD_PATH' manully"
+            exit 1
+        fi
+        echo "$DOWNLOAD_PATH"
+    )
+}
+
+
+
+get_download_path() {
+    file="$1"
+    if [ -x "$file" ]; then
+        cd "$(dirname "$file")"
+    else 
+        cd "($get_cache_dir)"
+        rsync --progress -r "$1" .
+    fi
+    powershell.exe Set-Clipboard -Path "$(basename "$file")"
+}
+
+
+get_download_path "$1"
+
+
+
+
+
