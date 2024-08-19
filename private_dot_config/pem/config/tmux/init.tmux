@@ -47,9 +47,14 @@
     # Trouble shooting with `tmux bind -n TheKey lsk`
     # https://github.com/tmux/tmux/wiki/Modifier-Keys
     bind ] paste-buffer -p # prevent run command
-    bind -n M-S-DC paste-buffer -p
     bind -n C-M-p paste-buffer -p
-    bind -n M-P paste-buffer -p
+
+    # NOTE !!! Will cause nvim random input at Start not using it !!!
+    # NOTE !!! Will cause nvim random input at Start not using it !!!
+    # ===============================================================
+    # bind -n M-P paste-buffer -p
+    # bind -n M-S-DC paste-buffer -p
+    # ===============================================================
 
     # Credit: https://stackoverflow.com/questions/12524308/bash-strip-trailing-linebreak-from-output
 
