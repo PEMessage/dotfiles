@@ -28,7 +28,7 @@ get_download_path() {
     if [ -x "$file" ]; then
         cd "$(dirname "$file")"
     else 
-        cd "($get_cache_dir)"
+        cd "$(get_cache_dir)"
         rsync --progress -r "$1" .
     fi
     powershell.exe Set-Clipboard -Path "$(basename "$file")"

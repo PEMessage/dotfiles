@@ -1459,6 +1459,11 @@ call plug#begin(pe_runtimepath . '/plugged')
         set shortmess+=c
     endif
 
+" -------------------------------------------
+" 6.12 debug adapter
+" -------------------------------------------
+    " Plug 'puremourning/vimspector'
+    "     let g:vimspector_enable_mappings = 'HUMAN'
 call plug#end()
 
 " 7. VIM Plug-in Zone (Part2)

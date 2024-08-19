@@ -524,14 +524,15 @@ require("lazy").setup({
             }
 
         )
-        vim.keymap.set(
-            'n',
-            '<leader>/','/',
-            {   desc = 'Search using origin VIM /',
-                remap = true,
-            }
-
-        )
+        -- DEPRECATE:
+        -- vim.keymap.set(
+        --     'n',
+        --     '<leader>/','/',
+        --     {   desc = 'Search using origin VIM /',
+        --         remap = true,
+        --     }
+        --
+        -- )
     end,
 },
 { 'junegunn/vim-easy-align', event = 'VeryLazy' },
