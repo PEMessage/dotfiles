@@ -590,10 +590,11 @@ call plug#begin(pe_runtimepath . '/plugged')
     " Plug 'linrongbin16/fzfx.vim'
     Plug 'tacahiroy/ctrlp-funky'
     Plug 'ctrlpvim/ctrlp.vim'
-        if has('python3') || has('python' )
-            Plug 'FelikZ/ctrlp-py-matcher'
-            let g:ctrlp_match_func = { 'match': 'pymatcher#PyMatch' }
-        endif
+        " NOTE: !!! will cause mru error !!! not use it
+        " if has('python3') || has('python' )
+        "     Plug 'FelikZ/ctrlp-py-matcher'
+        "     let g:ctrlp_match_func = { 'match': 'pymatcher#PyMatch' }
+        " endif
         let g:ctrlp_map = ''
         let g:ctrlp_root_markers = ['.root', 'repo', '.git']
         let g:ctrlp_max_depth = 3
