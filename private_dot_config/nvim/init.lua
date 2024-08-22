@@ -1414,6 +1414,21 @@ vim.cmd('command! PFile lua PE.CurrentFile()')
 
 vim.cmd('command! PCD :cd %:p:h')
 
+function PE.yank(text)
+    local escape = vim.fn.system("yank", text)
+    
+    if vim.v.shell_error ~= 0 then
+        vim.api.nvim_err_writeln(escape)
+    else
+        -- vim.fn.chan({escape}, "/dev/tty", "b")
+        vim.fn.chansend(vim.v.stderr, escape)
+    end
+end
+
+-- Create a mapping
+vim.api.nvim_set_keymap('', '<Leader>y', 'y:<C-U>lua PE.yank(vim.fn.getreg("@0"))<CR>',
+    { noremap = false, silent = true, desc = "yank to 'yank'" })
+
 
 
 
