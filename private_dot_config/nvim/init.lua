@@ -980,16 +980,6 @@ require("lazy").setup({
                 })
 
             end,
-            ["clangd"] = function ()
-                lspconfig.clangd.setup({
-                    autostart = true
-                })
-            end,
-            ["gopls"] = function ()
-                lspconfig.gopls.setup({
-                    autostart = true
-                })
-            end,
             ["pylsp"] = function ()
                 lspconfig.pylsp.setup({
                     autostart = true,
@@ -1019,7 +1009,10 @@ require("lazy").setup({
                         }
                     }
                 })
-            end
+            end,
+            ["clangd"] = function () lspconfig.clangd.setup({ autostart = true }) end,
+            ["gopls"] = function () lspconfig.gopls.setup({ autostart = true }) end,
+            ["jdtls"] = function () lspconfig.jdtls.setup({ autostart = true }) end
 
         })
 
@@ -1051,6 +1044,39 @@ require("lazy").setup({
 
     end,
 
+},
+{
+    'jay-babu/mason-nvim-dap.nvim',
+    dependencies = {
+        'williamboman/mason.nvim',
+        'mfussenegger/nvim-dap',
+    },
+    opts = {
+        handlers = {
+        function(config)
+          -- all sources with no handler get passed here
+          -- Keep original functionality
+          require('mason-nvim-dap').default_setup(config)
+        end,
+        }
+    },
+    config = function(_,opts)
+        require("mason-nvim-dap").setup(opts)
+    end,
+
+},
+{
+    "rcarriga/nvim-dap-ui",
+    event = 'VeryLazy',
+    cmd = { 'DapUiToggle' },
+    dependencies = {
+        "mfussenegger/nvim-dap",
+        "nvim-neotest/nvim-nio"
+    },
+    config = function ()
+        require("dapui").setup()
+        vim.api.nvim_create_user_command('DapUiToggle', function() require('dapui').toggle() end, { nargs = 0 })
+    end,
 },
 -- {
 --     "jay-babu/mason-nvim-dap.nvim",
@@ -1428,8 +1454,6 @@ end
 -- Create a mapping
 vim.api.nvim_set_keymap('', '<Leader>y', 'y:<C-U>lua PE.yank(vim.fn.getreg("@0"))<CR>',
     { noremap = false, silent = true, desc = "yank to 'yank'" })
-
-
 
 
 function PE.MouseSet(arg)
