@@ -1046,6 +1046,26 @@ require("lazy").setup({
 
 },
 {
+    'mfussenegger/nvim-dap',
+    config = function ()
+        local dap = require("dap")
+        local repl = require("dap.repl")
+        repl.commands = vim.tbl_extend("force", repl.commands, {
+            -- Add a new alias for the existing .exit command
+            exit = {'exit', '.exit', '.bye'},
+            -- Add your own commands; run `.echo hello world` to invoke
+            -- this function with the text "hello world"
+            custom_commands = {
+                ['.echo'] = function(text)
+                    dap.repl.append(text)
+                end,
+                -- Hook up a new command to an existing dap function
+                ['.restart'] = dap.restart,
+            },
+        })
+    end
+},
+{
     'jay-babu/mason-nvim-dap.nvim',
     dependencies = {
         'williamboman/mason.nvim',
