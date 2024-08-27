@@ -1010,9 +1010,15 @@ require("lazy").setup({
                     }
                 })
             end,
+            -- ["java_language_server"] = function ()
+            --     lspconfig.java_language_server.setup({
+            --         autostart = true,
+            --         cmd = { "java-language-server" },
+            --     })
+            -- end,
             ["clangd"] = function () lspconfig.clangd.setup({ autostart = true }) end,
             ["gopls"] = function () lspconfig.gopls.setup({ autostart = true }) end,
-            ["jdtls"] = function () lspconfig.jdtls.setup({ autostart = true }) end
+            ["jdtls"] = function () lspconfig.jdtls.setup({ autostart = true }) end,
 
         })
 
@@ -1045,6 +1051,34 @@ require("lazy").setup({
     end,
 
 },
+-- {
+--     'mfussenegger/nvim-jdtls',
+--     dependencies = {
+--         'mfussenegger/nvim-dap',
+--         'williamboman/mason.nvim',
+--         "neovim/nvim-lspconfig",
+--         'williamboman/mason-lspconfig.nvim',
+--     },
+--     opts = {
+--         root_dir = vim.fs.dirname(vim.fs.find({'gradlew', '.git', 'mvnw'}, { upward = true })[1]),
+--     },
+--     config = function (_, opts)
+--         local home = os.getenv("HOME")
+--         local mason_packages_path = home .. "/.local/share/nvim/mason/packages"
+--         local bundles = {
+--             vim.fn.glob(
+--                 mason_packages_path .. "/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar",
+--                 1
+--             ),
+--         }
+--
+--             opts["cmd"] =
+--         require('jdtls').start_or_attach(opts)
+--     end
+-- },
+-- -------------------------------------------
+-- 5.9 DAP Plug
+-- -------------------------------------------
 {
     'mfussenegger/nvim-dap',
     config = function ()
@@ -1067,17 +1101,34 @@ require("lazy").setup({
 },
 {
     'jay-babu/mason-nvim-dap.nvim',
+    event = 'VeryLazy',
     dependencies = {
         'williamboman/mason.nvim',
         'mfussenegger/nvim-dap',
     },
     opts = {
         handlers = {
-        function(config)
-          -- all sources with no handler get passed here
-          -- Keep original functionality
-          require('mason-nvim-dap').default_setup(config)
-        end,
+            function(config)
+                -- all sources with no handler get passed here
+                -- Keep original functionality
+                require('mason-nvim-dap').default_setup(config)
+            end,
+
+            -- See: https://github.com/jay-babu/mason-nvim-dap.nvim/tree/main/lua/mason-nvim-dap/mappings/adapters
+            -- mason not implementation it
+            javadbg = nil,
+            -- javadbg = function (config)
+            --     config.adapters = {
+            --         {
+            --             type = "java",
+            --             request = "attach",
+            --             name = "Debug (Attach) - Remote",
+            --             hostName = "127.0.0.1",
+            --             port = 5005,
+            --         },
+            --     }
+            --     require('mason-nvim-dap').default_setup(config)
+            -- end
         }
     },
     config = function(_,opts)
@@ -1085,6 +1136,9 @@ require("lazy").setup({
     end,
 
 },
+-- -------------------------------------------
+-- 5.9 DAP & LSP UI
+-- -------------------------------------------
 {
     "rcarriga/nvim-dap-ui",
     event = 'VeryLazy',
