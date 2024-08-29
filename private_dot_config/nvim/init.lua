@@ -1018,7 +1018,18 @@ require("lazy").setup({
             -- end,
             ["clangd"] = function () lspconfig.clangd.setup({ autostart = true }) end,
             ["gopls"] = function () lspconfig.gopls.setup({ autostart = true }) end,
-            ["jdtls"] = function () lspconfig.jdtls.setup({ autostart = true }) end,
+            -- ["jdtls"] = function () end, -- Leave it to nvim-jdtls
+            ["jdtls"] = function ()
+                local mason_root = require('mason.settings').current.install_root_dir
+                lspconfig.jdtls.setup({
+                    autostart = true,
+                    init_options = {
+                        bundles = {
+                            vim.fn.glob(mason_root .. 'packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar'),
+                        }
+                    }
+                })
+            end,
 
         })
 
@@ -1051,28 +1062,19 @@ require("lazy").setup({
     end,
 
 },
+-- { 'bfredl/nvim-luadev' },
 -- {
 --     'mfussenegger/nvim-jdtls',
 --     dependencies = {
 --         'mfussenegger/nvim-dap',
 --         'williamboman/mason.nvim',
 --         "neovim/nvim-lspconfig",
---         'williamboman/mason-lspconfig.nvim',
+--         -- 'williamboman/mason-lspconfig.nvim',
 --     },
 --     opts = {
---         root_dir = vim.fs.dirname(vim.fs.find({'gradlew', '.git', 'mvnw'}, { upward = true })[1]),
+--         root_dir = vim.fs.dirname(vim.fs.find({'gradlew', '.git', 'mvnw', '.root'}, { upward = true })[1]),
 --     },
 --     config = function (_, opts)
---         local home = os.getenv("HOME")
---         local mason_packages_path = home .. "/.local/share/nvim/mason/packages"
---         local bundles = {
---             vim.fn.glob(
---                 mason_packages_path .. "/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar",
---                 1
---             ),
---         }
---
---             opts["cmd"] =
 --         require('jdtls').start_or_attach(opts)
 --     end
 -- },
@@ -1116,19 +1118,27 @@ require("lazy").setup({
 
             -- See: https://github.com/jay-babu/mason-nvim-dap.nvim/tree/main/lua/mason-nvim-dap/mappings/adapters
             -- mason not implementation it
-            javadbg = nil,
-            -- javadbg = function (config)
-            --     config.adapters = {
-            --         {
-            --             type = "java",
-            --             request = "attach",
-            --             name = "Debug (Attach) - Remote",
-            --             hostName = "127.0.0.1",
-            --             port = 5005,
-            --         },
-            --     }
-            --     require('mason-nvim-dap').default_setup(config)
-            -- end
+            -- javadbg = nil,
+            javadbg = function (config)
+                -- local mason_root = require('mason.settings').current.install_root_dir
+                -- local bundles = {
+                --     vim.fn.glob(
+                --         mason_root .. "/packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar",
+                --         1
+                --     ),
+                -- }
+                --
+                -- config.adapters = {
+                --     {
+                --         type = "java",
+                --         request = "attach",
+                --         name = "Debug (Attach) - Remote",
+                --         hostName = "127.0.0.1",
+                --         port = 5005,
+                --     },
+                -- }
+                require('mason-nvim-dap').default_setup(config)
+            end
         }
     },
     config = function(_,opts)
@@ -1534,3 +1544,4 @@ function PE.MouseSet(arg)
     vim.o.mouse = arg
 end
 
+vim.cmd [[ command! -nargs=+ -complete=command Redir let s:reg = @@ | redir @"> | silent execute <q-args> | redir END | new | pu | 1,2d_ | let @@ = s:reg ]] 
