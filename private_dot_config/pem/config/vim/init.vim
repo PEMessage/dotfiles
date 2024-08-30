@@ -1,3 +1,4 @@
+" This should be pretty early before linebreak syntax
 set nocompatible
 let g:startify_custom_header = [
 \
@@ -83,6 +84,9 @@ let g:startify_custom_header = [
 " -------------------------------------------
 " 3.1 Basic Setting Zone
 " -------------------------------------------
+    filetype plugin indent on
+    set nrformats-=octal
+
     set nocompatible     " 禁用 vi 兼容模式
     set helplang=cn      " 设置中文帮助手册
     set nowrap           " 关闭自动换行
@@ -158,7 +162,9 @@ let g:startify_custom_header = [
 " 3.3 Search Zone
 " -------------------------------------------
     set smartcase   " 智能搜索大小写判断，默认忽略大小写，除非搜索内容包含大写字母
-    set incsearch   " 查找输入时动态增量显示查找结果
+    if has('reltime')
+        set incsearch
+    endif
     set hlsearch    " 高亮搜索内容
 
 
@@ -1735,6 +1741,11 @@ endif
         exe "setlocal bt=nofile bh=wipe nobl noswf ro ft=" . filetype
     endfunction
     com! DiffCVS call s:DiffWithCVSCheckedOut()
+
+    if !exists(":DiffOrig")
+        command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
+                    \ | wincmd p | diffthis
+    endif
 
     " let g:lightline = {
     "             \ 'active': {
