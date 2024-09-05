@@ -71,11 +71,15 @@ scd() {
     local end='\(/\|$\)'
     declare -a pattern_list=(
         "s@/sys$end@/vnd/@g"
+        "s@/SYSTEM$end@/VENDOR/@g"
         "s@/vnd$end@/sys/@g"
+        "s@/VENDOR$end@/SYSTEM/@g"
         "s@/qssi$end@/target/@g"
         "s@/target$end@/qssi/@g"
         "s@userdebug@user@g"
         "s@user@userdebug@g"
+        "s@sys@vnd@g"
+        "s@vnd@sys@g"
     )
     current_dir="$(readlink -f .)"
 
