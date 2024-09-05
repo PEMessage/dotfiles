@@ -1167,6 +1167,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     " Plug 'vim-scripts/taglist.vim'
 
     Plug 'skywind3000/asyncrun.vim'
+    Plug 'thinca/vim-quickrun'
         " $VIM_FILEPATH  - File name of current buffer with full path
         " $VIM_FILENAME  - File name of current buffer without path
         " $VIM_FILEDIR   - Full path of current buffer without the file name
@@ -1184,18 +1185,18 @@ call plug#begin(pe_runtimepath . '/plugged')
         " $VIM_LINES     - How many lines in vim's screen
         " $VIM_SVRNAME   - Value of v:servername for +clientserver usage
         let g:asyncrun_open = 7
-        nnoremap <leader>ar :AsyncRun!
+        " nnoremap <leader>ar :AsyncRun!
         " Compile current file
-        nnoremap <silent> <leader>aq1 :AsyncRun gcc -Wall -O2 "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
-        " Run it !
-        nnoremap <silent> <leader>aq2 :AsyncRun -raw -cwd=$(VIM_FILEDIR) "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
-        if has('win32') || has('win64')
-            noremap <silent><leader>aqe :AsyncRun! -cwd=<root> findstr /n /s /C:"<C-R><C-W>"
-                        \ "\%CD\%\*.h" "\%CD\%\*.c*" <cr>
-        else
-            noremap <silent><leader>aqe :AsyncRun! -cwd=<root> grep -n -s -R <C-R><C-W>
-                        \ --include='*.h' --include='*.c*' '<root>' <cr>
-        endif
+        " nnoremap <silent> <leader>aq1 :AsyncRun gcc -Wall -O2 "$(VIM_FILEPATH)" -o "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
+        " " Run it !
+        " nnoremap <silent> <leader>aq2 :AsyncRun -raw -cwd=$(VIM_FILEDIR) "$(VIM_FILEDIR)/$(VIM_FILENOEXT)" <cr>
+        " if has('win32') || has('win64')
+        "     noremap <silent><leader>aqe :AsyncRun! -cwd=<root> findstr /n /s /C:"<C-R><C-W>"
+        "                 \ "\%CD\%\*.h" "\%CD\%\*.c*" <cr>
+        " else
+        "     noremap <silent><leader>aqe :AsyncRun! -cwd=<root> grep -n -s -R <C-R><C-W>
+        "                 \ --include='*.h' --include='*.c*' '<root>' <cr>
+        " endif
 
 
 
