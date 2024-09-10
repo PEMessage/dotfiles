@@ -479,6 +479,12 @@ require("lazy").setup({
     'yianwillis/vimcdoc'
 },
 {
+    'thinca/vim-quickrun',
+    keys = {
+        { "<leader>rr", mode = { "n"}, '<cmd>QuickRun<CR>', desc = "QuickRun" },
+    },
+},
+{
     "mg979/vim-visual-multi",
     event = 'VeryLazy',
     enabled = true,
