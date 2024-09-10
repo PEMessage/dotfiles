@@ -19,8 +19,8 @@
     set-option -g history-limit 50000
 
     # Title
-    set -g set-titles on
-    set -g set-titles-string '#(whoami)@#H:#W(#S)'
+    set -g set-titles off
+    # set -g set-titles-string '#(whoami)@#H:#W(#S)'
 
     # Clock
     set -g clock-mode-style 24
@@ -47,7 +47,9 @@
     # Trouble shooting with `tmux bind -n TheKey lsk`
     # https://github.com/tmux/tmux/wiki/Modifier-Keys
     bind ] paste-buffer -p # prevent run command
-    bind -n C-M-p paste-buffer -p
+
+    bind -n C-M-o paste-buffer -p
+    bind -n M-O paste-buffer -p
 
     # NOTE !!! Will cause nvim random input at Start not using it !!!
     # NOTE !!! Will cause nvim random input at Start not using it !!!
@@ -58,10 +60,10 @@
 
     # Credit: https://stackoverflow.com/questions/12524308/bash-strip-trailing-linebreak-from-output
 
-    bind -n M-O \
+    bind -n M-I \
         run-shell "echo '#{pane_current_path}'  | sed -Ez '\$ s/\\n+$//' | tmux load-buffer -" \; \
         display "Copy to buffer: '#{pane_current_path}'"
-    bind -n C-M-o \
+    bind -n C-M-i \
         run-shell "echo '#{pane_current_path}'  | sed -Ez '\$ s/\\n+$//' | tmux load-buffer -" \; \
         display "Copy to buffer: '#{pane_current_path}'"
 
@@ -172,7 +174,7 @@ run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | cut -c 6-8)"
 
     # Credit: https://hackmd.io/@DailyOops/persistent-tmux-popup?type=view
     # Credit: https://stackoverflow.com/questions/229551/how-to-check-if-a-string-contains-a-substring-in-bash
-    bind -n "C-M-i" if-shell 'case "$(tmux display-message -p #S)" in float* ) exit 0;; *) exit 1;; esac ; ' \
+    bind -n "C-M-u" if-shell 'case "$(tmux display-message -p #S)" in float* ) exit 0;; *) exit 1;; esac ; ' \
         "detach-client" \
         "run-shell 'tmux-popup'"
 
