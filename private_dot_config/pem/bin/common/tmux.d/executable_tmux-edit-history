@@ -1,0 +1,6 @@
+#!/bin/sh
+
+file=`mktemp`.sh
+tmux capture-pane -pS - > $file
+tmux new-window -n:mywindow "vim '+ normal G $' $file"
+

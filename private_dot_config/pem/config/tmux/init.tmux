@@ -148,6 +148,7 @@ run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | cut -c 6-8)"
     # mouse support
     set-option -g mouse on
     bind-key -n C-M-m run-shell 'tmux-toggle-mouse toggle #{pane_tty}'
+    bind-key -n C-M-r run-shell 'tmux-edit-history'
     # bind-key -n C-M-i run-shell 'tmux-debug #{pane_tty}'
 
 
