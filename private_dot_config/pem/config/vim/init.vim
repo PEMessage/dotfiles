@@ -615,7 +615,7 @@ call plug#begin(pe_runtimepath . '/plugged')
 
         noremap <silent> <C-r> :CtrlPMRU<CR>
         noremap <silent> <C-p> :CtrlPBuffer<CR>
-        noremap <silent> <C-t> :CtrlPBufTagAll<CR>
+        " noremap <silent> <C-t> :CtrlPBufTagAll<CR>
         " nnoremap <Leader>fu :CtrlPFunky<Cr>
         " nnoremap <leader>cm :\<C-U>FzfxCommands<CR>
         " nnoremap <C-S-p> :\<C-U>FzfxCommands<CR>
