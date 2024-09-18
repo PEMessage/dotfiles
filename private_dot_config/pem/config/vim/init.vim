@@ -357,7 +357,8 @@ let g:startify_custom_header = [
     "   比会把当前窗口切换走了的 <C-]> 好用。
     "   use <C-W>] 
     "       <C-W>}
-    set tags=./.tags;,.tags
+    " set tags=./.tags;,.tags
+    set tags=./tags;,tags,./.tags;,.tags
 
 
 
@@ -1102,6 +1103,8 @@ call plug#begin(pe_runtimepath . '/plugged')
         " Gs"a"top a is for higher priority in wildmenu
         command Gsatop
                     \ echo 'Top is "' . b:gutentags_root . '"'
+        command! CtagGen
+            \ execute '!ctags --options="$HOME/.ctags" -R --output-format=e-ctags --fields=+niazS'
         set cscopetag
 
         " 0 or s: Find this symbol
@@ -1168,6 +1171,7 @@ call plug#begin(pe_runtimepath . '/plugged')
 
     Plug 'skywind3000/asyncrun.vim'
     Plug 'thinca/vim-quickrun'
+        nnoremap <leader>rr :QuickRun<CR>
         " $VIM_FILEPATH  - File name of current buffer with full path
         " $VIM_FILENAME  - File name of current buffer without path
         " $VIM_FILEDIR   - Full path of current buffer without the file name

@@ -250,3 +250,4 @@
     fi
 
     [ -f "$HOME/.peprofile" ] && . ~/.peprofile
+    [ -f "$HOME/.perc" ] && . ~/.perc
