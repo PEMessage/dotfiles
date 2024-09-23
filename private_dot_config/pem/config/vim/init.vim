@@ -161,6 +161,7 @@ let g:startify_custom_header = [
 " -------------------------------------------
 " 3.3 Search Zone
 " -------------------------------------------
+    set ignorecase  " smartcase depend this options
     set smartcase   " 智能搜索大小写判断，默认忽略大小写，除非搜索内容包含大写字母
     if has('reltime')
         set incsearch
