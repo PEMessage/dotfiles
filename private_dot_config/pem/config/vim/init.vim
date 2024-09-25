@@ -1104,7 +1104,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         command Gsatop
                     \ echo 'Top is "' . b:gutentags_root . '"'
         command! CtagGen
-            \ execute '!ctags --options="$HOME/.ctags" -R --output-format=e-ctags --fields=+niazS'
+            \ execute '!ctags  -R --output-format=e-ctags --fields=+niazS'
         set cscopetag
 
         " 0 or s: Find this symbol
