@@ -146,13 +146,14 @@ let g:startify_custom_header = [
         vnoremap RightMouse "+y
     endif
 
-    if has("patch-8.1.0360")
+    if has('patch-8.1.0360')
         set diffopt+=internal,algorithm:patience,iwhite
     endif
 
-    if has("patch-8.1.1270")
-        " set shortmess-=S
-    endif
+    " if has('patch-8.1.1270')
+    "     set shortmess-=S
+    " endif
+
     set diffopt+=iwhite
 
 
@@ -768,7 +769,10 @@ call plug#begin(pe_runtimepath . '/plugged')
 " 6.3 Style PlugIn
 " -------------------------------------------
     Plug 'itchyny/lightline.vim'
-    Plug 'google/vim-searchindex' , Cond( stridx(&shortmess, 'S')  != -1)
+    " Plug 'google/vim-searchindex' , Cond( stridx(&shortmess, 'S')  != -1)
+    " let g:searchindex_enabled = stridx(&shortmess, 'S') != -1  || has('patch-8.1.1270') != 1
+    Plug 'google/vim-searchindex'
+
 
     Plug 'edkolev/tmuxline.vim'
 
