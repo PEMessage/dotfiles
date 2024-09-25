@@ -1,0 +1,8 @@
+
+--output-format=e-ctags
+--fields=+niazS
+--extras=+q
+--c++-kinds=+px
+--c-kinds=+px
+
+--regex-sh=/^[ \t]*(local)?[ \t]*([A-Za-z0-9_-]+)=/\2/v,variable,variables/
