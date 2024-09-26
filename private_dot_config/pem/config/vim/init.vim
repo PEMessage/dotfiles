@@ -1015,7 +1015,10 @@ call plug#begin(pe_runtimepath . '/plugged')
 
             " See: https://github.com/jessepav/lacygoill-wiki-backup/blob/master/vim/autocmd.md?plain=1#L681
             " DEBUG: $ vim -Nu NONE +"autocmd TerminalOpen * echomsg 'buftype is: ' .. (&buftype == '' ? 'regular' : &buftype)"
-            autocmd TerminalOpen * call TermKeyMap()
+            if exists("#TerminalOpen")
+                autocmd TerminalOpen * call TermKeyMap()
+            endif
+
             autocmd User FloatermOpen
                         \ call FloatermKeyMap()
                         \ | call TermKeyMap()
