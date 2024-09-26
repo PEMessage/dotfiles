@@ -992,7 +992,9 @@ call plug#begin(pe_runtimepath . '/plugged')
             if exists('&termwinkey')
                 set termwinkey=<C-x> 
             endif
+
             tnoremap <m-q> <c-\><c-n>
+            tnoremap <M-S-x> <c-\><c-n>:wincmd c<CR>
 
             if has('textprop') && has('patch-8.2.0286')
                 let g:floaterm_position = 'bottomright'
@@ -1002,12 +1004,21 @@ call plug#begin(pe_runtimepath . '/plugged')
                 let g:floaterm_height = 0.3 
             endif
 
-            function! FloatermKeyMap()
-                nnoremap <buffer> <m-q> i
-                tnoremap <buffer> <M-S-x> <c-\><c-n>:FloatermHide<CR>
+            function! TermKeyMap()
+                nnoremap <buffer> <M-q> a
             endfunction
+
+            function! FloatermKeyMap()
+                " nnoremap <buffer> <m-q> i
+                tnoremap <buffer><silent> <M-S-x> <c-\><c-n>:FloatermHide<CR>
+            endfunction
+
+            " See: https://github.com/jessepav/lacygoill-wiki-backup/blob/master/vim/autocmd.md?plain=1#L681
+            " DEBUG: $ vim -Nu NONE +"autocmd TerminalOpen * echomsg 'buftype is: ' .. (&buftype == '' ? 'regular' : &buftype)"
+            autocmd TerminalOpen * call TermKeyMap()
             autocmd User FloatermOpen
                         \ call FloatermKeyMap()
+                        \ | call TermKeyMap()
                         \ | if exists('&termwinkey')
                         \ | call setbufvar(bufnr('%'), '&termwinkey', '<c-x>')
                         \ | endif
