@@ -990,14 +990,25 @@ call plug#begin(pe_runtimepath . '/plugged')
     if has('terminal')
         Plug 'voldikss/vim-floaterm'
             if exists('&termwinkey')
-                set termwinkey=<C-[> 
+                set termwinkey=<C-x> 
+            endif
+            tnoremap <m-q> <c-\><c-n>
+
+            if has('textprop') && has('patch-8.2.0286')
+                let g:floaterm_position = 'bottomright'
+            else
+                let g:floaterm_wintype = 'split'
+                let g:floaterm_position = 'botright'
+                let g:floaterm_height = 0.3 
             endif
             autocmd User FloatermOpen
                         \ if exists('&termwinkey') 
-                        \ | call setbufvar(bufnr('%'), '&termwinkey', '<c-z>') 
+                        \ | call setbufvar(bufnr('%'), '&termwinkey', '<c-x>') 
                         \ | endif
-            let g:floaterm_keymap_toggle = '<M-S-i>'
-            let g:floaterm_position = 'bottomright'
+                        \ | nnoremap <buffer> <m-q> i 
+                        \ | tnoremap <buffer> <M-S-x> <c-\><c-n>:FloatermHide<CR>
+
+            let g:floaterm_keymap_toggle = '<M-S-u>'
             let g:floaterm_opener = 'tabe'
     endif
     Plug 'christoomey/vim-tmux-navigator'
