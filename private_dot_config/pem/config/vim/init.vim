@@ -1001,12 +1001,16 @@ call plug#begin(pe_runtimepath . '/plugged')
                 let g:floaterm_position = 'botright'
                 let g:floaterm_height = 0.3 
             endif
+
+            function! FloatermKeyMap()
+                nnoremap <buffer> <m-q> i
+                tnoremap <buffer> <M-S-x> <c-\><c-n>:FloatermHide<CR>
+            endfunction
             autocmd User FloatermOpen
-                        \ if exists('&termwinkey') 
-                        \ | call setbufvar(bufnr('%'), '&termwinkey', '<c-x>') 
+                        \ call FloatermKeyMap()
+                        \ | if exists('&termwinkey')
+                        \ | call setbufvar(bufnr('%'), '&termwinkey', '<c-x>')
                         \ | endif
-                        \ | nnoremap <buffer> <m-q> i 
-                        \ | tnoremap <buffer> <M-S-x> <c-\><c-n>:FloatermHide<CR>
 
             let g:floaterm_keymap_toggle = '<M-S-u>'
             let g:floaterm_opener = 'tabe'
