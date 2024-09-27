@@ -653,6 +653,9 @@ require("lazy").setup({
     end
 
 },
+{
+    "nvim-treesitter/nvim-treesitter-context"
+},
 
 -- -------------------------------------------
 -- 5.5 Telescope Setting
