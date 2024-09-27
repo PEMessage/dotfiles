@@ -1872,3 +1872,13 @@ endif
 
     command! -nargs=+ -complete=command Redir let s:reg = @@ | redir @"> | silent execute <q-args> | redir END | new | pu | 1,2d_ | let @@ = s:reg
 
+
+    " Credit: GPT
+    function! DeletePattern(pattern)
+        let @" = ''
+        execute 'g/' . a:pattern . '/let @" .= getline(".") . "\n"'
+        execute 'g/' . a:pattern . '/d _'
+    endfunction
+    command! DeletePattern call DeletePattern(@/)
+    nnoremap dl :DeletePattern<CR>
+
