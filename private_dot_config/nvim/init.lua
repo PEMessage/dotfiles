@@ -512,35 +512,35 @@ require("lazy").setup({
         }
     end,
 },
-{
-    'easymotion/vim-easymotion',
-    event = 'VeryLazy',
-    enabled = true,
-    init = function()
-        vim.g.EasyMotion_smartcase        = 1
-        vim.g.EasyMotion_do_mapping       = 0
-        vim.g.EasyMotion_enter_jump_first = 1
-        vim.g.EasyMotion_space_jump_first = 1
-        vim.g.EasyMotion_use_upper        = 1
-        vim.keymap.set(
-            'n',
-            '/','<Plug>(easymotion-sn)',
-            {   desc = 'Search using easymotion',
-                remap = true,
-            }
-
-        )
-        -- DEPRECATE:
-        -- vim.keymap.set(
-        --     'n',
-        --     '<leader>/','/',
-        --     {   desc = 'Search using origin VIM /',
-        --         remap = true,
-        --     }
-        --
-        -- )
-    end,
-},
+-- {
+--     'easymotion/vim-easymotion',
+--     event = 'VeryLazy',
+--     enabled = false,
+--     init = function()
+--         vim.g.EasyMotion_smartcase        = 1
+--         vim.g.EasyMotion_do_mapping       = 0
+--         vim.g.EasyMotion_enter_jump_first = 1
+--         vim.g.EasyMotion_space_jump_first = 1
+--         vim.g.EasyMotion_use_upper        = 1
+--         vim.keymap.set(
+--             'n',
+--             '/','<Plug>(easymotion-sn)',
+--             {   desc = 'Search using easymotion',
+--                 remap = true,
+--             }
+--
+--         )
+--         -- DEPRECATE:
+--         -- vim.keymap.set(
+--         --     'n',
+--         --     '<leader>/','/',
+--         --     {   desc = 'Search using origin VIM /',
+--         --         remap = true,
+--         --     }
+--         --
+--         -- )
+--     end,
+-- },
 { 'junegunn/vim-easy-align', event = 'VeryLazy' },
 { 'tpope/vim-repeat', event = 'VeryLazy' },
 
