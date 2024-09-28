@@ -165,6 +165,7 @@
         #     )
 
         # common PATH
+        PEM_PRE_PATH=""
         for xbin in \
             "$x/bin"/*.d \
             "$x/bin/arch/${PEM_OS}-${PEM_ARCH}"/*.d \
@@ -175,7 +176,14 @@
                 case "$xbin" in
                     *.pre.d)
                         # will be preappend to $PATH later
-                        PEM_PRE_PATH="$PEM_PRE_PATH:$xbin"
+                        if [ -z "$PEM_PRE_PATH" ] ; then
+                            # Only for first loop
+                            # Do not append useless ':' before PATH
+                            # Which will casuse '::' in PATH
+                            PEM_PRE_PATH="$xbin"
+                        else
+                            PEM_PRE_PATH="$PEM_PRE_PATH:$xbin"
+                        fi
                         ;;
                     *.d)
                         PATH="$PATH:$xbin"
