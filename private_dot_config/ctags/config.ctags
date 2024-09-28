@@ -5,4 +5,21 @@
 --c++-kinds=+px
 --c-kinds=+px
 
+# Shell
 --regex-sh=/^[ \t]*(local)?[ \t]*([A-Za-z0-9_-]+)=/\2/v,variable,variables/
+
+# markdown
+# --regex-markdown=/^(#+)[ \t]+([^#]*)/\1 \2/h,headings,Markdown Headers/
+--regex-markdown=/\[([^\[]+)\]\(([^\)]+)\)/\1/l,links,Markdown Links/
+--regex-markdown=/!\[\]\(.*[\/ ](.*\.[a-z]{3})\)/\1/i,images,Markdown Image/
+
+
+# Exclude
+--exclude=.git
+--exclude=.svn
+--exclude=node_modules/*
+--exclude=tags
+--exclude=TAGS
+--exclude=GTAGS
+--exclude=GPATH
+--exclude=compile_commands.json
