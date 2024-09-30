@@ -73,4 +73,6 @@ then
 else
     exec_cmd="exec tmux new-window -n GDB"
 fi
-$exec_cmd sh -c "gdb -x ${CAHCE_PATH} $ARGS ${@@Q} ; tmux kill-window -t \$TMUX_PANE"
+# echo $exec_cmd sh -c "gdb-multi -x ${CAHCE_PATH} $ARGS $@ ; tmux kill-window -t \$TMUX_PANE"
+$exec_cmd sh -c "gdb-multiarch -x ${CAHCE_PATH} $ARGS $@ ; tmux kill-window -t \$TMUX_PANE"
+# $exec_cmd sh -c "gdb -x ${CAHCE_PATH} $ARGS $@ ; tmux kill-window -t \$TMUX_PANE"

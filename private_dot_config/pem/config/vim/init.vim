@@ -640,7 +640,7 @@ call plug#begin(pe_runtimepath . '/plugged')
 
     Plug 'mg979/vim-visual-multi', {'branch': 'master'}
         let g:M_default_mappings = 0
-        let g:VM_mouse_mappings  = 1
+        let g:VM_mouse_mappings  = 0
         let g:VM_maps = {}
         " Basic
         let g:VM_maps['Find Under']          = '<C-h>'
@@ -1140,6 +1140,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         command! CtagGen
             \ execute '!ctags  -R --output-format=e-ctags --fields=+niazS'
         set cscopetag
+        set cscopeprg=gtags-cscope
 
         " 0 or s: Find this symbol
         " 1 or g: Find this definition
