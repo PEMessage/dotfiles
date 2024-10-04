@@ -2366,12 +2366,6 @@ end
 
 # Better GDB defaults ----------------------------------------------------------
 
-set history save
-set verbose off
-set print pretty on
-set print array off
-set print array-indexes on
-set python print-stack full
 
 # Start ------------------------------------------------------------------------
 
@@ -2429,8 +2423,39 @@ end
 # ==========================================
 # 3. Custom Configuration
 # ==========================================
+
+# 3.1 alias
+# -------------------------------------------
 alias sk = shell
 alias fh = pipe help all | fzf
+
+# 3.2 Basic configuration
+# -------------------------------------------
+    set history save
+    set verbose off
+    set print array off
+    set python print-stack full
+    set disassembly-flavor intel
+
+# 3.3 C/C++ configuration
+# -------------------------------------------
+
+    # 每行打印一个结构体成员
+    set print pretty on
+
+    # 当打印一个数组时，打印索引下标
+    set print array-indexes on
+
+    # info vtbl [expr]
+    # info variables vtable for CLASS
+    set print vtbl on 
+
+    # 为了观察一个对象的虚表和相应虚表的内容，可以在启动gdb后设置如下命令
+    set print demangle on
+    set print asm-demangle on
+
+    # 按照派生类型打印对象
+    set print object on
 
 
 
