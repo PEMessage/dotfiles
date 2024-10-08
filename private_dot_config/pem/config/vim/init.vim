@@ -155,6 +155,8 @@ let g:startify_custom_header = [
     " endif
 
     set diffopt+=iwhite
+    " zf to fold, zo to open, zd to delete
+    set foldmethod=manual
 
 
 
