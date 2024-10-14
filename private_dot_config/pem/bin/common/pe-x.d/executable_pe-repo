@@ -29,6 +29,7 @@ CHANGELOG:
     v1.1: add r(print root)
     v1.2: add pm(xmlstarlet wrapper)
     v1.4: add getm(repo manifest for any)
+    v1.5: clean getm log
 
 "
 }
@@ -102,7 +103,7 @@ CHANGELOG:
         do
             revision="$( echo "$manifest" | xmlstarlet sel -t -v  "//project[@path='$x']/@revision")"
             echo "[Info]: check '$x' for '$revision'"
-            git -C "$x" log -n1 --oneline "${revision}"  || {
+            git --no-pager -C "$x" log -n1 --oneline "${revision}"  || {
                 echo "[Err]: error on command: git -C $x log -n1 --oneline $revision"
                 exit 1
             }
@@ -142,12 +143,12 @@ CHANGELOG:
         local branch="$1"
         local manifest="$2"
 
-        checkvar CONF_MANIFEST_URL
+        # checkvar CONF_MANIFEST_URL
         [ -n "$CONF_MANIFEST_URL" ] || {
             echo "[Err]: not $CONF_MANIFEST_URL founded"
             exit 1
         }
-        checkvar CONF_REPO_URL
+        # checkvar CONF_REPO_URL
         [ -n "$CONF_REPO_URL" ] || {
             echo "[Err]: not $CONF_REPO_URL founded"
             exit 1
@@ -156,18 +157,18 @@ CHANGELOG:
         local manifestname="$(last2base "$CONF_MANIFEST_URL" |  tr '/' '_')"
         local manifestpath="$CONF_CACHE_DIR/$manifestname"
 
-        checkvar manifestname
-        checkvar manifestpath
+        # checkvar manifestname
+        # checkvar manifestpath
         (
             # if [ ! -x  "$manifestpath/.repo/manifest.xml" ] ; then
-            echo '[Info]: init process...'
-            runcmd mkdir -p "$manifestpath"
-            runcmd cd "$manifestpath"
-            runcmd repo init --no-repo-verify \
+            # echo '[Info]: init process...'
+            mkdir -p "$manifestpath"
+            cd "$manifestpath"
+            repo init --no-repo-verify \
                 -u "$CONF_MANIFEST_URL" \
                 --repo-url "$CONF_REPO_URL" \
                 -b "$branch" \
-                -m "$manifest"
+                -m "$manifest"  > /dev/null
             # else
             #     echo  '[Info]:  reuse cache repo'
             #     runcmd cd "$manifestpath/.repo/manifests"
@@ -182,10 +183,10 @@ CHANGELOG:
         )
 
         (
-            runcmd cd "$manifestpath"
-            echo "${CONF_SPLIT}${CONF_SPLIT_KEY}-start${CONF_SPLIT}"
+            cd "$manifestpath"
+            # echo "${CONF_SPLIT}${CONF_SPLIT_KEY}-start${CONF_SPLIT}"
             repo manifest
-            echo "${CONF_SPLIT}${CONF_SPLIT_KEY}-close${CONF_SPLIT}"
+            # echo "${CONF_SPLIT}${CONF_SPLIT_KEY}-close${CONF_SPLIT}"
         )
     )
     }

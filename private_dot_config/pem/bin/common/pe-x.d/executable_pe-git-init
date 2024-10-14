@@ -3,7 +3,7 @@ command() {
     echo "Runing: $@"
     "$@"
 }
-command git config --global alias.pk cherry-pick
+command git config --global alias.pk cherry-pick -x
 command git config --global alias.cm commit
 command git config --global alias.co checkout
 command git config --global alias.fw merge --ff-only

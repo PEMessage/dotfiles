@@ -755,7 +755,6 @@ call plug#begin(pe_runtimepath . '/plugged')
           \ }
         map <CR> <Plug>(expand_region_expand)
         map <BS> <Plug>(expand_region_shrink)
-        
 
 
                 " \ 'i"'  :1,
@@ -1885,4 +1884,31 @@ endif
     endfunction
     command! DeletePattern call DeletePattern(@/)
     nnoremap dl :DeletePattern<CR>
+
+
+    " function! FoldSearchPattern() abort
+    "     if !exists('w:foldpatterns')
+    "         let w:foldpatterns=[]
+    "         setlocal foldmethod=expr foldlevel=0 foldcolumn=2
+    "     endif
+    "     if index(w:foldpatterns, @/) == -1
+    "         call add(w:foldpatterns, @/)
+    "         setlocal foldexpr=SetFolds(v:lnum)
+    "     endif
+    " endfunction
+
+    " function! SetFolds(lnum) abort
+    "     for pattern in w:foldpatterns
+    "         if getline(a:lnum) =~ pattern
+    "             if getline(a:lnum + 1) !~ pattern
+    "                 return 's1'
+    "             else
+    "                 return 1
+    "             endif
+    "         endif
+    "     endfor
+    " endfunction
+
+    " nnoremap \zf :call FoldSearchPattern()<CR>
+
 
