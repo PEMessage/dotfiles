@@ -1885,6 +1885,8 @@ endif
     command! DeletePattern call DeletePattern(@/)
     nnoremap dl :DeletePattern<CR>
 
+    " Credit: GPT
+
 
     " function! FoldSearchPattern() abort
     "     if !exists('w:foldpatterns')
@@ -1910,5 +1912,29 @@ endif
     " endfunction
 
     " nnoremap \zf :call FoldSearchPattern()<CR>
+
+
+    " Credit: GPT-4o-mini
+    " Function to execute a command on the last matched pattern
+    function! PatternCmd(...)
+        " Get the last search pattern
+        let l:pattern = @/
+
+        " Check if the pattern is empty
+        if empty(l:pattern)
+            echo "No previous search pattern found."
+            return
+        endif
+
+        " Extract the command from the arguments
+        let l:cmd = join(a:000, ' ') " Join all arguments as the command
+
+        " Execute the command on lines matching the pattern
+        execute 'g/' . l:pattern . '/ ' . l:cmd
+    endfunction
+
+    " Command to call the function
+    command! -nargs=+ -complete=command PatternCmd call PatternCmd(<f-args>)
+
 
 
