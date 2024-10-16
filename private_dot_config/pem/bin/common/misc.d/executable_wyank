@@ -11,7 +11,7 @@ get_cache_dir() {
         fi
         cd '/mnt/c'
         # 3. check wyank-cache
-        WIN_USER="$(cmd.exe /c echo %USERNAME% | tr -d '\015\n')"
+        WIN_USER="$(/mnt/c/Windows/System32/cmd.exe /c echo %USERNAME% | tr -d '\015\n')"
         DOWNLOAD_PATH="/mnt/c/Users/$WIN_USER/Downloads/wyank-cache"
         if [ ! -d "$DOWNLOAD_PATH" ] ; then
             echo "[Err]: pls mkdir '$DOWNLOAD_PATH' manully"
@@ -31,7 +31,7 @@ get_download_path() {
         cd "$(get_cache_dir)"
         rsync --progress -r "$1" .
     fi
-    powershell.exe Set-Clipboard -Path "$(basename "$file")"
+    /mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe Set-Clipboard -Path "$(basename "$file")"
 }
 
 
