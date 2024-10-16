@@ -736,6 +736,7 @@ call plug#begin(pe_runtimepath . '/plugged')
 
     Plug 'terryma/vim-expand-region'
     let g:expand_region_text_objects = {
+          \ 'iJ'  :0,
           \ 'iw'  :0,
           \ 'iy'  :0,
           \ 'iW'  :0,
@@ -1565,6 +1566,26 @@ endif
 	\     'select-i': 'i=',
 	\   },
 	\ })
+
+    " call textobj#user#plugin('datetime', {
+    " \   'date': {
+    " \     'pattern': '\<\d\d\d\d-\d\d-\d\d\>',
+    " \     'select': ['ad', 'id'],
+    " \   },
+    " \   'time': {
+    " \     'pattern': '\<\d\d:\d\d:\d\d\>',
+    " \     'select': ['at', 'it'],
+    " \   },
+    " \ })
+    "test 1234-12-34
+
+    call textobj#user#plugin('jiraid', {
+    \   'jiraid-t1': {
+    \     'pattern': '[A-Z]\+-[0-9]\{1,4\}',
+    \     'select': ['aJ', 'iJ'],
+    \   }
+    \ })
+
 
     call expand_region#custom_text_objects('java', {
                 \ 'iF' :0,
