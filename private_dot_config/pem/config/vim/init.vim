@@ -736,8 +736,8 @@ call plug#begin(pe_runtimepath . '/plugged')
 
     Plug 'terryma/vim-expand-region'
     let g:expand_region_text_objects = {
-          \ 'iJ'  :0,
           \ 'iw'  :0,
+          \ 'iJ'  :0,
           \ 'iy'  :0,
           \ 'iW'  :0,
           \ 'i"'  :0,
