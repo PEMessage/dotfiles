@@ -1580,11 +1580,13 @@ endif
     "test 1234-12-34
 
     call textobj#user#plugin('jiraid', {
-    \   'jiraid-t1': {
+    \   'jiraid-tag': {
     \     'pattern': '[A-Z]\+-[0-9]\{1,4\}',
     \     'select': ['aJ', 'iJ'],
+    \     'scan': 'cursor',
     \   }
     \ })
+    " Test: aaJIRA-1234aa
 
 
     call expand_region#custom_text_objects('java', {
