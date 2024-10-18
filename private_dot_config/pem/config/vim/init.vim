@@ -733,6 +733,14 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'skywind3000/vim-textobj-parameter'
         Plug 'kana/vim-textobj-function'
         Plug 'bps/vim-textobj-python'
+    Plug 'PEMessage/vim-text-process'
+        let g:textproc_inline_script = {
+            \}
+        " Test: example
+        " let g:textproc_inline_script['jq'] = 'jq'
+        " let g:textproc_inline_script['z_bashtest'] = 'bash -c "echo 123"'
+
+
 
     Plug 'terryma/vim-expand-region'
     let g:expand_region_text_objects = {
