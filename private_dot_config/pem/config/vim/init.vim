@@ -448,14 +448,14 @@ let g:startify_custom_header = [
 " -------------------------------------------
     nnoremap <leader>rcc  :w<CR> :source %<CR> " Re:Configuration
 
-    function PERcEdit() 
+    function! PERCEdit() 
         if exists('g:pe_rc["file"]') && !empty(g:pe_rc['file'])
             execute 'tabedit ' . g:pe_rc['file']
         else 
             execute 'tabedit ' . '~/.vimrc'
         endif
     endfunction
-    nnoremap <leader>rce  :call PERcEdit()<CR>
+    nnoremap <leader>rce  :call PERCEdit()<CR>
 
     nnoremap <leader>``   :nohlsearch<CR>
     nnoremap <leader>`1   :set! virtualedit=onemore<CR>
@@ -999,6 +999,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     "     let g:terminal_key = '<leader>='
         " let g:terminal_key = '<M-`>'
     if has('terminal')
+        Plug 'chrisbra/vpager'
         Plug 'voldikss/vim-floaterm'
             if exists('&termwinkey')
                 set termwinkey=<C-x> 
@@ -1966,6 +1967,5 @@ endif
 
     " Command to call the function
     command! -nargs=+ -complete=command PatternCmd call PatternCmd(<f-args>)
-
 
 
