@@ -742,7 +742,12 @@ call plug#begin(pe_runtimepath . '/plugged')
         Plug 'bps/vim-textobj-python'
     Plug 'PEMessage/vim-text-process'
         let g:textproc_inline_script = {
+            \'format_json': 'python3 -c "import json.tool ; json.tool.main()"',
             \}
+        if exists('g:ovr_textproc_inline_script')
+            expand(g:textproc_inline_script,g:ovr_textproc_inline_script)
+        endif
+           
         " Test: example
         " let g:textproc_inline_script['jq'] = 'jq'
         " let g:textproc_inline_script['z_bashtest'] = 'bash -c "echo 123"'
