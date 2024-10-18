@@ -52,6 +52,7 @@ let g:startify_custom_header = [
                 "    \   'gitbranch': 'FugitiveHead',
                 "    \   'searchcount': 'SearchIndex'
     nnoremap <leader>tt :call lightline#toggle()<CR>
+    let g:which_key_map = {}
 
                     " \   'gitbranch': 'FugitiveHead',
                     " \   'searchcount': 'SearchIndex'
@@ -457,14 +458,20 @@ let g:startify_custom_header = [
     endfunction
     nnoremap <leader>rce  :call PERCEdit()<CR>
 
+    let g:which_key_map['`'] = {
+                \ 'name': '+search-highlight'
+                \}
     nnoremap <leader>``   :nohlsearch<CR>
     nnoremap <leader>`1   :set! virtualedit=onemore<CR>
     nnoremap <leader>wp  :set nowrap!<CR>
     nnoremap <leader>cl  :set cursorline!<CR>
 
-    nnoremap <leader>nu  :set number!<CR>
-                        set number
-    nnoremap <leader>nr :set relativenumber!<CR>
+    let g:which_key_map['n'] = {
+                \ 'name': '+line-number'
+                \}
+        nnoremap <leader>nu  :set number!<CR>
+                            set number
+        nnoremap <leader>nr :set relativenumber!<CR>
     nnoremap <leader>tb  :tab ball<CR>
     nnoremap <leader>gp  `[v`]
     nnoremap gp  `[v`]
@@ -626,7 +633,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         " nnoremap <C-S-p> :\<C-U>FzfxCommands<CR>
 
 
-        nnoremap <leader>fbr :\<C-U>FzfxBranches<CR>
+        " nnoremap <leader>fbr :\<C-U>FzfxBranches<CR>
 
         " nnoremap <leader>fg :\<C-U>FzfxLiveGrep<CR>
         " nnoremap <leader>ff :\<C-U>FzfxFiles<CR>
@@ -785,9 +792,9 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'google/vim-searchindex'
 
 
-    Plug 'edkolev/tmuxline.vim'
+    Plug 'edkolev/tmuxline.vim' , { 'on' : [ 'TmuxlineSnapshot', 'Tmuxline' ] }
 
-    Plug 'romgrk/github-light.vim'
+    " Plug 'romgrk/github-light.vim'
     Plug 'joshdick/onedark.vim'
     " let g:onedark_color_overrides = {
     "             \ "QuickFixLine": {"gui": "#2F343F", "cterm": "235", "cterm16": "0" },
@@ -846,7 +853,11 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:startify_enable_unsafe = 1
         let g:startify_files_number = 8
 
-    Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
+    " Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
+    Plug 'liuchengxu/vim-which-key'
+        let g:mapleader = "\\"
+        let g:which_key_exit = ["\<Esc>", "\<C-[>", "\<C-c>"]
+        nnoremap <silent> <leader>      :<c-u>WhichKey '\'<CR>
     Plug 'itchyny/vim-cursorword'
     " Plug 'junegunn/rainbow_parentheses.vim'
     augroup rainbow_auto
@@ -884,8 +895,9 @@ call plug#begin(pe_runtimepath . '/plugged')
         autocmd BufNewFile,BufRead *.bp set filetype=json " arm = armv6/7
     " Plug 'sheerun/vim-polyglot'
     Plug 'mtdl9/vim-log-highlighting'
-    Plug 'chrisbra/Colorizer'
-    Plug 'powerman/vim-plugin-AnsiEsc'
+    Plug 'chrisbra/Colorizer' , { 'on': 'ColorToggle' }
+    Plug 'powerman/vim-plugin-AnsiEsc' , { 'on': 'AnsiEsc' }
+        let g:no_cecutil_maps = 1
 
     " vi 1976
     " | \      more 1978
@@ -939,8 +951,9 @@ call plug#begin(pe_runtimepath . '/plugged')
 " 6.6 Git plugin
 " -------------------------------------------
     Plug 'airblade/vim-gitgutter'
+        let g:gitgutter_map_keys = 0
         command! Gqf GitGutterQuickFix | copen
-    Plug 'will133/vim-dirdiff'
+    Plug 'will133/vim-dirdiff' , { 'on': [ 'DirDiff' ] }
         let g:DirDiffWindowSize = 7
     Plug 'samoshkin/vim-mergetool'
         let g:mergetool_layout = 'mr'
@@ -948,7 +961,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         " :h copy-diffs
         " :'<,'>diffget  do(diff obtain)
         " :'<,'>diffput. dp(diff put)
-    Plug 'cohama/agit.vim'
+    Plug 'cohama/agit.vim' , { 'on': [ 'Agit' ] }
         " J			    <Plug>(agit-scrolldown-stat)
         " K			    <Plug>(agit-scrollup-stat)
         " <C-j>			<Plug>(agit-scrolldown-diff)
@@ -1170,6 +1183,9 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:gutentags_plus_height = 5
         let g:gutentags_plus_native = 0
 
+        let g:which_key_map['g'] = {
+                    \ 'name': '+gtag'
+                    \}
         noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr>
         noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
 
@@ -1205,7 +1221,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         " " File
         " " noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
     " Plug 'preservim/tagbar'
-    Plug 'liuchengxu/vista.vim'
+    Plug 'liuchengxu/vista.vim' , { 'on': [ 'Vista' ] }
         let g:vista#renderer#enable_icon = 0
         let g:vista_echo_cursor_strategy = "scroll"
         " nnoremap <leader>at :TagbarToggle<CR>
@@ -1967,5 +1983,7 @@ endif
 
     " Command to call the function
     command! -nargs=+ -complete=command PatternCmd call PatternCmd(<f-args>)
+
+    call which_key#register('\', "g:which_key_map")
 
 
