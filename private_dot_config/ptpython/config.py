@@ -8,7 +8,7 @@ from ptpython.layout import CompletionVisualisation
 __all__ = ["configure"]
 
 def configure(repl):
-    repl.enable_mouse_support = True
+    repl.enable_mouse_support = False
     repl.enable_auto_suggest = True
     repl.color_depth = "DEPTH_24_BIT"
     repl.min_brightness = 0.4
