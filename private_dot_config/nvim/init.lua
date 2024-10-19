@@ -115,6 +115,8 @@ vim.keymap.set('i', 'jj', '<C-[>')
     vim.o.laststatus  = 2  -- 总是显示状态栏
     vim.o.showtabline = 2  -- 总是显示标签栏
     vim.o.splitright = true      -- 水平切割窗口时，默认在右边显示新窗口
+    
+    vim.diagnostic.config({ virtual_text = false })
 
 
 
@@ -654,7 +656,24 @@ require("lazy").setup({
 
 },
 {
-    "nvim-treesitter/nvim-treesitter-context"
+    "nvim-treesitter/nvim-treesitter-context",
+    opts = {
+        enable = false,
+        max_lines = 3
+    }
+},
+{
+    "utilyre/barbecue.nvim",
+    name = "barbecue",
+    version = "*",
+    dependencies = {
+        "SmiteshP/nvim-navic",
+        -- "nvim-tree/nvim-web-devicons", -- optional dependency
+    },
+    opts = {
+        kinds = false,
+        -- configurations go here
+    },
 },
 
 -- -------------------------------------------
@@ -908,13 +927,13 @@ require("lazy").setup({
         --     })
         -- })
 
-        cmp.setup.cmdline({ '/', '?' }, {
-            mapping = cmp.mapping.preset.cmdline(),
-
-            sources = {
-                { name = 'buffer' }
-            }
-        })
+        -- cmp.setup.cmdline({ '/', '?' }, {
+        --     mapping = cmp.mapping.preset.cmdline(),
+        --
+        --     sources = {
+        --         { name = 'buffer' }
+        --     }
+        -- })
 
     end
 
@@ -1006,6 +1025,7 @@ require("lazy").setup({
                                         -- 'W391',
                                         'E111', -- E111 indentation is not a multiple of 4
                                         'E114', -- E114 indentation is not a multiple of 4 (comment)
+                                        'E206', -- E266 too many leading '#' for block comment
                                         'W504', -- W504 line break after binary operator
                                         'E501', -- E501 line too long (80 > 79 characters)
                                         'W391', -- W391 blank line at end of file
@@ -1447,6 +1467,21 @@ local wk = PE.WkCheck()
 
     -- vim.keymap.set("n", "<leader>o/",'/', { noremap = true, desc = "Origin VIM /" })
     vim.keymap.set("v", "<leader>y",'"+y', { noremap = true, desc = "Copy to clipboard(Reg\")" })
+
+
+
+    -- Function to toggle diagnostics
+    function PE.ToggleDiagnostics()
+        local disabled = vim.diagnostic.is_disabled()
+        if disabled then
+            vim.diagnostic.enable()
+        else
+            vim.diagnostic.disable()
+        end
+    end
+    vim.keymap.set('n', '<leader>`d', PE.ToggleDiagnostics, { noremap = true, silent = true , desc = "Toggle diagnostic" })
+    -- Hide by default
+
 -- 7. Function Zone
 -- ===========================================
 
