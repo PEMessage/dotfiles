@@ -1017,7 +1017,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     "     let g:terminal_key = '<leader>='
         " let g:terminal_key = '<M-`>'
     if has('terminal')
-        Plug 'chrisbra/vpager'
+        Plug 'chrisbra/vpager' ,  Cond( (v:version > 800 || v:version == 800 && has("patch1647") )
         Plug 'voldikss/vim-floaterm'
             if exists('&termwinkey')
                 set termwinkey=<C-x> 
