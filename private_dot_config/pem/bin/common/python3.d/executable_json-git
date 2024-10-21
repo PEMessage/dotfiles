@@ -38,8 +38,8 @@ def git_log_json(argv: list):
 
 
     decoded = info.stdout.decode('utf-8')
-    records = decoded.split(RC_SPLITER)
-    del records[0] # delete first empty record [ '' , record1 , record2 ... ]
+    # ignore first empty record [ '' , record1 , record2 ... ]
+    records = [ s.strip() for s in decoded.split(RC_SPLITER)[1:] ]
     for i,rc in enumerate(records):
         records[i] = rc.split(ATTR_SPLITER)
 
