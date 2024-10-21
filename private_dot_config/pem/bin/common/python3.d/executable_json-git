@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+
+import sys
+import subprocess
+import json
+import re
+import pprint
+import hashlib
+
+
+
+def git_log_json(argv: list):
+    RC_SPLITER = "|^=<<=^|"
+    ATTR_SPLITER = "|^=@@=^|"
+    format_map = {
+        "hash" : "%h",
+        "subject" : "%s",
+        "ref" : "%d",
+        "body" : "%b",
+        "author_email" : "%ae",
+        "author_time" : "%at",
+    }
+
+    format_str = ATTR_SPLITER.join( v for _,v in format_map.items() )
+    cmd = [ 'git', 'log' , f'--format={RC_SPLITER}{format_str}' ] + argv
+
+    try:
+        info = subprocess.run(cmd, check=True, capture_output=True)
+    except subprocess.CalledProcessError as e:
+        err_msg = {
+            'returncode': e.returncode,
+            'cmd': e.cmd,
+        }
+        return { 
+            "type": "error",
+            "content": err_msg
+        }
+
+
+    decoded = info.stdout.decode('utf-8')
+    records = decoded.split(RC_SPLITER)
+    del records[0] # delete first empty record [ '' , record1 , record2 ... ]
+    for i,rc in enumerate(records):
+        records[i] = rc.split(ATTR_SPLITER)
+
+    for i,rc in enumerate(records):
+        result  = {}
+        for j,k in enumerate(format_map.keys()):
+            result[k] = rc[j]
+        records[i] = result
+
+    for rc in records:
+        matched = re.search(r'Change-Id: (\w+)', rc["body"])
+
+        if matched:
+            rc["changeid"] = matched.group(1)
+        else:
+            hash_content = "||".join( [ rc["subject"], rc["body"], rc["author_time"] ])
+            rc["changeid"] = hashlib.sha1(hash_content.encode(encoding='utf-8')).hexdigest() \
+                + "||subject||body||author_time"
+
+    return { 
+        "type": "success",
+        "content": records
+    }
+
+    
+if __name__ == "__main__":
+    print(
+        json.dumps(
+            git_log_json(sys.argv[1:]),
+            indent=4
+        )
+    )
+
+
+
+
+
