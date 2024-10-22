@@ -6,6 +6,7 @@ import json
 import re
 import pprint
 import hashlib
+import argparse
 
 
 
@@ -30,6 +31,7 @@ def git_log_json(argv: list):
         err_msg = {
             'returncode': e.returncode,
             'cmd': e.cmd,
+            'stderr': e.stderr.decode('utf-8')
         }
         return { 
             "type": "error",
@@ -73,12 +75,25 @@ def git_log_json(argv: list):
 
     
 if __name__ == "__main__":
-    print(
-        json.dumps(
-            git_log_json(sys.argv[1:]),
-            indent=4
+    parser = argparse.ArgumentParser(prog='json-git')
+    subparsers = parser.add_subparsers(help='support subcommand', dest='subcmd')
+
+    parser_log = subparsers.add_parser('log', help='git log')
+
+    parser_difflog = subparsers.add_parser('difflog', help='git diff A B')
+
+    opt, argv = parser.parse_known_args()
+
+    if opt.subcmd == 'log':
+        print(
+            json.dumps(
+                git_log_json(argv),
+                indent=4
+            )
         )
-    )
+    elif opt.subcmd == 'difflog':
+        pass
+    
 
 
 
