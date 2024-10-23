@@ -14,7 +14,8 @@ def git_log_json(argv: list):
     RC_SPLITER = "|^=<<=^|"
     ATTR_SPLITER = "|^=@@=^|"
     format_map = {
-        "hash" : "%h",
+        "hash" : "%H",
+        "parent" : "%P",
         "subject" : "%s",
         "ref" : "%d",
         "body" : "%b",
@@ -69,7 +70,7 @@ def git_log_json(argv: list):
                 + "||subject||body||author_time"
 
     return { 
-        "type": "success",
+        "type": "log",
         "content": records
     }
 
