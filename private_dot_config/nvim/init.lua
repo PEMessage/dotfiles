@@ -123,7 +123,6 @@ section()
 -- ===========================================
 require("lazy").setup({
     -- -------------------------------------------
-    -- -------------------------------------------
     -- 5.0 Essiential Plug
     -- -------------------------------------------
     {
@@ -1338,13 +1337,9 @@ require("lazy").setup({
             { "<leader>av", "<cmd>Vista!!<cr>", desc = "Open Vista bar" },
         }
     },
-    -- {
-    --     'roobert/search-replace.nvim',
-    -- },
 
     -- -------------------------------------------
 }, { -- Lazy.nvim Options
-        -- -------------------------------------------
         install = {
             -- install missing plugins on startup. This doesn't increase startup time.
             missing = true,
@@ -1382,8 +1377,6 @@ require("lazy").setup({
         }
     }) --End Lazy.nvim Quote
 -- ===========================================
---
---
 
 -- 6. KeyMap Zone
 -- ===========================================
@@ -1401,10 +1394,11 @@ function PE.WkCheck()
     end
 end
 local wk = PE.WkCheck()
--- -------------------------------------------
--- 6.1 Basic I / N Mode
--- -------------------------------------------
+---@diagnostic disable-next-line: redefined-local
 local section = function ()
+    -- -------------------------------------------
+    -- 6.1 Basic I / N Mode
+    -- -------------------------------------------
 
     -- Emacs-like Keymap
     vim.keymap.set('!','<C-a>','<home>')
@@ -1504,9 +1498,7 @@ local section = function ()
     end
     vim.keymap.set('n', '<leader>`d', PE.ToggleDiagnostics, { noremap = true, silent = true , desc = "Toggle diagnostic" })
     -- Hide by default
-end
-
-section()
+end ; section()
 
 -- 7. Function Zone
 -- ===========================================
@@ -1614,4 +1606,4 @@ function PE.MouseSet(arg)
     vim.o.mouse = arg
 end
 
-vim.cmd [[ command! -nargs=+ -complete=command Redir let s:reg = @@ | redir @"> | silent execute <q-args> | redir END | new | pu | 1,2d_ | let @@ = s:reg ]] 
+vim.cmd [[ command! -nargs=+ -complete=command Redir let s:reg = @@ | redir @"> | silent execute <q-args> | redir END | new | pu | 1,2d_ | let @@ = s:reg ]]
