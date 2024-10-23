@@ -81,7 +81,7 @@ if __name__ == "__main__":
 
     parser_log = subparsers.add_parser('log', help='git log')
 
-    parser_difflog = subparsers.add_parser('difflog', help='git diff A B')
+    parser_difflog = subparsers.add_parser('difflog', help='git diff refA refB')
 
     opt, argv = parser.parse_known_args()
 
