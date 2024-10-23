@@ -1110,7 +1110,6 @@ require("lazy").setup({
             -- })
 
         end,
-
     },
     -- { 'bfredl/nvim-luadev' },
     -- {
@@ -1195,6 +1194,36 @@ require("lazy").setup({
             require("mason-nvim-dap").setup(opts)
         end,
 
+    },
+    -- -------------------------------------------
+    -- 5.8 Linter
+    -- -------------------------------------------
+    {
+        'mhartington/formatter.nvim',
+        dependencies = {
+            'williamboman/mason.nvim',
+        },
+        config = function ()
+            local util = require "formatter.util"
+            require("formatter").setup {
+                logging = true,
+                log_level = vim.log.levels.WARN,
+                filetype = {
+                    python = {
+                        require("formatter.filetypes.python").autopep8,
+                    },
+                    -- Use the special "*" filetype for defining formatter configurations on
+                    -- any filetype
+                    ["*"] = {
+                        -- "formatter.filetypes.any" defines default configurations for any
+                        -- filetype
+                        require("formatter.filetypes.any").remove_trailing_whitespace,
+                        -- Remove trailing whitespace without 'sed'
+                        -- require("formatter.filetypes.any").substitute_trailing_whitespace,
+                    }
+                }
+            }
+        end
     },
     -- -------------------------------------------
     -- 5.9 DAP & LSP UI
@@ -1321,6 +1350,7 @@ require("lazy").setup({
             map( "n", "gd", "<cmd>Lspsaga  peek_definition<cr>", {silent = true,noremap = true})
             map( "n", "go", "<cmd>Lspsaga show_line_diagnostics<cr>", {silent = true, noremap = true})
             map( "n", "Q", "<cmd>Lspsaga finder tyd+ref+imp+def<cr>", {silent = true, noremap = true})
+            map( "n", "<C-q>", "<cmd>Lspsaga code_action<cr>", {silent = true, noremap = true})
         end,
         dependencies = {
             'nvim-treesitter/nvim-treesitter', -- optional
