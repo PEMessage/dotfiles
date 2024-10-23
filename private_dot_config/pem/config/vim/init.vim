@@ -743,6 +743,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'PEMessage/vim-text-process'
         let g:textproc_inline_script = {
             \'format_json': 'python3 -c "import json.tool ; json.tool.main()"',
+            \'format_py': 'python3 -m autopep8 -',
             \'spliter_before': 'bash -c ''sed "s@^$1@===================\n@g"'' -- ',
             \}
         if exists('g:ovr_textproc_inline_script')
