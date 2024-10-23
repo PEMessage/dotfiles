@@ -806,6 +806,11 @@ call plug#begin(pe_runtimepath . '/plugged')
     " let g:onedark_color_overrides = {
     "             \ "QuickFixLine": {"gui": "#2F343F", "cterm": "235", "cterm16": "0" },
     "             \}
+    " Strongly recommended: easy configuration of maktaba plugins.
+    " Plug 'google/vim-maktaba'
+    " Plug 'google/vim-glaive'
+    " Plug 'google/vim-syncopate'
+
     if (has("autocmd"))
         " +---------------------------------------------+
         " |  Color Name  |         RGB        |   Hex   |
@@ -996,8 +1001,8 @@ call plug#begin(pe_runtimepath . '/plugged')
 " 6.7 Tmux and Terminal
 " -------------------------------------------
     Plug 'NickLaMuro/vimux'
-        nmap <Leader>vl :VimuxRunLastCommand<CR>
-        nmap <Leader>vp :VimuxPromptCommand<CR>
+        " nmap <Leader>vl :VimuxRunLastCommand<CR>
+        " nmap <Leader>vp :VimuxPromptCommand<CR>
         " nmap <Leader>vo :VimuxOpenRunner<CR>
     Plug 'gioele/vim-autoswap'
         let g:autoswap_detect_tmux = 1

@@ -376,26 +376,26 @@ require("lazy").setup({
     --     config = function ()
     --         vim.g.rainbow_active = 1
     --         vim.g.cursorword_delay = 600
-    --         vim.cmd([[ 
-    --             let g:rainbow_conf = {                                                                                 
-    --            \   'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'firebrick'],                                 
-    --            \   'ctermfgs': ['lightblue', 'lightyellow', 'lightcyan', 'lightmagenta'],                             
-    --            \   'operators': '_,_',                                                                                
-    --            \   'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],   
-    --            \   'separately': {                                                                                    
-    --            \       '*': 0,                                                                                        
-    --            \       'vim': 0,                                                                                      
-    --            \       'make': {                                                                                      
-    --            \           'parentheses': ['start=/$\+(/ end=/)/', 'start=/\[/ end=/\]/'],                            
-    --            \       },                                                                                             
-    --            \       'nerdtree': 0,                                                                                 
-    --            \   }                                                                                                  
+    --         vim.cmd([[
+    --             let g:rainbow_conf = {
+    --            \   'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'firebrick'],
+    --            \   'ctermfgs': ['lightblue', 'lightyellow', 'lightcyan', 'lightmagenta'],
+    --            \   'operators': '_,_',
+    --            \   'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],
+    --            \   'separately': {
+    --            \       '*': 0,
+    --            \       'vim': 0,
+    --            \       'make': {
+    --            \           'parentheses': ['start=/$\+(/ end=/)/', 'start=/\[/ end=/\]/'],
+    --            \       },
+    --            \       'nerdtree': 0,
+    --            \   }
     --            \}
     --
     --            nnoremap <f1> :exec 'syn list '.synIDattr(synID(line('.'), col('.'), 0), 'name')<cr>
     --
-    --            augroup rainbow_auto                                                 
-    --               autocmd!                                                         
+    --            augroup rainbow_auto
+    --               autocmd!
     --               autocmd FileType make syntax clear makeIdent
     --            augroup END
     --         ]])
@@ -1635,5 +1635,18 @@ vim.api.nvim_set_keymap('', '<Leader>y', 'y:<C-U>lua PE.yank(vim.fn.getreg("@0")
 function PE.MouseSet(arg)
     vim.o.mouse = arg
 end
+
+-- 7.1 Vim Function Zone(I just tired)
+-- ===========================================
+vim.cmd [[
+    function! s:DiffWithSaved()
+        let filetype=&ft
+        diffthis
+        vnew | r # | normal! 1Gdd
+        diffthis
+        exe "setlocal bt=nofile bh=wipe nobl noswf ro ft=" . filetype
+    endfunction
+    com! DiffSaved call s:DiffWithSaved()
+]]
 
 vim.cmd [[ command! -nargs=+ -complete=command Redir let s:reg = @@ | redir @"> | silent execute <q-args> | redir END | new | pu | 1,2d_ | let @@ = s:reg ]]
