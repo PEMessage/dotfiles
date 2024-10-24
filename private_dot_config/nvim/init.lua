@@ -79,6 +79,7 @@ local section = function ()
     vim.o.completeopt = 'menu,menuone,noselect,noinsert' -- Better Complete
     vim.o.number      = true -- Print line number
     vim.o.splitright  = true -- Put new windows right of current
+    vim.o.pumheight = 10
 
     -- vim.api.nvim_create_autocmd( { 'FileType' },{
     --     pattern       = { 'help','man' },
@@ -828,6 +829,7 @@ require("lazy").setup({
         version = false, -- last release is way too old
         event = "InsertEnter",
         dependencies = {
+            'hrsh7th/cmp-nvim-lsp-signature-help',
             'hrsh7th/cmp-nvim-lsp',
             'hrsh7th/cmp-buffer',
             'hrsh7th/cmp-path',
@@ -915,6 +917,7 @@ require("lazy").setup({
                 sources = cmp.config.sources({
                     { name = 'buffer' },
                     { name = 'path' },
+                    { name = 'nvim_lsp_signature_help' },
                     { name = 'nvim_lsp' },
                     { name = 'vsnip'}
                 }),
@@ -953,6 +956,33 @@ require("lazy").setup({
         end
 
     },
+    {
+        "ray-x/lsp_signature.nvim",
+        enabled = false,
+        event = "VeryLazy",
+        opts = {
+            hint_prefix = {
+                above = "v",  -- when the hint is on the line above the current line
+                current = "<",  -- when the hint is on the same line
+                below = "^",  -- when the hint is on the line below the current line
+            },
+        },
+        config = function(_, opts)
+            require('lsp_signature').setup(opts)
+            vim.keymap.set({ 'n' }, '<C-k>',
+                function()
+                    require('lsp_signature').toggle_float_win()
+                end,
+                {
+                    silent = true,
+                    noremap = true,
+                    desc = 'toggle signature'
+                }
+            )
+
+        end
+    },
+
     -- -------------------------------------------
     -- 5.8 LSP Plug
     -- -------------------------------------------
