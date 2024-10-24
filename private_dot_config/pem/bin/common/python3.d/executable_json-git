@@ -3,9 +3,11 @@
 import subprocess
 import json
 import re
+import pprint
 import itertools
 import hashlib
 import argparse
+import xml.etree.ElementTree as ElementTree
 
 
 def git_log_json(argv: list):
@@ -25,7 +27,8 @@ def git_log_json(argv: list):
     cmd = ['git', 'log', f'--format={RC_SPLITER}{format_str}'] + argv
 
     try:
-        info = subprocess.run(cmd, check=True, capture_output=True)
+        info = subprocess.run(
+            cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     except subprocess.CalledProcessError as e:
         err_msg = {
             'returncode': e.returncode,
@@ -57,7 +60,7 @@ def git_log_json(argv: list):
 
     # 5. Try to find a changeid or calc one
     for rc in records:
-        matched = re.search(r'Change-Id: (\w+)', rc["body"])
+        matched = re.search(r'Change-Id: (\W)', rc["body"])
 
         if matched:
             rc["changeid"] = matched.group(1)
@@ -73,24 +76,79 @@ def git_log_json(argv: list):
     }
 
 
-def get_difference(list1, list2):
-    key = "changeid"
+def get_difference(a: list, b: list, key="changeid"):
+    # key = "changeid"
 
-    if list1 is None:
-        list1 = []
-    if list2 is None:
-        list2 = []
+    if a is None:
+        a = []
+    if b is None:
+        b = []
 
-    ids1 = set(item[key] for item in list1)
+    idsa = set(item[key] for item in a)
+    idsb = set(item[key] for item in b)
+    ids_cm = idsa & idsb
 
-    ids2 = set(item[key] for item in list2)
-    only_in_list1 = list(
-        itertools.filterfalse(lambda item: item[key] in ids2, list1)
-    )
-    only_in_list2 = list(
-        itertools.filterfalse(lambda item: item[key] in ids1, list2)
-    )
-    return only_in_list1, only_in_list2
+    # Create common dict
+    ab_common = dict()
+    for id in ids_cm:
+        ab_common[id] = dict()
+
+    a_only = []
+    for item in a:
+        id = item[key]
+        if id in ids_cm:
+            ab_common[id]["a"] = item
+        else:
+            a_only.append(item)
+
+    b_only = []
+    for item in b:
+        id = item[key]
+        if id in ids_cm:
+            ab_common[id]["b"] = item
+        else:
+            b_only.append(item)
+
+    return a_only, b_only, ab_common
+
+
+def git_difflog_json(refA: str, refB: str):
+    atob = git_log_json([refA + '..' + refB])
+    btoa = git_log_json([refB + '..' + refA])
+
+    a_only, b_only, _ = get_difference(atob["content"], btoa["content"])
+    return {
+        "type": "difflog",
+        "content": {
+            "a_only": a_only,
+            "b_only": b_only
+        }
+    }
+
+
+def git_diffmani_json(ma: str, mb: str):
+    eta = ElementTree.parse(ma)
+    etb = ElementTree.parse(mb)
+
+    projects_a = [x.attrib for x in eta.findall('project')]
+    projects_b = [x.attrib for x in etb.findall('project')]
+
+    # not treat hear
+    # for pj in projects_a + projects_b:
+    #     if "path" not in pj:
+    #         pj["path"] = pj["name"]
+
+    pjs_a_only, pjs_b_only, pjs_cm = get_difference(
+        projects_a, projects_b, key="path")
+
+    return {
+        "type": "diffmani",
+        "content": {
+            "a_only": pjs_b_only,
+            "b_only": pjs_a_only,
+            "common": pjs_cm,
+        }
+    }
 
 
 if __name__ == "__main__":
@@ -98,12 +156,20 @@ if __name__ == "__main__":
     subparsers = parser.add_subparsers(
         help='support subcommand', dest='subcmd')
 
+    # 1. git log wrapper
     parser_log = subparsers.add_parser('log', help='git log')
 
+    # 2. git difflog (repect changeid)
     parser_difflog = subparsers.add_parser(
         'difflog', help='git diff FROMID TOID')
     parser_difflog.add_argument("refA")
     parser_difflog.add_argument("refB")
+
+    # 3. git diffmanfest
+    parser_diffmanifests = subparsers.add_parser(
+        'diffmani', help='git diffmanifest')
+    parser_diffmanifests.add_argument("refA")
+    parser_diffmanifests.add_argument("refB")
 
     opt, argv = parser.parse_known_args()
 
@@ -115,20 +181,16 @@ if __name__ == "__main__":
             )
         )
     elif opt.subcmd == 'difflog':
-        atob = git_log_json([opt.refA + '..' + opt.refB])
-        btoa = git_log_json([opt.refB + '..' + opt.refA])
-
-        only_in_b, only_in_a = get_difference(atob["content"], btoa["content"])
-        result = {
-            "type": "difflog",
-            "content": {
-                "onlyB": only_in_b,
-                "onlyA": only_in_a
-            }
-        }
         print(
             json.dumps(
-                result,
+                git_difflog_json(str(opt.refA), str(opt.refB)),
+                indent=4
+            )
+        )
+    elif opt.subcmd == 'diffmani':
+        print(
+            json.dumps(
+                git_diffmani_json(str(opt.refA), str(opt.refB)),
                 indent=4
             )
         )
