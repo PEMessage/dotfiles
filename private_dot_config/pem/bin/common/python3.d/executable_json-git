@@ -101,7 +101,9 @@ if __name__ == "__main__":
     parser_log = subparsers.add_parser('log', help='git log')
 
     parser_difflog = subparsers.add_parser(
-        'difflog', help='git diff refA refB')
+        'difflog', help='git diff FROMID TOID')
+    parser_difflog.add_argument("refA")
+    parser_difflog.add_argument("refB")
 
     opt, argv = parser.parse_known_args()
 
@@ -113,4 +115,20 @@ if __name__ == "__main__":
             )
         )
     elif opt.subcmd == 'difflog':
-        pass
+        atob = git_log_json([opt.refA + '..' + opt.refB])
+        btoa = git_log_json([opt.refB + '..' + opt.refA])
+
+        only_in_b, only_in_a = get_difference(atob["content"], btoa["content"])
+        result = {
+            "type": "difflog",
+            "content": {
+                "onlyB": only_in_b,
+                "onlyA": only_in_a
+            }
+        }
+        print(
+            json.dumps(
+                result,
+                indent=4
+            )
+        )
