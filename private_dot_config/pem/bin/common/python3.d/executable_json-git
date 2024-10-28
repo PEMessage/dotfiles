@@ -3,6 +3,7 @@
 import subprocess
 import json
 import re
+import os
 import pprint
 import itertools
 import hashlib
@@ -10,7 +11,7 @@ import argparse
 import xml.etree.ElementTree as ElementTree
 
 
-def git_log_json(argv: list):
+def git_log_json(argv: list, preargv=[]):
     RC_SPLITER = "|^=<<=^|"
     ATTR_SPLITER = "|^=@@=^|"
     format_map = {
@@ -24,7 +25,8 @@ def git_log_json(argv: list):
     }
 
     format_str = ATTR_SPLITER.join(v for _, v in format_map.items())
-    cmd = ['git', 'log', f'--format={RC_SPLITER}{format_str}'] + argv
+    cmd = ['git'] + preargv + \
+        ['log', f'--format={RC_SPLITER}{format_str}'] + argv
 
     try:
         info = subprocess.run(
@@ -60,7 +62,7 @@ def git_log_json(argv: list):
 
     # 5. Try to find a changeid or calc one
     for rc in records:
-        matched = re.search(r'Change-Id: (\W)', rc["body"])
+        matched = re.search(r'Change-Id: (\S+)', rc["body"])
 
         if matched:
             rc["changeid"] = matched.group(1)
@@ -112,9 +114,9 @@ def get_difference(a: list, b: list, key="changeid"):
     return a_only, b_only, ab_common
 
 
-def git_difflog_json(refA: str, refB: str):
-    atob = git_log_json([refA + '..' + refB])
-    btoa = git_log_json([refB + '..' + refA])
+def git_difflog_json(refA: str, refB: str, preargv=[]):
+    atob = git_log_json([refA + '..' + refB], preargv)
+    btoa = git_log_json([refB + '..' + refA], preargv)
 
     a_only, b_only, _ = get_difference(atob["content"], btoa["content"])
     return {
@@ -127,19 +129,49 @@ def git_difflog_json(refA: str, refB: str):
 
 
 def git_diffmani_json(ma: str, mb: str):
-    eta = ElementTree.parse(ma)
-    etb = ElementTree.parse(mb)
 
-    projects_a = [x.attrib for x in eta.findall('project')]
-    projects_b = [x.attrib for x in etb.findall('project')]
+    manifests = {
+        "a": ma,
+        "b": mb
+    }
 
-    # not treat hear
-    # for pj in projects_a + projects_b:
-    #     if "path" not in pj:
-    #         pj["path"] = pj["name"]
+    projects = {}
+
+    for k, m in manifests.items():
+        et = ElementTree.parse(m)
+        default = et.find('default')
+        if default is not None:
+            default = default.attrib
+        else:
+            default = {}
+        # pprint.pprint(default)
+        # In Python 3.9.0 or greater: z = x | y
+        # In Python 3.5 or greater: z = {**x, **y}
+        # for others
+        # def merge_two_dicts(x, y):
+        #     z = x.copy()   # start with keys and values of x
+        #     z.update(y)    # modifies z with keys and values of y
+        #     return z
+
+        # etpj: ElementTree.<project>
+        pjs = [{**default, **etpj.attrib} for etpj in et.findall('project')]
+
+        # try to format revision
+        for pj in pjs:
+            rev = pj["revision"]
+            # pprint.pprint(pj)
+            if rev.startswith('refs/'):
+                continue
+            elif re.match('[a-f0-9]{40}', rev):
+                continue
+            else:
+                rev = '/'.join([pj["remote"], rev])
+            pj["revision"] = rev
+
+        projects[k] = pjs
 
     pjs_a_only, pjs_b_only, pjs_cm = get_difference(
-        projects_a, projects_b, key="path")
+        projects["a"], projects["b"], key="name")
 
     return {
         "type": "diffmani",
@@ -148,6 +180,46 @@ def git_diffmani_json(ma: str, mb: str):
             "b_only": pjs_a_only,
             "common": pjs_cm,
         }
+    }
+
+
+def git_diffall_json(ma: str, mb: str):
+    projects = git_diffmani_json(ma, mb)["content"]["common"]
+
+    def get_path(paths: list):
+        for path in paths:
+            if path and os.path.isdir(path):
+                return path
+        raise FileExistsError("'{}' is not dir".format(path))
+
+    diff_projects = {}
+
+    for name, pj in projects.items():
+        # Skip loop if same revision
+        reva = pj["a"].get("revision")
+        revb = pj["b"].get("revision")
+        if revb == reva:
+            continue
+
+        maybe_paths = [
+            pj["b"].get("path"),
+            pj["a"].get("path"),
+            # your always sure to have name attribute
+            name,
+        ]
+        pj_path = get_path(maybe_paths)
+
+        diff = git_difflog_json(reva, revb, preargv=['-C', pj_path])["content"]
+        if diff["a_only"] or diff["b_only"]:
+            diff_projects["name"] = {
+                "difflog": diff
+            }
+
+        # pprint.pprint(diff)
+
+    return {
+        "type": "diffall",
+        "content": diff_projects
     }
 
 
@@ -171,6 +243,12 @@ if __name__ == "__main__":
     parser_diffmanifests.add_argument("refA")
     parser_diffmanifests.add_argument("refB")
 
+    # 3. git all
+    parser_all = subparsers.add_parser(
+        'diffall', help='git diffall')
+    parser_all.add_argument("refA")
+    parser_all.add_argument("refB")
+
     opt, argv = parser.parse_known_args()
 
     if opt.subcmd == 'log':
@@ -183,14 +261,21 @@ if __name__ == "__main__":
     elif opt.subcmd == 'difflog':
         print(
             json.dumps(
-                git_difflog_json(str(opt.refA), str(opt.refB)),
+                git_difflog_json(opt.refA, opt.refB),
                 indent=4
             )
         )
     elif opt.subcmd == 'diffmani':
         print(
             json.dumps(
-                git_diffmani_json(str(opt.refA), str(opt.refB)),
+                git_diffmani_json(opt.refA, opt.refB),
+                indent=4
+            )
+        )
+    elif opt.subcmd == 'diffall':
+        print(
+            json.dumps(
+                git_diffall_json(opt.refA, opt.refB),
                 indent=4
             )
         )
