@@ -579,6 +579,10 @@ require("lazy").setup({
             require('gitsigns').setup(opts)
             vim.keymap.set( 'n',  '<leader>`1', '<cmd>Gitsigns toggle_current_line_blame<cr>' ,
                 { silent = true, desc = "Toggle line blame"  } )
+            vim.keymap.set( 'n',  '[c', '<cmd>Gitsigns prev_hunk<cr>' ,
+                { silent = true, desc = "Previous git changed line"  } )
+            vim.keymap.set( 'n',  ']c', '<cmd>Gitsigns next_hunk<cr>' ,
+                { silent = true, desc = "Next git changed line"  } )
         end
     },
     {
@@ -680,6 +684,7 @@ require("lazy").setup({
     },
     {
         "utilyre/barbecue.nvim",
+        enabled = false,
         name = "barbecue",
         version = "*",
         dependencies = {
@@ -691,6 +696,97 @@ require("lazy").setup({
             -- configurations go here
         },
     },
+    {
+        'Bekaboo/dropbar.nvim',
+        opts = {
+            icons = {
+                ui  = {
+                    bar = {
+                        -- separator = ','
+                    },
+                },
+                kinds = {
+                    symbols = {
+                        Array = '[ ',
+                        Boolean = '',
+                        BreakStatement = '',
+                        Call = 'f ',
+                        CaseStatement = '',
+                        Class = 'C ',
+                        Color = '',
+                        Constant = '',
+                        Constructor = '',
+                        ContinueStatement = '',
+                        Copilot = '',
+                        Declaration = '',
+                        Delete = '',
+                        DoStatement = '',
+                        Enum = 'E ',
+                        EnumMember = 'e ',
+                        Event = 'E ',
+                        Field = '.',
+                        File = '',
+                        Folder = '',
+                        ForStatement = '',
+                        Function = 'f ',
+                        H1Marker = '', -- Used by markdown treesitter parser
+                        H2Marker = '',
+                        H3Marker = '',
+                        H4Marker = '',
+                        H5Marker = '',
+                        H6Marker = '',
+                        Identifier = 'i ',
+                        IfStatement = '(',
+                        Interface = 'I ',
+                        Keyword = 'k',
+                        List = '[]',
+                        Log = '',
+                        Lsp = '',
+                        Macro = '',
+                        MarkdownH1 = '', -- Used by builtin markdown source
+                        MarkdownH2 = '',
+                        MarkdownH3 = '',
+                        MarkdownH4 = '',
+                        MarkdownH5 = '',
+                        MarkdownH6 = '',
+                        Method = '.f ',
+                        Module = '# ',
+                        Namespace = '{ ',
+                        Null = '',
+                        Number = 'n ',
+                        Object = 'o ',
+                        Operator = '+ ',
+                        Package = '# ',
+                        Pair = '()',
+                        Property = 'p ',
+                        Reference = '& ',
+                        Regex = 're',
+                        Repeat = '',
+                        Scope = '{ ',
+                        Snippet = '',
+                        Specifier = '',
+                        Statement = '( ',
+                        String = 's ',
+                        Struct = 'S ',
+                        SwitchStatement = '( ',
+                        Terminal = '',
+                        Text = 's ',
+                        Type = 'T ',
+                        TypeParameter = 'p ',
+                        Unit = '# ',
+                        Value = 'v ',
+                        Variable = 'v ',
+                        WhileStatement = '( ',
+                    }
+                }
+            }
+        }
+        -- optional, but required for fuzzy finder support
+        -- dependencies = {
+            -- 'nvim-telescope/telescope-fzf-native.nvim'
+        -- }
+    },
+
 
     -- -------------------------------------------
     -- 5.5 Telescope Setting
