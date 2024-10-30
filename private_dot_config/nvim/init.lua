@@ -684,7 +684,7 @@ require("lazy").setup({
     },
     {
         "utilyre/barbecue.nvim",
-        enabled = false,
+        enabled = true,
         name = "barbecue",
         version = "*",
         dependencies = {
@@ -698,6 +698,7 @@ require("lazy").setup({
     },
     {
         'Bekaboo/dropbar.nvim',
+        enabled = false,
         opts = {
             sources = {
                 path = {
@@ -722,7 +723,7 @@ require("lazy").setup({
                     return {
                         sources.path,
                         utils.source.fallback({
-                            sources.lsp,
+                            -- sources.lsp,
                             sources.treesitter,
                         }),
                     }
