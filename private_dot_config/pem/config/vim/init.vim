@@ -680,7 +680,7 @@ call plug#begin(pe_runtimepath . '/plugged')
 
     "     nmap / <Plug>(easymotion-sn)
     "     nnoremap <leader>/ /
-        map <space> <Plug>(easymotion-s)
+        map <space> <Plug>(easymotion-s2)
 
 
         " See: https://www.reddit.com/r/vim/comments/lhohqd/remap_after_searching/
@@ -742,7 +742,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         Plug 'bps/vim-textobj-python'
     Plug 'PEMessage/vim-text-process'
         let g:textproc_inline_script = {
-            \'format_json': 'python3 -c "import json.tool ; json.tool.main()"',
+            \'format_json': 'python3 -m json.tool',
             \'format_py': 'python3 -m autopep8 -',
             \'spliter_before': 'bash -c ''sed "s@^$1@===================\n@g"'' -- ',
             \}
