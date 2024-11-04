@@ -1998,6 +1998,6 @@ endif
     " Command to call the function
     command! -nargs=+ -complete=command PatternCmd call PatternCmd(<f-args>)
 
-    call which_key#register('\', "g:which_key_map")
+    " call which_key#register('\', "g:which_key_map")
 
 
