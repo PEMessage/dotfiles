@@ -745,6 +745,7 @@ call plug#begin(pe_runtimepath . '/plugged')
             \'format_json': 'python3 -m json.tool',
             \'format_py': 'python3 -m autopep8 -',
             \'spliter_before': 'bash -c ''sed "s@^$1@===================\n@g"'' -- ',
+            \'md_cleancode': 'perl -e ''my $var = do { local $/; <> }; ; $var =~ s/```[^`]*```/```\n```/g  ; print $var''',
             \}
         if exists('g:ovr_textproc_inline_script')
             expand(g:textproc_inline_script,g:ovr_textproc_inline_script)
