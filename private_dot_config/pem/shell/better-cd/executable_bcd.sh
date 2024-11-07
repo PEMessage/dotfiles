@@ -76,6 +76,8 @@ scd() {
         "s@/VENDOR$end@/SYSTEM/@g"
         "s@/qssi$end@/target/@g"
         "s@/target$end@/qssi/@g"
+        "s@/QSSI14@/TARGET13/@g"
+        "s@/TARGET13@/QSSI14/@g"
         "s@userdebug@user@g"
         "s@user@userdebug@g"
         "s@sys@vnd@g"
