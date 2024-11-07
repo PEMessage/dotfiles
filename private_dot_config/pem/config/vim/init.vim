@@ -478,7 +478,7 @@ let g:startify_custom_header = [
 
     command! PCD execute 'cd ' . expand('%:p:h')
     " command! PCD execute 'cd' . expand('%:p:h')
-    command! PFile echo  expand('%:p')
+    command! PFile echo  expand('%:p') |  call Yank(expand('%:p'))
     " See: https://www.cyberciti.biz/faq/vim-vi-text-editor-save-file-without-root-permission/
     command Psudow :execute ':silent w !sudo tee % > /dev/null' | :edit!
     nnoremap <silent><leader>ro :set readonly!<CR>:set modifiable<CR>
@@ -604,6 +604,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'junegunn/fzf.vim'
         noremap <silent> <C-e> :FZF<CR>
         noremap <leader>ft :BTags<CR>
+        command VMaps call fzf#vim#maps('x')
     Plug 'Yggdroot/LeaderF'
         let g:Lf_ShortcutF = ''
         let g:Lf_ShortcutF = ''
@@ -868,10 +869,10 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:startify_files_number = 8
 
     " Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
-    Plug 'liuchengxu/vim-which-key'
+    " Plug 'liuchengxu/vim-which-key'
         let g:mapleader = "\\"
         let g:which_key_exit = ["\<Esc>", "\<C-[>", "\<C-c>"]
-        nnoremap <silent> <leader>      :<c-u>WhichKey '\'<CR>
+        " nnoremap <silent> <leader>      :<c-u>WhichKey '\'<CR>
     Plug 'itchyny/vim-cursorword'
     " Plug 'junegunn/rainbow_parentheses.vim'
     augroup rainbow_auto
