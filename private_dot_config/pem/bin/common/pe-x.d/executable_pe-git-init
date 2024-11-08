@@ -22,10 +22,10 @@ git_config_global() {
 }
  
 git_config_global alias.pk cherry-pick
-git_config_global alias.cm commit
 git_config_global alias.co checkout
 git_config_global alias.fw 'merge --ff-only'
 git_config_global alias.re 'remote -v'
+git_config_global alias.top 'rev-parse --show-toplevel'
 git_config_global alias.st 'status --short --branch'
 git_config_global alias.lg 'log --oneline --graph'
 git_config_global alias.ddf 'difftool --ignore-submodules --dir-diff --no-symlinks --tool=dirdiff'
