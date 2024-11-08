@@ -1,14 +1,34 @@
 #!/bin/sh
-command() {
-    echo "Runing: $@"
+
+
+runcmd() {
+    echo "Runing: $*"
     "$@"
 }
-command git config --global alias.pk cherry-pick -x
-command git config --global alias.cm commit
-command git config --global alias.co checkout
-command git config --global alias.fw merge --ff-only
-command git config --global alias.re 'remote -v'
-command git config --global alias.st 'status --short --branch'
-command git config --global alias.lg 'log --oneline --graph'
-command git config --global alias.ddf 'difftool --ignore-submodules --dir-diff --no-symlinks --tool=dirdiff'
-command git config --global difftool.dirdiff.cmd 'dirdiff $LOCAL $REMOTE'
+git_config_global() {
+    key="$1"
+    value="$2"
+
+    curvalue="$(git config --global --get-all "$key")"
+    
+    if [ "$curvalue" = "$value" ] ; then
+        return 0
+    elif [ -z "$curvalue" ] ; then
+        true
+    else 
+        runcmd git config --global --unset-all "$key"
+    fi
+    runcmd git config --global "$key" "$value"
+}
+ 
+git_config_global alias.pk cherry-pick
+git_config_global alias.cm commit
+git_config_global alias.co checkout
+git_config_global alias.fw 'merge --ff-only'
+git_config_global alias.re 'remote -v'
+git_config_global alias.st 'status --short --branch'
+git_config_global alias.lg 'log --oneline --graph'
+git_config_global alias.ddf 'difftool --ignore-submodules --dir-diff --no-symlinks --tool=dirdiff'
+git_config_global difftool.dirdiff.cmd 'dirdiff $LOCAL $REMOTE'
+git_config_global alias.contain \
+    '!func() { head=HEAD ; [ "$2" ] && head="$2" ; git merge-base --is-ancestor $1 $head ; } ; func'
