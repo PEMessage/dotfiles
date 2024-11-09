@@ -513,6 +513,8 @@ let g:startify_custom_header = [
         xnoremap p "_dp
     endif
 
+    xnoremap x "_d
+
 
     " Visual mode pressing * or # searches for the current selection
     " Super useful! From an idea by Michael Naumann
