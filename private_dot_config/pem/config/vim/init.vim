@@ -171,7 +171,7 @@ let g:startify_custom_header = [
         set incsearch
     endif
     set hlsearch    " 高亮搜索内容
-    set gp=git\ grep\ -n
+    set gp=rg\ -n
 
 
 
@@ -462,7 +462,7 @@ let g:startify_custom_header = [
     let g:which_key_map['`'] = {
                 \ 'name': '+search-highlight'
                 \}
-    nnoremap <leader>``   :nohlsearch<CR>
+    nnoremap <leader>``   :nohlsearch<CR>:match none<CR>
     nnoremap <leader>`1   :set! virtualedit=onemore<CR>
     nnoremap <leader>wp  :set nowrap!<CR>
     nnoremap <leader>cl  :set cursorline!<CR>
@@ -857,7 +857,7 @@ call plug#begin(pe_runtimepath . '/plugged')
             autocmd ColorScheme * call onedark#extend_highlight("Search", { "gui" : "underline,bold,italic,standout",  "bg": { "gui": "#444959" } , "fg" : {"gui":"#ffde87" }})
             autocmd ColorScheme * call onedark#extend_highlight("IncSearch", { "gui" : "underline,bold,italic,standout",  "bg": { "gui": "#ffde87" } , "fg" : {"gui":"#444959" }})
             autocmd ColorScheme * call onedark#extend_highlight("QuickFixLine", { "gui" : "underline",  "bg": { "gui": "NONE" } , "fg" : {"gui":"yellow" }})
-            autocmd ColorScheme * highlight QuickFixLineScope gui=underline guifg=#e5c07b
+            autocmd ColorScheme * highlight QuickFixLineScope gui=underline guifg=#e5c07b guibg=#444959
 
         augroup END
     endif
@@ -1315,15 +1315,6 @@ call plug#begin(pe_runtimepath . '/plugged')
     endfunction
     command! Ctoggle call ToggleQuickfix()
 
-    " Plug 'vim-scripts/cscope-quickfix'
-    Plug 'skywind3000/vim-preview'
-        autocmd FileType qf nnoremap <silent><buffer> p :PreviewQuickfix<cr>
-        autocmd FileType qf nnoremap <silent><buffer> P :PreviewClose<cr>
-        autocmd FileType qf nnoremap <silent><buffer> <MiddleMouse> :PreviewQuickfix<cr>
-
-
-
-
     " Move cursor in quickfix preview
     function! QuickfixArrowPreview(direction)
         " Check if quickfix window is open
@@ -1344,7 +1335,21 @@ call plug#begin(pe_runtimepath . '/plugged')
         endwhile
         copen   " Quickfix window is not open, so open it
     endfunction
+    " Open a file, and jump back to quickfix
+    autocmd FileType qf nnoremap <buffer> <space> <enter>zz
+                \:execute 'match QuickFixLineScope /\%'.line('.').'l/'<CR>
+                \:copen<CR>zz
     " Call the function! to setup the autocmd
+
+    " Plug 'vim-scripts/cscope-quickfix'
+    Plug 'skywind3000/vim-preview'
+        autocmd FileType qf nnoremap <silent><buffer> p :PreviewQuickfix<cr>
+        autocmd FileType qf nnoremap <silent><buffer> P :PreviewClose<cr>
+        autocmd FileType qf nnoremap <silent><buffer> <MiddleMouse> :PreviewQuickfix<cr>
+
+
+
+
 
     " Gtag quickfix keymap
         noremap <silent> go :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
@@ -2044,4 +2049,35 @@ endif
     command! PEToggleGP call LoopOption('&gp', ['git grep -n', 'rg -n'])
     nnoremap <leader>gp :PEToggleGP<CR>
 
+
+    function! PEGrep(...)
+        " Check if any arguments were provided
+        if len(a:000) == 0
+            " No arguments provided, prompt the user for input
+            let pattern = input('Enter the search pattern: ')
+            if pattern == ''
+                echo "No pattern entered. Aborting."
+                return
+            endif
+        else
+            " Join all provided arguments as the pattern
+            let pattern = join(a:000, ' ')
+        endif
+
+        " Execute the grep command with the pattern
+        silent execute 'grep! ' . pattern
+        redraw!
+
+        " Check if there are any entries in the quickfix list
+        if len(getqflist()) > 0
+            " Open the quickfix window if there are matches
+            copen
+        else
+            echo "No matches found."
+        endif
+    endfunction
+
+    " Create a command that takes one or more arguments
+    command! -nargs=* PEGrep call PEGrep(<f-args>)
+    nnoremap <leader>gg :PEGrep<CR>
 
