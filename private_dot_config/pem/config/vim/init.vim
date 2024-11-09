@@ -504,8 +504,14 @@ let g:startify_custom_header = [
 
     vnoremap tt :s/\s\+$//e<CR>:set nohls<CR>
     " See: v_p v_P swap function between these
-    vnoremap p P
-    vnoremap P p
+    " Also See: https://superuser.com/a/1759793/1659524
+    if has('patch-8.2.4881')
+        xnoremap p P
+        xnoremap P p
+    else
+        xnoremap P p
+        xnoremap p "_dp
+    endif
 
 
     " Visual mode pressing * or # searches for the current selection
