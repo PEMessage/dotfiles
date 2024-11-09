@@ -171,6 +171,7 @@ let g:startify_custom_header = [
         set incsearch
     endif
     set hlsearch    " 高亮搜索内容
+    set gp=git\ grep\ -n
 
 
 
