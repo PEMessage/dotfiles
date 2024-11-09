@@ -2054,7 +2054,7 @@ endif
         " Check if any arguments were provided
         if len(a:000) == 0
             " No arguments provided, prompt the user for input
-            let pattern = input('Enter the search pattern: ')
+            let pattern = input('Enter pattern(pwd is' . '"' . expand('%:p:h') . '"' . '): ' )
             if pattern == ''
                 echo "No pattern entered. Aborting."
                 return
