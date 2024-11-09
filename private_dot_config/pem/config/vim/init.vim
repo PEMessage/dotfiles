@@ -1298,11 +1298,12 @@ call plug#begin(pe_runtimepath . '/plugged')
 " -------------------------------------------
     " Quickfix Config
     set cscopequickfix=s-,g-,d-,c-,t-,e-,f-,i-,a-
-    " Plug 'vim-scripts/cscope-quickfix'
-    Plug 'skywind3000/vim-preview'
-        autocmd FileType qf nnoremap <silent><buffer> p :PreviewQuickfix<cr>
-        autocmd FileType qf nnoremap <silent><buffer> P :PreviewClose<cr>
-        autocmd FileType qf nnoremap <silent><buffer> <MiddleMouse> :PreviewQuickfix<cr>
+    " override vim-expend-region keymap
+    autocmd FileType qf nnoremap <buffer> <enter> <enter>zz
+
+    " Basic keymap
+    nnoremap ]q :copen<CR>:cnext<CR>
+    nnoremap [q :copen<CR>:cprev<CR>
 
     " Quicktoggle
     function! ToggleQuickfix()
@@ -1312,6 +1313,16 @@ call plug#begin(pe_runtimepath . '/plugged')
             cclose
         endif
     endfunction
+    command! Ctoggle call ToggleQuickfix()
+
+    " Plug 'vim-scripts/cscope-quickfix'
+    Plug 'skywind3000/vim-preview'
+        autocmd FileType qf nnoremap <silent><buffer> p :PreviewQuickfix<cr>
+        autocmd FileType qf nnoremap <silent><buffer> P :PreviewClose<cr>
+        autocmd FileType qf nnoremap <silent><buffer> <MiddleMouse> :PreviewQuickfix<cr>
+
+
+
 
     " Move cursor in quickfix preview
     function! QuickfixArrowPreview(direction)
