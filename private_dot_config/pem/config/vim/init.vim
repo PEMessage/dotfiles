@@ -2023,4 +2023,25 @@ endif
 
     " call which_key#register('\', "g:which_key_map")
 
+    function! LoopOption(option, choices)
+        " Get the current value of the option
+        exe 'let current_value =' . a:option
+        let choices_list = a:choices
+        
+        let index = index(choices_list, current_value) " Find the index of the current value in the choices
+        " " Toggle the index to get the next option
+        if index == -1
+            let new_index = 0
+        else
+            let new_index = (index + 1) % len(choices_list)
+        endif
+
+        let new_value = choices_list[new_index]
+        let cmd = 'let ' . a:option . ' = ' . '''' . new_value . ''''
+        execute cmd
+        echo  'Loop Option ' . (index + 1) .  ' of ' . len(a:choices) . ' by running: ' . cmd
+    endfunction
+    command! PEToggleGP call LoopOption('&gp', ['git grep -n', 'rg -n'])
+    nnoremap <leader>gp :PEToggleGP<CR>
+
 
