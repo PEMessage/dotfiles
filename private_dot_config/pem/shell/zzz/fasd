@@ -33,7 +33,7 @@ fasd() {
     _FASD_get_vcs() {
         local begin_path=$1
         cd "$begin_path"
-        while [ "$PWD" != "/" ] || [ "$PWD" != "//" ]  ; do
+        while [ "$PWD" != "/" ] && [ "$PWD" != "//" ]  ; do
             if { [ -d .git ] || [ -d .hg ] ;} then
                 echo $PWD
                 return
