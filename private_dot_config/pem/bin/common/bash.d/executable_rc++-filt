@@ -1,0 +1,29 @@
+#!/bin/bash
+# g++ invokes the front-end for the cc1plusplus compiler.
+# g++ -x c++ says to interpret the input language as C++.
+# g++ -x c++ - says to get the input from the stdin (the piped echo).
+# g++ -x c++ - -o - says to output to the stdout (your display).
+# g++ -x c++ - -o - -S says to output assembler/assembly language.
+# g++ -x c++ - -o - -S -w says to silence all warnings from cc1plusplus.
+# sed 's/:$//' says to remove the colon (:) character at the end of each line
+# Link: https://gcc.gnu.org/onlinedocs/libstdc++/manual/ext_demangling.html
+# Link: https://refspecs.linuxbase.org/cxxabi-1.83.html#mangling
+# Link: https://stackoverflow.com/questions/11335624/what-is-linux-utility-to-mangle-a-c-symbol-name
+templete="
+#include <bits/stdc++.h>
+$1 {}
+"
+fake_templete="#include <bits/stdc++.h>"
+
+
+
+
+func() {
+echo "$1" \
+| g++ -x c++ - -o - -S -w \
+| grep '^_' \
+| sed 's/:$//' | grep -v '_GLOBAL__sub_'
+}
+
+
+diff <(func "$fake_templete") <(func "$templete") |  grep "^>" |  cut -d ' ' -f 2
