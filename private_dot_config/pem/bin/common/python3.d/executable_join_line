@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+import sys
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: python3 join_lines <delimiter>")
+        sys.exit(1)
+    delimiter = sys.argv[1]
+    lines = sys.stdin.read().strip().splitlines()
+    result = delimiter.join(lines)
+    print(result)
+
+if __name__ == "__main__":
+    main()
+
