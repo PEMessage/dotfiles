@@ -977,6 +977,8 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'airblade/vim-gitgutter'
         let g:gitgutter_map_keys = 0
         command! Gqf GitGutterQuickFix | copen
+        nmap [c <Plug>(GitGutterPrevHunk)
+        nmap ]c <Plug>(GitGutterNextHunk)
     Plug 'will133/vim-dirdiff' , { 'on': [ 'DirDiff' ] }
         let g:DirDiffWindowSize = 7
     Plug 'samoshkin/vim-mergetool'
@@ -985,6 +987,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         " :h copy-diffs
         " :'<,'>diffget  do(diff obtain)
         " :'<,'>diffput. dp(diff put)
+    Plug 'HiPhish/info.vim'
     Plug 'cohama/agit.vim' , { 'on': [ 'Agit' ] }
         " J			    <Plug>(agit-scrolldown-stat)
         " K			    <Plug>(agit-scrollup-stat)
