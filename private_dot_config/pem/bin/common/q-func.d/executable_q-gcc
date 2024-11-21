@@ -1,8 +1,5 @@
-#!/bin/sh
+#!/bin/bash
 # lazy gcc, default outfile: filename_prefix.out, eg: hello.c -> hello.out
-q_gcc()
-{
-	gcc -o ${1%.*}{.out,.${1##*.}} $2 $3 $4 $5
-}
 
-q_gcc "$@"
+echo g++ -g -o ${1%.*}{.out,.${1##*.}} $2 $3 $4 $5
+g++ -g -o ${1%.*}{.out,.${1##*.}} $2 $3 $4 $5
