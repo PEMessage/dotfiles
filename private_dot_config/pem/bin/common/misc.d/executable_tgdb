@@ -27,9 +27,9 @@ sp.check_call(['stty', '--file', dashboard_tty, '-echo'])
 set_title(dashboard_tty, 'dashboard')
 gdb.execute(f'dashboard -output {dashboard_tty}')
 
-# app_pane, app_tty = tmux('split-window', '-d', '-v', '-P', '-F', '#{pane_id},#{pane_tty}', NULLPROG).strip().split(',')
-# set_title(app_tty, 'inferior')
-# gdb.execute(f'set inferior-tty {app_tty}')
+#app_pane, app_tty = tmux('split-window', '-d', '-v', '-P', '-F', '#{pane_id},#{pane_tty}', NULLPROG).strip().split(',')
+#set_title(app_tty, 'inferior')
+#gdb.execute(f'set inferior-tty {app_tty}')
 
 end
 
@@ -74,5 +74,4 @@ else
     exec_cmd="exec tmux new-window -n GDB"
 fi
 # echo $exec_cmd sh -c "gdb-multi -x ${CAHCE_PATH} $ARGS $@ ; tmux kill-window -t \$TMUX_PANE"
-$exec_cmd sh -c "gdb-multiarch -x ${CAHCE_PATH} $ARGS $@ ; tmux kill-window -t \$TMUX_PANE"
-# $exec_cmd sh -c "gdb -x ${CAHCE_PATH} $ARGS $@ ; tmux kill-window -t \$TMUX_PANE"
+$exec_cmd sh -c "gdb-multiarch -x ${CAHCE_PATH} $ARGS $* ; tmux kill-window -t \$TMUX_PANE"

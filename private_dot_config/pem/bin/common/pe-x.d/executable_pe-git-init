@@ -32,5 +32,9 @@ git_config_global alias.ddf 'difftool --ignore-submodules --dir-diff --no-symlin
 git_config_global difftool.dirdiff.cmd 'dirdiff $LOCAL $REMOTE'
 git_config_global alias.contain \
     '!func() { head=HEAD ; [ "$2" ] && head="$2" ; git merge-base --is-ancestor $1 $head ; } ; func'
-git_config_global alias.fone  \
+git_config_global alias.fbr  \
     '!func() { remote=$1 ; branch=$2 ; git fetch $remote $branch:refs/remotes/$remote/$branch ; } ; func'
+git_config_global alias.ftag  \
+    '!func() { remote=$1 ; tag=$2 ; git fetch $remote $branch:refs/tags/$tag ; } ; func'
+git_config_global alias.showtool \
+    '!showci () { rev=${1:-HEAD}; git difftool $rev~1 $rev; }; showci $1'

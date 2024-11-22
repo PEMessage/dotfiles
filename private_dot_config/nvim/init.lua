@@ -1150,6 +1150,22 @@ require("lazy").setup({
 
         end
     },
+    {
+        'dstein64/nvim-scrollview',
+        dependencies = {
+            'lewis6991/gitsigns.nvim',
+        },
+        config = function ()
+            require('scrollview').setup({
+                excluded_filetypes = {'nerdtree'},
+                current_only = true,
+                -- base = 'buffer',
+                -- column = 80,
+                signs_on_startup = {'search','diagnostics','cursor'},
+            })
+            require('scrollview.contrib.gitsigns').setup()
+        end
+    },
 
     -- -------------------------------------------
     -- 5.8 LSP Plug
