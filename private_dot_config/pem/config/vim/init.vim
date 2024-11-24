@@ -89,6 +89,16 @@ let g:startify_custom_header = [
     set nrformats-=octal
 
     set nocompatible     " 禁用 vi 兼容模式
+    " set viminfo=%,<800,'10,/50,:100,h,f0,n~/.vim/cache/.viminfo
+    "             | |    |   |   |    | |  + viminfo file path
+    "             | |    |   |   |    | + file marks 0-9,A-Z 0=NOT stored
+    "             | |    |   |   |    + disable 'hlsearch' loading viminfo
+    "             | |    |   |   + command-line history saved
+    "             | |    |   + search history saved
+    "             | |    + files marks saved
+    "             | + lines saved each register (new name for ", vi6.2)
+    "             + save/restore buffer list
+    set viminfo='300,<50,s10,h
     set helplang=cn      " 设置中文帮助手册
     set nowrap           " 关闭自动换行
     set ruler            " 显示光标位置
