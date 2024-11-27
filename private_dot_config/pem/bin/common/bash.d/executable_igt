@@ -1,0 +1,14 @@
+#!/bin/sh
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1 ; then
+    cd "$(git rev-parse --show-toplevel)"
+    cmd="git ls-tree HEAD -r --name-only"
+else
+    cmd="find . -type f"
+fi
+
+$cmd | fzf -d: \
+    --ansi \
+    --query="$1" \
+    --bind="enter:execute:${EDITOR:-vim} {1}" \
+    --preview-window='+{2}-/2' \
+    --preview="[[ -n {1} ]] && cat {1}"
