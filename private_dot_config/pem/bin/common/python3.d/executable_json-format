@@ -1,5 +1,4 @@
-#!/bin/bash
-python3 -c "
+#!/usr/bin/env python3
 import sys
 import json
 import ptpython
@@ -24,15 +23,10 @@ def main():
     format_string = sys.argv[1]
 
     for x in data_list:
-        try:
-            output = f'''$1'''
-            print(output)
-        except KeyError as e:
-            print(f'Key error')
-        except Exception as e:
-            print(f'Error formatting')
+        locals().update(x)
+        output = eval("f'''" + format_string +  "'''")
+        print(output)
 
 if __name__ == '__main__':
     main()
 
-" "$@"

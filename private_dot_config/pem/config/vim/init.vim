@@ -1230,7 +1230,8 @@ call plug#begin(pe_runtimepath . '/plugged')
         noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
 
         " search symbol under cursor
-        noremap <silent> gn         :GscopeFind g <C-R><C-W><cr>
+        " Caution: This will interface cgn, so dont use it
+        " noremap <silent> gn         :GscopeFind g <C-R><C-W><cr>
         " search symbol under cursor, and preview
         noremap <silent> gy         :GscopeFind g <C-R><C-W><cr>:call QuickfixArrowPreview('j')<cr>
         " search symbol under cursor, and open
