@@ -1,14 +1,19 @@
 #!/bin/sh
-if git rev-parse --is-inside-work-tree >/dev/null 2>&1 ; then
+
+if [ "$1" = "-f" ] ; then
+    cmd="find . -type f"
+elif git rev-parse --is-inside-work-tree >/dev/null 2>&1 ; then
     cd "$(git rev-parse --show-toplevel)"
     cmd="git ls-tree HEAD -r --name-only"
 else
-    cmd="find . -type f"
+    shift
+    cmd='find .  -name ".git" \( -type l -or -type d \) -prune | xargs -I{} -P1  sh -c '"'"'a="{}" ;  git -C {}  ls-tree HEAD -r --name-only | sed "s@^@${a%.git}@g"'"'"
 fi
 
-$cmd | fzf -d: \
+eval "$cmd" | fzf -d: \
     --ansi \
     --query="$1" \
     --bind="enter:execute:${EDITOR:-vim} {1}" \
     --preview-window='+{2}-/2' \
-    --preview="[[ -n {1} ]] && cat {1}"
+    --preview="if file {} | grep -i 'text'; then head -200 {}; else head -c 4096 {} | xxd ; fi"
+    # --preview="[[ -n {1} ]] && cat {1}"
