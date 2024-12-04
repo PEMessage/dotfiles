@@ -84,7 +84,8 @@
     # bind-key -T copy-mode-vi y send-keys -X copy-selection
 
     # prevent tmux from exiting copy mode after selection with mouse
-    # bind-key -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-selection -x
+    unbind -Tcopy-mode MouseDragEnd1Pane
+    bind-key -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-selection
     bind-key -T copy-mode-vi MouseDown2Pane paste-buffer -p
 
     # another setup by may report error 
