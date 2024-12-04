@@ -767,7 +767,7 @@ call plug#begin(pe_runtimepath . '/plugged')
             \'spliter_before': 'bash -c ''sed "s@^$1@===================\n@g"'' -- ',
             \'md_cleancode': 'perl -e ''my $var = do { local $/; <> }; ; $var =~ s/```[^`]*```/```\n```/g  ; print $var''',
             \'change_attri': 'bash -c ''sed -E "/<project/ {s@$1=\"(\S*)\"@$1=\"$2\"@g}"'' -- ',
-            \'inline_sort': 'bash -c ''tr "$1" "\n" | sort | join_line "$1" '' -- ',
+            \'sort_inline': 'bash -c ''tr "$1" "\n" | sort | join_line "$1" '' -- ',
             \}
         if exists('g:ovr_textproc_inline_script')
             expand(g:textproc_inline_script,g:ovr_textproc_inline_script)
