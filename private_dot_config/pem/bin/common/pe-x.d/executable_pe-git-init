@@ -21,6 +21,9 @@ git_config_global() {
     runcmd git config --global "$key" "$value"
 }
  
+git_config_global branch.sort -committerdate
+git_config_global column.ui auto
+
 git_config_global alias.pk cherry-pick
 git_config_global alias.co checkout
 git_config_global alias.fw 'merge --ff-only'
