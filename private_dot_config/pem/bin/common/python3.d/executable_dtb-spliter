@@ -2,8 +2,12 @@
 """\
 Split a combined DTB file into individual DTB files
 
-Tips: you could combined  DTB by these way
+Tips: 
+    1. you could combined  DTB by these way
         `cat dtb1 dtb2 dtb3 dtb4 > dtb_combined`
+
+    2. decompile dtb
+        `( for x in * ; do dtc -I dtb -O dts -o ${x%dtb}dts $x ; done )`
 
 Credit: GPT-4o-mini
 """
