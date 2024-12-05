@@ -1,0 +1,89 @@
+#!/usr/bin/env python3
+"""\
+Split a combined DTB file into individual DTB files
+
+Tips: you could combined  DTB by these way
+        `cat dtb1 dtb2 dtb3 dtb4 > dtb_combined`
+
+Credit: GPT-4o-mini
+"""
+import struct
+import os
+import argparse
+from dataclasses import dataclass
+
+# Constants for the FDT header
+FDT_MAGIC = 0xd00dfeed  # Magic number for FDT
+HEADER_FORMAT = '>IIIIIIIIII'  # Little-endian format for the FDT header
+HEADER_SIZE = struct.calcsize(HEADER_FORMAT)
+
+@dataclass
+class FDTHeader:
+    magic: int
+    totalsize: int
+    off_dt_struct: int
+    off_dt_strings: int
+    off_mem_rsvmap: int
+    version: int
+    last_comp_version: int
+    boot_cpuid_phys: int
+    size_dt_strings: int
+    size_dt_struct: int
+
+def read_fdt_header(data, offset):
+    """Read the FDT header from the given offset in data."""
+    header = struct.unpack_from(HEADER_FORMAT, data, offset)
+    return FDTHeader(*header)
+
+def split_dtb(dtb_combined_path, output_dir):
+    """Split the combined DTB file into individual DTB files."""
+    os.makedirs(output_dir, exist_ok=True)  # Create output directory if it doesn't exist
+
+    with open(dtb_combined_path, 'rb') as f:
+        data = f.read()
+
+    offset = 0
+    dtb_count = 0
+    while offset < len(data):
+        if offset + HEADER_SIZE > len(data):
+            print("Reached end of data before reading full header.")
+            break
+        
+        header = read_fdt_header(data, offset)
+        
+        if header.magic != FDT_MAGIC:
+            print(f"Invalid FDT magic at offset {offset}.")
+            break
+        
+        total_size = header.totalsize
+        
+        if offset + total_size > len(data):
+            print("Total size exceeds data length. Possible corruption.")
+            break
+        
+        # Extract the DTB blob
+        dtb_blob = data[offset:offset + total_size]
+        
+        # Write the extracted DTB to a new file in the output directory
+        dtb_filename = os.path.join(output_dir, f'dtb_{dtb_count:>03}.dtb')
+        with open(dtb_filename, 'wb') as dtb_file:
+            dtb_file.write(dtb_blob)
+        
+        print(f"Extracted {dtb_filename} (size: {total_size} bytes)")
+        
+        # Move to the next header
+        offset += total_size
+        dtb_count += 1
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+            description=__doc__,
+            formatter_class=argparse.RawDescriptionHelpFormatter
+            )
+    parser.add_argument('input_file', type=str, help='Path to the combined DTB file')
+    parser.add_argument('--out', type=str, default='out/', help='Output directory for extracted DTB files')
+
+    args = parser.parse_args()
+    
+    split_dtb(args.input_file, args.out)
+
