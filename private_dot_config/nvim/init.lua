@@ -73,6 +73,14 @@ local section = function ()
     vim.o.smartindent = true                       -- Insert indents automatically
 
     vim.o.backspace   = 'eol,start,indent'         -- 类似所有编辑器的删除键
+        -- unmenu PopUp.-1-
+    vim.cmd [[
+        unmenu PopUp.How-to\ disable\ mouse
+    ]]
+    vim.cmd [[ 
+        menu PopUp.Go\ to\ Define <c-]>
+        menu PopUp.Back\  <c-t>
+    ]]
     -- -------------------------------------------
     -- 3.5 Windows Setting
     -- -------------------------------------------
@@ -864,7 +872,7 @@ require("lazy").setup({
     -- 5.5 Telescope Setting
     -- -------------------------------------------
     {
-        'nvim-telescope/telescope.nvim', tag = '0.1.4',
+        'nvim-telescope/telescope.nvim', tag = '0.1.8',
         enabled = true,
         dependencies = { 'nvim-lua/plenary.nvim' },
         cmd = "Telescope",
@@ -908,6 +916,7 @@ require("lazy").setup({
                 desc = "MRU"
             },
             { "<leader>tm", "<cmd>Telescope man_pages<cr>", desc = "Telescope Man Pages" },
+            { "<leader>td", "<cmd>Telescope lsp_definitions<cr>", desc = "Telescope LSP Define" },
             { "<leader>th", "<cmd>Telescope help_tags<cr>", desc = "Telescope Help Pages" },
             { "<leader>tf", "<cmd>Telescope find_files<cr>", desc = "Telescope Find Files" },
             { "<leader>tg", "<cmd>Telescope live_grep<cr>", desc = "Telescope Live Grep" },
