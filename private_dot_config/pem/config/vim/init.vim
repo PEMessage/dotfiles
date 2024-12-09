@@ -520,7 +520,7 @@ let g:startify_custom_header = [
         xnoremap P p
     else
         xnoremap P p
-        xnoremap p "_dp
+        xnoremap p "_d[p
     endif
 
     xnoremap x "_d
