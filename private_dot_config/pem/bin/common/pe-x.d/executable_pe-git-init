@@ -24,7 +24,7 @@ git_config_global() {
 git_config_global branch.sort -committerdate
 git_config_global column.ui auto
 git_config_global fetch.writeCommitGraph true
-git_config_global core.fsmonitor true
+# git_config_global core.fsmonitor true
 
 git_config_global alias.pk cherry-pick
 git_config_global alias.co checkout
