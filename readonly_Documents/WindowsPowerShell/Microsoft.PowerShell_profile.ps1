@@ -9,15 +9,16 @@
 
     Set-PSReadLineOption -EditMode Emacs
 
-if (((Get-Module) | Where-Object { $_.Name -eq "PSReadLine" } ).Version.CompareTo([Version]"2.1.0") -gt 0) {
-    # Tips: sudo powershell -Command ' Install-Module -Force PSReadline '
-    Set-PSReadLineOption -PredictionSource History # 设置预测文本来源为历史记录
-    Set-PSReadLineKeyHandler -Key "Ctrl+d" -Function MenuComplete # 设置 Ctrl+d 为菜单补全和 Intellisense
-}
+	if (((Get-Module) | Where-Object { $_.Name -eq "PSReadLine" } ).Version.CompareTo([Version]"2.1.0") -gt 0) {
+		# Tips: sudo powershell -Command ' Install-Module -Force PSReadline '
+		Set-PSReadLineOption -PredictionSource History # 设置预测文本来源为历史记录
+		Set-PSReadLineKeyHandler -Key "Ctrl+f" -Function MenuComplete # 设置 Ctrl+d 为菜单补全和 Intellisense
+	}
 
 
-
-
+ 
+# My Command
+# # =========================================
 function Update-CommandHelp {
     param (
         [string]$CmdletName
@@ -44,6 +45,17 @@ function Update-CommandHelp {
 
 # Example usage:
 # Update-CmdletHelp -CmdletName "Install-Module"
+
+function Run-As {
+    param (
+        [Parameter(ValueFromRemainingArguments=$true)]
+        [string]$Arguments
+    )
+	Start-Process powershell.exe -Verb RunAs -Args $Arguments
+}
+#Alias: My sudo
+Set-Alias -Name msudo -Value Run-As
+
 
 
 
