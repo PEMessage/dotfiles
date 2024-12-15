@@ -147,7 +147,7 @@
     for x in $(echo $PEM_ROOT_LIST) ;
     do
         [ -d "$x" ] || {
-           mkdir -p "$x/bin"
+           mkdir -p "$x/bin/misc.d"
            mkdir -p "$x/shell"
            echo "# this script auto source by $PEM_INIT_SCRIPT" > \
                "$x/shell/autorun.sh"

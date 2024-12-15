@@ -532,7 +532,7 @@ require("lazy").setup({
     {
         'thinca/vim-quickrun',
         keys = {
-            { "<leader>rkk", mode = { "n"}, '<cmd>QuickRun<CR>', desc = "QuickRun" },
+            { "<leader>rkk", mode = { "n" }, '<cmd>QuickRun<CR>', desc = "QuickRun" },
         },
     },
     {
@@ -1590,6 +1590,52 @@ require("lazy").setup({
             { "<leader>av", "<cmd>Vista!!<cr>", desc = "Open Vista bar" },
         }
     },
+    -- -------------------------------------------
+    -- 5.10 AI
+    -- -------------------------------------------
+    {
+        "yetone/avante.nvim",
+        event = "VeryLazy",
+        lazy = false,
+        enabled = false,
+        version = false, -- set this if you want to always pull the latest change
+        opts = {
+            -- add any opts here
+        },
+        -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
+        build = "make",
+        -- build = "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false" -- for windows
+        dependencies = {
+            "stevearc/dressing.nvim",
+            "nvim-lua/plenary.nvim",
+            "MunifTanjim/nui.nvim",
+            --- The below dependencies are optional,
+            "hrsh7th/nvim-cmp", -- autocompletion for avante commands and mentions
+            {
+                -- Make sure to set this up properly if you have lazy=true
+                'MeanderingProgrammer/render-markdown.nvim',
+                opts = {
+                    file_types = { "markdown", "Avante" },
+                },
+                ft = { "markdown", "Avante" },
+            },
+        },
+        config = function (_, opts)
+            require('avante_lib').load()
+            require('avante').setup ({
+                provider = "ollama",
+                vendors = {
+                    ollama = {
+                        __inherited_from = "openai",
+                        api_key_name = "",
+                        -- endpoint = "http://80/v1",
+                        model = "qwen2.5-coder",
+                    },
+                }
+            })
+        end
+    },
+
 
     -- -------------------------------------------
 }, { -- Lazy.nvim Options
