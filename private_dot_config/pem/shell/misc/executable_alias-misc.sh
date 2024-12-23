@@ -1,9 +1,10 @@
 alias ffapt='ffpm i'
-alias rsync='rsync --progress'
+alias rsync='rsync --progress -u'
 alias s="git status --short --branch"
 alias vit='vim $(command ls -tp | grep -v / |  head -n1)'
 alias lvim='vim -c "normal '\''0"'
 alias lvi='vim -c "normal '\''0"'
+
 # alias ttt='command ls -tp | head -n1'
 ttt() {
     if [ -n "$1" ] ; then
