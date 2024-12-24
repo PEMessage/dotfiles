@@ -5,6 +5,27 @@ qemu_target_list="i386 i486 alpha arm armeb sparc sparc32plus sparc64 \
 ppc ppc64 ppc64le m68k mips mipsel mipsn32 mipsn32el mips64 mips64el \
 sh4 sh4eb s390x aarch64 aarch64_be hppa riscv32 riscv64 xtensa xtensaeb \
 microblaze microblazeel or1k x86_64 hexagon loongarch64"
+# check if given TARGETS is/are in the supported target list
+qemu_check_target_list() {
+    if [ $# -eq 0 ]; then
+      checked_target_list="$qemu_target_list"
+      return
+    fi
+    unset checked_target_list
+    for target; do
+        for cpu in $qemu_target_list; do
+            if [ "x$cpu" = "x$target" ]; then
+                checked_target_list="$checked_target_list $target"
+                break
+            fi
+        done
+        if [ "x$cpu" != "x$target" ]; then
+            echo "ERROR: unknown CPU \"$target\"" 1>&2
+            usage
+            exit 1
+        fi
+    done
+}
 
 i386_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
 i386_mask='\xff\xff\xff\xff\xff\xfe\xfe\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
@@ -189,6 +210,7 @@ Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
 
        Configure binfmt_misc to use qemu interpreter
 
+       --clear          remove registered interpreters for target TARGETS;
        --help:          display this usage
        --qemu-path:     set path to qemu interpreter ($QEMU_PATH)
        --qemu-suffix:   add a suffix to the default interpreter name
@@ -206,6 +228,20 @@ Usage: qemu-binfmt-conf.sh [--qemu-path PATH][--debian][--systemd CPU]
                         configured and remains in memory. All future uses
                         are cloned from the open file.
        --preserve-argv0 preserve argv[0]
+
+    Defaults:
+        QEMU_TARGETS=$QEMU_TARGETS
+        QEMU_PATH=$QEMU_PATH
+        QEMU_SUFFIX=$QEMU_SUFFIX
+        QEMU_PERSISTENT=$QEMU_PERSISTENT
+        QEMU_CREDENTIAL=$QEMU_CREDENTIAL
+        QEMU_CLEAR=$QEMU_CLEAR
+        QEMU_TEST=$QEMU_TEST
+
+    TLDR:
+        Ubuntu 22.04:
+        ./qemu-binfmt-conf.sh --qemu-path /usr/bin --qemu-suffix -static
+
 
     To import templates with update-binfmts, use :
 
@@ -335,33 +371,57 @@ qemu_set_binfmts() {
     done
 }
 
+qemu_clear_notimplemented() {
+    echo "ERROR: option clear not implemented for this mode yet" 1>&2
+    usage
+    exit 1
+}
+
+qemu_clear_interpreter() {
+    p="/proc/sys/fs/binfmt_misc/$1"
+    if [ -f "$p" ]; then
+      printf %s -1 > "$p"
+    fi
+}
+
 CHECK=qemu_check_bintfmt_misc
 BINFMT_SET=qemu_register_interpreter
+BINFMT_CLEAR=qemu_clear_interpreter
 
 SYSTEMDDIR="/etc/binfmt.d"
 DEBIANDIR="/usr/share/binfmts"
 
-QEMU_PATH=/usr/local/bin
-CREDENTIAL=no
-PERSISTENT=no
-PRESERVE_ARG0=no
-QEMU_SUFFIX=""
+QEMU_TARGETS="${QEMU_TARGETS:-}"
+QEMU_PATH="${QEMU_PATH:-/usr/bin}"
+QEMU_SUFFIX="${QEMU_SUFFIX:--static}"
+QEMU_PERSISTENT="${QEMU_PERSISTENT:-no}"
+QEMU_CREDENTIAL="${QEMU_CREDENTIAL:-no}"
+QEMU_CLEAR="${QEMU_CLEAR:-no}"
+QEMU_TEST="${QEMU_TEST:-no}"
 
-_longopts="debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential:,\
+_longopts="test,clear,debian,systemd:,qemu-path:,qemu-suffix:,exportdir:,help,credential:,\
 persistent:,preserve-argv0:"
-options=$(getopt -o ds:Q:S:e:hc:p:g:F: -l ${_longopts} -- "$@")
+options=$(getopt -o trds:Q:S:e:hc:p:g:F: -l ${_longopts} -- "$@")
 eval set -- "$options"
 
 while true ; do
     case "$1" in
+    -t|--test)
+        QEMU_TEST="yes"
+        ;;
+    -r|--clear)
+        QEMU_CLEAR="yes"
+        ;;
     -d|--debian)
         CHECK=qemu_check_debian
         BINFMT_SET=qemu_generate_debian
+        BINFMT_CLEAR=qemu_clear_notimplemented
         EXPORTDIR=${EXPORTDIR:-$DEBIANDIR}
         ;;
     -s|--systemd)
         CHECK=qemu_check_systemd
         BINFMT_SET=qemu_generate_systemd
+        BINFMT_CLEAR=qemu_clear_notimplemented
         EXPORTDIR=${EXPORTDIR:-$SYSTEMDDIR}
         shift
         # check given cpu is in the supported CPU list
@@ -416,5 +476,21 @@ while true ; do
     shift
 done
 
+shift
+
 $CHECK
-qemu_set_binfmts
+
+if [ "x$QEMU_TEST" = "xyes" ]; then
+    BINFMT_SET=:
+    BINFMT_CLEAR=:
+fi
+
+if [ "x$QEMU_CLEAR" = "xyes" ]; then
+    qemu_check_target_list "$@"
+    for t in $checked_target_list; do
+        $BINFMT_CLEAR "qemu-$t"
+    done
+    exit
+fi
+
+qemu_set_binfmts "$@"
