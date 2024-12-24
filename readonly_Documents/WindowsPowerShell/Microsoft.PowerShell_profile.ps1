@@ -56,6 +56,10 @@ function Run-As {
 #Alias: My sudo
 Set-Alias -Name msudo -Value Run-As
 
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
+# Module List
+Import-Module z
+
 
 
 # Wsl port
