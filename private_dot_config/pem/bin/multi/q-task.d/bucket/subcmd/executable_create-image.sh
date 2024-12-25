@@ -4,7 +4,7 @@
 
 # create-image.sh creates a minimal Debian Linux image suitable for syzkaller.
 
-set -eux
+set -eu
 
 # Create a minimal Debian distribution in a directory.
 PREINSTALL_PKGS=openssh-server,curl,tar,gcc,libc6-dev,time,strace,sudo,less,psmisc,selinux-utils,policycoreutils,checkpolicy,selinux-policy-default,firmware-atheros,debian-ports-archive-keyring
@@ -18,7 +18,7 @@ fi
 ARCH=$(uname -m)
 RELEASE=bullseye
 FEATURE=minimal
-SEEK=2047
+SEEK=16383
 PERF=false
 
 # Display help function
@@ -28,7 +28,7 @@ display_help() {
     echo "   -a, --arch                 Set architecture"
     echo "   -d, --distribution         Set on which debian distribution to create"
     echo "   -f, --feature              Check what packages to install in the image, options are minimal, full"
-    echo "   -s, --seek                 Image size (MB), default 2048 (2G)"
+    echo "   -s, --seek                 Image size (MB), default 16384 (16G)"
     echo "   -h, --help                 Display help message"
     echo "   -p, --add-perf             Add perf support with this option enabled. Please set envrionment variable \$KERNEL at first"
     echo
@@ -147,7 +147,7 @@ fi
 
 # debootstrap may fail for EoL Debian releases
 RET=0
-sudo --preserve-env=http_proxy,https_proxy,ftp_proxy,no_proxy debootstrap $DEBOOTSTRAP_PARAMS || RET=$?
+sudo --preserve-env=http_proxy,https_proxy,ftp_proxy,no_proxy debootstrap $DEBOOTSTRAP_PARAMS https://repo.huaweicloud.com/debian/ || RET=$?
 
 if [ $RET != 0 ] && [ $DEBARCH != "riscv64" ]; then
     # Try running debootstrap again using the Debian archive
