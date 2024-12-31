@@ -1443,6 +1443,8 @@ call plug#begin(pe_runtimepath . '/plugged')
         Plug 'wellle/tmux-complete.vim' , Cond(g:pe_competesys == 'async')
         Plug 'rafamadriz/friendly-snippets' , Cond(g:pe_competesys == 'async')
         Plug 'prabirshrestha/asyncomplete-file.vim' , Cond(g:pe_competesys == 'async')
+
+    Plug 'prabirshrestha/asyncomplete-lsp.vim'
     if g:pe_competesys == 'async' 
         let g:asyncomplete_auto_popup = 1
 
