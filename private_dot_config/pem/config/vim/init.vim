@@ -1420,7 +1420,9 @@ call plug#begin(pe_runtimepath . '/plugged')
     "     let g:pe_competesys = 'easy'
     " if has('win32') && v:version >= 800 
     "     let g:pe_competesys = 'async'
-    if has('patch-7.4.775')
+    if v:version >= 802
+        let g:pe_competesys = 'async'
+    elseif has('patch-7.4.775')
         " Good enought for buffer
         let g:pe_competesys = 'apt'
     else 
@@ -1434,35 +1436,35 @@ call plug#begin(pe_runtimepath . '/plugged')
 " -------------------------------------------
 
     " Buggy buffer 
-    " Plug 'prabirshrestha/async.vim' , Cond(g:pe_competesys == 'async')
-    " Plug 'prabirshrestha/asyncomplete.vim' , Cond(g:pe_competesys == 'async')
-    " Plug 'prabirshrestha/asyncomplete-buffer.vim' , Cond(g:pe_competesys == 'async')
+    Plug 'prabirshrestha/async.vim' , Cond(g:pe_competesys == 'async')
+    Plug 'prabirshrestha/asyncomplete.vim' , Cond(g:pe_competesys == 'async')
+    Plug 'prabirshrestha/asyncomplete-buffer.vim' , Cond(g:pe_competesys == 'async')
 
-    "     Plug 'wellle/tmux-complete.vim' , Cond(g:pe_competesys == 'async')
-    "     Plug 'rafamadriz/friendly-snippets' , Cond(g:pe_competesys == 'async')
-    "     Plug 'prabirshrestha/asyncomplete-file.vim' , Cond(g:pe_competesys == 'async')
-    " if g:pe_competesys == 'async' 
-    "     let g:asyncomplete_auto_popup = 1
+        Plug 'wellle/tmux-complete.vim' , Cond(g:pe_competesys == 'async')
+        Plug 'rafamadriz/friendly-snippets' , Cond(g:pe_competesys == 'async')
+        Plug 'prabirshrestha/asyncomplete-file.vim' , Cond(g:pe_competesys == 'async')
+    if g:pe_competesys == 'async' 
+        let g:asyncomplete_auto_popup = 1
 
-    "     function! s:check_back_space() abort
-    "         let col = col('.') - 1
-    "         return !col || getline('.')[col - 1]  =~ '\s'
-    "     endfunction
+        function! s:check_back_space() abort
+            let col = col('.') - 1
+            return !col || getline('.')[col - 1]  =~ '\s'
+        endfunction
 
-    "     inoremap <silent><expr> <TAB>
-    "                 \ pumvisible() ? "\<C-n>" :
-    "                 \ <SID>check_back_space() ? "\<TAB>" :
-    "                 \ asyncomplete#force_refresh()
-    "     inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+        inoremap <silent><expr> <TAB>
+                    \ pumvisible() ? "\<C-n>" :
+                    \ <SID>check_back_space() ? "\<TAB>" :
+                    \ asyncomplete#force_refresh()
+        inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
-    "     inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
-    "     imap <c-space> <Plug>(asyncomplete_force_refresh)
+        inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
+        imap <c-space> <Plug>(asyncomplete_force_refresh)
 
-    "     if has('patch-8.0.1494')
-    "         Plug 'hrsh7th/vim-vsnip'
-    "         Plug 'hrsh7th/vim-vsnip-integ'
-    "     endif
-    " endif
+        if has('patch-8.0.1494')
+            Plug 'hrsh7th/vim-vsnip'
+            Plug 'hrsh7th/vim-vsnip-integ'
+        endif
+    endif
 
 " -------------------------------------------
 " 6.11.2 Complete Engine (easy)
