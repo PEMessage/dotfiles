@@ -27,6 +27,31 @@ ff_man() {
     fi
 }
 
+ff_include() {
+    
+    # priority in for loop: low(left) -- hight(right)
+    for x in `which gcc 2>/dev/null` `which g++ 2>/dev/null` $@
+    do
+        local cmd="$x"
+    done
+    # echo $cmd
+
+    # Credit: qwen2.5-coder:14b 
+    #   Q:  g++ how to print default include search path ?
+    #   - `-E`: Stop after preprocessing.
+    #   - `-x c++`: Treat the input as C++ code (you can use `-x c` if you're working with C code).
+    #   - `-v`: Verbose output, showing the search paths for headers.
+    #   - `< /dev/null`: Redirects standard input from `/dev/null`,
+    #      so `g++` doesn't try to read any actual source file.
+    $cmd -E -x c++ -v - < /dev/null 2>&1 |
+        awk '
+        /search starts here/{ a = 1 ; next }
+        /End of search list/{ a = 0 ; next }
+        a == 1 {
+            gsub(/^[ \t]+|[ \t]+$/, "") ; print $0
+        } ' | xargs -I {} find {} -name '*.h' | fzf
+}
+
 
 
 usage() {
@@ -34,6 +59,7 @@ usage() {
     echo "       ff path            : search all path bin"
     echo "       ff man             : alias all of MANPATH"
     echo "       ff [apt|pacman|rpm]: alias of \`ffpm i\`"
+    echo "       ff include         : seach g++/gcc default include path"
 }
 
 
@@ -50,6 +76,10 @@ main() {
         man)
             shift
             ff_man "$@"
+            ;;
+        include)
+            shift
+            ff_include "$@"
             ;;
         *)
             usage
