@@ -30,8 +30,11 @@
 # Also documented at https://sunaku.github.io/tmux-yank-osc52.html
 #
 # Credit: https://sunaku.github.io/tmux-yank-osc52.html
+is_print= # defualt
+[ "$1" = -p ] && shift && is_print=1
 
 input=$( cat "$@" )
+[ "$is_print" ] && echo "$input"
 input() { printf %s "$input" ;}
 known() { command -v "$1" >/dev/null ;}
 maybe() { known "$1" && input | "$@" ;}
