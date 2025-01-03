@@ -25,6 +25,13 @@ function q-myip()
 }
 
 function q-pwd() {
+if [ -n "$PEM_Q_PWD_NR" ] ; then
+    local postcmd="awk 'NR == $PEM_Q_PWD_NR'"
+else
+    local postcmd="cat"
+fi
+# echo $postcmd
+
 for x in `q-myip`
 do
     if [ -z "$1" ]; then 
@@ -32,8 +39,8 @@ do
     else
         path="$(readlink -f "$1")"
         echo `whoami`@$x:"$path"
-    fi
-done
+    fi 
+done | eval "$postcmd"
 }
 
 
