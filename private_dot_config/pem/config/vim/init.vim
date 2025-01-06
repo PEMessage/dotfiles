@@ -1820,8 +1820,14 @@ endif
         nmap <buffer> [g <plug>(lsp-previous-diagnostic)
         nmap <buffer> ]g <plug>(lsp-next-diagnostic)
         nmap <buffer> K <plug>(lsp-hover)
-        nnoremap <buffer> <expr><c-f> lsp#scroll(+4)
-        nnoremap <buffer> <expr><c-d> lsp#scroll(-4)
+
+        # Extra Map
+        nmap <buffer> <leader>la :LspDocumentSwitchSourceHeader<CR>
+        nmap <buffer> <leader>lt :LspTypeHierarchy<CR>
+        nmap <buffer> <leader>li :LspCallHierarchyIncoming<CR>
+        nmap <buffer> <leader>lo :LspCallHierarchyOutgoing<CR>
+        " nnoremap <buffer> <expr><c-f> lsp#scroll(+4)
+        " nnoremap <buffer> <expr><c-d> lsp#scroll(-4)
 
         let g:lsp_format_sync_timeout = 1000
         autocmd! BufWritePre *.rs,*.go call execute('LspDocumentFormatSync')
