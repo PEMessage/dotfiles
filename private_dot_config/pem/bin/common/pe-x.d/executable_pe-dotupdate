@@ -3,14 +3,18 @@ GREEN='\e[092m'
 STOP='\e[0m'
 temp=$(chezmoi source-path)
 
-if [ "$1" = "-d" ] || [ "$1" = "--diff" ]  ; then 
-    cd $temp
-    chezmoi re-add
-    git add .
-    git diff --staged
-    cd -
-    exit 0
-fi
+
+for x in "$@"
+do
+    if [ "$x" = "-d" ] ; then 
+        cd $temp
+        chezmoi re-add
+        git add .
+        git diff --staged
+        cd -
+        exit 0
+    fi
+done
 
 
 echo "${GREEN}INFO${STOP}: ""chezmoi re-add all trackfile"
