@@ -3,6 +3,13 @@
 
     Remove-Item alias:curl
     Set-Alias -Name l -Value ls
+    Function Invoke-ScoopRsync {
+        & rsync.exe `
+            -e "$HOME\scoop\apps\cwrsync\current\bin\ssh.exe -i $HOME\.ssh\id_rsa -o UserKnownHostsFile=$HOME\.ssh\known_hosts" `
+            --progress -u `
+            $args
+    }
+    Set-Alias -name rsync -Value Invoke-ScoopRsync
 
 # PSReadline
 # # =========================================
