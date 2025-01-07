@@ -970,13 +970,13 @@ call plug#begin(pe_runtimepath . '/plugged')
     " the file and line number where the option was last set.
     " Can you do the following after opening a kotlin file?
     " verbose set commentstring?
-        aug VIMCOMMENT
+        augroup VIMCOMMENT
             autocmd!
             autocmd FileType apache setlocal commentstring=#\ %s
             autocmd FileType python setlocal commentstring=#\ %s
             autocmd FileType cpp setlocal commentstring=//\ %s
             autocmd FileType c setlocal commentstring=//\ %s
-        aug VIMCOMMENT
+        augroup END
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-fugitive'
     Plug 'tpope/vim-vinegar'
