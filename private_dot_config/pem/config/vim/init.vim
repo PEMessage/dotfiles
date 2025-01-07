@@ -974,6 +974,7 @@ call plug#begin(pe_runtimepath . '/plugged')
             autocmd!
             autocmd FileType apache setlocal commentstring=#\ %s
             autocmd FileType python setlocal commentstring=#\ %s
+            autocmd FileType cpp setlocal commentstring=//\ %s
             autocmd FileType c setlocal commentstring=//\ %s
         aug VIMCOMMENT
     Plug 'tpope/vim-repeat'
@@ -1817,15 +1818,16 @@ endif
         nmap <buffer> gi <plug>(lsp-implementation)
         nmap <buffer> gt <plug>(lsp-type-definition)
         nmap <buffer> <leader>rn <plug>(lsp-rename)
-        nmap <buffer> [g <plug>(lsp-previous-diagnostic)
-        nmap <buffer> ]g <plug>(lsp-next-diagnostic)
+        nmap <buffer> [d <plug>(lsp-previous-diagnostic)
+        nmap <buffer> ]d <plug>(lsp-next-diagnostic)
         nmap <buffer> K <plug>(lsp-hover)
 
         # Extra Map
-        nmap <buffer> <leader>la :LspDocumentSwitchSourceHeader<CR>
-        nmap <buffer> <leader>lt :LspTypeHierarchy<CR>
-        nmap <buffer> <leader>li :LspCallHierarchyIncoming<CR>
-        nmap <buffer> <leader>lo :LspCallHierarchyOutgoing<CR>
+        nmap <buffer> <leader>ga :LspDocumentSwitchSourceHeader<CR>
+        nmap <buffer> <leader>gt :LspTypeHierarchy<CR>
+        nmap <buffer> <leader>gi :LspCallHierarchyIncoming<CR>
+        nmap <buffer> <leader>go :LspCallHierarchyOutgoing<CR>
+        nmap <buffer> <M-`> :LspDocumentSwitchSourceHeader<CR>
         " nnoremap <buffer> <expr><c-f> lsp#scroll(+4)
         " nnoremap <buffer> <expr><c-d> lsp#scroll(-4)
 
