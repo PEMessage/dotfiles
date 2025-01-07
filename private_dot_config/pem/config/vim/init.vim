@@ -1822,7 +1822,7 @@ endif
         nmap <buffer> ]d <plug>(lsp-next-diagnostic)
         nmap <buffer> K <plug>(lsp-hover)
 
-        # Extra Map
+        " Extra Map
         nmap <buffer> <leader>ga :LspDocumentSwitchSourceHeader<CR>
         nmap <buffer> <leader>gt :LspTypeHierarchy<CR>
         nmap <buffer> <leader>gi :LspCallHierarchyIncoming<CR>
