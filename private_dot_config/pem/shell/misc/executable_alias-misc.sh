@@ -5,6 +5,7 @@ alias vit='vim $(command ls -tp | grep -v / |  head -n1)'
 alias lvim='vim -c "normal '\''0"'
 alias lvi='vim -c "normal '\''0"'
 alias msudo="sudo env \"PATH=\$PATH\""
+alias vi="vim" # if we dont use package manger vim, we shouldn't use package manger vi
 
 # alias ttt='command ls -tp | head -n1'
 ttt() {
