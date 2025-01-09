@@ -138,8 +138,6 @@
 # -----------------------------------------
 
     source ~/.config/pem/init.sh
-    [ -f "$HOME/.peprofile" ] && source "$HOME/.peprofile"
-
     # source ~/.config/chezmoi/chezmoi.zsh
     # source ~/.config/pem/shell/fzf/fzf-ff.sh
     # source ~/.config/pem/shell/vless/vless.sh

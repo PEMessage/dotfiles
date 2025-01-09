@@ -121,5 +121,3 @@ PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
     # bind 'TAB:menu-complete'
 
     [ -f "$HOME/.config/pem/init.sh" ] && source ~/.config/pem/init.sh
-    [ -f "$HOME/.peprofile" ] && source "$HOME/.peprofile"
-    [ -f "$HOME/.pemrc" ] && source "$HOME/.pemrc"
