@@ -194,8 +194,8 @@ run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | cut -c 6-8)"
     set -g status-right-length "100"
     set -g status-left-length "100"
     set -g status-style "none,bg=#252525"
-    set -g status-left "#[fg=#252525,bg=#89bbfe] #S #[fg=#89bbfe,bg=#252525,nobold,nounderscore,noitalics]"
-    set -g status-right "#[fg=#3b3b3b,bg=#252525,nobold,nounderscore,noitalics]#[fg=#a1b7cc,bg=#3b3b3b] %Y-%m-%d | %H:%M #[fg=#89bbfe,bg=#3b3b3b,nobold,nounderscore,noitalics]#[fg=#252525,bg=#89bbfe] #h "
+    set -g status-left "#[fg=#252525,bg=#89bbfe] #h #[fg=#89bbfe,bg=#252525,nobold,nounderscore,noitalics]"
+    set -g status-right "#[fg=#3b3b3b,bg=#252525,nobold,nounderscore,noitalics]#[fg=#a1b7cc,bg=#3b3b3b] %Y-%m-%d | %H:%M #[fg=#89bbfe,bg=#3b3b3b,nobold,nounderscore,noitalics]#[fg=#252525,bg=#89bbfe] #S "
 
 
     set -g message-command-style "fg=#a1b7cc,bg=#3b3b3b"
