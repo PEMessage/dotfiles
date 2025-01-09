@@ -484,7 +484,7 @@ let g:startify_custom_header = [
                             set number
         nnoremap <leader>nr :set relativenumber!<CR>
     nnoremap <leader>tb  :tab ball<CR>
-    nnoremap <leader>gp  `[v`]
+    " nnoremap <leader>gp  `[v`]
     nnoremap gp  `[v`]
 
     command! PCD execute 'cd ' . expand('%:p:h')
@@ -930,6 +930,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         autocmd BufNewFile,BufRead *.bp set filetype=json " arm = armv6/7
     " Plug 'sheerun/vim-polyglot'
     Plug 'mtdl9/vim-log-highlighting'
+    " Plug 'gburca/vim-logcat'
     Plug 'chrisbra/Colorizer' , { 'on': 'ColorToggle' }
     Plug 'powerman/vim-plugin-AnsiEsc' , { 'on': 'AnsiEsc' }
         let g:no_cecutil_maps = 1
@@ -1324,12 +1325,14 @@ call plug#begin(pe_runtimepath . '/plugged')
     " Quicktoggle
     function! ToggleQuickfix()
         if empty(filter(getwininfo(), 'v:val.quickfix'))
-            copen
+            botright copen
         else
             cclose
         endif
     endfunction
     command! Ctoggle call ToggleQuickfix()
+    nnoremap <leader>cc  :call ToggleQuickfix()<CR>
+    nnoremap <silent> <M-S-T> :call ToggleQuickfix()<CR> 
 
     " Move cursor in quickfix preview
     function! QuickfixArrowPreview(direction)
@@ -1369,7 +1372,6 @@ call plug#begin(pe_runtimepath . '/plugged')
 
     " Gtag quickfix keymap
         noremap <silent> go :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
-        nnoremap <leader>cc  :call ToggleQuickfix()<CR>
         nnoremap <S-F12> :call QuickfixArrowPreview('j')<CR>
         nnoremap <S-F11> :call QuickfixArrowPreview('k')<CR>
 
