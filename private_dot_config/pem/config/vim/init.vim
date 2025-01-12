@@ -600,7 +600,22 @@ let g:startify_custom_header = [
 
     nnoremap <silent><leader>b  :Lexplore<CR>
 
-    command! PEWrite w !sudo tee %
+    " command! PEWrite execute 'w !sudo tee % <bar> edit! ' 
+    " cnoremap w!! execute 'silent! write !sudo tee % >/dev/null' <bar> edit!
+    function! PEWrite()
+        " Credit: https://stackoverflow.com/questions/2600783/how-does-the-vim-write-with-sudo-trick-work
+        execute 'silent! w !sudo tee % > /dev/null' |
+            edit!
+    endfunction
+    command! PEWrite :call PEWrite()
+    command! PWrite :call PEWrite()
+
+    " command! PWrite call SudoSaveFile()
+    " function! SudoSaveFile() abort
+    "     execute (has('gui_running') ? '' : 'silent') 'write !env SUDO_EDITOR=tee sudo -e % >/dev/null'
+    "     let &modified = v:shell_error
+    " endfunction
+
 
 
 " 6. VIM Plug-in Zone (Part1)
