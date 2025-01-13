@@ -2457,6 +2457,8 @@ alias fh = pipe help all | fzf
     # 按照派生类型打印对象
     set print object on
 
+    set auto-load safe-path /
+
 # ==========================================
 # 4. GEP
 # ==========================================
@@ -2498,7 +2500,7 @@ try:
     from prompt_toolkit.output import create_output
     from prompt_toolkit.shortcuts import CompleteStyle
 except ImportError as e:
-    print_info("Not able to run GEP")
+    print("Not able to run GEP")
     raise e
     
     
@@ -3089,9 +3091,7 @@ try:
     gep_main()
 except Exception as e:
     traceback.print_tb(e.__traceback__)
-    print_warning(
-        "Something went wrong when running GEP, please report an issue on https://github.com/lebr0nli/GEP/issues with the traceback above, thanks!"
-    )
+    print_warning( "Something went wrong when running GEP, please report an issue on https://github.com/lebr0nli/GEP/issues with the traceback above, thanks!")
 end
 
 

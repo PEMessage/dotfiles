@@ -1,7 +1,9 @@
 # Function to set up proxy settings
 
 px2dns() {
-    local hostip="$(cat /etc/resolv.conf |grep -oP '(?<=nameserver\ ).*')"
+    # local hostip="$(cat /etc/resolv.conf |grep -oP '(?<=nameserver\ ).*')"
+    # change to wsl recommand way, see https://learn.microsoft.com/en-us/windows/wsl/networking
+    local hostip="$(ip route show | grep -i default | awk '{ print $3}')"
     __px2_defconfig set $hostip:7890
 }
 

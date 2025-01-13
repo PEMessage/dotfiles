@@ -1476,6 +1476,8 @@ call plug#begin(pe_runtimepath . '/plugged')
                     \ <SID>check_back_space() ? "\<TAB>" :
                     \ asyncomplete#force_refresh()
         inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+        inoremap <expr> <C-c>   pumvisible() ? "\<Esc>" : "\<C-c>"
+
 
         inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
         imap <c-space> <Plug>(asyncomplete_force_refresh)
@@ -1840,11 +1842,11 @@ endif
         nmap <buffer> K <plug>(lsp-hover)
 
         " Extra Map
-        nmap <buffer> <leader>ga :LspDocumentSwitchSourceHeader<CR>
-        nmap <buffer> <leader>gt :LspTypeHierarchy<CR>
-        nmap <buffer> <leader>gi :LspCallHierarchyIncoming<CR>
-        nmap <buffer> <leader>go :LspCallHierarchyOutgoing<CR>
-        nmap <buffer> <M-`> :LspDocumentSwitchSourceHeader<CR>
+        nmap <buffer> <leader>lt :LspTypeHierarchy<CR>
+        nmap <buffer> <leader>li :LspCallHierarchyIncoming<CR>
+        nmap <buffer> <leader>lo :LspCallHierarchyOutgoing<CR>
+        nmap <buffer> <M-h> :LspDocumentSwitchSourceHeader<CR>
+        nnoremap <leader>av :Vista vim_lsp<CR>
         " nnoremap <buffer> <expr><c-f> lsp#scroll(+4)
         " nnoremap <buffer> <expr><c-d> lsp#scroll(-4)
 
