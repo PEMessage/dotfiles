@@ -1626,6 +1626,7 @@ call plug#begin(pe_runtimepath . '/plugged')
 " 6.13 LSP
 " -------------------------------------------
     Plug 'prabirshrestha/vim-lsp'
+    Plug 'jiz4oh/vim-lspfuzzy'
     Plug 'mattn/vim-lsp-settings'
 call plug#end()
 
