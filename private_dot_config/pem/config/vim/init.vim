@@ -1165,7 +1165,7 @@ call plug#begin(pe_runtimepath . '/plugged')
             let g:gutentags_generate_on_write = 0
             let g:gutentags_background_update = 0
 
-            let g:gutentags_project_root = ['.gentag']
+            let g:gutentags_project_root = ['gtags']
             let g:gutentags_add_default_project_roots = 0
             let g:gutentags_add_ctrlp_root_markers = 0
             " Pls manully gen tags, using :GutentagsUpdate
@@ -1177,7 +1177,7 @@ call plug#begin(pe_runtimepath . '/plugged')
             " 同时开启 ctags 和 gtags 支持：
             let g:gutentags_modules = []
             if executable('ctags')
-                let g:gutentags_modules += [ 'ctags' ]
+                " let g:gutentags_modules += [ 'ctags' ]
             endif
             if executable('gtags-cscope') && executable('gtags')
                 let g:gutentags_modules += ['gtags_cscope']
