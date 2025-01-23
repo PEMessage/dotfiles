@@ -654,6 +654,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:ctrlp_root_markers = ['.root', 'repo', '.git']
         let g:ctrlp_max_depth = 3
         let g:ctrlp_mruf_max = 250
+        let g:ctrlp_mruf_relative = 1
         let g:ctrlp_prompt_mappings = {
                     \ 'ToggleType(1)':        ['<c-up>'],
                     \ 'ToggleType(-1)':       ['<c-down>'],
