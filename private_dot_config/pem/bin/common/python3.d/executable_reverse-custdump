@@ -2,11 +2,14 @@
 # coding: utf-8
 
 import re
+import argparse
 from dataclasses import dataclass
 from enum import Enum
 from typing import List
 import sys
 import pprint
+import os
+import sys
 
 @dataclass
 class MemoryDump:
@@ -66,11 +69,27 @@ class MemoryDump:
     # import pprint
     # pprint.pprint(memory_dump)
 
+def write_memory_dumps_to_file(memory_dumps, out_dir):
+    os.makedirs(out_dir, exist_ok=True)
+    for dump in memory_dumps:
+        file_name = f"{out_dir}/{dump.mOffset}.bin"
+        with open(file_name, 'wb') as f:
+            # Writing the attributes to the file
+            f.write(dump.mContent)
+
 
 if __name__ == "__main__":
     # See: https://stackoverflow.com/questions/72236607/how-to-get-python-to-tolerate-utf-8-encoding-errors
+    parser = argparse.ArgumentParser(description="Process some output directory.")
+    parser.add_argument('-o', '--out_dir', help='Output directory (default: out)')
+    args = parser.parse_args()
+    
     lines = sys.stdin.buffer.read().decode(errors='replace').splitlines()
-    pprint.pprint(MemoryDump.extracts(lines))
+    msgs = MemoryDump.extracts(lines)
+    pprint.pprint(msgs)
+    
+    if args.out_dir:
+        write_memory_dumps_to_file(msgs, args.out_dir)
 
 
 
