@@ -489,6 +489,26 @@ let g:startify_custom_header = [
 
     command! PCD execute 'cd ' . expand('%:p:h')
     " command! PCD execute 'cd' . expand('%:p:h')
+
+    " Credit: deepseek-v3
+    function! Tcd(target)
+        let current_dir = getcwd()
+        while current_dir != '/'
+            if filereadable(current_dir . '/' . a:target) || isdirectory(current_dir . '/' . a:target)
+                execute 'cd ' . fnameescape(current_dir)
+                return 0
+            elseif fnamemodify(current_dir, ':t') == a:target
+                execute 'cd ' . fnameescape(current_dir)
+                return 0
+            endif
+            let current_dir = fnamemodify(current_dir, ':h')
+        endwhile
+        echo 'No parent directory containing ' . a:target . ' found; staying in ' . getcwd()
+        return 1
+    endfunction
+    command! -nargs=1 Tcd call Tcd(<q-args>)
+    command! Rcd call Tcd('.repo')
+
     command! PFile echo  expand('%:p') |  call Yank(expand('%:p'))
     " See: https://www.cyberciti.biz/faq/vim-vi-text-editor-save-file-without-root-permission/
     command Psudow :execute ':silent w !sudo tee % > /dev/null' | :edit!
