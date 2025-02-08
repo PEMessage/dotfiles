@@ -107,8 +107,12 @@
     bind -n C-M-l select-pane -R
     # See: https://superuser.com/questions/343572/how-do-i-reorder-tmux-windows
     # bind-key -n T swap-window -t 1
-    bind-key -n C-M-Left swap-window -t -1 \; previous-window
-    bind-key -n C-M-Right swap-window -t +1 \; next-window
+    # bind-key -n C-M-Left swap-window -t -1 \; previous-window
+    # bind-key -n C-M-Right swap-window -t +1 \; next-window
+    if-shell -b '[ "$(echo "$TMUX_VERSION >= 3.0" | bc)" = 1 ]' " \
+        bind-key -n C-M-Left swap-window -t -1 -d ; bind-key -n C-M-Right swap-window -t +1 -d "
+    if-shell -b '[ "$(echo "$TMUX_VERSION < 3.0" | bc)" = 1 ]' " \
+        bind-key -n C-M-Left swap-window -t -1 ; bind-key -n C-M-Right swap-window -t +1 "
 
     bind -n C-M-e next-window
     # Credit: https://nju-projectn.github.io/ics-pa-gitbook/ics2023/0.5.html
