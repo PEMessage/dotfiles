@@ -57,6 +57,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Call the split_logfile function with the provided arguments
-    split_logfile(args.input, args.pattern, args.output_name)
+    split_logfile(args.input, args.pattern, args.output_name_format)
 
     print("Log file split completed.")
