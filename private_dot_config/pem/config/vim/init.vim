@@ -132,7 +132,7 @@ let g:startify_custom_header = [
         set fileencoding=utf-8
 
         " 打开文件时自动尝试下面顺序的编码
-        set fileencodings=ucs-bom,utf-8,utf-16,gbk,gb18030,big5,euc-jp,latin1,sjis
+        set fileencodings=ucs-bom,utf-8,utf-16,utf-16be,gbk,gb18030,big5,euc-jp,latin1,sjis
     endif
 
     if has('folding')

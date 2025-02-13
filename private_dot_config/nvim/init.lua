@@ -485,7 +485,7 @@ require("lazy").setup({
             -- hop.setup({
             --     create_hl_autocmd = false,
             -- })
-            vim.keymap.set('', '<space>', function()
+            vim.keymap.set('n', '<space>', function()
                 hop.hint_char1()
             end, {remap=true, desc='Hop to char'})
 
@@ -1782,7 +1782,7 @@ local section = function ()
         { desc = "Tab Ball buffers" })
 
     -- vim.keymap.set("n", "<leader>o/",'/', { noremap = true, desc = "Origin VIM /" })
-    vim.keymap.set("v", "<leader>y",'"+y', { noremap = true, desc = "Copy to clipboard(Reg\")" })
+    -- vim.keymap.set("v", "<leader>y",'"+y', { noremap = true, desc = "Copy to clipboard(Reg\")" })
 
 
 
@@ -1899,6 +1899,8 @@ end
 -- Create a mapping
 vim.api.nvim_set_keymap('', '<Leader>y', 'y:<C-U>lua PE.yank(vim.fn.getreg("@0"))<CR>',
     { noremap = false, silent = true, desc = "yank to 'yank'" })
+-- vim.keymap.set("v", "<leader>y",'"+y', { noremap = true, desc = "Copy to clipboard(Reg\")" })
+vim.keymap.set("x", "<space>",'y:<C-U>lua PE.yank(vim.fn.getreg("@0"))<CR>', { noremap = true, desc = "yank to 'yank'" })
 
 
 function PE.MouseSet(arg)
