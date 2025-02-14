@@ -440,12 +440,11 @@ let g:startify_custom_header = [
     nnoremap <silent><M-S-P> :bprev<CR>
 
     " Switch Tab
-    nnoremap <silent><C-S-TAB> :tabp<CR>
-    inoremap <silent><C-S-TAB> <C-o>:tabp<CR>
-    nnoremap <silent><C-TAB>   :tabn<CR>
-    inoremap <silent><C-TAB>   <C-o>:tabn<CR>
-
-    nnoremap gq :exit<CR>
+    " nnoremap <silent><C-S-TAB> :tabp<CR>
+    " inoremap <silent><C-S-TAB> <C-o>:tabp<CR>
+    " nnoremap <silent><C-TAB>   :tabn<CR>
+    " inoremap <silent><C-TAB>   <C-o>:tabn<CR>
+    " nnoremap gq :exit<CR>
 
 " -------------------------------------------
 " 4.3 Mouse mapping
