@@ -144,7 +144,7 @@ __px3()
                 # Initialize override file if needed
                 if [[ ! -f "$override_file" ]]; then
                     sudo mkdir -p "$override_dir"
-                    echo '[ext_arg]' | sudo tee "$override_file" >/dev/null
+                    echo '[Service]' | sudo tee "$override_file" >/dev/null
                 fi
 
                 # Process systemd commands
