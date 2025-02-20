@@ -71,6 +71,11 @@ __px3()
     local ip=
     local url_prefix=
 
+    # Old bash will not reset this variable, manully reset it
+    local OPTIND=1
+    local opt=
+    local OPTARG=
+
     # Option parsing
     while getopts "m:a:k:i:p:x:u:v:E:i:" opt; do
         case $opt in
