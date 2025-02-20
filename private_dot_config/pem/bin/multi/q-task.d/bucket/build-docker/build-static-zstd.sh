@@ -9,11 +9,10 @@ docker run -t \
     -w /tmp \
     --rm \
     -it \
-    alpine \
+    alpine:latest \
     sh -c "
-    $Q_TASK_HOOK
     apk add gcc musl-dev make wget &&
-    apk add lz4-dev lz4-static zlib-dev zlib-static xz-dev &&
+    apk add lz4-dev lz4-static zlib-dev zlib-static xz-dev xz-static &&
 
     URL=\"${URL}/v${ZSTD_VERSION}/zstd-${ZSTD_VERSION}.tar.gz\" &&
 
@@ -22,14 +21,14 @@ docker run -t \
     cd zstd-${ZSTD_VERSION} &&
 
 
-    export CFLAGS=-flto
-    export LDLAGS=\"-flto -static -static-libgcc -static-libstdc++\"
-    export HAVE_LZ4=1
-    export HAVE_ZLIB=1
-    export HAVE_LZMA=1
+    export CFLAGS=-flto &&
+    export LDFLAGS=\"-flto -static -static-libgcc -static-libstdc++\" &&
+    export HAVE_LZ4=1 &&
+    export HAVE_ZLIB=1 &&
+    export HAVE_LZMA=1 &&
 
-    make zstd-release
-    cd programs
+    make zstd-release &&
+    cd programs &&
 
 
     chown "$UID:$GID" zstd &&

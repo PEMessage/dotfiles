@@ -123,11 +123,15 @@ __px3()
                 eval "export $key=\"$value\""
                 echo "export $upper_key=\"$value\""
                 eval "export $upper_key=\"$value\""
+                export PEM_PROXY_ALL
+                PEM_PROXY_ALL+="export $key=\"$value\" ; "
+                PEM_PROXY_ALL+="export $upper_key=\"$value\" ;"
             else
                 echo "unset $key"
                 eval "unset $key"
                 echo "unset $upper_key"
                 eval "unset $upper_key"
+                export PEM_PROXY_ALL=""
             fi
             ;;
 
