@@ -562,6 +562,11 @@ let g:startify_custom_header = [
             call CmdLine("%s" . '/'. l:pattern . '/')
         elseif a:direction == 'f'
             execute "normal /" . l:pattern . "\<CR>"
+        elseif a:direction == 'fa'
+            let l:tmp = @/
+            let l:pattern = l:tmp . "\\|" . l:pattern
+            echo l:pattern
+            execute "normal /" . l:pattern . "\<CR>"
         endif
 
         let @/ = l:pattern
@@ -569,6 +574,7 @@ let g:startify_custom_header = [
         " set hls
     endfunction
     vnoremap <silent> * :<C-u>call VisualSelection('f')<CR>:set hls<CR>
+    vnoremap <silent> & :<C-u>call VisualSelection('fa')<CR>:set hls<CR>
     vnoremap <silent> # :<C-u>call VisualSelection('b')<CR>:set hls<CR>
 " 5. Netrw Setting
 " ===========================================
@@ -577,15 +583,16 @@ let g:startify_custom_header = [
 " 5.1 Basic netrw setting
 " -------------------------------------------
     let g:netrw_banner = 0                      " 设置是否显示横幅
-    if argv(0) ==# '.'
-        let g:netrw_browse_split = 0
-    else
-        let g:netrw_browse_split = 4
-    endif
+    " if argv(0) ==# '.'
+    "     let g:netrw_browse_split = 0
+    " else
+    "     let g:netrw_browse_split = 0
+    " endif
+    " let g:netrw_browse_split = 4
 
-    let g:netrw_preview = 1                     " 指针保留于Netrw
-    let g:netrw_winsize = 25                    " %25的窗口大小
-    let g:netrw_liststyle = 0                   " 设置目录列表的样式：树形
+    " let g:netrw_preview = 1                     " 指针保留于Netrw
+    " let g:netrw_winsize = 25                    " %25的窗口大小
+    let g:netrw_liststyle = 2                   " 设置目录列表的样式：树形
     let g:netrw_sort_sequence = '[\/]$,*'
     let g:netrw_hide = 1
 
@@ -596,28 +603,30 @@ let g:startify_custom_header = [
     function! s:RemoveNetrwMap()
         if hasmapto('<Plug>NetrwRefresh')
         " Unmap Netrw Keybind
-            unmap <buffer> <C-I>
-            unmap <buffer> <C-O>
+            " unmap <buffer> <C-I>
+            " unmap <buffer> <C-O>
+            " unmap -
             " unmap <buffer> cd
 
         " map Netrw Keybind
             " Forward dir
-            nmap <buffer> <C-I> U
+            " nmap <buffer> <C-I> U
             " Backword dir
-            nmap <buffer> <C-O> u
+            " nmap <buffer> <C-O> u
             " ctrl-l for left pannel
 
         " New Map
             " Back to parent dir
-            nmap <buffer> H -
-            nmap <buffer> <C-0> echo b
+            nmap <buffer> <silent> <nowait> H       <Plug>NetrwBrowseUpDir
+            nmap <buffer> <silent> <nowait> H       <Plug>NetrwBrowseUpDir
+            " nmap <buffer> <C-0> echo b
             " Enter next dir
-            nmap <buffer> L <C-M>
+            nmap <buffer> L       <Plug>NetrwReturn
             nmap <buffer> <leader>b :wincmd c<CR>
         endif
     endfunction
 
-    nnoremap <silent><leader>b  :Lexplore<CR>
+    nnoremap <silent><leader>b  :Lexplore<CR>:resize 25%<CR>
 
     " command! PEWrite execute 'w !sudo tee % <bar> edit! ' 
     " cnoremap w!! execute 'silent! write !sudo tee % >/dev/null' <bar> edit!
@@ -656,6 +665,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
         noremap <silent> <C-e> :FZF<CR>
+        noremap <silent> <C-f> :Marks<CR>
         noremap <leader>ft :BTags<CR>
         command VMaps call fzf#vim#maps('x')
     Plug 'Yggdroot/LeaderF'
@@ -678,7 +688,7 @@ call plug#begin(pe_runtimepath . '/plugged')
                     \ 'ToggleType(1)':        ['<c-up>'],
                     \ 'ToggleType(-1)':       ['<c-down>'],
                     \}
-        nnoremap <c-f> :CtrlPBufTag<Cr>
+        " nnoremap <c-f> :CtrlPBufTag<Cr>
 
         noremap <silent> <C-r> :CtrlPMRU<CR>
         noremap <silent> <C-p> :CtrlPBuffer<CR>
@@ -1015,7 +1025,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         augroup END
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-fugitive'
-    Plug 'tpope/vim-vinegar'
+    " Plug 'tpope/vim-vinegar'
     Plug 'tpope/vim-rsi'
 
 
