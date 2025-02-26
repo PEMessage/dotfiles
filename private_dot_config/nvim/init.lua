@@ -379,6 +379,12 @@ require("lazy").setup({
             }
         }
     },
+    {
+        'fei6409/log-highlight.nvim',
+        config = function()
+            require('log-highlight').setup {}
+        end,
+    },
     -- {
     --     'luochen1990/rainbow',
     --     event = { "BufReadPost", "BufNewFile" },
@@ -1170,7 +1176,8 @@ require("lazy").setup({
                 current_only = true,
                 -- base = 'buffer',
                 -- column = 80,
-                signs_on_startup = {'search','diagnostics','cursor'},
+                signs_on_startup = {'search','diagnostics','cursor', 'marks'},
+                -- signs_on_startup = {'all'},
             })
             require('scrollview.contrib.gitsigns').setup()
         end
@@ -1900,7 +1907,7 @@ end
 vim.api.nvim_set_keymap('', '<Leader>y', 'y:<C-U>lua PE.yank(vim.fn.getreg("@0"))<CR>',
     { noremap = false, silent = true, desc = "yank to 'yank'" })
 -- vim.keymap.set("v", "<leader>y",'"+y', { noremap = true, desc = "Copy to clipboard(Reg\")" })
-vim.keymap.set("x", "<space>",'y:<C-U>lua PE.yank(vim.fn.getreg("@0"))<CR>', { noremap = true, desc = "yank to 'yank'" })
+vim.keymap.set("x", "<space>",'y:<C-U>lua PE.yank(vim.fn.getreg("@0"))<CR>', { silent = true, noremap = true, desc = "yank to 'yank'" })
 
 
 function PE.MouseSet(arg)
@@ -1921,3 +1928,34 @@ vim.cmd [[
 ]]
 
 vim.cmd [[ command! -nargs=+ -complete=command Redir let s:reg = @@ | redir @"> | silent execute <q-args> | redir END | new | pu | 1,2d_ | let @@ = s:reg ]]
+
+vim.cmd [[ 
+    function! VisualSelection(direction) range
+        let l:saved_reg = @"
+        execute "normal! gvy"
+
+        let l:pattern = escape(@", '\\/.*$^~[]')
+        let l:pattern = substitute(l:pattern, "\n$", "", "")
+
+        if a:direction == 'b'
+            execute "normal ?" . l:pattern . "\<CR>"
+        elseif a:direction == 'gv'
+            call CmdLine("vimgrep " . '/'. l:pattern . '/' . ' **/*.')
+        elseif a:direction == 'replace'
+            call CmdLine("%s" . '/'. l:pattern . '/')
+        elseif a:direction == 'f'
+            execute "normal /" . l:pattern . "\<CR>"
+        elseif a:direction == 'fa'
+            let l:tmp = @/
+            let l:pattern = l:tmp . "\\|" . l:pattern
+            echo l:pattern
+            execute "normal /" . l:pattern . "\<CR>"
+        endif
+
+        let @/ = l:pattern
+        let @" = l:saved_reg
+        " set hls
+    endfunction
+
+]]
+vim.keymap.set('v', '&', ':<C-u>call VisualSelection(\'fa\')<CR>:set hls<CR>', { silent = true })
