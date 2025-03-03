@@ -7,6 +7,14 @@ alias lvi='vim -c "normal '\''0"'
 alias msudo="sudo env \"PATH=\$PATH\""
 alias vi="vim" # if we dont use package manger vim, we shouldn't use package manger vi
 
+# -c, --continue [true|false]
+# -s, --split=<N>
+# -x, --max-connection-per-server=<NUM>
+# -k, --min-split-size=<SIZE>
+# -j, --max-concurrent-downloads=<N>
+# -i, --input-file=<FILE>
+alias q-aria2c='aria2c -c -s 16 -x 16'
+
 # alias ttt='command ls -tp | head -n1'
 ttt() {
     if [ -n "$1" ] ; then
