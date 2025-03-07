@@ -531,7 +531,7 @@
     "     call winrestview(l:save)
     " endfun
     " autocmd BufWritePre * %s/\s\+$//e
-    set clipboard+=unnamed
+    " set clipboard+=unnamed
     nnoremap <RightMouse> p
     vnoremap <RightMouse> y
 
