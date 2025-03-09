@@ -1079,6 +1079,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         " nmap <Leader>vo :VimuxOpenRunner<CR>
     Plug 'gioele/vim-autoswap'
         let g:autoswap_detect_tmux = 1
+    Plug 'PEMessage/vim-fifoserver' ,  { 'on': [ 'FIFOStart' ] }
         " set title titlestring=
         " ALT + =: toggle terminal below.
         " ALT + SHIFT + h: move to the window on the left.
