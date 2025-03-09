@@ -28,6 +28,7 @@
 
     set -g xterm-keys on
 
+    run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | grep -o '[0-9]\\\+\\\.[0-9]*')"
 
 # --------------------------------
 # Basic Key map
@@ -134,7 +135,6 @@
 # --------------------------------
 # osc 52
 # --------------------------------
-run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | cut -c 6-8)"
 
     if-shell -b '[ "$(echo "$TMUX_VERSION >= 3.3" | bc)" = 1 ]' " \
         set-window-option -g allow-passthrough on "
