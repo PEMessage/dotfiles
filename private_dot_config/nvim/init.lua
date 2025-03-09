@@ -1417,6 +1417,10 @@ require("lazy").setup({
                     --     },
                     -- }
                     require('mason-nvim-dap').default_setup(config)
+                end,
+                cppdbg = function (config)
+
+                    require('mason-nvim-dap').default_setup(config)
                 end
             }
         },
@@ -1468,7 +1472,12 @@ require("lazy").setup({
         },
         config = function ()
             require("dapui").setup()
-            vim.api.nvim_create_user_command('DapUiToggle', function() require('dapui').toggle() end, { nargs = 0 })
+            vim.api.nvim_create_user_command('DapUiToggle',
+                function()
+                    require('dapui').toggle()
+                end,
+                { nargs = 0 }
+            )
         end,
     },
     -- {
