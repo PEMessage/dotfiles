@@ -30,6 +30,10 @@ if __name__ == "__main__":
     # Read input from stdin
     input_hex = sys.stdin.read().strip()
 
+    # try to judge if perfix exist or not
+    if '0x' not in input_hex:
+        args.no_prefix = True
+
     # Convert hex to bytes
     byte_output = hex_to_bytes(input_hex, no_prefix=args.no_prefix)
 
