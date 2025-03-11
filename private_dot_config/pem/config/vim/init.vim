@@ -1536,9 +1536,11 @@ call plug#begin(pe_runtimepath . '/plugged')
     " See: ins-completion for origin complete help
     Plug 'lifepillar/vim-mucomplete' , Cond(g:pe_competesys == 'mu')
     Plug 'skywind3000/vim-dict' , Cond(g:pe_competesys == 'mu')
+
+    " Plug 'PEMessage/T.vim' , { 'on' : ['Trans'] }
     Plug 'PEMessage/T.vim'
-        vnoremap <leader>t :<c-u>call T#VisualSearch(visualmode())<cr>
-        nnoremap <leader>r :call T#DisplayRecent()<cr>
+        vnoremap <leader>t :<c-u>Trans<cr>
+        command! -n=0 Trans call T#VisualSearch(visualmode())
     " Plug 'Konfekt/complete-common-words.vim' , Cond(g:pe_competesys == 'mu')
     " let g:common_words_dicts_dir = g:plug_home .. 'complete-common-words.vim/dicts'
     " set dictionary+=spell
