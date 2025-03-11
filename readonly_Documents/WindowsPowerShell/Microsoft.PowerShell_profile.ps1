@@ -49,7 +49,9 @@ function Update-CommandHelp {
     }
 }
 
-
+# Env setup
+# # =========================================
+    $env:PATh += ";$HOME\Documents\Script\PS1;"
 
 # Example usage:
 # Update-CmdletHelp -CmdletName "Install-Module"
@@ -82,5 +84,38 @@ function Add-WSLPortForwarding ($Port = '23333', $Protocol = 'TCP') {
 function Remove-WSLPortForwarding ($Port = '23333', $Protocol = 'TCP') {
 	netsh interface portproxy delete v4tov4 listenport=$Port
 	Remove-NetFirewallRule -DisplayName "Allow ${Protocol} Inbound Port ${Port}"
+}
+
+if (Get-Command fzf -ErrorAction SilentlyCont) {
+    function Invoke-FuzzyHistory($Query='') {
+        $seenCommands = New-Object System.Collections.Generic.HashSet[string]
+        $excludeCommands = @('ls', 'cd', 'clear', 'pwd')
+        $command = Get-Content (Get-PSReadlineOption).HistorySavePath |
+        ForEach-Object { $_.Trim() } |
+        ForEach-Object {
+            if ($seenCommands.Add($_)) {
+                $_
+            }
+        } | fzf --tac "--query=${Query}" --color dark
+
+        if ($command) {
+            return $command
+        }
+    }
+    function Invoke-FzfPsReadlineHandlerHistory {
+        $result = $null
+        $line = $null
+        $cursor = $null
+        [Microsoft.PowerShell.PSConsoleReadline]::GetBufferState([ref]$line, [ref]$cursor)
+
+        $result = Invoke-FuzzyHistory -Query $line
+        echo $result
+
+        if (-not [string]::IsNullOrEmpty($result)) {
+            [Microsoft.PowerShell.PSConsoleReadLine]::Replace(0, $line.Length, $result)
+        }
+    }
+    Set-PSReadLineKeyHandler -Key Ctrl+r { Invoke-FzfPsReadlineHandlerHistory }
+    Set-PSReadLineKeyHandler -Key Ctrl+q -Function ReverseSearchHistory
 }
 
