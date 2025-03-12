@@ -76,6 +76,7 @@ Set-Alias -Name msudo -Value Run-As
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 # Module List
 Import-Module z
+Import-Module cd-extras
 
 
 
