@@ -96,7 +96,7 @@ if (Get-Command fzf -ErrorAction SilentlyCont) {
             if ($seenCommands.Add($_)) {
                 $_
             }
-        } | fzf --tac "--query=${Query}" --color dark
+        } | fzf --tac "--query=${Query}" --color dark --no-sort
 
         if ($command) {
             return $command
