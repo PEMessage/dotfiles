@@ -52,6 +52,13 @@ function Update-CommandHelp {
 # Env setup
 # # =========================================
     $env:PATh += ";$HOME\Documents\Script\PS1;"
+    # Get-ChildItem -path "$HOME\Documents\Script\PS1" -Filter *.ps1 |
+    # Foreach-Object{
+    #     $name = $_.Name
+    #     $scptName = $_.Name -split ".ps1",0,"simplematch"
+    #     $scptName = $scptName[0]
+    #     new-alias $name $scptName
+    # }
 
 # Example usage:
 # Update-CmdletHelp -CmdletName "Install-Module"
@@ -86,17 +93,23 @@ function Remove-WSLPortForwarding ($Port = '23333', $Protocol = 'TCP') {
 	Remove-NetFirewallRule -DisplayName "Allow ${Protocol} Inbound Port ${Port}"
 }
 
-if (Get-Command fzf -ErrorAction SilentlyCont) {
+if ( (Get-Command fzf -ErrorAction SilentlyCon ) -and ( Get-Command awk -ErrorAction SilentlyCont ) ) {
+    # Credit: https://gist.github.com/nv-h/081684cee2505cd336e26c2660fc7541
+    # Credit: https://github.com/kelleyma49/PSFzf
     function Invoke-FuzzyHistory($Query='') {
-        $seenCommands = New-Object System.Collections.Generic.HashSet[string]
-        $excludeCommands = @('ls', 'cd', 'clear', 'pwd')
+        # Pure powershell implent seen have bug? 
+        # $seenCommands = New-Object System.Collections.Generic.HashSet[string]
+        # $excludeCommands = @('ls', 'cd', 'clear', 'pwd')
+        # $command = Get-Content (Get-PSReadlineOption).HistorySavePath |
+        # ForEach-Object { $_.Trim() } |
+        # ForEach-Object {
+        #     if ($seenCommands.Add($_)) {
+        #         $_
+        #     }
+        # } | fzf --tac "--query=${Query}" --color dark --no-sort
         $command = Get-Content (Get-PSReadlineOption).HistorySavePath |
-        ForEach-Object { $_.Trim() } |
-        ForEach-Object {
-            if ($seenCommands.Add($_)) {
-                $_
-            }
-        } | fzf --tac "--query=${Query}" --color dark --no-sort
+            awk '!a[$0]++'  |
+            fzf --tac "--query=${Query}" --color dark --no-sort
 
         if ($command) {
             return $command
