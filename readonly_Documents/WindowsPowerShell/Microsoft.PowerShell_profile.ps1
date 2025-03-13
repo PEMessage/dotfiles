@@ -109,8 +109,9 @@ if ( (Get-Command fzf -ErrorAction SilentlyCon ) -and ( Get-Command awk -ErrorAc
         #     }
         # } | fzf --tac "--query=${Query}" --color dark --no-sort
         $command = Get-Content (Get-PSReadlineOption).HistorySavePath |
-            awk '!a[$0]++'  |
-            fzf --tac "--query=${Query}" --color dark --no-sort
+            awk '!a[$0]++'   |
+            # awk '!a[$0]++'  |
+            fzf --scheme=history --tac "--query=${Query}" --color dark
 
         if ($command) {
             return $command
