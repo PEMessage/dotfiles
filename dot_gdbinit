@@ -30,7 +30,6 @@ python
 # SOFTWARE.
 
 # Imports ----------------------------------------------------------------------
-
 import ast
 import io
 import itertools
@@ -2364,103 +2363,9 @@ class Breakpoints(Dashboard.Module):
 # XXX traceback line numbers in this Python block must be increased by 1
 end
 
-# Better GDB defaults ----------------------------------------------------------
-
-
-# Start ------------------------------------------------------------------------
-
-python Dashboard.start()
-
-# File variables ---------------------------------------------------------------
 
 # ==========================================
-# 2. ShellPipe
-# ==========================================
-
-python
-from __future__ import print_function
-
-import gdb
-import string
-import subprocess
-import sys
-
-class ShellPipe (gdb.Command):
-    "Command to pipe gdb internal command output to external commands."
-
-    def __init__(self):
-        super (ShellPipe, self).__init__("shell-pipe",
-                gdb.COMMAND_DATA,
-                gdb.COMPLETE_NONE, True)
-        gdb.execute("alias -a sp = shell-pipe", True)
-
-    def invoke(self, arg, from_tty):
-        arg = arg.strip()
-        if arg == "":
-            print("Argument required (gdb_command_and_args | externalcommand..).")
-            return
-
-        gdb_command, shell_commands = None, None
-
-        if '|' in arg:
-            gdb_command, shell_commands = arg.split("|", maxsplit=1)
-            gdb_command, shell_commands = gdb_command.strip(), shell_commands.strip()
-        else:
-            gdb_command = arg
-
-        # Collect the output and feed it through the pipe
-        output = gdb.execute(gdb_command, True, True)
-        if shell_commands:
-            shell_process = subprocess.Popen(shell_commands, stdin=subprocess.PIPE, shell=True)
-            shell_process.communicate(output.encode('utf-8'))
-        else:
-            sys.stdout.write(output)
-
-ShellPipe()
-
-end
-
-# ==========================================
-# 3. Custom Configuration
-# ==========================================
-
-# 3.1 alias
-# -------------------------------------------
-alias sk = shell
-alias fh = pipe help all | fzf
-
-# 3.2 Basic configuration
-# -------------------------------------------
-    set history save
-    set verbose off
-    set print array off
-    set python print-stack full
-    set disassembly-flavor intel
-
-# 3.3 C/C++ configuration
-# -------------------------------------------
-
-    # 每行打印一个结构体成员
-    set print pretty on
-
-    # 当打印一个数组时，打印索引下标
-    set print array-indexes on
-
-    # info vtbl [expr]
-    # info variables vtable for CLASS
-    set print vtbl on 
-
-    # 为了观察一个对象的虚表和相应虚表的内容，可以在启动gdb后设置如下命令
-    set print demangle on
-    set print asm-demangle on
-
-    # 按照派生类型打印对象
-    set print object on
-
-    set auto-load safe-path /
-
-# ==========================================
-# 4. GEP
+# 2. GEP
 # ==========================================
 python
 from __future__ import annotations
@@ -3085,15 +2990,123 @@ def gep_main() -> None:
     hijack_prompt()
 
     # Hijack the prompt of GDB to use our own prompt
-
-
-try:
-    gep_main()
-except Exception as e:
-    traceback.print_tb(e.__traceback__)
-    print_warning( "Something went wrong when running GEP, please report an issue on https://github.com/lebr0nli/GEP/issues with the traceback above, thanks!")
 end
 
+
+# Better GDB defaults ----------------------------------------------------------
+
+
+# Start ------------------------------------------------------------------------
+
+
+# File variables ---------------------------------------------------------------
+
+# ==========================================
+# 3. ShellPipe
+# ==========================================
+
+python
+from __future__ import print_function
+
+import gdb
+import string
+import subprocess
+import sys
+
+class ShellPipe (gdb.Command):
+    "Command to pipe gdb internal command output to external commands."
+
+    def __init__(self):
+        super (ShellPipe, self).__init__("shell-pipe",
+                gdb.COMMAND_DATA,
+                gdb.COMPLETE_NONE, True)
+        gdb.execute("alias -a sp = shell-pipe", True)
+
+    def invoke(self, arg, from_tty):
+        arg = arg.strip()
+        if arg == "":
+            print("Argument required (gdb_command_and_args | externalcommand..).")
+            return
+
+        gdb_command, shell_commands = None, None
+
+        if '|' in arg:
+            gdb_command, shell_commands = arg.split("|", maxsplit=1)
+            gdb_command, shell_commands = gdb_command.strip(), shell_commands.strip()
+        else:
+            gdb_command = arg
+
+        # Collect the output and feed it through the pipe
+        output = gdb.execute(gdb_command, True, True)
+        if shell_commands:
+            shell_process = subprocess.Popen(shell_commands, stdin=subprocess.PIPE, shell=True)
+            shell_process.communicate(output.encode('utf-8'))
+        else:
+            sys.stdout.write(output)
+
+ShellPipe()
+
+end
+
+# ==========================================
+# 4. Custom Configuration
+# ==========================================
+
+# 3.1 alias
+# -------------------------------------------
+    alias sk = shell
+    alias fh = pipe help all | fzf
+
+# 3.2 Basic configuration
+# -------------------------------------------
+    set history save
+    set verbose off
+    set print array off
+    set python print-stack full
+    set disassembly-flavor intel
+
+# 3.3 C/C++ configuration
+# -------------------------------------------
+
+    # 每行打印一个结构体成员
+    set print pretty on
+
+    # 当打印一个数组时，打印索引下标
+    set print array-indexes on
+
+    # info vtbl [expr]
+    # info variables vtable for CLASS
+    set print vtbl on 
+
+    # 为了观察一个对象的虚表和相应虚表的内容，可以在启动gdb后设置如下命令
+    set print demangle on
+    set print asm-demangle on
+
+    # 按照派生类型打印对象
+    set print object on
+
+    set auto-load safe-path /
+
+
+# ==========================================
+# 5. python plug start
+# ==========================================
+python
+import os
+SKIP_LIST = os.environ.get("PEM_GDB_SKIP", default="").lower()
+
+if "all" not in SKIP_LIST:
+
+    if "dashboard" not in SKIP_LIST:
+        Dashboard.start()
+
+    if "gep" not in SKIP_LIST:
+        try:
+            gep_main()
+        except Exception as e:
+            traceback.print_tb(e.__traceback__)
+            print_warning( "Something went wrong when running GEP, please report an issue on https://github.com/lebr0nli/GEP/issues with the traceback above, thanks!")
+end
 
 
 # vim: filetype=python
