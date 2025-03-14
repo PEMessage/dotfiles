@@ -1,0 +1,111 @@
+
+
+
+import re
+import struct
+from dataclasses import dataclass, fields
+from io import BytesIO
+
+# ==========================================
+# Some Helper function
+# ==========================================
+def getclass(name):
+    match = re.fullmatch(r'(\w+)\[(\d+)\]', name)
+    # Handle __class_getitem__ like 'CharType[32]'
+    if match:
+        base_name, param = match.groups()
+        base_cls = globals()[base_name]
+        return base_cls[int(param)]
+    else:
+        return globals()[name]
+
+def binary_data_handler(func):
+    def wrapper(cls, binary_data, *args, **kwargs):
+        if isinstance(binary_data, bytes):
+            bio = BytesIO(binary_data)
+        else:
+            bio = binary_data
+        return func(cls, bio, *args, **kwargs)
+    return wrapper
+
+
+# ==========================================
+# Main Class
+# ==========================================
+class Base:
+    @classmethod
+    @binary_data_handler
+    def from_binary(cls, bio, ctx_upper=None):
+        init_args = {}
+        ctx = {
+            'parrent': ctx_upper,
+            'init_args': init_args,
+        }
+        for f in fields(cls):
+            init_args[f.name] = getclass(f.type).from_binary(bio, ctx)
+        return cls(**init_args)
+
+    @classmethod
+    def to_binary(cls, self) -> bytes:
+        bio = BytesIO()
+        for f in fields(self):
+            field_type = getclass(f.type)
+            value = getattr(self, f.name)
+            bio.write(field_type.to_binary(value))
+        return bio.getvalue()
+
+
+# ==========================================
+# Some Helper function built on pervious define
+# ==========================================
+def make_struct_type(fmt: str):
+    class StructType(Base):
+        @classmethod
+        @binary_data_handler
+        def from_binary(cls, bio: BytesIO, _ctx) -> int:
+            return struct.unpack(fmt, bio.read(struct.calcsize(fmt)))[0]
+
+        @classmethod
+        def to_binary(cls, value: int) -> bytes:
+            return struct.pack(fmt, value)
+    return StructType
+
+def make_char_type(fmt: str, encoding: str):
+    class CharType(Base):
+        @classmethod
+        @binary_data_handler
+        def from_binary(cls, bio: BytesIO, _ctx) -> int:
+            return struct.unpack(fmt, bio.read(struct.calcsize(fmt)))[0].decode(encoding)
+
+        @classmethod
+        def to_binary(cls, value: int) -> bytes:
+            return struct.pack(fmt, value)
+    return CharType
+
+class char:
+    @classmethod
+    def __class_getitem__(cls, size: int):
+        fmt = f"{size}s"
+        return make_char_type(fmt, 'ascii')
+
+
+u8 = make_struct_type('<B')
+i8 = make_struct_type('<b')
+u16 = make_struct_type('<H')
+i16 = make_struct_type('<h')
+u32 = make_struct_type('<I')
+i32 = make_struct_type('<i')
+u64 = make_struct_type('<Q')
+i64 = make_struct_type('<q')
+
+
+@dataclass
+class MyStruct(Base):
+    a: u32
+    b: u32
+    c: char[2]
+
+@dataclass
+class MyStruct2(Base):
+    a: MyStruct
+    b: u32
