@@ -1,8 +1,13 @@
+#!/usr/bin/env python3
+
 import re
 import pprint
+import sys
 import struct
 import json
 from dataclasses import dataclass, fields, asdict
+import typing
+from typing import List
 from io import BytesIO
 
 # ==========================================
@@ -62,7 +67,13 @@ class Base:
         for f in fields(self):
             field_type = getclass(f.type)
             value = getattr(self, f.name)
-            bio.write(field_type.to_binary(value))
+            # for List[T]
+            if type(f.type) ==  typing._GenericAlias:
+                contentor_type = getclass(f.type.__args__[0])
+                for i in value:
+                    bio.write(contentor_type.to_binary(i))
+            else:
+                bio.write(field_type.to_binary(value))
         return bio.getvalue()
 
     @classmethod
@@ -105,7 +116,7 @@ def make_char_type(fmt: str, encoding: str):
 
         @classmethod
         def to_binary(cls, value: int) -> bytes:
-            return struct.pack(fmt, value)
+            return struct.pack(fmt, value.encode(encoding))
 
         @classmethod
         def get_size(cls, _self):
@@ -133,3 +144,5 @@ uint = u32
 i32 = make_struct_type('<i')
 u64 = make_struct_type('<Q')
 i64 = make_struct_type('<q')
+
+
