@@ -14,8 +14,11 @@ from io import BytesIO
 # Some Helper function
 # ==========================================
 def getclass(cla):
+    # deal with normal case, field.type already is class object
     if isinstance(type(cla), type):
         return cla
+    # deal with special case, python3 runtime sevice can't find classtype
+    # for example 'char[16]', manully parse it, and even generate type at this time
     elif isinstance(type(cla), str):
         match = re.fullmatch(r'(\w+)\[(\d+)\]', cla)
         # Handle __class_getitem__ like 'CharType[32]'
