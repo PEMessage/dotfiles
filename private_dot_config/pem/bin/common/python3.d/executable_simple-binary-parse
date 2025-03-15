@@ -1,23 +1,27 @@
-#!/usr/bin/env python3
-
-
 import re
+import pprint
 import struct
-from dataclasses import dataclass, fields
+import json
+from dataclasses import dataclass, fields, asdict
 from io import BytesIO
 
 # ==========================================
 # Some Helper function
 # ==========================================
-def getclass(name):
-    match = re.fullmatch(r'(\w+)\[(\d+)\]', name)
-    # Handle __class_getitem__ like 'CharType[32]'
-    if match:
-        base_name, param = match.groups()
-        base_cls = globals()[base_name]
-        return base_cls[int(param)]
+def getclass(cla):
+    if isinstance(type(cla), type):
+        return cla
+    elif isinstance(type(cla), str):
+        match = re.fullmatch(r'(\w+)\[(\d+)\]', cla)
+        # Handle __class_getitem__ like 'CharType[32]'
+        if match:
+            base_name, param = match.groups()
+            base_cls = globals()[base_name]
+            return base_cls[int(param)]
+        else:
+            return globals()[cla]
     else:
-        return globals()[name]
+        raise ValueError("Can't Handle it")
 
 def binary_data_handler(func):
     def wrapper(cls, binary_data, *args, **kwargs):
@@ -28,6 +32,13 @@ def binary_data_handler(func):
         return func(cls, bio, *args, **kwargs)
     return wrapper
 
+def print_dataclass(obj):
+    print(json.dumps(
+        asdict(obj),
+        indent=2
+    ))
+
+
 
 # ==========================================
 # Main Class
@@ -36,14 +47,14 @@ class Base:
     @classmethod
     @binary_data_handler
     def from_binary(cls, bio, ctx_upper=None):
-        init_args = {}
+        m = {}
         ctx = {
             'parrent': ctx_upper,
-            'init_args': init_args,
+            'm': m,
         }
         for f in fields(cls):
-            init_args[f.name] = getclass(f.type).from_binary(bio, ctx)
-        return cls(**init_args)
+            m[f.name] = getclass(f.type).from_binary(bio, ctx)
+        return cls(**m)
 
     @classmethod
     def to_binary(cls, self) -> bytes:
@@ -53,6 +64,17 @@ class Base:
             value = getattr(self, f.name)
             bio.write(field_type.to_binary(value))
         return bio.getvalue()
+
+    @classmethod
+    def get_size(cls, self=None):
+        size = 0
+        for f in fields(cls):
+            field_type = getclass(f.type)
+            size = size + field_type.get_size(self)
+        return size
+        
+
+
 
 
 # ==========================================
@@ -68,6 +90,10 @@ def make_struct_type(fmt: str):
         @classmethod
         def to_binary(cls, value: int) -> bytes:
             return struct.pack(fmt, value)
+        @classmethod
+        def get_size(cls, _self):
+            return struct.calcsize(fmt)
+
     return StructType
 
 def make_char_type(fmt: str, encoding: str):
@@ -80,6 +106,10 @@ def make_char_type(fmt: str, encoding: str):
         @classmethod
         def to_binary(cls, value: int) -> bytes:
             return struct.pack(fmt, value)
+
+        @classmethod
+        def get_size(cls, _self):
+            return struct.calcsize(fmt)
     return CharType
 
 class char:
@@ -90,22 +120,16 @@ class char:
 
 
 u8 = make_struct_type('<B')
+uchar = u8
+
 i8 = make_struct_type('<b')
 u16 = make_struct_type('<H')
 i16 = make_struct_type('<h')
+
 u32 = make_struct_type('<I')
+ulong = u32
+uint = u32
+
 i32 = make_struct_type('<i')
 u64 = make_struct_type('<Q')
 i64 = make_struct_type('<q')
-
-
-@dataclass
-class MyStruct(Base):
-    a: u32
-    b: u32
-    c: char[2]
-
-@dataclass
-class MyStruct2(Base):
-    a: MyStruct
-    b: u32
