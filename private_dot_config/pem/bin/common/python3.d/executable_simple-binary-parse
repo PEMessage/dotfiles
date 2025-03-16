@@ -67,7 +67,7 @@ class Base:
     @classmethod
     def to_binary(cls, self) -> bytes:
         bio = BytesIO()
-        for f in fields(self):
+        for f in fields(cls):
             field_type = getclass(f.type)
             value = getattr(self, f.name)
             # for List[T]
@@ -86,7 +86,6 @@ class Base:
             field_type = getclass(f.type)
             size = size + field_type.get_size(self)
         return size
-        
 
 
 
@@ -96,14 +95,19 @@ class Base:
 # ==========================================
 def make_struct_type(fmt: str):
     class StructType(Base):
+        def __init__(self, value):
+            self.value = value
+        def __repr__(self):
+            return str(self.value)
+
         @classmethod
         @binary_data_handler
         def from_binary(cls, bio: BytesIO, _ctx) -> int:
-            return struct.unpack(fmt, bio.read(struct.calcsize(fmt)))[0]
+            return cls( struct.unpack(fmt, bio.read(struct.calcsize(fmt)))[0] )
 
         @classmethod
-        def to_binary(cls, value: int) -> bytes:
-            return struct.pack(fmt, value)
+        def to_binary(cls, self) -> bytes:
+            return struct.pack(fmt, self.value)
         @classmethod
         def get_size(cls, _self):
             return struct.calcsize(fmt)
@@ -112,6 +116,11 @@ def make_struct_type(fmt: str):
 
 def make_char_type(fmt: str, encoding: str):
     class CharType(Base):
+        def __init__(self, value):
+            self.value = value
+        def __repr__(self):
+            return str(self.value)
+
         @classmethod
         @binary_data_handler
         def from_binary(cls, bio: BytesIO, _ctx) -> int:
@@ -149,3 +158,12 @@ u64 = make_struct_type('<Q')
 i64 = make_struct_type('<q')
 
 
+
+@dataclass
+class MyStruct(Base):
+    a: u32
+    b: u32
+    c: char[2]
+
+a = MyStruct.from_binary(b"\01\00\00\00" * 2 + b"12")
+print(asdict(a))
