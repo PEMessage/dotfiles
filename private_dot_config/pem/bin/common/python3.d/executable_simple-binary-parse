@@ -5,6 +5,7 @@ import pprint
 import sys
 import struct
 import json
+from functools import cache
 from dataclasses import dataclass, fields, asdict
 import typing
 from typing import List
@@ -75,6 +76,27 @@ class classinstancemethod:
 # Main Class
 # ==========================================
 class Base:
+    # only dataclass will run this, so we could use dataclass api -- fields
+    # force type convert to match @dataclass define
+    def __post_init__(self):
+        def skip_type(T):
+            SKIP_TYPE = [
+                typing._GenericAlias, # We can't handle 'List[T]'
+            ]
+            if type(T) in SKIP_TYPE or T in SKIP_TYPE:
+                return True
+            else:
+                return False
+
+        for f in fields(self):
+            value = getattr(self, f.name)
+            T = getclass(f.type)
+            if skip_type(T):
+                return
+            if not isinstance(value, T):
+                setattr(self, f.name, T(value))
+
+    # if not dataclass, your should override this
     @classmethod
     @binary_data_handler
     def from_binary(cls, bio, ctx_upper=None):
@@ -87,6 +109,7 @@ class Base:
             m[f.name] = getclass(f.type).from_binary(bio, ctx)
         return cls(**m)
 
+    # if not dataclass, your should override this
     @classinstancemethod
     def to_binary(cls, self) -> bytes:
         bio = BytesIO()
@@ -102,6 +125,7 @@ class Base:
                 bio.write(field_type.to_binary(value))
         return bio.getvalue()
 
+    # if not dataclass, your should override this
     @classinstancemethod
     def get_size(cls, self=None):
         size = 0
@@ -111,9 +135,12 @@ class Base:
         return size
 
 
+
+
 # ==========================================
 # Some Helper function built on pervious define
 # ==========================================
+@cache
 def make_int_type(fmt: str):
     class IntType(int, Base):
 
@@ -133,6 +160,7 @@ def make_int_type(fmt: str):
 
     return IntType
 
+@cache
 def make_char_type(fmt: str, encoding: str):
     class CharType(str, Base):
 
@@ -163,7 +191,10 @@ u8 = make_int_type('<B')
 uchar = u8
 
 i8 = make_int_type('<b')
+
 u16 = make_int_type('<H')
+ushort = u16
+
 i16 = make_int_type('<h')
 
 u32 = make_int_type('<I')
