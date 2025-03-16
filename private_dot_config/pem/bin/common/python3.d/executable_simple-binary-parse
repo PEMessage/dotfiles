@@ -8,6 +8,7 @@ import json
 from dataclasses import dataclass, fields, asdict
 import typing
 from typing import List
+from typing_extensions import Self
 from io import BytesIO
 
 # ==========================================
@@ -93,37 +94,29 @@ class Base:
 # ==========================================
 # Some Helper function built on pervious define
 # ==========================================
-def make_struct_type(fmt: str):
-    class StructType(Base):
-        def __init__(self, value):
-            self.value = value
-        def __repr__(self):
-            return str(self.value)
+def make_int_type(fmt: str):
+    class IntType(int, Base):
 
         @classmethod
         @binary_data_handler
-        def from_binary(cls, bio: BytesIO, _ctx) -> int:
+        def from_binary(cls, bio: BytesIO, _ctx) -> Self:
             return cls( struct.unpack(fmt, bio.read(struct.calcsize(fmt)))[0] )
 
         @classmethod
         def to_binary(cls, self) -> bytes:
-            return struct.pack(fmt, self.value)
+            return struct.pack(fmt, self)
         @classmethod
         def get_size(cls, _self):
             return struct.calcsize(fmt)
 
-    return StructType
+    return IntType
 
 def make_char_type(fmt: str, encoding: str):
-    class CharType(Base):
-        def __init__(self, value):
-            self.value = value
-        def __repr__(self):
-            return str(self.value)
+    class CharType(str, Base):
 
         @classmethod
         @binary_data_handler
-        def from_binary(cls, bio: BytesIO, _ctx) -> int:
+        def from_binary(cls, bio: BytesIO, _ctx) -> Self:
             return struct.unpack(fmt, bio.read(struct.calcsize(fmt)))[0].decode(encoding)
 
         @classmethod
@@ -142,21 +135,20 @@ class char:
         return make_char_type(fmt, 'ascii')
 
 
-u8 = make_struct_type('<B')
+u8 = make_int_type('<B')
 uchar = u8
 
-i8 = make_struct_type('<b')
-u16 = make_struct_type('<H')
-i16 = make_struct_type('<h')
+i8 = make_int_type('<b')
+u16 = make_int_type('<H')
+i16 = make_int_type('<h')
 
-u32 = make_struct_type('<I')
+u32 = make_int_type('<I')
 ulong = u32
 uint = u32
 
-i32 = make_struct_type('<i')
-u64 = make_struct_type('<Q')
-i64 = make_struct_type('<q')
-
+i32 = make_int_type('<i')
+u64 = make_int_type('<Q')
+i64 = make_int_type('<q')
 
 
 @dataclass
