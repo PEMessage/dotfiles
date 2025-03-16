@@ -47,6 +47,27 @@ def print_dataclass(obj):
         indent=2
     ))
 
+# Credit: https://stackoverflow.com/questions/48808788/make-a-method-that-is-both-a-class-method-and-an-instance-method
+class classinstancemethod:
+    def __init__(self, method, instance=None, owner=None):
+        self.method = method
+        self.instance = instance
+        self.owner = owner
+
+    def __get__(self, instance, owner=None):
+        return type(self)(self.method, instance, owner)
+
+    def __call__(self, *args, **kwargs):
+        instance = self.instance
+        if instance is None:
+            if not args:
+                raise TypeError('missing required parameter "self"')
+            instance, args = args[0], args[1:]
+
+        cls = self.owner
+        return self.method(cls, instance, *args, **kwargs)
+
+
 
 
 # ==========================================
@@ -65,7 +86,7 @@ class Base:
             m[f.name] = getclass(f.type).from_binary(bio, ctx)
         return cls(**m)
 
-    @classmethod
+    @classinstancemethod
     def to_binary(cls, self) -> bytes:
         bio = BytesIO()
         for f in fields(cls):
@@ -80,7 +101,7 @@ class Base:
                 bio.write(field_type.to_binary(value))
         return bio.getvalue()
 
-    @classmethod
+    @classinstancemethod
     def get_size(cls, self=None):
         size = 0
         for f in fields(cls):
@@ -100,12 +121,14 @@ def make_int_type(fmt: str):
         @classmethod
         @binary_data_handler
         def from_binary(cls, bio: BytesIO, _ctx) -> Self:
-            return cls( struct.unpack(fmt, bio.read(struct.calcsize(fmt)))[0] )
+            return cls(
+                struct.unpack(fmt, bio.read(struct.calcsize(fmt)))[0]
+            )
 
-        @classmethod
-        def to_binary(cls, self) -> bytes:
+        @classinstancemethod
+        def to_binary(cls, self: Self) -> bytes:
             return struct.pack(fmt, self)
-        @classmethod
+        @classinstancemethod
         def get_size(cls, _self):
             return struct.calcsize(fmt)
 
@@ -117,13 +140,15 @@ def make_char_type(fmt: str, encoding: str):
         @classmethod
         @binary_data_handler
         def from_binary(cls, bio: BytesIO, _ctx) -> Self:
-            return struct.unpack(fmt, bio.read(struct.calcsize(fmt)))[0].decode(encoding)
+            return cls(
+                struct.unpack(fmt, bio.read(struct.calcsize(fmt)))[0].decode(encoding)
+            )
 
-        @classmethod
-        def to_binary(cls, value: int) -> bytes:
-            return struct.pack(fmt, value.encode(encoding))
+        @classinstancemethod
+        def to_binary(cls, self: Self) -> bytes:
+            return struct.pack(fmt, self.encode(encoding))
 
-        @classmethod
+        @classinstancemethod
         def get_size(cls, _self):
             return struct.calcsize(fmt)
     return CharType
