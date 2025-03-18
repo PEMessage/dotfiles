@@ -93,7 +93,7 @@ def process_action(ctx: ActionContext):
             if action.action == 'place':
                 # Read file during execution phase
                 with open(action.source['path'], 'rb') as f:
-                    binary_data = f.read()
+                    binary_data = f.read(action.source['size'])
                 if action.args['address']:
                     cur_address = action.args['address']
                 else:
