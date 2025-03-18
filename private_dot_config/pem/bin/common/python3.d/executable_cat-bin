@@ -40,6 +40,53 @@ def evaluate_address_expression(address_str):
     except (SyntaxError, NameError, TypeError) as e:
         raise ValueError(f"Invalid address expression: {address_str}") from e
 
+def parse_fileargument(file_arg: str):
+    # Just plain path, fast path
+    if ":" not in file_arg:
+        fpath = file_arg
+        address = None
+        size = os.path.getsize(fpath)
+        return fpath, address, size
+    
+    # /path/to/file:XXXXX
+    fpath, rest_part = file_arg.split(":", 1)
+                # Validate file existence early
+    if not os.path.exists(fpath):
+        raise FileNotFoundError(f"File not found: {fpath}")
+
+    components = [c.strip() for c in rest_part.split(',')]
+    address_str = None
+    params = {}
+    for component in components:
+        if '=' in component:
+            # /path/to/file:address_str,size=XX
+            key, value = component.split('=', 1)
+            key = key.strip()
+            # if key != 'size':
+            #     raise ValueError(f"Unknown parameter '{key}' in file argument")
+            params[key] = value.strip()
+        else:
+            # /path/to/file:address_str
+            if address_str is not None:
+                raise ValueError("Multiple address specifications found")
+            address_str = component
+
+    # Process address
+    if address_str:
+        address = evaluate_address_expression(address_str)
+    else:
+        address = None
+
+    # Process size
+    if 'size' in params:
+        size = evaluate_address_expression(params['size'])
+    else:
+        size = os.path.getsize(fpath)
+
+    return fpath, address, size
+
+
+
 def generate_action_list(args) -> ActionContext:
     """Parse command-line arguments and generate an execution plan."""
     action_list = []
@@ -53,22 +100,11 @@ def generate_action_list(args) -> ActionContext:
 
     for file_arg in args.files:
         try:
-            if ":" in file_arg:
-                file_path, address_str = file_arg.split(":", 1)
-                address = evaluate_address_expression(address_str)
-            else:
-                file_path = file_arg
-                address = None
-
-            
-            # Validate file and get size
-            if not os.path.isfile(file_path):
-                raise FileNotFoundError(f"File not found: {file_path}")
-            file_size = os.path.getsize(file_path)
+            fpath, address, size = parse_fileargument(file_arg) 
             
             action = Action(
                 action='place',
-                source={'type': 'file', 'path': file_path, 'size': file_size},
+                source={'type': 'file', 'path': fpath, 'size': size},
                 args={'address': address}
             )
             action_list.append(action)
@@ -98,8 +134,10 @@ def process_action(ctx: ActionContext):
                     cur_address = action.args['address']
                 else:
                     cur_address = memory_buffer.tell()
-                post_address =  place_binary_at_address(memory_buffer, binary_data, cur_address)
-                print(f"Placed {len(binary_data)} bytes from '{action.source['path']}' at  [ {cur_address} (0x{cur_address:0x}) -- {post_address} (0x{post_address:0x}) )")
+                written_size =  place_binary_at_address(memory_buffer, binary_data, cur_address)
+                post_address = memory_buffer.tell()
+                # post_address = cur_address + written_size
+                print(f"Placed {written_size} bytes from '{action.source['path']}' at [[[ {cur_address} (0x{cur_address:0x}) --- {post_address} (0x{post_address:0x}) )))")
         except Exception as e:
             print(f"Failed to execute action for '{action.source['path']}': {e}")
             raise
