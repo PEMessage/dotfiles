@@ -1,0 +1,132 @@
+#!/usr/bin/env python3
+import argparse
+import os
+import io
+import json
+from dataclasses import dataclass, asdict
+from typing import List
+
+@dataclass
+class Action:
+    action: str        # e.g., 'place'
+    source: dict      # {'type': 'file', 'path': str, 'size': int}
+    args: dict        # {'address': int}
+
+@dataclass
+class ActionContext:
+    actions: List[Action]
+    attributes: dict  # Stores metadata like output path
+
+def place_binary_at_address(memory_buffer, binary_data, address) -> int:
+    """Dynamically place binary data into the buffer at the specified address."""
+    if address:
+        current_size = memory_buffer.seek(0, io.SEEK_END)
+        end_address = address + len(binary_data)
+        if end_address > current_size:
+            memory_buffer.write(b'\x00' * (end_address - current_size))
+        memory_buffer.seek(address)
+    else:
+        pass
+    return memory_buffer.write(binary_data)
+
+def evaluate_address_expression(address_str):
+    """Evaluate arithmetic expressions with optional 'K' suffix for kilobytes."""
+    address_expr = address_str.upper().replace('K', '*1024')
+    try:
+        evaluated = eval(address_expr, {'__builtins__': None}, {})
+        if isinstance(evaluated, float) and not evaluated.is_integer():
+            raise ValueError("Address must resolve to an integer")
+        return int(evaluated)
+    except (SyntaxError, NameError, TypeError) as e:
+        raise ValueError(f"Invalid address expression: {address_str}") from e
+
+def generate_action_list(args) -> ActionContext:
+    """Parse command-line arguments and generate an execution plan."""
+    action_list = []
+    attributes = {}
+    # attributes = {'out': args.out}  # Store output path in attributes
+    if args.out:
+        attributes['out'] =  args.out  # Store output path in attributes
+    else:
+        attributes['out'] = None
+    
+
+    for file_arg in args.files:
+        try:
+            if ":" in file_arg:
+                file_path, address_str = file_arg.split(":", 1)
+                address = evaluate_address_expression(address_str)
+            else:
+                file_path = file_arg
+                address = None
+
+            
+            # Validate file and get size
+            if not os.path.isfile(file_path):
+                raise FileNotFoundError(f"File not found: {file_path}")
+            file_size = os.path.getsize(file_path)
+            
+            action = Action(
+                action='place',
+                source={'type': 'file', 'path': file_path, 'size': file_size},
+                args={'address': address}
+            )
+            action_list.append(action)
+        except ValueError as ve:
+            print(f"Error processing '{file_arg}': {ve}")
+            raise
+        except FileNotFoundError as fnfe:
+            print(fnfe)
+            raise
+        except Exception as e:
+            print(f"Unexpected error with '{file_arg}': {e}")
+            raise
+
+    return ActionContext(actions=action_list, attributes=attributes)
+
+def process_action(ctx: ActionContext):
+    """Execute all actions in the context and handle output."""
+    memory_buffer = io.BytesIO()
+
+    for action in ctx.actions:
+        try:
+            if action.action == 'place':
+                # Read file during execution phase
+                with open(action.source['path'], 'rb') as f:
+                    binary_data = f.read()
+                if action.args['address']:
+                    cur_address = action.args['address']
+                else:
+                    cur_address = memory_buffer.tell()
+                post_address =  place_binary_at_address(memory_buffer, binary_data, cur_address)
+                print(f"Placed {len(binary_data)} bytes from '{action.source['path']}' at  [ {cur_address} (0x{cur_address:0x}) -- {post_address} (0x{post_address:0x}) )")
+        except Exception as e:
+            print(f"Failed to execute action for '{action.source['path']}': {e}")
+            raise
+
+    print(f"Total buffer size: {memory_buffer.getbuffer().nbytes} bytes")
+    
+    # Handle output if specified
+    if ctx.attributes.get('out'):
+        with open(ctx.attributes['out'], 'wb') as f:
+            f.write(memory_buffer.getvalue())
+        print(f"Output written to {ctx.attributes['out']}")
+    else:
+        print(
+            json.dumps(asdict(ctx), indent=2)
+            )
+
+def main():
+    parser = argparse.ArgumentParser(description="Manage binary data placement using a two-phase approach.")
+    parser.add_argument("files", nargs="+", help="File and address pairs in 'path/to/file:address' format")
+    parser.add_argument("--out", help="Output file path")
+    args = parser.parse_args()
+
+    try:
+        ctx = generate_action_list(args)
+        process_action(ctx)
+    except Exception as e:
+        print(f"Processing aborted: {e}")
+
+if __name__ == "__main__":
+    main()
