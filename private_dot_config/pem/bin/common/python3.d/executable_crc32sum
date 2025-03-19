@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+import sys
+import zlib
+
+def calculate_crc32(fileobj):
+    crc = 0
+    while True:
+        chunk = fileobj.read(8192)
+        if not chunk:
+            break
+        crc = zlib.crc32(chunk, crc)
+    return crc
+
+def main():
+    if len(sys.argv) == 1:
+        # No files provided, read from stdin
+        crc = calculate_crc32(sys.stdin.buffer)
+        print(f"{crc:08x}\t-")
+        return
+
+    for arg in sys.argv[1:]:
+        if arg == '-':
+            # Handle stdin explicitly
+            crc = calculate_crc32(sys.stdin.buffer)
+            print(f"{crc:08x}\t-")
+        else:
+            try:
+                with open(arg, 'rb') as f:
+                    crc = calculate_crc32(f)
+                print(f"{crc:08x}\t{arg}")
+            except FileNotFoundError:
+                print(f"crc32sum: {arg}: No such file or directory", file=sys.stderr)
+            except IsADirectoryError:
+                print(f"crc32sum: {arg}: Is a directory", file=sys.stderr)
+
+if __name__ == "__main__":
+    main()
