@@ -1,0 +1,66 @@
+
+import sys
+import inspect
+from crccheck.crc import *
+
+def count_mandatory_arguments(func):
+    """
+    Counts the number of mandatory (required) arguments in a function or method.
+    """
+    sig = inspect.signature(func)
+    mandatory_count = 0
+
+    for param in sig.parameters.values():
+        # Ignore variable arguments (*args and **kwargs)
+        if param.kind in (param.VAR_POSITIONAL, param.VAR_KEYWORD):
+            continue
+
+        # Check if the parameter has no default value (mandatory)
+        if param.default is param.empty:
+            mandatory_count += 1
+
+    return mandatory_count
+
+def main():
+    if len(sys.argv) != 2:
+        print(f"Usage: {sys.argv[0]} <filepath>")
+        sys.exit(1)
+
+    filepath = sys.argv[1]
+    try:
+        with open(filepath, 'rb') as f:
+            data = f.read()
+    except Exception as e:
+        print(f"Error reading file: {e}")
+        sys.exit(1)
+
+    # Collect and deduplicate CRC16 variants by class name
+    crc_classes = []
+    seen_names = set()
+
+    for name, obj in inspect.getmembers(sys.modules['crccheck.crc']):
+        if ( inspect.isclass(obj) and
+            obj.__name__.startswith('Crc') and
+            hasattr(obj, 'calchex') and
+            count_mandatory_arguments(obj.calchex) == 1) :
+
+            class_name = obj.__name__
+            if class_name not in seen_names:
+                crc_classes.append(obj)
+                seen_names.add(class_name)
+
+    # Sort classes by name for consistent output
+    SKIP_LIST = [
+            'CrccheckBase',
+            'CrcBase'
+            ]
+    crc_classes = [cls for cls in crc_classes if cls.__name__ not in SKIP_LIST]
+    crc_classes.sort(key=lambda x: x._width)
+
+    # Calculate and print all CRC16 variants
+    for cls in crc_classes:
+        crc_value = cls.calchex(data)
+        print(f"{cls.__name__:25}: {crc_value}")
+
+if __name__ == "__main__":
+    main()
