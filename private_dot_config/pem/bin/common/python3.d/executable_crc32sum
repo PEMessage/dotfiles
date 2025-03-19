@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import sys
 import zlib
+import argparse
+from contextlib import nullcontext
 
 def calculate_crc32(fileobj):
     crc = 0
@@ -9,29 +11,81 @@ def calculate_crc32(fileobj):
         if not chunk:
             break
         crc = zlib.crc32(chunk, crc)
+    return crc & 0xFFFFFFFF
+
+def calculate_crc16_ccitt_false(fileobj):
+    crc = 0xFFFF  # Initial value for CCITT
+    while True:
+        chunk = fileobj.read(8192)
+        if not chunk:
+            break
+        for byte in chunk:
+            crc ^= (byte << 8)
+            for _ in range(8):
+                if crc & 0x8000:
+                    crc = (crc << 1) ^ 0x1021  # CCITT polynomial
+                else:
+                    crc <<= 1
+                crc &= 0xFFFF
+    return crc
+
+def calculate_crc16_umts(fileobj):
+    crc = 0x0000  # Initial value for UMTS
+    while True:
+        chunk = fileobj.read(8192)
+        if not chunk:
+            break
+        for byte in chunk:
+            crc ^= (byte << 8)
+            for _ in range(8):
+                if crc & 0x8000:
+                    crc = (crc << 1) ^ 0x8005  # UMTS polynomial
+                else:
+                    crc <<= 1
+                crc &= 0xFFFF
     return crc
 
 def main():
-    if len(sys.argv) == 1:
-        # No files provided, read from stdin
-        crc = calculate_crc32(sys.stdin.buffer)
-        print(f"{crc:08x}\t-")
-        return
+    parser = argparse.ArgumentParser(description='Calculate CRC checksums')
+    parser.add_argument('files', nargs='*', help='Files to process (default: stdin)')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--n16', choices=['ccitt_false', 'umts'],
+                      help='CRC16 variant: CCITT (0x1021), UMTS (0x8005)')
+    group.add_argument('--n32', action='store_true', help='Force CRC32 (default)')
 
-    for arg in sys.argv[1:]:
-        if arg == '-':
-            # Handle stdin explicitly
-            crc = calculate_crc32(sys.stdin.buffer)
-            print(f"{crc:08x}\t-")
-        else:
-            try:
-                with open(arg, 'rb') as f:
-                    crc = calculate_crc32(f)
-                print(f"{crc:08x}\t{arg}")
-            except FileNotFoundError:
-                print(f"crc32sum: {arg}: No such file or directory", file=sys.stderr)
-            except IsADirectoryError:
-                print(f"crc32sum: {arg}: Is a directory", file=sys.stderr)
+    args = parser.parse_args()
+    files = args.files if args.files else ['-']
+
+    # Determine CRC type
+    if args.n16:
+        crc_width = 4
+        if args.n16 == 'ccitt_false':
+            crc_func = calculate_crc16_ccitt_false
+        elif args.n16 == 'umts':
+            crc_func = calculate_crc16_umts
+    else:
+        crc_func = calculate_crc32
+        crc_width = 8
+
+    for arg in files:
+        try:
+            if arg == '-':
+                fileobj = sys.stdin.buffer
+                output_name = '-'
+            else:
+                fileobj = open(arg, 'rb')
+                output_name = arg
+
+            with fileobj if arg != '-' else nullcontext(fileobj):
+                crc = crc_func(fileobj)
+                print(f"{crc:0{crc_width}x}\t{output_name}")
+
+        except FileNotFoundError:
+            print(f"crcsum: {arg}: No such file or directory", file=sys.stderr)
+        except IsADirectoryError:
+            print(f"crcsum: {arg}: Is a directory", file=sys.stderr)
+        except Exception as e:
+            print(f"crcsum: {arg}: {str(e)}", file=sys.stderr)
 
 if __name__ == "__main__":
     main()
