@@ -38,6 +38,6 @@ countdown(){
 }
 
 while : ; do
-  countdown ${icon} ${workPeriod} 10 "WORKING"
-  countdown ${icon} ${restPeriod} 10 "RESTING"
+    countdown ${icon} ${workPeriod} "$(( {workPeriod} / 2 - 1 ))" "WORKING"
+    countdown ${icon} ${restPeriod} "$(( {restPeriod} / 2 - 1 ))" "RESTING"
 done
