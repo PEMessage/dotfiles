@@ -83,6 +83,9 @@ scd() {
         "s@sys@vnd@g"
         "s@vnd@sys@g"
     )
+    if [ -n "$PEM_SCD_APPEND" ] ; then 
+        pattern_list+=( "${PEM_SCD_APPEND[@]}" )
+    fi
     current_dir="$(readlink -f .)"
 
     for x in "${pattern_list[@]}"
