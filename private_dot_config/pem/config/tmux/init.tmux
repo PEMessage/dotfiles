@@ -39,6 +39,14 @@
     'bind r source-file ~/.tmux.conf \; display "Reload!"' \
     'bind r source-file ~/.config/tmux/tmux.conf \; display "Reload!"'
 
+    # Sort all tmux window
+    bind s                                      \
+        set -g renumber-windows on\;            \
+        new-window\; kill-window\;              \
+        set -g renumber-windows off\;           \
+        display-message "Windows reordered..."
+
+
     # copy mode 
     # ----------------------------
     # bind P paste-buffer
