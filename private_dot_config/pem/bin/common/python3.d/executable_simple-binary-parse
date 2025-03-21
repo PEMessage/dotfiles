@@ -1,27 +1,112 @@
 #!/usr/bin/env python3
 
+
+
 import re
 import pprint
 import sys
 import struct
+import argparse
 import json
 from functools import cache
-from dataclasses import dataclass, fields, asdict
+from dataclasses import dataclass, fields, asdict, is_dataclass
 import typing
 from typing import List
 from typing_extensions import Self
+from typing import get_origin, get_args, Union, Optional
 from io import BytesIO
+import pudb
 
 # ==========================================
 # Some Helper function
 # ==========================================
+
+
+def set_nested_value(obj, key_path, value):
+    parts = [re.match(r'([^\[\]]+)(?:\[(\d+)\])?', p).groups() 
+             for p in key_path.split('.')]
+    
+    current = obj
+    for (key, idx) in parts[:-1]:
+        # Navigate through containers
+        current = current[int(key)] if isinstance(current, list) else (
+            current[key] if isinstance(current, dict) else getattr(current, key)
+        )
+        # Handle list indexing
+        if idx is not None:
+            current = current[int(idx)]
+    
+    # Process final assignment
+    last_key, last_idx = parts[-1]
+    container = current
+    
+    if last_idx is not None:
+        container = container[int(last_idx)]
+    
+    # Type-aware assignment
+    if isinstance(container, dict):
+        if last_key not in container:
+            raise KeyError(f"Key '{last_key}' not found")
+        target_type = type(container[last_key])
+        container[last_key] = target_type(value)
+    else:
+        if not hasattr(container, last_key):
+            raise AttributeError(f"Attribute '{last_key}' not found")
+        target_type = type(getattr(container, last_key))
+        setattr(container, last_key, target_type(value))
+
+
+def checktype(obj, hint):
+    # Handle Optional/Union types (e.g., Optional[int] = Union[int, None])
+    if get_origin(hint) is Union:
+        return any(checktype(obj, arg) for arg in get_args(hint))
+    
+    # For non-generic types, use direct isinstance check
+    if not (origin := get_origin(hint)):
+        return isinstance(obj, hint)
+    
+    # Check if the object matches the base type (e.g., list, dict)
+    if not isinstance(obj, origin):
+        return False
+    
+    # Handle generic types (e.g., list[int], dict[str, int])
+    type_args = get_args(hint)
+    
+    if origin is list:
+        # Check all elements in the list
+        return all(checktype(item, type_args[0]) for item in obj)
+    
+    elif origin is dict:
+        # Check keys and values in the dictionary
+        key_type, value_type = type_args
+        return all(
+            checktype(key, key_type) and checktype(value, value_type)
+            for key, value in obj.items()
+        )
+    
+    elif origin is tuple:
+        # Handle tuples (fixed-length or variable-length)
+        if len(type_args) == 2 and type_args[1] is Ellipsis:
+            # tuple[int, ...] (variable-length)
+            return all(checktype(item, type_args[0]) for item in obj)
+        else:
+            # tuple[int, str] (fixed-length)
+            return len(obj) == len(type_args) and all(
+                checktype(item, arg) for item, arg in zip(obj, type_args)
+            )
+    
+    # Add support for other generic types (e.g., set, frozenset) here
+    return True  # Fallback for unsupported generics
+
 def getclass(cla):
     # deal with normal case, field.type already is class object
-    if isinstance(type(cla), type):
+    if type(cla) is type:
         return cla
     # deal with special case, python3 runtime sevice can't find classtype
     # for example 'char[16]', manully parse it, and even generate type at this time
-    elif isinstance(type(cla), str):
+    elif isinstance(cla, typing._GenericAlias):
+        return cla
+    elif isinstance(cla, str):
         match = re.fullmatch(r'(\w+)\[(\d+)\]', cla)
         # Handle __class_getitem__ like 'CharType[32]'
         if match:
@@ -91,10 +176,28 @@ class Base:
         for f in fields(self):
             value = getattr(self, f.name)
             T = getclass(f.type)
-            if skip_type(T):
-                return
-            if not isinstance(value, T):
+            # if skip_type(T):
+            #     return
+            if not checktype(value, T):
                 setattr(self, f.name, T(value))
+
+    def __setattr__(self, name, value):
+        if not is_dataclass(self):
+            super().__setattr__(name, value)
+            return
+
+        f = next(
+            filter(lambda f: f.name == name, fields(self)),
+            None
+        )
+        if f:
+            T = getclass(f.type)
+            if not checktype(value, T):
+                super().__setattr__(name, T(value))
+            else:
+                super().__setattr__(name, value)
+
+
 
     # if not dataclass, your should override this
     @classmethod
@@ -147,8 +250,9 @@ def make_int_type(fmt: str):
         @classmethod
         @binary_data_handler
         def from_binary(cls, bio: BytesIO, _ctx) -> Self:
+            data = bio.read(struct.calcsize(fmt))
             return cls(
-                struct.unpack(fmt, bio.read(struct.calcsize(fmt)))[0]
+                struct.unpack(fmt, data)[0]
             )
 
         @classinstancemethod
@@ -167,8 +271,9 @@ def make_char_type(fmt: str, encoding: str):
         @classmethod
         @binary_data_handler
         def from_binary(cls, bio: BytesIO, _ctx) -> Self:
+            data = bio.read(struct.calcsize(fmt))
             return cls(
-                struct.unpack(fmt, bio.read(struct.calcsize(fmt)))[0].decode(encoding)
+                struct.unpack(fmt, data)[0].decode(encoding)
             )
 
         @classinstancemethod
