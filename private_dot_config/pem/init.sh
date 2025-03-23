@@ -144,6 +144,7 @@
     # Therefore in both Bash and zsh you can use
     # See: 
     # https://unix.stackexchange.com/questions/295033/loop-over-a-string-in-zsh-and-bash
+    PEM_PRE_PATH=""
     for x in $(echo $PEM_ROOT_LIST) ;
     do
         [ -d "$x" ] || {
@@ -165,7 +166,6 @@
         #     )
 
         # common PATH
-        PEM_PRE_PATH=""
         for xbin in \
             "$x/bin"/*.d \
             "$x/bin/arch/${PEM_OS}-${PEM_ARCH}"/*.d \
@@ -192,7 +192,9 @@
             }
         done ; unset xbin
     done ; unset x
-    PATH="$PEM_PRE_PATH:$PATH"
+    if [ -n "$PEM_PRE_PATH" ] ; then
+        PATH="$PEM_PRE_PATH:$PATH"
+    fi
 
 
 
