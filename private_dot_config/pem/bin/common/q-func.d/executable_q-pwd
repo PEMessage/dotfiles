@@ -25,8 +25,18 @@ function q-myip()
 }
 
 function q-pwd() {
+local x
 if [ -n "$PEM_Q_PWD_NR" ] ; then
-    local postcmd="awk 'NR == $PEM_Q_PWD_NR'"
+    for x in $PEM_Q_PWD_NR
+    do
+        if [ -z "$postcmd" ] ; then
+            local postcmd="NR == $x"
+        else
+            local postcmd+=" || NR == $x"
+        fi
+    done
+    # echo $postcmd
+    postcmd="awk '$postcmd'"
 else
     local postcmd="cat"
 fi
