@@ -473,6 +473,7 @@ let g:startify_custom_header = [
                 \}
     nnoremap <leader>``   :nohlsearch<CR>:match none<CR>
     nnoremap <leader>`1   :set! virtualedit=onemore<CR>
+    nnoremap <leader>ig  :set ignorecase!<CR>
     nnoremap <leader>wp  :set nowrap!<CR>
     nnoremap <leader>cl  :set cursorline!<CR>
 

@@ -42,15 +42,25 @@ else
 fi
 # echo $postcmd
 
-for x in `q-myip`
-do
-    if [ -z "$1" ]; then 
-        echo `whoami`@$x:`pwd`
-    else
-        path="$(readlink -f "$1")"
-        echo `whoami`@$x:"$path"
-    fi 
-done | eval "$postcmd"
+local out
+# Thanks to https://serverfault.com/questions/377943/how-do-i-read-multiple-lines-from-stdin-into-a-variable
+read -d '' out < \
+<(for x in `q-myip`
+    do
+        if [ -z "$1" ]; then 
+            echo `whoami`@$x:`pwd`
+        else
+            path="$(readlink -f "$1")"
+            echo `whoami`@$x:"$path"
+        fi 
+    done | eval "$postcmd"  )
+
+echo "$out"
+# Thanks: https://stackoverflow.com/questions/911168/how-can-i-detect-if-my-shell-script-is-running-through-a-pipe
+if [ -t 1  ] ; then 
+    echo "$out" | yank
+    echo "Copy to yank..."
+fi
 }
 
 
