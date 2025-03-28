@@ -8,6 +8,7 @@
             -e "$HOME\scoop\apps\cwrsync\current\bin\ssh.exe -i $HOME\.ssh\id_rsa -o UserKnownHostsFile=$HOME\.ssh\known_hosts" `
             --progress -u `
             $args
+        return $?
     }
     Set-Alias -name rsync -Value Invoke-ScoopRsync
 
@@ -75,7 +76,13 @@ Set-Alias -Name msudo -Value Run-As
 
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 # Module List
-Import-Module z
+if (Get-Command fzf -ErrorAction SilentlyCon ) {
+    Invoke-Expression (& { (zoxide init powershell | Out-String) })
+} else {
+    Import-Module z
+}
+Set-Alias cdd z
+
 Import-Module cd-extras
 Import-Module PwshComplete
 
@@ -110,7 +117,7 @@ if ( (Get-Command fzf -ErrorAction SilentlyCon ) -and ( Get-Command awk -ErrorAc
         $command = Get-Content (Get-PSReadlineOption).HistorySavePath |
             awk '!a[$0]++'   |
             # awk '!a[$0]++'  |
-            fzf --scheme=history --tac "--query=${Query}" --color dark
+            fzf --scheme=history --tac "--query=${Query}" --color dark --height 10%
 
         if ($command) {
             return $command
