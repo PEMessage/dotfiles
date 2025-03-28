@@ -1028,7 +1028,8 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'tpope/vim-fugitive'
     " Plug 'tpope/vim-vinegar'
     Plug 'tpope/vim-rsi'
-    Plug 'tpope/vim-sleuth'
+    Plug 'tpope/vim-sleuth' , { 'on': [ 'Sleuth' ] }
+        command UnSleuth setlocal et sw=4 ts=4
 
 " -------------------------------------------
 " 6.6 Git plugin

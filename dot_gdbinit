@@ -3060,6 +3060,8 @@ end
 # 3.2 Basic configuration
 # -------------------------------------------
     set history save
+    set history filename ~/.gdb_history
+    set history size 4096
     set verbose off
     set print array off
     set python print-stack full
