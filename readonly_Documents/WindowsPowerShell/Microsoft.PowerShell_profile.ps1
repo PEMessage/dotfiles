@@ -77,8 +77,7 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 # Module List
 Import-Module z
 Import-Module cd-extras
-
-
+Import-Module PwshComplete
 
 # Wsl port
 function Add-WSLPortForwarding ($Port = '23333', $Protocol = 'TCP') {
@@ -134,3 +133,30 @@ if ( (Get-Command fzf -ErrorAction SilentlyCon ) -and ( Get-Command awk -ErrorAc
     Set-PSReadLineKeyHandler -Key Ctrl+q -Function ReverseSearchHistory
 }
 
+
+
+
+function Add-ToPath {
+    param(
+            [string]$Directory = ""
+         )
+
+        if ($Directory -ne "") {
+            $fullPath = (Get-Item $Directory).FullName
+                Write-Host "Running:"
+                Write-Host "`$env:PATH = `"$fullPath;`$env:PATH`""
+                $env:PATH = "$fullPath;$env:PATH"
+        }
+        else {
+            $currentDir = (Get-Location).Path
+                Write-Host "Running:"
+                Write-Host "`$env:PATH = `"$currentDir;`$env:PATH`""
+                $env:PATH = "$currentDir;$env:PATH"
+        }
+
+    Write-Host "`nCurrent Path:"
+        ($env:PATH -split ';' | Where-Object { $_ -ne '' } | Select-Object -First 5) -join "`n"
+        Write-Host "..."
+}
+
+Set-Alias a2p Add-ToPath
