@@ -1028,7 +1028,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'tpope/vim-fugitive'
     " Plug 'tpope/vim-vinegar'
     Plug 'tpope/vim-rsi'
-
+    Plug 'tpope/vim-sleuth'
 
 " -------------------------------------------
 " 6.6 Git plugin

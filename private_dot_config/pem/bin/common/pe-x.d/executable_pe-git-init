@@ -63,3 +63,5 @@ git_config_global alias.remove-file-from-branch-history '!sh -c '"'"'git filter-
 
 # From: https://stackoverflow.com/questions/39887690/how-to-reproduce-the-format-of-git-log-oneline-decorate
 git_config_global alias.reproduced-online-stat 'log --graph --stat --format="%C(auto)%h%C(reset) %C(auto)%d %C(bold blue)%s%C(reset)"'
+git_config_global alias.reset-author \
+    "-c rebase.instructionFormat='%s%nexec GIT_COMMITTER_DATE=\"%cD\" GIT_AUTHOR_DATE=\"%aD\" git commit --amend --no-edit --reset-author' rebase -f"
