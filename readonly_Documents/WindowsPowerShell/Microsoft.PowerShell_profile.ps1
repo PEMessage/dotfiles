@@ -76,14 +76,12 @@ Set-Alias -Name msudo -Value Run-As
 
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 # Module List
-if (Get-Command fzf -ErrorAction SilentlyCon ) {
+if (Get-Command zoxide.exe -ErrorAction SilentlyCon ) {
     Invoke-Expression (& { (zoxide init powershell | Out-String) })
 } else {
-    Import-Module z
+    # Import-Module z
 }
 Set-Alias cdd z
-
-Import-Module cd-extras
 Import-Module PwshComplete
 
 # Wsl port
