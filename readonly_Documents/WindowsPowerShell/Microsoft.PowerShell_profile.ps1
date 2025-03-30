@@ -76,12 +76,16 @@ Set-Alias -Name msudo -Value Run-As
 
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 # Module List
+
+
+Import-Module better-cd 
 if (Get-Command zoxide.exe -ErrorAction SilentlyCon ) {
-    Invoke-Expression (& { (zoxide init powershell | Out-String) })
+    Import-Module ZoxidePS -ArgumentList "Set-LocationEx"  
+    Set-Alias -Name cdd -Value z
 } else {
     # Import-Module z
 }
-Set-Alias cdd z
+Set-Alias -Name cd -Value Set-LocationEx -Option AllScope
 Import-Module PwshComplete
 
 # Wsl port
