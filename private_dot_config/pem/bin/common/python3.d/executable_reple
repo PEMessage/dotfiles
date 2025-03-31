@@ -105,7 +105,8 @@ BUILTIN_RULE = {'bcl': {'compile': '{compiler} {cflags} -o {bin_fname} {code_fna
                            'template_begin': '#include <cstdlib>\n'
                                              '#include <cstdio>\n'
                                              '#include <unistd.h>\n'
-                                             '#include <iostream>\n',
+                                             '#include <iostream>\n'
+                                             'using namespace std;\n',
                            'template_end': 'return 0;\n}',
                            'template_main_begin': 'int main(int argc, char '
                                                   '**argv) {'},
