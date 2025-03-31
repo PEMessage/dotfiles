@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 import sys
 import os
+import pprint
 
 from functools import reduce
 from operator import add
@@ -24,6 +25,334 @@ from prompt_toolkit.styles import style_from_pygments_cls
 
 from pygments.styles import get_style_by_name
 from pygments.formatters import Terminal256Formatter
+
+
+BUILTIN_RULE = {'bcl': {'compile': '{compiler} {cflags} -o {bin_fname} {code_fname}',
+         'compile_args': {'cflags': '-w -std=gnu++17 -O3',
+                          'code_suffix': '.cpp',
+                          'compiler': 'mpic++'},
+         'run': 'mpirun {user_rargs} {bin_fname}',
+         'template': '{template_begin}\n'
+                     '{prolog_lines}\n'
+                     '{template_main_begin}\n'
+                     '{repl_lines}\n'
+                     '{template_end}\n',
+         'template_args': {'line_epilogue': 'BCL::barrier() ; fflush(stdout) ; '
+                                            'fflush(stderr) ; BCL::barrier();',
+                           'template_begin': '#include <cstdlib>\n'
+                                             '#include <cstdio>\n'
+                                             '#include <unistd.h>\n'
+                                             '#include <iostream>\n'
+                                             '#include <bcl/bcl.hpp>',
+                           'template_end': 'BCL::finalize();\nreturn 0;\n}',
+                           'template_main_begin': 'int main(int argc, char '
+                                                  '**argv) {\n'
+                                                  'BCL::init();\n'},
+         'terminal_opts': {'enclosers': [['{', '}']],
+                           'lexer_class': 'pygments.lexers',
+                           'lexer_fn': 'CppLexer',
+                           'prolog_char': '$'}},
+ 'c': {'compile': '{compiler} {user_cargs} {cflags} -o {bin_fname} '
+                  '{code_fname}',
+       'compile_args': {'cflags': '-w -O3',
+                        'code_suffix': '.c',
+                        'compiler': 'gcc'},
+       'run': '{bin_fname}',
+       'template': '{template_begin}\n'
+                   '{prolog_lines}\n'
+                   '{template_main_begin}\n'
+                   '{repl_lines}\n'
+                   '{template_end}\n',
+       'template_args': {'line_epilogue': '',
+                         'template_begin': '#include <stdlib.h>\n'
+                                           '#include <stdio.h>\n'
+                                           '#include <unistd.h>',
+                         'template_end': 'return 0;\n}',
+                         'template_main_begin': 'int main(int argc, char '
+                                                '**argv) {'},
+       'terminal_opts': {'enclosers': [['{', '}']],
+                         'lexer_class': 'pygments.lexers',
+                         'lexer_fn': 'CLexer',
+                         'prolog_char': '$'}},
+ 'cr': {'compile': '{compiler} {crflags} {user_cargs} -o {bin_fname} '
+                   '{code_fname}',
+        'compile_args': {'code_suffix': '.cr',
+                         'compiler': 'crystal build',
+                         'crflags': '--no-debug'},
+        'run': '{bin_fname}',
+        'template': '{template_begin}\n'
+                    '{prolog_lines}\n'
+                    '{repl_lines}\n'
+                    '{template_end}\n',
+        'template_args': {'line_epilogue': '',
+                          'template_begin': '',
+                          'template_end': ''},
+        'terminal_opts': {'enclosers': [['do', 'end']],
+                          'lexer_class': 'pygments.lexers',
+                          'lexer_fn': 'CrystalLexer',
+                          'prolog_char': '$'}},
+ 'cxx': {'compile': '{compiler} {cflags} -o {bin_fname} {code_fname}',
+         'compile_args': {'cflags': '-w -O3',
+                          'code_suffix': '.cpp',
+                          'compiler': 'g++'},
+         'run': '{bin_fname}',
+         'template': '{template_begin}\n'
+                     '{prolog_lines}\n'
+                     '{template_main_begin}\n'
+                     '{repl_lines}\n'
+                     '{template_end}\n',
+         'template_args': {'line_epilogue': '',
+                           'template_begin': '#include <cstdlib>\n'
+                                             '#include <cstdio>\n'
+                                             '#include <unistd.h>\n'
+                                             '#include <iostream>\n',
+                           'template_end': 'return 0;\n}',
+                           'template_main_begin': 'int main(int argc, char '
+                                                  '**argv) {'},
+         'terminal_opts': {'enclosers': [['{', '}']],
+                           'lexer_class': 'pygments.lexers.c_cpp',
+                           'lexer_fn': 'CppLexer',
+                           'prolog_char': '$'}},
+ 'd': {'compile': '{compiler} {dflags} -of={bin_fname} {code_fname}',
+       'compile_args': {'code_suffix': '.d', 'compiler': 'dmd', 'dflags': '-w'},
+       'run': '{bin_fname}',
+       'template': '{template_begin}\n'
+                   '{prolog_lines}\n'
+                   '{template_main_begin}\n'
+                   '{repl_lines}\n'
+                   '{template_end}\n',
+       'template_args': {'line_epilogue': '',
+                         'template_begin': 'import std;\n',
+                         'template_end': '\n}',
+                         'template_main_begin': 'void main() {'},
+       'terminal_opts': {'enclosers': [['{', '}']],
+                         'lexer_class': 'pygments.lexers.d',
+                         'lexer_fn': 'DLexer',
+                         'prolog_char': '$'}},
+ 'dash': {'compile': '{compiler} {cflags} -o {bin_fname} {code_fname}',
+          'compile_args': {'cflags': '-w -std=gnu++17 -O3',
+                           'code_suffix': '.cpp',
+                           'compiler': 'dash-mpic++'},
+          'run': 'mpirun {user_rargs} {bin_fname}',
+          'template': '{template_begin}\n'
+                      '{prolog_lines}\n'
+                      '{template_main_begin}\n'
+                      '{repl_lines}\n'
+                      '{template_end}\n',
+          'template_args': {'line_epilogue': 'dash::barrier() ; fflush(stdout) '
+                                             '; fflush(stderr) ; '
+                                             'dash::barrier();',
+                            'template_begin': '#include <cstdlib>\n'
+                                              '#include <cstdio>\n'
+                                              '#include <unistd.h>\n'
+                                              '#include <iostream>\n'
+                                              '#include <libdash.h>',
+                            'template_end': 'dash::finalize();\nreturn 0;\n}',
+                            'template_main_begin': 'int main(int argc, char '
+                                                   '**argv) {\n'
+                                                   'dash::init(&argc, '
+                                                   '&argv);\n'},
+          'terminal_opts': {'enclosers': [['{', '}']],
+                            'lexer_class': 'pygments.lexers',
+                            'lexer_fn': 'CppLexer',
+                            'prolog_char': '$'}},
+ 'go': {'compile': '{compiler} {user_cargs} -o {bin_fname} {code_fname}',
+        'compile_args': {'code_suffix': '.go', 'compiler': 'go build'},
+        'run': '{bin_fname}',
+        'template': '{template_begin}\n'
+                    '{prolog_lines}\n'
+                    '{template_main_begin}\n'
+                    '{repl_lines}\n'
+                    '{template_end}\n',
+        'template_args': {'line_epilogue': '',
+                          'template_begin': 'package main\nimport "fmt"\n',
+                          'template_end': '}',
+                          'template_main_begin': 'func main() {'},
+        'terminal_opts': {'enclosers': [['{', '}']],
+                          'lexer_class': 'pygments.lexers',
+                          'lexer_fn': 'GoLexer',
+                          'prolog_char': '$'}},
+ 'mpicc': {'compile': '{compiler} {cflags} -o {bin_fname} {code_fname}',
+           'compile_args': {'cflags': '-w -O3',
+                            'code_suffix': '.c',
+                            'compiler': 'mpicc'},
+           'run': 'mpirun {user_rargs} {bin_fname}',
+           'template': '{template_begin}\n'
+                       '{prolog_lines}\n'
+                       '{template_main_begin}\n'
+                       '{repl_lines}\n'
+                       '{template_end}\n',
+           'template_args': {'line_epilogue': 'MPI_Barrier(MPI_COMM_WORLD) ; '
+                                              'fflush(stdout) ; fflush(stderr) '
+                                              '; MPI_Barrier(MPI_COMM_WORLD);',
+                             'template_begin': '#include <stdlib.h>\n'
+                                               '#include <stdio.h>\n'
+                                               '#include <unistd.h>\n'
+                                               '#include <mpi.h>',
+                             'template_end': 'MPI_Finalize();\nreturn 0;\n}',
+                             'template_main_begin': 'int main(int argc, char '
+                                                    '**argv) {\n'
+                                                    'MPI_Init(NULL, NULL);\n'},
+           'terminal_opts': {'enclosers': [['{', '}']],
+                             'lexer_class': 'pygments.lexers',
+                             'lexer_fn': 'CLexer',
+                             'prolog_char': '$'}},
+ 'mpicxx': {'compile': '{compiler} {cflags} -o {bin_fname} {code_fname}',
+            'compile_args': {'cflags': '-w -O3',
+                             'code_suffix': '.cpp',
+                             'compiler': 'mpic++'},
+            'run': 'mpirun {user_rargs} {bin_fname}',
+            'template': '{template_begin}\n'
+                        '{prolog_lines}\n'
+                        '{template_main_begin}\n'
+                        '{repl_lines}\n'
+                        '{template_end}\n',
+            'template_args': {'line_epilogue': 'MPI_Barrier(MPI_COMM_WORLD) ; '
+                                               'fflush(stdout) ; '
+                                               'fflush(stderr) ; '
+                                               'MPI_Barrier(MPI_COMM_WORLD);',
+                              'template_begin': '#include <cstdlib>\n'
+                                                '#include <cstdio>\n'
+                                                '#include <unistd.h>\n'
+                                                '#include <iostream>\n'
+                                                '#include <mpi.h>',
+                              'template_end': 'MPI_Finalize();\nreturn 0;\n}',
+                              'template_main_begin': 'int main(int argc, char '
+                                                     '**argv) {\n'
+                                                     'MPI_Init(NULL, NULL);\n'},
+            'terminal_opts': {'enclosers': [['{', '}']],
+                              'lexer_class': 'pygments.lexers',
+                              'lexer_fn': 'CppLexer',
+                              'prolog_char': '$'}},
+ 'nasm': {'compile': '{compiler} -f elf64 {code_fname} {cflags} -o '
+                     '{code_fname}\\.o && {linker} -o {bin_fname} '
+                     '{code_fname}\\.o',
+          'compile_args': {'cflags': '-w -O3',
+                           'code_suffix': '.asm',
+                           'compiler': 'nasm',
+                           'linker': 'ld'},
+          'run': '{bin_fname}',
+          'template': '{template_begin}\n'
+                      '{prolog_lines}\n'
+                      '{template_main_begin}\n'
+                      '{repl_lines}\n'
+                      '{template_end}\n',
+          'template_args': {'line_epilogue': '',
+                            'template_begin': 'global _start\nsection .text\n',
+                            'template_end': 'mov eax, 60\n'
+                                            'xor rdi, rdi\n'
+                                            'syscall\n',
+                            'template_main_begin': '_start:'},
+          'terminal_opts': {'lexer_class': 'pygments.lexers',
+                            'lexer_fn': 'NasmLexer'}},
+ 'rust': {'compile': '{compiler} {user_cargs} {cflags} -o {bin_fname} '
+                     '{code_fname}',
+          'compile_args': {'cflags': '-O -Awarnings',
+                           'code_suffix': '.rs',
+                           'compiler': 'rustc'},
+          'run': '{bin_fname}',
+          'template': '{template_begin}\n'
+                      '{prolog_lines}\n'
+                      '{template_main_begin}\n'
+                      '{repl_lines}\n'
+                      '{template_end}\n',
+          'template_args': {'line_epilogue': '',
+                            'template_begin': '',
+                            'template_end': '}',
+                            'template_main_begin': 'fn main() {'},
+          'terminal_opts': {'enclosers': [['{', '}']],
+                            'lexer_class': 'pygments.lexers',
+                            'lexer_fn': 'RustLexer',
+                            'prolog_char': '$'}},
+ 'unicon': {'compile': '{compiler} {user_cargs} {uflags} -o {bin_fname} '
+                       '{code_fname}',
+            'compile_args': {'code_suffix': '.icn',
+                             'compiler': 'unicon',
+                             'uflags': '-s'},
+            'run': '{bin_fname}',
+            'template': '{template_begin}\n'
+                        '{prolog_lines}\n'
+                        '{template_main_begin}\n'
+                        '{repl_lines}\n'
+                        '{template_end}\n',
+            'template_args': {'line_epilogue': '',
+                              'template_begin': '',
+                              'template_end': 'end',
+                              'template_main_begin': 'procedure main(argv)'},
+            'terminal_opts': {'enclosers': [['{', '}']],
+                              'lexer_class': 'pygments.lexers',
+                              'lexer_fn': 'UniconLexer',
+                              'prolog_char': '$'}},
+ 'upc': {'compile': '{compiler} {cflags} -o {bin_fname} {code_fname}',
+         'compile_args': {'cflags': '-Wc,"-w -O3" -Wl,"-w -O3"',
+                          'code_suffix': '.upc',
+                          'compiler': 'upcc'},
+         'run': 'mpirun {user_rargs} {bin_fname}',
+         'template': '{template_begin}\n'
+                     '{prolog_lines}\n'
+                     '{template_main_begin}\n'
+                     '{repl_lines}\n'
+                     '{template_end}\n',
+         'template_args': {'line_epilogue': 'upc_barrier ; fflush(stdout) ; '
+                                            'fflush(stderr) ; upc_barrier;',
+                           'template_begin': '#include <stdlib.h>\n'
+                                             '#include <stdio.h>\n'
+                                             '#include <unistd.h>\n'
+                                             '#include <upc.h>',
+                           'template_end': 'return 0;\n}',
+                           'template_main_begin': 'int main(int argc, char '
+                                                  '**argv) {\n'},
+         'terminal_opts': {'enclosers': [['{', '}']],
+                           'lexer_class': 'pygments.lexers',
+                           'lexer_fn': 'CLexer',
+                           'prolog_char': '$'}},
+ 'upcxx': {'compile': '{compiler} {cflags} -o {bin_fname} {code_fname} '
+                      '{lflags}',
+           'compile_args': {'cflags': '-w -std=gnu++11 -O3 $(upcxx-meta '
+                                      'PPFLAGS)',
+                            'code_suffix': '.cpp',
+                            'compiler': 'g++',
+                            'lflags': '$(upcxx-meta LDFLAGS) $(upcxx-meta '
+                                      'LIBFLAGS)'},
+           'run': 'upcxx-run -n 4 {user_rargs} {bin_fname}',
+           'template': '{template_begin}\n'
+                       '{prolog_lines}\n'
+                       '{template_main_begin}\n'
+                       '{repl_lines}\n'
+                       '{template_end}\n',
+           'template_args': {'line_epilogue': 'upcxx::barrier() ; '
+                                              'fflush(stdout) ; fflush(stderr) '
+                                              '; upcxx::barrier();',
+                             'template_begin': '#include <cstdlib>\n'
+                                               '#include <cstdio>\n'
+                                               '#include <unistd.h>\n'
+                                               '#include <iostream>\n'
+                                               '#include <upcxx/upcxx.hpp>',
+                             'template_end': 'upcxx::finalize();\nreturn 0;\n}',
+                             'template_main_begin': 'int main(int argc, char '
+                                                    '**argv) {\n'
+                                                    'upcxx::init();\n'},
+           'terminal_opts': {'enclosers': [['{', '}']],
+                             'lexer_class': 'pygments.lexers',
+                             'lexer_fn': 'CppLexer',
+                             'prolog_char': '$'}},
+ 'zig': {'compile': '{compiler} build-exe {user_cargs} -femit-bin={bin_fname} '
+                    '{code_fname}',
+         'compile_args': {'code_suffix': '.zig', 'compiler': 'zig'},
+         'run': '{bin_fname}',
+         'template': '{template_begin}\n'
+                     '{prolog_lines}\n'
+                     '{template_main_begin}\n'
+                     '{repl_lines}\n'
+                     '{template_end}\n',
+         'template_args': {'line_epilogue': '',
+                           'template_begin': 'const std = @import("std");',
+                           'template_end': '}',
+                           'template_main_begin': 'pub fn main() !void {'},
+         'terminal_opts': {'enclosers': [['{', '}']],
+                           'lexer_class': 'pygments.lexers',
+                           'lexer_fn': 'ZigLexer',
+                           'prolog_char': '$'}}}
 
 class CompilationEnvironment:
     def __init__(self, compile, compile_args, user_cargs):
@@ -271,6 +600,10 @@ def run_reple(cmd_args):
     config_group.add_argument('-env', dest='env', type=str, help='reple\
             environment to use.  See $INSTALL_DIR/configs for included\
             environments.')
+    config_group.add_argument('-i', dest='builtin', type=str, help='reple\
+            using built in rule.')
+    config_group.add_argument('-g', '--gen', help='reple\
+            generate builtin rule.', action='store_true', default=False)
     config_group.add_argument('-f', dest='fname', type=str, help='File name for\
             the json config file')
     parser.add_argument('--rargs', dest='user_rargs', type=str, help='User\
@@ -279,8 +612,21 @@ def run_reple(cmd_args):
             options to forward at compile time', default='')
     args = parser.parse_args(cmd_args)
 
-    fname = get_config_fname(args)
-    config = json.load(open(fname, 'r'))
+
+    if args.gen :
+        def load_json_files():
+            return {
+                    os.path.splitext(f)[0]: json.load(open(f, encoding='utf-8'))
+                    for f in os.listdir('.')
+                    if f.endswith('.json') and os.path.isfile(f)
+                    }
+        return pprint.pprint(load_json_files())
+
+    if args.builtin and args.builtin in BUILTIN_RULE:
+        config = BUILTIN_RULE[args.builtin]
+    else:
+        fname = get_config_fname(args)
+        config = json.load(open(fname, 'r'))
 
     assert(not (args.user_rargs != '' and '{user_rargs}' not in config['run']))
     assert(not (args.user_cargs != '' and '{user_cargs}' not in config['compile']))
