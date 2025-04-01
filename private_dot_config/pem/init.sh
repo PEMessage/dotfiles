@@ -125,9 +125,9 @@
     # Default to human readable figures
     alias df='df -h'
     alias du='du -h'
-    alias ls='ls --color --time-style=long-iso -h'
-    alias l="ls --color --time-style=long-iso -h"
-    alias ll='ls --color --time-style=long-iso -h -l -a'
+    alias ls='ls --color=auto --time-style=long-iso -h'
+    alias l="ls --color=auto --time-style=long-iso -h"
+    alias ll='ls --color=auto --time-style=long-iso -h -l -a'
 
 # -----------------------------------------
 # configuration
