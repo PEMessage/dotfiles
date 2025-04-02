@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -e
+
+q_iconv() {
+    if [ ! -f "$1" ] ; then
+        echo "Err: not a filepath"
+        return 1
+    fi
+
+    local origin_locale="$(uchardet "$1")"
+    if [ "$origin_locale" = ASCII ] || 
+        [ "$origin_locale" = 'UTF-8' ] ;then
+        return 0
+    fi
+
+    cp -a "$1" "$1.bak"
+    echo cp -a "$1" "$1.bak"
+
+    iconv -f "$orgin_locale" -t UTF-8 "$1.bak"  > "$1"
+    echo iconv -f "$orgin_locale" -t UTF-8 "$1.bak"  '>' "$1"
+}
+
+for x in "$@"
+do
+    q_iconv "$x"
+done
