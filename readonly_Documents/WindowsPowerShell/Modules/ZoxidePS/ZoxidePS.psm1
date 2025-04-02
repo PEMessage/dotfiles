@@ -100,10 +100,10 @@ function script:__zoxide_zi {
     }
 }
 
-Export-ModuleMember -Function __zoxide_z, __zoxide_zi -Alias z, zi
+
 Set-Alias -Name z -Value __zoxide_z  -Scope Global
 Set-Alias -Name zi -Value __zoxide_zi  -Scope Global
-
+Export-ModuleMember -Function __zoxide_z, __zoxide_zi -Alias z, zi
 
 $MyInvocation.MyCommand.ScriptBlock.Module.OnRemove = {
     # Set-Alias cd (Get-Alias cd).Definition -Scope Global  # 恢复原始别名
