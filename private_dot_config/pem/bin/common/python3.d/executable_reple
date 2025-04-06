@@ -106,7 +106,19 @@ BUILTIN_RULE = {'bcl': {'compile': '{compiler} {cflags} -o {bin_fname} {code_fna
                                              '#include <cstdio>\n'
                                              '#include <unistd.h>\n'
                                              '#include <iostream>\n'
-                                             'using namespace std;\n',
+                                             'using namespace std;\n'
+                                             '\n'
+                                             'class Logger {\n'
+                                             'public:\n'
+                                             '    template<typename T>\n'
+                                             '    Logger& operator<<(const T& val) {\n'
+                                             '        std::cout << val << std::endl;\n'
+                                             '        return *this;\n'
+                                             '    }\n'
+                                             '};\n'
+                                             '\n'
+                                             'Logger log;  // Global logger instance\n',
+
                            'template_end': 'return 0;\n}',
                            'template_main_begin': 'int main(int argc, char '
                                                   '**argv) {'},

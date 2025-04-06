@@ -154,6 +154,7 @@ let g:startify_custom_header = [
 
     if has('mouse')
         set mouse+=a
+        set ttymouse=sgr
         vnoremap RightMouse "+y
     endif
 
@@ -976,6 +977,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         autocmd BufNewFile,BufRead *.bp set filetype=json " arm = armv6/7
     " Plug 'sheerun/vim-polyglot'
     Plug 'mtdl9/vim-log-highlighting'
+    Plug 'udalov/kotlin-vim'
     " Plug 'gburca/vim-logcat'
     Plug 'chrisbra/Colorizer' , { 'on': 'ColorToggle' }
     Plug 'powerman/vim-plugin-AnsiEsc' , { 'on': 'AnsiEsc' }
@@ -1870,6 +1872,8 @@ endif
         setlocal signcolumn=yes
         if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
         nmap <buffer> gd <plug>(lsp-definition)
+        nmap <buffer> <C-w>gd :rightbelow vertical LspDefinition<CR>
+
         nmap <buffer> gs <plug>(lsp-document-symbol-search)
         nmap <buffer> gS <plug>(lsp-workspace-symbol-search)
         nmap <buffer> gr <plug>(lsp-references)
