@@ -324,33 +324,33 @@ let g:startify_custom_header = [
     " 记得设置 ttimeout （见 init-basic.vim） 和 ttimeoutlen （上面）
     " Plug ‘vim-fixkey’ 更好的解决了这个问题
     "----------------------------------------------------------------------
-    if has('nvim') == 0 && has('gui_running') == 0
-        function! s:metacode(key)
-            exec "set <M-".a:key.">=\e".a:key
-        endfunc
-        function! s:set_key(key, keyCode)
-            if get(g:, 'altmeta_skip_meta', 0) == 0
-                execute "set " . a:key . "=" . a:keyCode
-            endif
-        endfunc
+    " if has('nvim') == 0 && has('gui_running') == 0
+    "     function! s:metacode(key)
+    "         exec "set <M-".a:key.">=\e".a:key
+    "     endfunc
+    "     function! s:set_key(key, keyCode)
+    "         if get(g:, 'altmeta_skip_meta', 0) == 0
+    "             execute "set " . a:key . "=" . a:keyCode
+    "         endif
+    "     endfunc
 
-        for i in range(10)
-            call s:metacode(nr2char(char2nr('0') + i))
-        endfor
-        for i in range(26)
-            call s:metacode(nr2char(char2nr('a') + i))
-            call s:metacode(nr2char(char2nr('A') + i))
-        endfor
-        for c in [',', '.', '/', ';', '{', '}']
-            call s:metacode(c)
-        endfor
-        for c in ['?', ':', '-', '_', '+', '=', "'"]
-            call s:metacode(c)
-        endfor
-        for c in ['`']
-            call s:metacode(c)
-        endfor
-    endif
+    "     for i in range(10)
+    "         call s:metacode(nr2char(char2nr('0') + i))
+    "     endfor
+    "     for i in range(26)
+    "         call s:metacode(nr2char(char2nr('a') + i))
+    "         call s:metacode(nr2char(char2nr('A') + i))
+    "     endfor
+    "     for c in [',', '.', '/', ';', '{', '}']
+    "         call s:metacode(c)
+    "     endfor
+    "     for c in ['?', ':', '-', '_', '+', '=', "'"]
+    "         call s:metacode(c)
+    "     endfor
+    "     for c in ['`']
+    "         call s:metacode(c)
+    "     endfor
+    " endif
 " -------------------------------------------
 " 3.7 VIM Style Setting
 " -------------------------------------------
