@@ -12,8 +12,14 @@
     # set-option -g renumber-windows on 
 
     # Ture Color support
-    set -g default-terminal "xterm-256color"
-    set -ga terminal-overrides ",xterm*:Tc"
+    # set -g default-terminal "xterm-256color"
+    # See: https://github.com/tmux/tmux/wiki/FAQ#how-do-i-use-a-256-colour-terminal
+    set -g default-terminal "screen-256color"
+    # all term outside 
+    set-option -ga terminal-overrides ',*-256color*:Tc'
+    set-option -ga terminal-overrides ',*-256color*:RGB'
+    # set -as terminal-features ",gnome*:RGB"
+    # set -as terminal-overrides ",xterm*:Tc"
 
     # From: tmux-plugins/tmux-sensible
     set-option -g history-limit 50000

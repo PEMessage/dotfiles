@@ -9,12 +9,24 @@ let g:pe_rc['files'] =  [
   \  $PEM_HOME . '/config/vim/lite.vim',
   \  $HOME . '/.config/pem/config/vim/lite.vim',
                \ ]
+let g:pe_rc['local_files'] =  [
+  \  $HOME . '/.perc.vim',
+               \ ]
 
 for pfile in g:pe_rc['files']
     " 检查文件是否可读
     if filereadable(pfile)
         " 如果文件可读，打印文件名并跳出循环
         let g:pe_rc['file'] = pfile
+        execute 'source ' . g:pe_rc['file'] 
+        break
+    endif
+endfor
+
+for pfile in g:pe_rc['local_files']
+    " 检查文件是否可读
+    if filereadable(pfile)
+        " 如果文件可读，打印文件名并跳出循环
         execute 'source ' . g:pe_rc['file'] 
         break
     endif
