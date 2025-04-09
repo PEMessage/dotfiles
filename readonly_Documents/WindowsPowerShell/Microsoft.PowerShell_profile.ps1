@@ -176,3 +176,130 @@ function Run-As {
 }
 #Alias: My sudo
 Set-Alias -Name msudo -Value Run-As
+
+
+function Invoke-SerialTerminal {
+    param (
+        [string]$Port = ([System.IO.Ports.SerialPort]::GetPortNames() | Select-Object -First 1),
+        [int]$BaudRate = 115200,
+        [System.IO.Ports.Parity]$Parity = "None",
+        [int]$DataBits = 8,
+        [System.IO.Ports.StopBits]$StopBits = "One",
+        [int]$ReadTimeout = 100,
+        [switch]$EchoLocal
+    )
+
+    # Validate COM port exists
+    $availablePorts = [System.IO.Ports.SerialPort]::GetPortNames()
+    if ($Port -notin $availablePorts) {
+        throw "COM port '$Port' is not available. Available ports: $($availablePorts -join ', ')"
+    }
+
+    try {
+        $serialPort = New-Object System.IO.Ports.SerialPort $Port, $BaudRate, $Parity, $DataBits, $StopBits
+        $serialPort.ReadTimeout = $ReadTimeout
+        $serialPort.Open()
+        
+        if (-not $serialPort.IsOpen) {
+            throw "Failed to open COM port $Port"
+        }
+
+        Write-Host "Serial Terminal - $Port @ $BaudRate baud (Press ESC to exit)"
+        Write-Host "----------------------------------------"
+
+        # Use .NET Console for faster key reading
+        Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+public static class ConsoleHelper {
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern IntPtr GetStdHandle(int nStdHandle);
+    
+    [DllImport("kernel32.dll")]
+    public static extern bool GetConsoleMode(IntPtr hConsoleHandle, out uint lpMode);
+    
+    [DllImport("kernel32.dll")]
+    public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
+    
+    public const int STD_INPUT_HANDLE = -10;
+    public const uint ENABLE_ECHO_INPUT = 0x0004;
+    public const uint ENABLE_LINE_INPUT = 0x0002;
+}
+"@
+
+        # Configure console for immediate key reading
+        $handle = [ConsoleHelper]::GetStdHandle([ConsoleHelper]::STD_INPUT_HANDLE)
+        $mode = 0
+        [ConsoleHelper]::GetConsoleMode($handle, [ref]$mode) | Out-Null
+        $newMode = $mode -band (-bnot [ConsoleHelper]::ENABLE_LINE_INPUT) -band (-bnot [ConsoleHelper]::ENABLE_ECHO_INPUT)
+        [ConsoleHelper]::SetConsoleMode($handle, $newMode) | Out-Null
+
+        try {
+            while ($serialPort.IsOpen) {
+                # Read from serial port
+                try {
+                    $incomingData = $serialPort.ReadExisting()
+                    if ($incomingData.Length -gt 0) {
+                        Write-Host -NoNewline $incomingData
+                    }
+                }
+                catch [System.TimeoutException] {
+                    # Expected timeout - continue
+                }
+                catch {
+                    Write-Warning "Read error: $_"
+                    break
+                }
+
+                # Check for keyboard input
+                if ([Console]::KeyAvailable) {
+                    $key = [Console]::ReadKey($true)
+                    
+                    # Exit on ESC key
+                    if ($key.Key -eq [ConsoleKey]::Escape) {
+                        break
+                    }
+                    
+                    # Handle Enter key
+                    if ($key.Key -eq [ConsoleKey]::Enter) {
+                        $serialPort.Write("`r`n")
+                        if ($EchoLocal) {
+                            Write-Host "`r`n" -NoNewline
+                        }
+                    }
+                    # Handle backspace
+                    elseif ($key.Key -eq [ConsoleKey]::Backspace) {
+                        $serialPort.Write([char]8)  # Send backspace
+                        if ($EchoLocal) {
+                            Write-Host "`b `b" -NoNewline
+                        }
+                    }
+                    # Normal characters
+                    else {
+                        $serialPort.Write($key.KeyChar)
+                        if ($EchoLocal) {
+                            Write-Host $key.KeyChar -NoNewline
+                        }
+                    }
+                }
+
+                # Smaller sleep for more responsive input
+                Start-Sleep -Milliseconds 1
+            }
+        }
+        finally {
+            # Restore console mode
+            [ConsoleHelper]::SetConsoleMode($handle, $mode) | Out-Null
+        }
+    }
+    catch {
+        Write-Error "Serial port error: $_"
+    }
+    finally {
+        if ($serialPort -and $serialPort.IsOpen) {
+            $serialPort.Close()
+            $serialPort.Dispose()
+        }
+        Write-Host "`nExiting..."
+    }
+}
