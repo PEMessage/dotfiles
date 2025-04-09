@@ -25,8 +25,16 @@ while [[ $# -gt 0 ]]; do
             pass_through_args+=("$@") # append to it
             break
             ;;
+        # bool parameter 
         -i)
-            pass_through_args+=("$1")
+            pass_through_args+=("'$1'")
+            shift
+            ;;
+        # single value parameter
+        -g)
+            pass_through_args+=("'$1'")
+            shift
+            pass_through_args+=("'$1'")
             shift
             ;;
         *)
