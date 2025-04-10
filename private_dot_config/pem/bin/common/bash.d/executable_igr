@@ -60,5 +60,5 @@ fzf -d: \
     --bind="start:reload:$command {q}" \
     --bind="ctrl-r:reload:$command {q}" \
     --bind="enter:execute:$EDITOR {1} $EDITOR_EXTRARG" \
-    --preview-window='+{2}-/2' \
+    --preview-window='up:+{2}-/2' \
     --preview="[[ -n {1} ]] && $preview"

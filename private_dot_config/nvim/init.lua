@@ -353,7 +353,7 @@ require("lazy").setup({
         config = function(_,opts)
             require('lualine').setup({
                 options = {
-                    theme = 'auto',
+                 theme = 'auto',
                     icons_enabled = false,
                     component_separators = { left = '|', right = '|' },
                     section_separators = { left = '', right = '' },
@@ -734,13 +734,13 @@ require("lazy").setup({
     {
         "nvim-treesitter/nvim-treesitter-context",
         opts = {
-            enable = false,
+            enable = true,
             max_lines = 3
         }
     },
     {
         "utilyre/barbecue.nvim",
-        enabled = true,
+        enabled = false,
         name = "barbecue",
         version = "*",
         dependencies = {
@@ -749,12 +749,15 @@ require("lazy").setup({
         },
         opts = {
             kinds = false,
+            symbols = {
+                separator = ">",
+            },
             -- configurations go here
         },
     },
     {
         'Bekaboo/dropbar.nvim',
-        enabled = false,
+        enabled = true,
         opts = {
             sources = {
                 path = {
@@ -777,94 +780,95 @@ require("lazy").setup({
                         }
                     end
                     return {
-                        sources.path,
                         utils.source.fallback({
-                            -- sources.lsp,
+                            sources.lsp,
                             sources.treesitter,
+                            sources.path,
                         }),
                     }
                 end
             },
             icons = {
+                enable = false,
                 ui  = {
                     bar = {
-                        -- separator = ','
+                        separator = ' > '
                     },
                 },
-                kinds = {
-                    symbols = {
-                        Array = '[ ',
-                        Boolean = '',
-                        BreakStatement = '',
-                        Call = 'f ',
-                        CaseStatement = '',
-                        Class = 'C ',
-                        Color = '',
-                        Constant = '',
-                        Constructor = '',
-                        ContinueStatement = '',
-                        Copilot = '',
-                        Declaration = '',
-                        Delete = '',
-                        DoStatement = '',
-                        Enum = 'E ',
-                        EnumMember = 'e ',
-                        Event = 'E ',
-                        Field = '.',
-                        File = '',
-                        Folder = '',
-                        ForStatement = '',
-                        Function = 'f ',
-                        H1Marker = '', -- Used by markdown treesitter parser
-                        H2Marker = '',
-                        H3Marker = '',
-                        H4Marker = '',
-                        H5Marker = '',
-                        H6Marker = '',
-                        Identifier = 'i ',
-                        IfStatement = '(',
-                        Interface = 'I ',
-                        Keyword = 'k',
-                        List = '[]',
-                        Log = '',
-                        Lsp = '',
-                        Macro = '',
-                        MarkdownH1 = '', -- Used by builtin markdown source
-                        MarkdownH2 = '',
-                        MarkdownH3 = '',
-                        MarkdownH4 = '',
-                        MarkdownH5 = '',
-                        MarkdownH6 = '',
-                        Method = '.f ',
-                        Module = '# ',
-                        Namespace = '{ ',
-                        Null = '',
-                        Number = 'n ',
-                        Object = 'o ',
-                        Operator = '+ ',
-                        Package = '# ',
-                        Pair = '()',
-                        Property = 'p ',
-                        Reference = '& ',
-                        Regex = 're',
-                        Repeat = '',
-                        Scope = '{ ',
-                        Snippet = '',
-                        Specifier = '',
-                        Statement = '( ',
-                        String = 's ',
-                        Struct = 'S ',
-                        SwitchStatement = '( ',
-                        Terminal = '',
-                        Text = 's ',
-                        Type = 'T ',
-                        TypeParameter = 'p ',
-                        Unit = '# ',
-                        Value = 'v ',
-                        Variable = 'v ',
-                        WhileStatement = '( ',
-                    }
-                }
+                -- kinds = {
+                    -- symbols = {
+                    --     Array = '[ ',
+                    --     Boolean = '',
+                    --     BreakStatement = '',
+                    --     Call = 'f ',
+                    --     CaseStatement = '',
+                    --     Class = 'C ',
+                    --     Color = '',
+                    --     Constant = '',
+                    --     Constructor = '',
+                    --     ContinueStatement = '',
+                    --     Copilot = '',
+                    --     Declaration = '',
+                    --     Delete = '',
+                    --     DoStatement = '',
+                    --     Enum = 'E ',
+                    --     EnumMember = 'e ',
+                    --     Event = 'E ',
+                    --     Field = '.',
+                    --     File = '',
+                    --     Folder = '',
+                    --     ForStatement = '',
+                    --     Function = 'f ',
+                    --     H1Marker = '', -- Used by markdown treesitter parser
+                    --     H2Marker = '',
+                    --     H3Marker = '',
+                    --     H4Marker = '',
+                    --     H5Marker = '',
+                    --     H6Marker = '',
+                    --     Identifier = 'i ',
+                    --     IfStatement = '(',
+                    --     Interface = 'I ',
+                    --     Keyword = 'k',
+                    --     List = '[]',
+                    --     Log = '',
+                    --     Lsp = '',
+                    --     Macro = '',
+                    --     MarkdownH1 = '', -- Used by builtin markdown source
+                    --     MarkdownH2 = '',
+                    --     MarkdownH3 = '',
+                    --     MarkdownH4 = '',
+                    --     MarkdownH5 = '',
+                    --     MarkdownH6 = '',
+                    --     Method = '.f ',
+                    --     Module = '# ',
+                    --     Namespace = '{ ',
+                    --     Null = '',
+                    --     Number = 'n ',
+                    --     Object = 'o ',
+                    --     Operator = '+ ',
+                    --     Package = '# ',
+                    --     Pair = '()',
+                    --     Property = 'p ',
+                    --     Reference = '& ',
+                    --     Regex = 're',
+                    --     Repeat = '',
+                    --     Scope = '{ ',
+                    --     Snippet = '',
+                    --     Specifier = '',
+                    --     Statement = '( ',
+                    --     String = 's ',
+                    --     Struct = 'S ',
+                    --     SwitchStatement = '( ',
+                    --     Terminal = '',
+                    --     Text = 's ',
+                    --     Type = 'T ',
+                    --     TypeParameter = 'p ',
+                    --     Unit = '# ',
+                    --     Value = 'v ',
+                    --     Variable = 'v ',
+                    --     WhileStatement = '( ',
+                    -- }
+                -- }
             }
         }
         -- optional, but required for fuzzy finder support
