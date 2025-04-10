@@ -670,6 +670,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     " Some little tweak
     " Plug 'drmikehenry/vim-fixkey'
     Plug 'junegunn/vim-plug'
+    " NOTE: !!!fixkey will casuse vim blink(flick) at startup!!!!
     Plug 'PEMessage/vim-fixkey'
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
@@ -798,7 +799,6 @@ call plug#begin(pe_runtimepath . '/plugged')
 " -------------------------------------------
 " 6.2 Textobj
 " -------------------------------------------
-"
 
     Plug 'kana/vim-submode'
         let g:submode_timeout = 0

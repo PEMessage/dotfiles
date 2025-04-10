@@ -277,6 +277,7 @@
      set -g @tpm_plugins '          \
        tmux-plugins/tpm             \
        fcsonline/tmux-thumbs        \
+       artemave/tmux_super_fingers  \
     '
 
        # RTBHOUSE/tmux-picker \

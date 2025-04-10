@@ -734,7 +734,7 @@ require("lazy").setup({
     {
         "nvim-treesitter/nvim-treesitter-context",
         opts = {
-            enable = true,
+            enable = false,
             max_lines = 3
         }
     },
@@ -873,6 +873,7 @@ require("lazy").setup({
         },
         config = function(_,opts)
             vim.cmd [[ highlight! link WinBar StatusLine ]]
+            vim.cmd [[ highlight! link WinBarNC StatusLineNC ]]
             require('dropbar').setup(opts)
             local dropbar_api = require('dropbar.api')
             vim.keymap.set('n', '<Leader>;', dropbar_api.pick, { desc = 'Pick symbols in winbar' })
