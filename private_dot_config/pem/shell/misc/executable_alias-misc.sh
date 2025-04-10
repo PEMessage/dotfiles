@@ -14,6 +14,7 @@ alias vi="vim" # if we dont use package manger vim, we shouldn't use package man
 # -j, --max-concurrent-downloads=<N>
 # -i, --input-file=<FILE>
 alias q-aria2c='aria2c -c -s 16 -x 16'
+alias q-less='less -R --mouse -X'
 
 # alias ttt='command ls -tp | head -n1'
 ttt() {

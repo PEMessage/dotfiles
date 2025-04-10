@@ -1035,6 +1035,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         augroup END
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-fugitive'
+        let g:fugitive_legacy_commands = 1
     " Plug 'tpope/vim-vinegar'
     Plug 'tpope/vim-rsi'
     Plug 'tpope/vim-sleuth' , { 'on': [ 'Sleuth' ] }

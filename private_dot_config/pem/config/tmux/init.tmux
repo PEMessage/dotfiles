@@ -51,6 +51,9 @@
         new-window\; kill-window\;              \
         set -g renumber-windows off\;           \
         display-message "Windows reordered..."
+    bind x \
+        set-window-option synchronize-panes\; \
+        display-message "synchronize-panes is now #{?pane_synchronized,on,off}"
 
 
     # copy mode 
