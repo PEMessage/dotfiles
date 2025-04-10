@@ -348,8 +348,9 @@ require("lazy").setup({
             -- statuscolumn = { enabled = true },
             -- words = { enabled = true },
         },
+        keys = {
+        }
     },
-
     {
         'yamatsum/nvim-cursorline',
         config = function ()
