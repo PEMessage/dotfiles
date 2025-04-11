@@ -1,0 +1,42 @@
+#!/bin/bash
+function q-highlight() {
+    # Check if input is from pipe or terminal
+    if [ -t 0 ]; then
+        echo "Usage: cat file.txt | highlight PATTERN1 PATTERN2 ..."
+        echo "Or:    highlight PATTERN1 PATTERN2 ... < file.txt"
+        return 1
+    fi
+
+    # Define an array of colors (ANSI color codes)
+    local colors=(
+        '\x1b[31;1m'  # Red
+        '\x1b[32;1m'  # Green
+        '\x1b[33;1m'  # Yellow
+        '\x1b[34;1m'  # Blue
+        '\x1b[35;1m'  # Magenta
+        '\x1b[36;1m'  # Cyan
+    )
+    local reset='\x1b[0m'
+
+    # Read patterns from arguments or use default
+    if [ $# -eq 0 ]; then
+        local patterns=("DEVTODO" "ERROR" "WARNING" "INFO")
+    else
+        local patterns=("$@")
+    fi
+
+    # Build sed command with different colors for each pattern
+    local sed_cmd="sed"
+    local color_index=0
+    for pattern in "${patterns[@]}"; do
+        # Cycle through colors if we have more patterns than colors
+        local color="${colors[$((color_index % ${#colors[@]}))]}"
+        sed_cmd+=" -e \"s/${pattern}/${color}&${reset}/gi\""
+        ((color_index++))
+    done
+
+    # Apply highlighting
+    eval "$sed_cmd"
+}
+
+q-highlight "$@"
