@@ -3110,6 +3110,51 @@ document xxd
             sizeof(*addr) is used by default
 end
 
+# 3.4 hfstack
+# -------------------------------------------
+# Thanks to : https://community.st.com/t5/stm32-mcus/how-to-debug-a-hardfault-on-an-arm-cortex-m-stm32/ta-p/672235
+# Thanks to : https://stackoverflow.com/a/59186224/20689546
+define hfstack
+    # Determine if the exception used MSP or PSP (check EXC_RETURN bit 2)
+    if $lr & 0x04
+        # EXC_RETURN = 0xFFFFFFED or 0xFFFFFFFD → PSP was used
+        echo "Using PSP: "
+        print $psp
+        set $frame_ptr = (unsigned *)$psp
+    else
+        # EXC_RETURN = 0xFFFFFFFx (MSP was used)
+        echo "Using MSP: "
+        print $msp
+        set $frame_ptr = (unsigned *)$msp
+    end
+
+    # Check if FPU registers were pushed (EXC_RETURN bit 4)
+    if $lr & 0x10
+        # Basic stack frame (8 registers, no FPU)
+        set $sp = $frame_ptr + (8 * 4)
+    else
+        # Extended stack frame (26 registers, FPU state included)
+        set $sp = $frame_ptr + (26 * 4)
+    end
+
+    # Restore LR and PC from the stack frame
+    # LR is the 6th entry (0-based index 5)
+    set $lr = $frame_ptr[5]  
+    # PC is the 7th entry (0-based index 6)
+    set $pc = $frame_ptr[6] 
+
+    # Print backtrace
+    bt
+end
+
+document hfstack
+
+Set the correct stack context after a HardFault on Cortex-M.
+Checks EXC_RETURN (LR) to determine MSP/PSP usage and FPU state.
+Restores SP, LR, and PC, then prints a backtrace (bt).
+
+end
+
 
 # ==========================================
 # 5. python plug start
