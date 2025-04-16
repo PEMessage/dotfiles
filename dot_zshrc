@@ -119,6 +119,7 @@
     zinit ice as"command" from"gh-r" \
               atclone"./starship init zsh > init.zsh; ./starship completions zsh > _starship" \
               atpull"%atclone" src"init.zsh"
+    export STARSHIP_CONFIG=~/.config/starship/starship.toml
     zinit light starship/starship
 
     # https://unix.stackexchange.com/a/157773
