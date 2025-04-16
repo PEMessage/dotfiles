@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # GitHub Auto-Update Download Script with jq
-# Usage: ./github_updater.sh [-f] <repo_owner> <repo_name> <asset_pattern> [<output_file>]
+# Usage: ./github_updater.sh [-f] <repo_owner>/<repo_name> <asset_pattern> [<output_file>]
 
 set -eo pipefail
 
@@ -15,123 +15,174 @@ NC='\033[0m' # No Color
 # Initialize variables
 FORCE=false
 
+# -------------------------------
+# Function Definitions
+# -------------------------------
+
+# Print usage information
+usage() {
+    echo -e "${RED}Usage:${NC} $0 [-f] <repo_owner>/<repo_name> <asset_pattern> [<output_file>]"
+    echo -e "${GREEN}Example:${NC} $0 -f neovim/neovim-releases 'nvim-linux64.tar.gz$' nvim.tar.gz"
+    echo -e "${YELLOW}Requires:${NC} curl, jq"
+    exit 1
+}
+
+# Check for required commands
+check_requirements() {
+    command -v curl >/dev/null 2>&1 || { echo -e "${RED}Error: curl is required${NC}"; exit 1; }
+    command -v jq >/dev/null 2>&1 || { echo -e "${RED}Error: jq is required${NC}"; exit 1; }
+}
+
+# Get release information from GitHub API
+get_release_info() {
+    local repo="$1"
+    API_URL="https://api.github.com/repos/${repo}/releases/latest"
+    echo -e "${BLUE}┌──────────────────────────────────────────────────────┐${NC}"
+    echo -e "${BLUE}│ ${YELLOW}Fetching release info from GitHub...${NC}"
+    echo -e "${BLUE}│ API URL: ${GREEN}${API_URL}${NC}"
+    
+    RELEASE_JSON=$(curl -sL "$API_URL")
+    LATEST_VERSION=$(echo "$RELEASE_JSON" | jq -r '.tag_name')
+    echo -e "${BLUE}│ Latest Tag: ${GREEN}${LATEST_VERSION}${NC}"
+}
+
+# Find matching assets
+find_matching_assets() {
+    local pattern="$1"
+    MATCHING_ASSETS=$(echo "$RELEASE_JSON" | jq -r --arg pattern "$pattern" '[.assets[] | select(.name | test($pattern))]')
+    ASSET_COUNT=$(echo "$MATCHING_ASSETS" | jq 'length')
+    
+    if [ "$ASSET_COUNT" -eq 0 ]; then
+        echo -e "${BLUE}└──────────────────────────────────────────────────────┘${NC}"
+        echo -e "${RED}Error: No assets found matching pattern '${pattern}'${NC}"
+        echo -e "${YELLOW}Available assets:${NC}"
+        echo "$RELEASE_JSON" | jq -r '.assets[].name' | sed 's/^/ - /'
+        exit 1
+    elif [ "$ASSET_COUNT" -gt 1 ]; then
+        echo -e "${BLUE}└──────────────────────────────────────────────────────┘${NC}"
+        echo -e "${RED}Error: Found ${ASSET_COUNT} assets matching pattern '${pattern}'${NC}"
+        echo -e "${YELLOW}Matching assets:${NC}"
+        echo "$MATCHING_ASSETS" | jq -r '.[].name' | sed 's/^/ - /'
+        echo -e "\n${YELLOW}Please refine your pattern to match exactly one asset.${NC}"
+        exit 1
+    fi
+    
+    ASSET_INFO=$(echo "$MATCHING_ASSETS" | jq '.[0]')
+    ASSET_NAME=$(echo "$ASSET_INFO" | jq -r '.name')
+    ASSET_URL=$(echo "$ASSET_INFO" | jq -r '.browser_download_url')
+    DOWNLOAD_COUNT=$(echo "$ASSET_INFO" | jq -r '.download_count')
+    SIZE_BYTES=$(echo "$ASSET_INFO" | jq -r '.size')
+    SIZE_MB=$(awk "BEGIN {printf \"%.1f\", $SIZE_BYTES/1024/1024}")
+    CREATED_AT=$(echo "$ASSET_INFO" | jq -r '.created_at' | cut -d'T' -f1)
+    
+    echo -e "${BLUE}│ Asset Name:    ${GREEN}${ASSET_NAME}${NC}"
+    echo -e "${BLUE}│ Download URL:  ${YELLOW}${ASSET_URL}${NC}"
+    echo -e "${BLUE}│ Created:       ${GREEN}${CREATED_AT}${NC}"
+    echo -e "${BLUE}│ Downloads:     ${GREEN}${DOWNLOAD_COUNT}${NC}"
+    echo -e "${BLUE}│ Size:          ${GREEN}${SIZE_MB} MB${NC}"
+    echo -e "${BLUE}└──────────────────────────────────────────────────────┘${NC}"
+}
+
+# Handle existing file
+handle_existing_file() {
+    local file="$1"
+    if [ -f "$file" ]; then
+        if [ "$FORCE" = true ]; then
+            echo -e "${YELLOW}Warning: Overwriting existing file '${file}'${NC}"
+        else
+            echo -e "${YELLOW}Warning: File '${file}' already exists${NC}"
+            read -p "Overwrite? (y/N) " -n 1 -r
+            echo
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                echo -e "${RED}Download canceled${NC}"
+                exit 0
+            fi
+        fi
+    fi
+}
+
+# Confirm download with user
+confirm_download() {
+    local url="$1"
+    local file="$2"
+    local size="$3"
+    
+    if [ "$FORCE" = false ]; then
+        echo -e "\n${BLUE}About to download:${NC}"
+        echo -e " - From: ${YELLOW}${url}${NC}"
+        echo -e " - To:   ${GREEN}${file}${NC}"
+        echo -e " - Size: ${GREEN}${size} MB${NC}"
+
+        read -p "Proceed with download? (Y/n) " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Nn]$ ]]; then
+            echo -e "${RED}Download canceled${NC}"
+            exit 0
+        fi
+    fi
+}
+
+# Download the asset
+download_asset() {
+    local url="$1"
+    local output="$2"
+    
+    echo -e "${BLUE}Downloading...${NC}"
+    curl -# -L -o "$output" "$url"
+    
+    # Make executable if it's an AppImage or binary
+    if [[ "$output" == *.appimage ]] || [[ "$output" == *linux* ]] || 
+       [[ "$output" == *darwin* ]] || [[ "$output" == *macos* ]] ||
+       [[ "$output" == *.bin ]]; then
+        chmod +x "$output"
+        echo -e "${GREEN}Made executable: ${output}${NC}"
+    fi
+    
+    echo -e "${GREEN}Download completed successfully${NC}"
+    echo -e "File saved as: ${GREEN}${output}${NC}"
+}
+
+# -------------------------------
+# Main Script Execution
+# -------------------------------
+
 # Parse command line options
 while getopts "f" opt; do
   case $opt in
     f) FORCE=true ;;
-    *) echo -e "${RED}Usage:${NC} $0 [-f] <repo_owner>/<repo_name> <asset_pattern> [<output_file>]"
-       exit 1 ;;
+    *) usage ;;
   esac
 done
 shift $((OPTIND -1))
 
-if [ $# -lt 3 ]; then
-    echo -e "${RED}Usage:${NC} $0 [-f] <repo_owner>/<repo_name> <asset_pattern> [<output_file>]"
-    echo -e "${GREEN}Example:${NC} $0 -f neovim neovim-releases 'nvim-linux64.tar.gz' nvim.tar.gz"
-    echo -e "${YELLOW}Requires:${NC} curl, jq"
-    exit 1
+# Validate arguments
+if [ $# -lt 2 ]; then
+    usage
 fi
 
 REPO="$1"
-ASSET_PATTERN="$3"
-OUTPUT_FILE="${4:-}"
+ASSET_PATTERN="$2"
+OUTPUT_FILE="${3:-}"
 
-# Check for required commands
-command -v curl >/dev/null 2>&1 || { echo -e "${RED}Error: curl is required${NC}"; exit 1; }
-command -v jq >/dev/null 2>&1 || { echo -e "${RED}Error: jq is required${NC}"; exit 1; }
+# Check requirements
+check_requirements
 
-# Get the latest release data
-API_URL="https://api.github.com/repos/${REPO}/releases/latest"
-echo -e "${BLUE}┌──────────────────────────────────────────────────────┐${NC}"
-echo -e "${BLUE}│ ${YELLOW}Fetching release info from GitHub...${NC}"
-echo -e "${BLUE}│ API URL: ${GREEN}${API_URL}${NC}"
-RELEASE_JSON=$(curl -sL "$API_URL")
+# Get release information
+get_release_info "$REPO"
 
-# Extract data using jq
-LATEST_VERSION=$(echo "$RELEASE_JSON" | jq -r '.tag_name')
-echo -e "${BLUE}│ Latest Tag: ${GREEN}${LATEST_VERSION}${NC}"
+# Find matching assets
+find_matching_assets "$ASSET_PATTERN"
 
-# Count matching assets
-MATCHING_ASSETS=$(echo "$RELEASE_JSON" | jq -r --arg pattern "$ASSET_PATTERN" '[.assets[] | select(.name | test($pattern))]')
-ASSET_COUNT=$(echo "$MATCHING_ASSETS" | jq 'length')
-
-if [ "$ASSET_COUNT" -eq 0 ]; then
-    echo -e "${BLUE}└──────────────────────────────────────────────────────┘${NC}"
-    echo -e "${RED}Error: No assets found matching pattern '${ASSET_PATTERN}'${NC}"
-    echo -e "${YELLOW}Available assets:${NC}"
-    echo "$RELEASE_JSON" | jq -r '.assets[].name' | sed 's/^/ - /'
-    exit 1
-elif [ "$ASSET_COUNT" -gt 1 ]; then
-    echo -e "${BLUE}└──────────────────────────────────────────────────────┘${NC}"
-    echo -e "${RED}Error: Found ${ASSET_COUNT} assets matching pattern '${ASSET_PATTERN}'${NC}"
-    echo -e "${YELLOW}Matching assets:${NC}"
-    echo "$MATCHING_ASSETS" | jq -r '.[].name' | sed 's/^/ - /'
-    echo -e "\n${YELLOW}Please refine your pattern to match exactly one asset.${NC}"
-    exit 1
-fi
-
-# Extract the single matching asset
-ASSET_INFO=$(echo "$MATCHING_ASSETS" | jq '.[0]')
-ASSET_NAME=$(echo "$ASSET_INFO" | jq -r '.name')
-ASSET_URL=$(echo "$ASSET_INFO" | jq -r '.browser_download_url')
-DOWNLOAD_COUNT=$(echo "$ASSET_INFO" | jq -r '.download_count')
-SIZE_BYTES=$(echo "$ASSET_INFO" | jq -r '.size')
-SIZE_MB=$(awk "BEGIN {printf \"%.1f\", $SIZE_BYTES/1024/1024}")
-CREATED_AT=$(echo "$ASSET_INFO" | jq -r '.created_at' | cut -d'T' -f1)
-
-echo -e "${BLUE}│ Asset Name:    ${GREEN}${ASSET_NAME}${NC}"
-echo -e "${BLUE}│ Download URL:  ${YELLOW}${ASSET_URL}${NC}"
-echo -e "${BLUE}│ Created:       ${GREEN}${CREATED_AT}${NC}"
-echo -e "${BLUE}│ Downloads:     ${GREEN}${DOWNLOAD_COUNT}${NC}"
-echo -e "${BLUE}│ Size:          ${GREEN}${SIZE_MB} MB${NC}"
-echo -e "${BLUE}└──────────────────────────────────────────────────────┘${NC}"
-
-# Determine output filename if not specified
+# Determine output filename
 if [ -z "$OUTPUT_FILE" ]; then
     OUTPUT_FILE="$ASSET_NAME"
 fi
 
 # Handle existing file
-if [ -f "$OUTPUT_FILE" ]; then
-    if [ "$FORCE" = true ]; then
-        echo -e "${YELLOW}Warning: Overwriting existing file '${OUTPUT_FILE}'${NC}"
-    else
-        echo -e "${YELLOW}Warning: File '${OUTPUT_FILE}' already exists${NC}"
-        read -p "Overwrite? (y/N) " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            echo -e "${RED}Download canceled${NC}"
-            exit 0
-        fi
-    fi
-fi
+handle_existing_file "$OUTPUT_FILE"
 
-# Confirm download (unless forced)
-if [ "$FORCE" = false ]; then
-    echo -e "\n${BLUE}About to download:${NC}"
-    echo -e " - From: ${YELLOW}${ASSET_URL}${NC}"
-    echo -e " - To:   ${GREEN}${OUTPUT_FILE}${NC}"
-    echo -e " - Size: ${GREEN}${SIZE_MB} MB${NC}"
+# Confirm download
+confirm_download "$ASSET_URL" "$OUTPUT_FILE" "$SIZE_MB"
 
-    read -p "Proceed with download? (Y/n) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Nn]$ ]]; then
-        echo -e "${RED}Download canceled${NC}"
-        exit 0
-    fi
-fi
-
-# Download the asset with progress bar
-echo -e "${BLUE}Downloading...${NC}"
-curl -# -L -o "$OUTPUT_FILE" "$ASSET_URL"
-
-# Make executable if it's an AppImage or binary
-if [[ "$OUTPUT_FILE" == *.appimage ]] || [[ "$OUTPUT_FILE" == *linux* ]] || 
-   [[ "$OUTPUT_FILE" == *darwin* ]] || [[ "$OUTPUT_FILE" == *macos* ]] ||
-   [[ "$OUTPUT_FILE" == *.bin ]]; then
-    chmod +x "$OUTPUT_FILE"
-    echo -e "${GREEN}Made executable: ${OUTPUT_FILE}${NC}"
-fi
-
-echo -e "${GREEN} Download completed successfully${NC}"
-echo -e "File saved as: ${GREEN}${OUTPUT_FILE}${NC}"
+# Download the asset
+download_asset "$ASSET_URL" "$OUTPUT_FILE"
