@@ -1775,8 +1775,8 @@ local section = function ()
 
     -- vim.keymap.set("n","<M-S-V>","<cmd>wincmd v<CR>",{ desc = "Vertical split", remap = true })
     -- vim.keymap.set("n","<M-S-C>","<cmd>wincmd c<CR>",{ desc = "Close current pane", remap = true })
-    vim.keymap.set( 'n',  '<M-S-C>', ':vsplit<cr>' )
-    vim.keymap.set( 'n',  '<M-S-X>', ':confirm q<cr>' )
+    vim.keymap.set( 'n',  '<M-S-C>', ':vsplit<cr>',    { silent = true } )
+    vim.keymap.set( 'n',  '<M-S-X>', ':confirm q<cr>', { silent = true } )
 
     vim.keymap.set( 'n',  '<M-S-E>', ':tabn<cr>' )
     vim.keymap.set( 'n',  '<M-S-W>', ':tab new<cr>' )
