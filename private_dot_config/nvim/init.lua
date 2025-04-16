@@ -964,6 +964,7 @@ require("lazy").setup({
             { "<leader>td", "<cmd>Telescope lsp_definitions<cr>", desc = "Telescope LSP Define" },
             { "<leader>th", "<cmd>Telescope help_tags<cr>", desc = "Telescope Help Pages" },
             { "<leader>tf", "<cmd>Telescope find_files<cr>", desc = "Telescope Find Files" },
+            { "<C-e>", "<cmd>Telescope find_files<cr>", desc = "Telescope Find Files" },
             { "<leader>tg", "<cmd>Telescope live_grep<cr>", desc = "Telescope Live Grep" },
             { "<leader>tt", "<cmd>Telescope<cr>", desc = "Telescope All" },
         },
@@ -1299,6 +1300,9 @@ require("lazy").setup({
                         }
                     })
 
+                end,
+                ['rust_analyzer'] = function () 
+                    lspconfig.rust_analyzer.setup({ autostart = true })
                 end,
                 ["pylsp"] = function ()
                     lspconfig.pylsp.setup({
