@@ -1,0 +1,2 @@
+#!/bin/sh
+github-download neovim/neovim-releases 'nvim-linux-x86_64.appimage$' nvim
