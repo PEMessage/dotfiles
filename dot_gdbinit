@@ -3156,6 +3156,15 @@ Restores SP, LR, and PC, then prints a backtrace (bt).
 end
 
 
+ define freertos-stack
+  printf "Task %s stack usage:\n", pxCurrentTCB->pcTaskName
+  printf "  Stack base: 0x%x\n", pxCurrentTCB->pxStack
+  printf "  Stack top:  0x%x\n", pxCurrentTCB->pxTopOfStack
+  printf "  Stack Size:  0x%x\n", pxCurrentTCB->pxStack - pxCurrentTCB->pxTopOfStack
+  printf "  High water: %d bytes\n", uxTaskGetStackHighWaterMark(pxCurrentTCB)
+end
+
+
 # ==========================================
 # 5. python plug start
 # ==========================================

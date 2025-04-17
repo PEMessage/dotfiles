@@ -51,7 +51,7 @@
         new-window\; kill-window\;              \
         set -g renumber-windows off\;           \
         display-message "Windows reordered..."
-    bind x \
+    bind 0 \
         set-window-option synchronize-panes\; \
         display-message "synchronize-panes is now #{?pane_synchronized,on,off}"
 
@@ -75,6 +75,7 @@
     # bind -n M-P paste-buffer -p
     # bind -n M-S-DC paste-buffer -p
     # ===============================================================
+    bind -n C-M-p command-prompt # maybe this is safe?
 
     # Credit: https://stackoverflow.com/questions/12524308/bash-strip-trailing-linebreak-from-output
 
