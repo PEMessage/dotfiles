@@ -1,5 +1,45 @@
 #!/bin/bash
 # lazy gcc, default outfile: filename_prefix.out, eg: hello.c -> hello.out
 
-echo g++ -g -o ${1%.*}{.out,.${1##*.}} $2 $3 $4 $5
-g++ -g -o ${1%.*}{.out,.${1##*.}} $2 $3 $4 $5
+#!/bin/bash
+# lazy gcc - Compiles C/C++ code and runs the output
+# Default output: filename_prefix.out (e.g., hello.c -> hello.out)
+# Usage: ./lazygcc source_file [compiler_flags] --args [program_args]
+
+# Extract source file (first argument)
+source_file="$1"
+shift  # Remove source file from arguments list
+
+# Separate compiler flags from program arguments
+compiler_flags=()
+program_args=()
+first_found_double_dash=false
+
+for arg in "$@"; do
+    if [ "$arg" = "--" ] && [ "$first_found_double_dash" = false ] ; then
+        first_found_double_dash=true
+        continue
+    fi
+
+    if $first_found_double_dash; then
+        program_args+=("$arg")
+    else
+        compiler_flags+=("$arg")
+    fi
+done
+
+# Generate output filename (replace extension with .out)
+output_file="${source_file%.*}.out"
+
+# Build the compilation command
+echo "Compiling: g++ -g -o \"$output_file\" \"$source_file\" ${compiler_flags[@]}"
+g++ -g -o "$output_file" "$source_file" "${compiler_flags[@]}"
+
+# Check if compilation succeeded
+if [ $? -eq 0 ]; then
+    echo "Running: ./\"$output_file\" ${program_args[@]}"
+    ./"$output_file" "${program_args[@]}"
+else
+    echo "Compilation failed"
+    exit 1
+fi
