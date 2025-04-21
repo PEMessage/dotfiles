@@ -11,7 +11,12 @@ source_file="$1"
 shift  # Remove source file from arguments list
 
 # Separate compiler flags from program arguments
-compiler_flags=()
+compiler_flags=(
+    "-ggdb"
+    "-g3"
+    "-fsanitize=address"
+    "-Wall"
+    )
 program_args=()
 first_found_double_dash=false
 
@@ -32,7 +37,7 @@ done
 output_file="${source_file%.*}.out"
 
 # Build the compilation command
-echo "Compiling: g++ -g -o \"$output_file\" \"$source_file\" ${compiler_flags[@]}"
+echo "Compiling: g++ -o \"$output_file\" \"$source_file\" ${compiler_flags[@]}"
 g++ -g -o "$output_file" "$source_file" "${compiler_flags[@]}"
 
 # Check if compilation succeeded

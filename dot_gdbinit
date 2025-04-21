@@ -3116,6 +3116,7 @@ end
 # Thanks to : https://stackoverflow.com/a/59186224/20689546
 define hfstack
     # Determine if the exception used MSP or PSP (check EXC_RETURN bit 2)
+    # if 1
     if $lr & 0x04
         # EXC_RETURN = 0xFFFFFFED or 0xFFFFFFFD → PSP was used
         echo "Using PSP: "
@@ -3162,6 +3163,15 @@ end
   printf "  Stack top:  0x%x\n", pxCurrentTCB->pxTopOfStack
   printf "  Stack Size:  0x%x\n", pxCurrentTCB->pxStack - pxCurrentTCB->pxTopOfStack
   printf "  High water: %d bytes\n", uxTaskGetStackHighWaterMark(pxCurrentTCB)
+end
+
+
+define printargv
+    set $i = 0
+    while $i < argc
+        printf "argv[%d] = %s\n", $i, argv[$i]
+        set $i = $i + 1
+    end
 end
 
 
