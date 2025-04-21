@@ -31,7 +31,7 @@ __px3_smartone() {
 
     if [ "$PEM_OS_VARIANT" = wsl2 ] ||
         uname -a | grep -i wsl2 >/dev/null 2>&1 ; then 
-        local hostip="$(ip route show | grep -i default | awk '{ print $3}')"
+        local hostip="$(ip route show | grep -i default | awk '{ print $3}' | head -n1)"
         __px3_alltype  -i "$hostip" -p "7890" "$@"
     fi
 

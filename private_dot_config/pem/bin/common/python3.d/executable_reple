@@ -107,6 +107,7 @@ BUILTIN_RULE = {'bcl': {'compile': '{compiler} {cflags} -o {bin_fname} {code_fna
                                              '#include <unistd.h>\n'
                                              '#include <vector>\n'
                                              '#include <iostream>\n'
+                                             '#include <vector>\n'
                                              'using namespace std;\n'
                                              '\n'
                                              'class Logger {\n'
