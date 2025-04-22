@@ -4,6 +4,7 @@ from prompt_toolkit.keys import Keys
 from prompt_toolkit.styles import Style
 
 from ptpython.layout import CompletionVisualisation
+import pudb
 
 __all__ = ["configure"]
 
@@ -18,3 +19,13 @@ def configure(repl):
     def _(event):
         ' Pressing Control-B will insert "pdb.set_trace()" '
         event.cli.current_buffer.insert_text('\nimport pdb; pdb.set_trace()\n')
+
+    # Debug Only
+    # @repl.add_key_binding(Keys.ControlQ)
+    # def _(event):
+    #     a = repl
+    #     pudb.set_trace()
+
+    @repl.add_key_binding(Keys.ControlT)
+    def _(event):
+        repl.enter_history()
