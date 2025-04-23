@@ -878,6 +878,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:localvimrc_sandbox = 0
         let g:localvimrc_ask = 1
         let g:localvimrc_persistent = 2 " Store and restore all decisions
+        let g:localvimrc_event  = [ 'VimEnter' ]
         if has('unix')
             let g:localvimrc_persistence_file = pe_cachedir . '/localvimrc_persistent'
         endif
@@ -1167,6 +1168,12 @@ call plug#begin(pe_runtimepath . '/plugged')
         noremap  <silent><M-S-j> :TmuxNavigateDown<cr>
         noremap  <silent><M-S-k> :TmuxNavigateUp<cr>
         noremap  <silent><M-S-l> :TmuxNavigateRight<cr>
+
+        
+        inoremap  <silent><M-S-h> <C-o>:TmuxNavigateLeft<cr>
+        inoremap  <silent><M-S-j> <C-o>:TmuxNavigateDown<cr>
+        inoremap  <silent><M-S-k> <C-o>:TmuxNavigateUp<cr>
+        inoremap  <silent><M-S-l> <C-o>:TmuxNavigateRight<cr>
 
         tnoremap  <silent><M-S-h> <cmd>TmuxNavigateLeft<cr>
         tnoremap  <silent><M-S-j> <cmd>TmuxNavigateDown<cr>
@@ -1865,6 +1872,9 @@ endif
     " let n_rightmouse_opts = {'index':g:quickui#context#cursor}
     " nnoremap <RightMouse> :call quickui#context#open(n_rightmouse_content, n_rightmouse_opts)<CR>
 
+" -------------------------------------------
+" 7.4 local vimrc load
+" -------------------------------------------
 
 " -------------------------------------------
 " 7.5 vim-lsp
@@ -2245,3 +2255,31 @@ endif
         endfor
     endfunction
     command! InspectHightlight  call InspectHightlight()
+
+
+    function! HighlightCurrentLineTemporarily()
+        " Save the current highlight settings
+        let s:old_cursorline = &cursorline
+        let s:old_cursorlineopt = &cursorlineopt
+
+        " Set highlight options
+        set cursorline
+        set cursorlineopt=both  " highlight both line number and text
+
+        " Define highlight group (you can customize this)
+        highlight TemporaryLineHighlight term=bold cterm=bold ctermbg=darkgray guibg=darkgray
+
+        " Apply the highlight
+        highlight link CursorLine TemporaryLineHighlight
+
+        " Set up a timer to clear the highlight after 1 second
+        let timer = timer_start(1000, {-> execute([
+                    \ 'highlight link CursorLine ' . (s:old_cursorline ? 'CursorLine' : 'NONE'),
+                    \ 'set nocursorline',
+                    \ 'set cursorlineopt=' . s:old_cursorlineopt,
+                    \ 'redraw'
+                    \ ])})
+    endfunction
+
+    " You can map this to a key, for example:
+    " nnoremap <Leader>h :call HighlightCurrentLineTemporarily()<CR>
