@@ -874,6 +874,13 @@ call plug#begin(pe_runtimepath . '/plugged')
     " Plug 'google/vim-searchindex' , Cond( stridx(&shortmess, 'S')  != -1)
     " let g:searchindex_enabled = stridx(&shortmess, 'S') != -1  || has('patch-8.1.1270') != 1
     Plug 'google/vim-searchindex'
+    Plug 'embear/vim-localvimrc'
+        let g:localvimrc_sandbox = 0
+        let g:localvimrc_ask = 1
+        let g:localvimrc_persistent = 2 " Store and restore all decisions
+        if has('unix')
+            let g:localvimrc_persistence_file = pe_cachedir . '/localvimrc_persistent'
+        endif
 
 
     Plug 'edkolev/tmuxline.vim' , { 'on' : [ 'TmuxlineSnapshot', 'Tmuxline' ] }
