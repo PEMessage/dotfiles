@@ -317,8 +317,12 @@ let g:startify_custom_header = [
 " -------------------------------------------
     if $TMUX != ''
         set ttimeoutlen=30
+        let g:pem_tmux_pane_id = system("tmux display-message -p '#{pane_id}'")
+        let g:pem_tmux_window_id = system("tmux display-message -p '#{window_id}'")
     elseif &ttimeoutlen > 80 || &ttimeoutlen <= 0
         set ttimeoutlen=80
+        let g:pem_tmux_pane_id = ''
+        let g:pem_tmux_window_id = ''
     endif
     " 终端下允许 ALT，详见：http://www.skywind.me/blog/archives/2021
     " 记得设置 ttimeout （见 init-basic.vim） 和 ttimeoutlen （上面）
@@ -2265,6 +2269,7 @@ endif
         " Set highlight options
         set cursorline
         set cursorlineopt=both  " highlight both line number and text
+        normal zz
 
         " Define highlight group (you can customize this)
         highlight TemporaryLineHighlight term=bold cterm=bold ctermbg=darkgray guibg=darkgray
@@ -2280,6 +2285,23 @@ endif
                     \ 'redraw'
                     \ ])})
     endfunction
+
+    function! TmuxFocusCurrentPane()
+        " Check if we're running inside tmux
+        if ! ( exists('$TMUX') && g:pem_tmux_pane_id != '' && g:pem_tmux_window_id != '' )
+            echohl WarningMsg
+            echo "Not running inside tmux!"
+            echohl None
+            return
+        endif
+
+        " Get tmux pane ID for current vim instance
+
+        " Focus on this pane in tmux
+        call system("tmux select-window -t " . g:pem_tmux_window_id)
+        call system("tmux select-pane -t " . g:pem_tmux_pane_id)
+    endfunction
+
 
     " You can map this to a key, for example:
     " nnoremap <Leader>h :call HighlightCurrentLineTemporarily()<CR>
