@@ -63,8 +63,8 @@ def main():
                                     #   -> z - y = x 
             arguments = [
                     "call", "TmuxFocusCurrentPane()",
-                    "|", "edit",   f"{args.arguments[other_idx]}|{args.arguments[num_idx][1:]}",
-                    "|", "call",   "HighlightCurrentLineTemporarily()"]
+                    "|", "edit",   f"{args.arguments[other_idx]}|{args.arguments[num_idx][1:]}",]
+                    # "|", "call",   "HighlightCurrentLineTemporarily()"]
                 
 
 
@@ -75,6 +75,7 @@ def main():
         context=context,
         arguments=arguments
     )
+    print(arguments)
     if args.debug:
         print(message)
         exit()

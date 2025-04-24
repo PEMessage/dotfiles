@@ -81,5 +81,6 @@ then
 else
     exec_cmd="exec tmux new-window -n GDB"
 fi
+export EDITOR="$EDITOR"
 # echo $exec_cmd sh -c "gdb-multi -x ${CAHCE_PATH} $ARGS $@ ; tmux kill-window -t \$TMUX_PANE"
-$exec_cmd sh -c "$GDB_EXE -x ${CAHCE_PATH} $ARGS $* ; tmux kill-window -t \$TMUX_PANE"
+$exec_cmd sh -c "export EDITOR='$EDITOR' ; $GDB_EXE -x ${CAHCE_PATH} $ARGS $* ; tmux kill-window -t \$TMUX_PANE"

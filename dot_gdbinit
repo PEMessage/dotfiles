@@ -3047,6 +3047,95 @@ class ShellPipe (gdb.Command):
 ShellPipe()
 
 end
+# ==========================================
+# 4. editex
+# ==========================================
+python
+import gdb
+import os
+import subprocess
+import tempfile
+
+class EditExCommand(gdb.Command):
+    """Edit memory or files using an external editor.
+Usage: editex <editor> [address|filename]
+Examples:
+  editex nano              # Edit current file
+  editex vim main.c        # Edit specific file
+  editex emacs 0x400000    # Edit memory at address
+"""
+
+    def __init__(self):
+        super(EditExCommand, self).__init__("editex", gdb.COMMAND_USER)
+
+    def invoke(self, args, from_tty):
+        argv = gdb.string_to_argv(args)
+        if len(argv) < 1:
+            print("Usage: editex <editor> [address|filename]")
+            return
+
+        editor = argv[0]
+        target = argv[1] if len(argv) > 1 else None
+
+        if target is None:
+            # Edit current source file
+            frame = gdb.selected_frame()
+            sal = frame.find_sal()
+            if sal.symtab:
+                self.edit_file(editor, sal.symtab.filename)
+            else:
+                print("No current source file available")
+        elif target.startswith('0x'):
+            # Edit memory
+            self.edit_memory(editor, target)
+        else:
+            # Edit file
+            self.edit_file(editor, target)
+
+    def edit_file(self, editor, filename):
+        """Edit a file using the specified editor"""
+        if not os.path.exists(filename):
+            print(f"File {filename} does not exist")
+            return
+
+        try:
+            subprocess.run([editor, filename], check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Editor command failed: {e}")
+        except FileNotFoundError:
+            print(f"Editor '{editor}' not found")
+
+    def edit_memory(self, editor, address):
+        """Edit memory at the specified address"""
+        try:
+            # Get memory contents
+            mem = gdb.selected_inferior().read_memory(int(address, 16), 1024)
+
+            # Create temp file
+            with tempfile.NamedTemporaryFile(mode='w+b', suffix='.bin', delete=False) as f:
+                temp_name = f.name
+                f.write(mem.tobytes())
+
+            # Edit the file
+            subprocess.run([editor, temp_name], check=True)
+
+            # Read back changes
+            with open(temp_name, 'rb') as f:
+                new_data = f.read()
+                gdb.selected_inferior().write_memory(int(address, 16), new_data)
+
+            # Clean up
+            os.unlink(temp_name)
+
+        except gdb.MemoryError:
+            print(f"Failed to read memory at {address}")
+        except subprocess.CalledProcessError as e:
+            print(f"Editor command failed: {e}")
+        except Exception as e:
+            print(f"Error: {e}")
+
+EditExCommand()
+end
 
 # ==========================================
 # 4. Custom Configuration
@@ -3157,12 +3246,13 @@ Restores SP, LR, and PC, then prints a backtrace (bt).
 end
 
 
- define freertos-stack
-  printf "Task %s stack usage:\n", pxCurrentTCB->pcTaskName
-  printf "  Stack base: 0x%x\n", pxCurrentTCB->pxStack
-  printf "  Stack top:  0x%x\n", pxCurrentTCB->pxTopOfStack
-  printf "  Stack Size:  0x%x\n", pxCurrentTCB->pxStack - pxCurrentTCB->pxTopOfStack
-  printf "  High water: %d bytes\n", uxTaskGetStackHighWaterMark(pxCurrentTCB)
+ define freertos-growdown-stack
+  printf "Task %s stack usage: (pxCurrentTCB->pcTaskName)\n",  pxCurrentTCB->pcTaskName
+  # See uxTaskGetStackHighWaterMark, pucEndOfStack == (pxCurrentTCB->pxStack) if portSTACK_GROWTH < 0 (向下生长)
+  printf "  Stack end(Lowwest valid): 0x%x      (pxCurrentTCB->pxStack)\n",      pxCurrentTCB->pxStack    
+  printf "  Stack current Top       : 0x%x      (pxCurrentTCB->pxTopOfStack)\n", pxCurrentTCB->pxTopOfStack
+  printf "  Stack Remain            : %d bytes  (pxCurrentTCB->pxTopOfStack - pxCurrentTCB->pxStack)\n", pxCurrentTCB->pxTopOfStack - pxCurrentTCB->pxStack
+  printf "  High water mark         : %d bytes  (uxTaskGetStackHighWaterMark(pxCurrentTCB))\n", uxTaskGetStackHighWaterMark(pxCurrentTCB)
 end
 
 
@@ -3172,6 +3262,22 @@ define printargv
         printf "argv[%d] = %s\n", $i, argv[$i]
         set $i = $i + 1
     end
+end
+define toggle-editor
+  # Check if we're already using vim-client
+  if $EDITOR == "vim"
+    set environment EDITOR=vim-client
+    printf "EDITOR set to vim-client\n"
+  else
+    set environment EDITOR=vim
+    printf "EDITOR set to vim\n"
+  end
+end
+
+document toggle-editor
+Toggle EDITOR between vim and vim-client (nvr --remote-wait).
+Use this when you want to switch between editing in separate windows
+and editing in your terminal.
 end
 
 
