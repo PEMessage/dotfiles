@@ -1,0 +1,29 @@
+#!/bin/sh
+
+# Thanks to: https://www.reddit.com/r/tmux/comments/flhc6w/comment/fkyyq4b/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+# Default session name for the mirrored session
+MIRRORED_SESSION="_mirrored"
+
+# Check if a session name was provided as an argument
+if [ $# -eq 0 ]; then
+    # No session specified, find the most recent non-mirrored session
+    EXISTING_SESSION=$(tmux list-sessions -F '#{session_name}' | grep -v "^${MIRRORED_SESSION}$" | head -n 1)
+
+    if [ -z "$EXISTING_SESSION" ]; then
+        echo "Error: No non-mirrored tmux sessions found"
+        exit 1
+    fi
+else
+    EXISTING_SESSION="$1"
+fi
+
+
+# Check if the mirrored session already exists
+if tmux has-session -t "$MIRRORED_SESSION" 2>/dev/null; then
+    echo "Killing existing mirrored session: $MIRRORED_SESSION"
+    tmux kill-session -t "$MIRRORED_SESSION"
+fi
+
+# Create the new mirrored session
+echo "Creating mirrored session '$MIRRORED_SESSION' for '$EXISTING_SESSION'"
+tmux new-session -t "$EXISTING_SESSION" -s "$MIRRORED_SESSION"
