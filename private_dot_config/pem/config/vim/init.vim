@@ -2278,7 +2278,7 @@ endif
         highlight link CursorLine TemporaryLineHighlight
 
         " Set up a timer to clear the highlight after 1 second
-        let timer = timer_start(1000, {-> execute([
+        let timer = timer_start(3000, {-> execute([
                     \ 'highlight link CursorLine ' . (s:old_cursorline ? 'CursorLine' : 'NONE'),
                     \ 'set nocursorline',
                     \ 'set cursorlineopt=' . s:old_cursorlineopt,

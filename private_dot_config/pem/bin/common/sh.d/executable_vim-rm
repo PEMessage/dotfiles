@@ -1,0 +1,7 @@
+#!/bin/bash
+
+
+
+vim --remote "$@"
+vim --remote-send 'zz'
+vim --remote-expr 'HighlightCurrentLineTemporarily()'

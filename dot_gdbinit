@@ -3057,12 +3057,13 @@ import subprocess
 import tempfile
 
 class EditExCommand(gdb.Command):
-    """Edit memory or files using an external editor.
-Usage: editex <editor> [address|filename]
+    """Edit memory or files using an external editor with optional line number.
+Usage: editex <editor> [address|filename[:linenumber]]
 Examples:
-  editex nano              # Edit current file
-  editex vim main.c        # Edit specific file
+  editex nano              # Edit current file at current line
+  editex vim main.c:42     # Edit main.c at line 42
   editex emacs 0x400000    # Edit memory at address
+  editex code -g main.c:10 # Edit with VS Code at line 10
 """
 
     def __init__(self):
@@ -3071,35 +3072,52 @@ Examples:
     def invoke(self, args, from_tty):
         argv = gdb.string_to_argv(args)
         if len(argv) < 1:
-            print("Usage: editex <editor> [address|filename]")
+            print("Usage: editex <editor> [address|filename[:linenumber]]")
             return
 
         editor = argv[0]
         target = argv[1] if len(argv) > 1 else None
 
         if target is None:
-            # Edit current source file
+            # Edit current source file at current line
             frame = gdb.selected_frame()
             sal = frame.find_sal()
             if sal.symtab:
-                self.edit_file(editor, sal.symtab.filename)
+                self.edit_file(editor, sal.symtab.filename, sal.line)
             else:
                 print("No current source file available")
         elif target.startswith('0x'):
             # Edit memory
             self.edit_memory(editor, target)
         else:
-            # Edit file
-            self.edit_file(editor, target)
+            # Check if target contains line number (file:line)
+            if ':' in target:
+                filename, line = target.rsplit(':', 1)
+                try:
+                    line = int(line)
+                except ValueError:
+                    print(f"Invalid line number: {line}")
+                    return
+                self.edit_file(editor, filename, line)
+            else:
+                self.edit_file(editor, target)
 
-    def edit_file(self, editor, filename):
-        """Edit a file using the specified editor"""
+    def edit_file(self, editor, filename, line=None):
+        """Edit a file using the specified editor, optionally at specific line"""
         if not os.path.exists(filename):
             print(f"File {filename} does not exist")
             return
 
         try:
-            subprocess.run([editor, filename], check=True)
+            # Build command array
+            cmd = [editor]
+
+            # Add line number argument if supported
+            if line is not None:
+                cmd.append(f'+{line}')
+            cmd.append(filename)
+
+            subprocess.run(cmd, check=True)
         except subprocess.CalledProcessError as e:
             print(f"Editor command failed: {e}")
         except FileNotFoundError:
