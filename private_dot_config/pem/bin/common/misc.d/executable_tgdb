@@ -1,15 +1,56 @@
 #!/usr/bin/env bash
 
-CAHCE_PATH="$HOME/.cache/gdb/tgdbinit"
+# Improved GDB launcher script with tmux integration
 
-if [ ! -f "$CAHCE_PATH" ] ; then
-    mkdir -p "$(dirname "$CAHCE_PATH")"
-    cat <<EOF > "$CAHCE_PATH"
+CACHE_PATH="$HOME/.cache/gdb/tgdbinit"  # Fixed typo in variable name (CAHCE -> CACHE)
+
+# Create cache directory and init file if they don't exist
+
+# Process command line arguments
+base_dir=$(dirname "$(readlink -f "$0")")  # More reliable way to get script directory
+GDB_EXE="gdb-multiarch"
+ARGS=()
+TGDB_ARGS=''
+
+# Handle -g option for custom GDB executable
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -g)
+            if [[ -z "$2" ]]; then
+                echo "Error: -g requires an argument" >&2
+                exit 1
+            fi
+            GDB_EXE="$2"
+            shift 2
+            ;;
+        -v)
+            TGDB_ARGS+=';-v'
+            TGDB_VIM=1
+            shift
+            ;;
+        *)
+            ARGS+=("'$1'")
+            shift
+            ;;
+    esac
+done
+
+if [[ ! -f "$CACHE_PATH" ]]; then
+    mkdir -p "$(dirname "$CACHE_PATH")" || {
+        echo "Error: Failed to create cache directory" >&2
+        exit 1
+    }
+fi
+
+cat <<'EOF' > "$CACHE_PATH" 
 python
 import subprocess as sp
 import os
+TGDB_ARGS = os.environ.get("TGDB_ARGS", "").split(';')
+TGDB_ARGS = [ x for x in TGDB_ARGS if x != '' ]
 
-NULLPROG = "sh -c 'while [ 1 = 1 ]; do sleep 100; done'"
+NULLPROG = "sh -c 'while true; do sleep 100; done'"
+VIMPROG = "sh -c 'vim --servername VIM'"
 
 def tmux(*args):
     return sp.check_output(['tmux'] + list(args)).decode('utf8')
@@ -19,16 +60,20 @@ def set_title(tty, title):
         t.write(b'\x1b]2;' + title.encode('utf8') + b'\x1b\\\\')
 
 tmux('setw', 'remain-on-exit', 'on')
-gdb_pane, gdb_tty = tmux('display-message', '-p' , '-F', '#{pane_id},#{pane_tty}').strip().split(',')
+gdb_pane, gdb_tty = tmux('display-message', '-p', '-F', '#{pane_id},#{pane_tty}').strip().split(',')
 set_title(gdb_tty, 'gdb')
 
-dashboard_pane, dashboard_tty = tmux('split-window', '-d', '-h', '-P', '-F', '#{pane_id},#{pane_tty}', NULLPROG).strip().split(',')
+dashboard_pane, dashboard_tty = tmux('split-window', '-d', '-h', '-P', '-F', '#{pane_id},#{pane_tty}', '-p', '25', NULLPROG).strip().split(',')
 sp.check_call(['stty', '--file', dashboard_tty, '-echo'])
 set_title(dashboard_tty, 'dashboard')
 gdb.execute(f'dashboard -output {dashboard_tty}')
 
-#app_pane, app_tty = tmux('split-window', '-d', '-v', '-P', '-F', '#{pane_id},#{pane_tty}', NULLPROG).strip().split(',')
-#set_title(app_tty, 'inferior')
+# -d: do not focus to new window
+# -P: prints information about the new window after it has been created
+# -F: information format 
+if "-v" in TGDB_ARGS:
+    app_pane, app_tty = tmux('split-window', '-d', '-h', '-P', '-F', '#{pane_id},#{pane_tty}', VIMPROG).strip().split(',')
+    set_title(app_tty, 'VIM')
 #gdb.execute(f'set inferior-tty {app_tty}')
 
 end
@@ -37,6 +82,36 @@ dashboard -layout source assembly registers stack
 dashboard -enabled on
 dashboard -style syntax_highlighting 'monokai'
 
+
+# vim: set ft=python:
+EOF
+
+
+if [ "$TGDB_VIM" = 1  ] ; then
+cat <<'EOF' >> "$CACHE_PATH"
+define hookpost-step
+editex vim-rm
+end
+define hookpost-next
+editex vim-rm
+end
+define hookpost-finish
+editex vim-rm
+end
+define hookpost-continue
+editex vim-rm
+end
+define hookpost-up
+dashboard
+editex vim-rm
+end
+define hookpost-down
+dashboard
+editex vim-rm
+end
+EOF
+else
+cat <<'EOF' >> "$CACHE_PATH"
 # make sure dashboard output is updated when gdb state changes
 define hookpost-up
 dashboard
@@ -44,6 +119,10 @@ end
 define hookpost-down
 dashboard
 end
+EOF
+
+fi
+cat <<'EOF' >> "$CACHE_PATH"
 define hookpost-thread
 dashboard
 end
@@ -56,31 +135,24 @@ end
 define hookpost-break
 dashboard
 end
-
-# vim: set ft=python:
 EOF
+
+# Add local gdbinit if present
+if [[ -f "./gdbinit" ]]; then
+    ARGS+=(-x "./gdbinit")
 fi
 
-base_dir=$(dirname "$0")
-ARGS=
-if [ "$1" = -g ] ; then
-    shift 
-    GDB_EXE=$1
-    shift
+# Prepare tmux command
+if [[ -z "$TMUX" ]]; then
+    exec_cmd="tmux new -n GDB"
 else
-    GDB_EXE="gdb-multiarch"
+    exec_cmd="tmux new-window -n GDB"
 fi
 
-if [ -f "./gdbinit" ]; then
-	ARGS=$ARGS\ -x\ ./gdbinit
-fi
-
-if [ -z "$TMUX" ]
-then
-    exec_cmd="exec tmux new -n GDB"
-else
-    exec_cmd="exec tmux new-window -n GDB"
-fi
-export EDITOR="$EDITOR"
-# echo $exec_cmd sh -c "gdb-multi -x ${CAHCE_PATH} $ARGS $@ ; tmux kill-window -t \$TMUX_PANE"
-$exec_cmd sh -c "export EDITOR='$EDITOR' ; $GDB_EXE -x ${CAHCE_PATH} $ARGS $* ; tmux kill-window -t \$TMUX_PANE"
+# Execute GDB in tmux
+exec $exec_cmd sh -c "
+    export EDITOR='$EDITOR';
+    export TGDB_ARGS='$TGDB_ARGS';
+    $GDB_EXE -x '$CACHE_PATH' ${ARGS[@]};
+    tmux kill-window -t \$TMUX_PANE
+"
