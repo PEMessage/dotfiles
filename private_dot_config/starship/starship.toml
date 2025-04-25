@@ -239,3 +239,6 @@ symbol = "zig "
 
 [hostname]
 ssh_symbol = ""
+
+[haxe]
+disabled = true
