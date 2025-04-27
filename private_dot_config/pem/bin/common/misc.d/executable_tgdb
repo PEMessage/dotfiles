@@ -153,6 +153,7 @@ fi
 exec $exec_cmd sh -c "
     export EDITOR='$EDITOR';
     export TGDB_ARGS='$TGDB_ARGS';
+    tmux setw remain-on-exit off;
     $GDB_EXE -x '$CACHE_PATH' ${ARGS[@]};
     tmux kill-window -t \$TMUX_PANE
 "
