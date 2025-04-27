@@ -6,11 +6,11 @@
     Function Invoke-ScoopRsync {
         & rsync.exe `
             -e "$HOME\scoop\apps\cwrsync\current\bin\ssh.exe -i $HOME\.ssh\id_rsa -o UserKnownHostsFile=$HOME\.ssh\known_hosts" `
-            --progress -u `
-            $args
+            --checksum `
+            --progress  $args
         return $?
     }
-    Set-Alias -name rsync -Value Invoke-ScoopRsync
+    # Set-Alias -name rsync -Value Invoke-ScoopRsync
 
 # PSReadline
 # # =========================================
