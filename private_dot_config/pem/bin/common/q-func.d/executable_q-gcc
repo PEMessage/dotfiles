@@ -7,6 +7,13 @@
 source_file="$1"
 shift  # Remove source file from arguments list
 
+if [ -t 1 ] ; then
+    greenF="\e[1;32m"
+    resetFB="\e[0m"
+else
+    greenF=""
+    resetFB=""
+fi
 # Separate compiler flags from program arguments
 pre_compiler_flags=(
     "-ggdb"
@@ -58,12 +65,12 @@ fi
 output_file="${source_file%.*}.out"
 
 # Build the compilation command
-echo "Compiling: g++ -o \"$output_file\" \"$source_file\" ${compiler_flags[@]}"
+echo -e "${greenF}Compiling${resetFB}: g++ -o \"$output_file\" \"$source_file\" ${compiler_flags[@]}"
 g++ -o "$output_file" "$source_file" "${compiler_flags[@]}"
 
 # Check if compilation succeeded
 if [ $? -eq 0 ]; then
-    echo "Running: ./\"$output_file\" ${program_args[@]}"
+    echo -e  "${greenF}Running${resetFB}: \"./$output_file\" ${program_args[@]}"
     ./"$output_file" "${program_args[@]}"
 else
     echo "Compilation failed"
