@@ -953,6 +953,8 @@ call plug#begin(pe_runtimepath . '/plugged')
         " Plug 'ap/vim-buftabline'
         let g:startify_enable_unsafe = 1
         let g:startify_files_number = 8
+        let g:startify_change_to_dir = 0 " do not auto change dir
+
 
     " Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
     " Plug 'liuchengxu/vim-which-key'
