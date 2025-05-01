@@ -4,7 +4,7 @@ from prompt_toolkit.keys import Keys
 from prompt_toolkit.styles import Style
 
 from ptpython.layout import CompletionVisualisation
-import pudb
+# import pudb
 
 __all__ = ["configure"]
 
