@@ -4,6 +4,12 @@
 # Usage: ./q-gcc source_file [compiler_flags] -- [program_args]
 
 # Extract source file (first argument)
+if [ "$1" = clean ] ; then 
+    echo rm -if *.out
+    rm -if *.out
+    exit 0
+fi
+
 source_file="$1"
 shift  # Remove source file from arguments list
 
