@@ -155,11 +155,8 @@ download_asset() {
     local output="$2"
     
     echo -e "${BLUE}Downloading...${NC}"
-    if [ "$EXTRACT_MODE" = true ]; then
-        curl -# -L -o "${TEMP_DIR}/archive" "$url"
-    else
-        curl -# -L -o "$output" "$url"
-    fi
+    echo curl '-#' -L -o "$output" "$url"
+    curl -# -L -o "$output" "$url"
 }
 
 # Extract file from archive
@@ -168,7 +165,7 @@ extract_from_archive() {
     local path="$2"
     local output="$3"
     
-    echo -e "${BLUE}Extracting ${path} from archive...${NC}"
+    echo -e "${BLUE}Extracting ${path} from $archive...${NC}"
     
     if [[ "$archive" == *.zip ]]; then
         unzip -p "$archive" "$path" > "$output"
@@ -178,6 +175,8 @@ extract_from_archive() {
         echo -e "${RED}Error: Unsupported archive format${NC}"
         exit 1
     fi
+    chmod a+x "$output"
+    rm -rf "$archive"
     
 }
 
@@ -206,7 +205,7 @@ OUTPUT_SPEC="${3:-}"
 # Check requirements
 check_requirements
 
-# Parse output specification if provided
+# # Parse output specification if provided
 if [ -n "$OUTPUT_SPEC" ]; then
     parse_output_spec "$OUTPUT_SPEC"
 fi
@@ -221,7 +220,7 @@ find_matching_assets "$ASSET_PATTERN"
 if [ -z "$OUTPUT_SPEC" ]; then
     OUTPUT_FILE="$ASSET_NAME"
 elif [ "$EXTRACT_MODE" = true ]; then
-    OUTPUT_FILE="$FINAL_FILE"
+    OUTPUT_FILE="$ASSET_NAME"
 else
     OUTPUT_FILE="$OUTPUT_SPEC"
 fi
@@ -230,25 +229,21 @@ fi
 handle_existing_file "$OUTPUT_FILE"
 
 # Confirm download
-confirm_download "$ASSET_URL" "$OUTPUT_FILE" "$SIZE_MB"
+confirm_download "$ASSET_URL" "$ASSET_NAME" "$SIZE_MB"
 
 # Download the asset
-download_asset "$ASSET_URL" "$OUTPUT_FILE"
+download_asset "$ASSET_URL" "$ASSET_NAME"
 
 # Handle extraction if needed
 if [ "$EXTRACT_MODE" = true ]; then
-    extract_from_archive "${TEMP_DIR}/archive" "$ARCHIVE_PATH" "$FINAL_FILE"
+    extract_from_archive "$ASSET_NAME" "$ARCHIVE_PATH" "$FINAL_FILE"
     echo -e "${BLUE}└──────────────────────────────────────────────────────┘${NC}"
     echo -e "${GREEN} Extraction completed successfully${NC}"
     echo -e "File saved as: ${GREEN}${FINAL_FILE}${NC}"
 else
     # Make executable if it's an AppImage or binary
-    if [[ "$OUTPUT_FILE" == *.appimage ]] || [[ "$OUTPUT_FILE" == *linux* ]] || 
-       [[ "$OUTPUT_FILE" == *darwin* ]] || [[ "$OUTPUT_FILE" == *macos* ]] ||
-       [[ "$OUTPUT_FILE" == *.bin ]]; then
-        chmod +x "$OUTPUT_FILE"
-        echo -e "${GREEN}Made executable: ${OUTPUT_FILE}${NC}"
-    fi
+    chmod +x "$OUTPUT_FILE"
+    echo -e "${GREEN}Made executable: ${OUTPUT_FILE}${NC}"
     
     echo -e "${BLUE}└──────────────────────────────────────────────────────┘${NC}"
     echo -e "${GREEN} Download completed successfully${NC}"
