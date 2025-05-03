@@ -241,7 +241,7 @@ if [ "$EXTRACT_MODE" = true ]; then
     echo -e "${GREEN} Extraction completed successfully${NC}"
     echo -e "File saved as: ${GREEN}${FINAL_FILE}${NC}"
 else
-    # Make executable if it's an AppImage or binary
+
     chmod +x "$OUTPUT_FILE"
     echo -e "${GREEN}Made executable: ${OUTPUT_FILE}${NC}"
     

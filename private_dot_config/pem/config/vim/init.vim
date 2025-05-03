@@ -1694,6 +1694,14 @@ call plug#begin(pe_runtimepath . '/plugged')
 " 6.13 LSP
 " -------------------------------------------
     Plug 'prabirshrestha/vim-lsp'
+        let g:lsp_diagnostics_virtual_text_enabled = 0 " this will cause display random empty line when cursor move
+        let g:lsp_diagnostics_echo_cursor = 1 
+        if has('patch-9.0.0167')
+            let g:lsp_inlay_hints_enabled = 1
+            " same as Comment
+            highlight default link lspInlayHintsParameter  Comment
+            highlight default link lspInlayHintsType  lspInlayHintsParameter
+        endif
     Plug 'jiz4oh/vim-lspfuzzy'
     Plug 'mattn/vim-lsp-settings'
 call plug#end()
@@ -2199,7 +2207,7 @@ endif
 
     " call which_key#register('\', "g:which_key_map")
 
-    function! LoopOption(option, choices)
+    function! LoopOption(option, choices, ...)
         " Get the current value of the option
         exe 'let current_value =' . a:option
         let choices_list = a:choices
@@ -2213,12 +2221,29 @@ endif
         endif
 
         let new_value = choices_list[new_index]
-        let cmd = 'let ' . a:option . ' = ' . '''' . new_value . ''''
-        execute cmd
+        if type(new_value) == 1 " str
+            let cmd = 'let ' . a:option . ' = ' . '''' . new_value . ''''
+        elseif type(new_value) == 0 " number
+            let cmd = 'let ' . a:option . ' = ' . new_value
+        else 
+            echo "Unknow type"
+            return 
+        endif
         echo  'Loop Option ' . (index + 1) .  ' of ' . len(a:choices) . ' by running: ' . cmd
+
+        execute cmd
+
+        if a:0 > 0
+            execute a:1
+        endif
+
     endfunction
     command! PEToggleGP call LoopOption('&gp', ['git grep -n', 'rg -n'])
     nnoremap <leader>gp :PEToggleGP<CR>
+
+    command! PEToggleInlayHint call LoopOption('g:lsp_inlay_hints_enabled', [0, 1], 'silent edit %')
+    command! LspInlayHintToggle execute 'PEToggleInlayHint'
+    nnoremap <leader>ih :PEToggleInlayHint<CR>
 
 
     function! PEGrep(...)
