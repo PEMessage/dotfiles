@@ -1,81 +1,107 @@
-#!/bin/sh
+#!/bin/bash
 
 q_extract() {
+    # Usage help
     if [ $# -eq 0 ]; then
         echo "Usage:"
         echo "  Extract all: q-extract archive"
         echo "  Extract specific files: q-extract archive [path1:output1] [path2:output2 ...]"
+        echo "  Preview contents: q-extract --list archive"
         return 1
     fi
 
-    local archive="$1"
+    local archive
+    local action="extract_all"
+    local filelists=()
 
-    if [ ! -f "$archive" ]; then
+    # Parse arguments
+    case "$1" in
+        --list|-l)
+            action="list"
+            shift
+            archive="$1"
+            ;;
+        *)
+            archive="$1"
+            shift
+            [ "$#" -gt 0 ] &&
+                action="extract_one"
+            filelists=("$@")
+            ;;
+    esac
+
+    [ -f "$archive" ] || {
         echo "'$archive' is not a valid file!"
         return 1
-    fi
+    }
 
-    # If only archive is specified, extract all contents
-    if [ $# -eq 1 ]; then
-        case "$archive" in
-            *.tar.bz2)   tar -xvjf "$archive" ;;
-            *.tar.gz)    tar -xvzf "$archive" ;;
-            *.tar.xz)    tar -xvJf "$archive" ;;
-            *.tar.zst)   tar --use-compress-program='zstd -d' -xvf "$archive" ;;
-            *.bz2)       bunzip2 "$archive" ;;
-            *.rar)       rar x "$archive" ;;
-            *.gz)        gunzip "$archive" ;;
-            *.tar)      tar -xvf "$archive" ;;
-            *.tbz2)      tar -xvjf "$archive" ;;
-            *.tgz)       tar -xvzf "$archive" ;;
-            *.zip)       unzip "$archive" ;;
-            *.Z)        uncompress "$archive" ;;
-            *.7z)        7z x "$archive" ;;
-            *.zst)       zstd -d "$archive" ;;
-            *)          echo "don't know how to extract '$archive'..." ;;
-        esac
-        return $?
-    fi
+    # 1. Determine file type and select binary + base arguments
+    local bin
+    local args
+    case "$archive" in
+        *.tar.bz2|*.tbz2)  bin="tar"; args=(-j) ;;
+        *.tar.gz|*.tgz)     bin="tar"; args=(-z) ;;
+        *.tar.xz)           bin="tar"; args=(-J) ;;
+        *.tar.zst)          bin="tar"; args=(--use-compress-program='zstd -d') ;;
+        *.tar)              bin="tar"; args=() ;;
+        *.zip)             bin="unzip"; args=() ;;
+        *.rar)             bin="rar"; args=(x) ;;
+        *.7z)              bin="7z"; args=(x) ;;
+        *.bz2)             bin="bunzip2"; args=() ;;
+        *.gz)              bin="gunzip"; args=() ;;
+        *.Z)               bin="uncompress"; args=() ;;
+        *.zst)             bin="zstd"; args=(-d) ;;
+        *)                 echo "Unsupported archive type: '$archive'"; return 1 ;;
+    esac
 
-    # Selective extraction for multiple arguments
-    shift
-    for arg in "$@"; do
-        path="${arg%%:*}"
-        output="${arg#*:}"
-        if [ -z "$output" ]; then
-            echo "Invalid argument format: '$arg'. Should be 'path:output'"
-            continue
-        fi
+    # 2. Handle different actions
+    case "$action" in
+        extract_all)
+            case "$bin" in
+                tar)    "$bin" "${args[@]}" -xvf "$archive" ;;
+                unzip)  "$bin" "$archive" ;;
+                rar|7z) "$bin" "${args[@]}" "$archive" ;;
+                *)      "$bin" "${args[@]}" "$archive" ;;
+            esac
+            ;;
 
-        case "$archive" in
-            *.zip)
-                if ! unzip -p "$archive" "$path" > "$output"; then
-                    echo "Failed to extract '$path' from '$archive'"
-                else
-                    echo "Extracted '$path' to '$output'"
-                fi
-                ;;
-            *.tar|*.tar.gz|*.tgz|*.tar.bz2|*.tbz2|*.tar.xz|*.tar.zst)
-                local decompress_flag=""
-                case "$archive" in
-                    *.tar.gz|*.tgz) decompress_flag="-z" ;;
-                    *.tar.bz2|*.tbz2) decompress_flag="-j" ;;
-                    *.tar.xz) decompress_flag="-J" ;;
-                    *.tar.zst) decompress_flag="--use-compress-program='zstd -d'" ;;
+        extract_one)
+            for arg in "${filelists[@]}"; do
+                path="${arg%:*}"  # Remove everything after last :
+                output="${arg#*:}" # Remove everything before first :
+                
+                [ -z "$output" ] && { echo "Invalid format: '$arg'. Use 'path:output'"; continue; }
+
+                case "$bin" in
+                    tar)
+                        "$bin" "${args[@]}" -xf  "$archive" -O "$path" > "$output"
+                        ;;
+                    unzip)
+                        "$bin" -p "$archive" "$path" > "$output"
+                        ;;
+                    *)
+                        echo "Selective extraction not supported for $bin"
+                        return 1
+                        ;;
                 esac
+            done
+            ;;
 
-                if ! tar -xf "$archive" $decompress_flag -O "$path" > "$output" 2>/dev/null; then
-                    echo "Failed to extract '$path' from '$archive'"
-                else
-                    echo "Extracted '$path' to '$output'"
-                fi
-                ;;
-            *)
-                echo "Archive type not supported for selective extraction: '$archive'"
-                return 1
-                ;;
-        esac
-    done
+        list)
+            case "$bin" in
+                tar)    "$bin" "${args[@]}" -tf "$archive" ;;
+                unzip)  "$bin" -l "$archive" ;;
+                rar)    "$bin" v "$archive" ;;
+                7z)     "$bin" l "$archive" ;;
+                *)      echo "Listing not supported for $bin"; return 1 ;;
+            esac
+            ;;
+
+        *)
+            echo "Unknown action: $action"
+            return 1
+            ;;
+    esac
 }
-q_extract "$@"
 
+q_extract "$@"
