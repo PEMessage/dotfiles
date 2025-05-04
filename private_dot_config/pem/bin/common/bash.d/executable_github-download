@@ -1,15 +1,16 @@
 #!/bin/bash
 
 # GitHub Auto-Update Download Script with jq parsing
-# Usage: ./github_updater.sh <owner> <repo> <asset_pattern> [<output_file>]
+# Usage: ./github_updater.sh <owner>/<repo> <asset_pattern> [<output_file>] [-v VERSION]
 
 set -euo pipefail
 
 # Global variables
 RELEASE_DATA=""
-LATEST_VERSION=""
+SELECTED_VERSION="latest"
 ASSET_URL=""
 OUTPUT_FILE=""
+
 runcmd() {
     echo "Runing: $*"
     "$@"
@@ -31,20 +32,29 @@ check_dependencies() {
     fi
 }
 
-# Get the latest release data from GitHub API
+# Get release data from GitHub API
 fetch_release_data() {
     local repo="$1"
-    local api_url="https://api.github.com/repos/${repo}/releases/latest"
-
-    echo "[Info]: Fetching release data from GitHub... "
+    local version="$2"
+    local api_url
+    
+    api_url="https://api.github.com/repos/${repo}/releases/tags/${version}"
+    echo "[Info]: Fetching release data for version $version from GitHub..."
+    
     echo "[Info]: Runing: RELEASE_DATA=\"\$(curl -sL \"$api_url\")\""
     RELEASE_DATA="$(curl -sL "$api_url")"
+    
+    # Check if release data was fetched successfully
+    if [[ $(jq -r '.message' <<< "$RELEASE_DATA") == "Not Found" ]]; then
+        echo "[Err]: Release not found - $api_url"
+        exit 1
+    fi
 }
 
-# Extract the latest version tag
-get_latest_version() {
-    LATEST_VERSION=$(echo "$RELEASE_DATA" | jq -r '.tag_name')
-    echo "[Info]: Latest version found: $LATEST_VERSION"
+# Extract the version tag
+get_version() {
+    SELECTED_VERSION=$(jq -r '.tag_name' <<< "$RELEASE_DATA")
+    echo "[Info]: Selected version: $SELECTED_VERSION"
 }
 
 # Find the asset URL that matches our pattern
@@ -52,17 +62,19 @@ find_asset_url() {
     local pattern="$1"
     
     # NOTE: !!! using `echo "$VAR" | jq` will case some bug
-    ASSET_URL=$( jq -r --arg pattern "$pattern" \
-        '.assets[] | select(.name | match($pattern)) | .browser_download_url' <<< "$RELEASE_DATA" ) 
+    ASSET_URL=$(jq -r --arg pattern "$pattern" \
+        '.assets[] | select(.name | match($pattern)) | .browser_download_url' <<< "$RELEASE_DATA" )
 
     if [ "$(echo "${ASSET_URL}" | wc -l)" -gt 1 ] ; then
         echo "[Err]: More than one asset matching pattern '$pattern'"
         exit 1
     fi
+
     if [ -z "$ASSET_URL" ]; then
         echo "[Err]: Could not find asset matching pattern '$pattern'"
         exit 1
     fi
+    
 }
 
 # Determine the output filename
@@ -81,31 +93,52 @@ download_asset() {
     runcmd curl -# -L -o "$OUTPUT_FILE" "$ASSET_URL"
 }
 
-
+# Parse command line arguments
+parse_arguments() {
+    local positional=()
+    
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -v|--version)
+                SELECTED_VERSION="$2"
+                shift 2
+                ;;
+            *)
+                positional+=("$1")
+                shift
+                ;;
+        esac
+    done
+    
+    # Restore positional parameters
+    set -- "${positional[@]}"
+    
+    if [ $# -lt 2 ]; then
+        echo "Usage: $0 <owner>/<repo> <asset_pattern> [<output_file>] [-v VERSION]"
+        echo "Example: $0 neovim/neovim 'nvim-linux64.tar.gz' nvim.tar.gz -v v0.9.0"
+        echo "Example: $0 neovim/neovim 'nvim-linux64.tar.gz' # Uses latest version"
+        exit 1
+    fi
+    
+    repo="$1"
+    asset_pattern="$2"
+    suggested_output="${3:-}"
+}
 
 # Main control function
 main() {
     check_dependencies
-
-    if [ $# -lt 3 ]; then
-        echo "Usage: $0 <owner>/<repo> <asset_pattern> [<output_file>]"
-        echo "Example: $0 neovim neovim-releases 'nvim-linux-x86_64.appimage' nvim.appimage"
-        exit 1
-    fi
-
-    local repo="$1"
-    local asset_pattern="$2"
-    local suggested_output="${3:-}"
-
-    fetch_release_data "$repo"
-    get_latest_version
+    parse_arguments "$@"
+    
+    fetch_release_data "$repo" "$SELECTED_VERSION"
+    get_version
     find_asset_url "$asset_pattern"
     set_output_filename
     download_asset
 
     echo "Download completed successfully"
     echo "File saved to: $(pwd)/$OUTPUT_FILE"
-    echo "Version: $LATEST_VERSION"
+    echo "Version: $SELECTED_VERSION"
 }
 
 main "$@"

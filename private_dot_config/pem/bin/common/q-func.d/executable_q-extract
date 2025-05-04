@@ -1,28 +1,81 @@
 #!/bin/sh
 
-q_extract()
-{
-	if [ -f $1 ] ; then
-		case $1 in
-		*.tar.bz2)   tar -xvjf $1    ;;
-		*.tar.gz)    tar -xvzf $1    ;;
-		*.tar.xz)    tar -xvJf $1    ;;
-		*.tar.zst)   tar --use-compress-program='zstd -d' -xvf $1    ;;
-		*.bz2)       bunzip2 $1     ;;
-		*.rar)       rar x $1       ;;
-		*.gz)        gunzip $1      ;;
-		*.tar)       tar -xvf $1     ;;
-		*.tbz2)      tar -xvjf $1    ;;
-		*.tgz)       tar -xvzf $1    ;;
-		*.zip)       unzip $1       ;;
-		*.Z)         uncompress $1  ;;
-		*.7z)        7z x $1        ;;
-		*.zst)       zstd -d $1    ;;
-		*)           echo "don't know how to extract '$1'..." ;;
-		esac
-	else
-		echo "'$1' is not a valid file!"
-	fi
-}
+q_extract() {
+    if [ $# -eq 0 ]; then
+        echo "Usage:"
+        echo "  Extract all: q-extract archive"
+        echo "  Extract specific files: q-extract archive [path1:output1] [path2:output2 ...]"
+        return 1
+    fi
 
+    local archive="$1"
+
+    if [ ! -f "$archive" ]; then
+        echo "'$archive' is not a valid file!"
+        return 1
+    fi
+
+    # If only archive is specified, extract all contents
+    if [ $# -eq 1 ]; then
+        case "$archive" in
+            *.tar.bz2)   tar -xvjf "$archive" ;;
+            *.tar.gz)    tar -xvzf "$archive" ;;
+            *.tar.xz)    tar -xvJf "$archive" ;;
+            *.tar.zst)   tar --use-compress-program='zstd -d' -xvf "$archive" ;;
+            *.bz2)       bunzip2 "$archive" ;;
+            *.rar)       rar x "$archive" ;;
+            *.gz)        gunzip "$archive" ;;
+            *.tar)      tar -xvf "$archive" ;;
+            *.tbz2)      tar -xvjf "$archive" ;;
+            *.tgz)       tar -xvzf "$archive" ;;
+            *.zip)       unzip "$archive" ;;
+            *.Z)        uncompress "$archive" ;;
+            *.7z)        7z x "$archive" ;;
+            *.zst)       zstd -d "$archive" ;;
+            *)          echo "don't know how to extract '$archive'..." ;;
+        esac
+        return $?
+    fi
+
+    # Selective extraction for multiple arguments
+    shift
+    for arg in "$@"; do
+        path="${arg%%:*}"
+        output="${arg#*:}"
+        if [ -z "$output" ]; then
+            echo "Invalid argument format: '$arg'. Should be 'path:output'"
+            continue
+        fi
+
+        case "$archive" in
+            *.zip)
+                if ! unzip -p "$archive" "$path" > "$output"; then
+                    echo "Failed to extract '$path' from '$archive'"
+                else
+                    echo "Extracted '$path' to '$output'"
+                fi
+                ;;
+            *.tar|*.tar.gz|*.tgz|*.tar.bz2|*.tbz2|*.tar.xz|*.tar.zst)
+                local decompress_flag=""
+                case "$archive" in
+                    *.tar.gz|*.tgz) decompress_flag="-z" ;;
+                    *.tar.bz2|*.tbz2) decompress_flag="-j" ;;
+                    *.tar.xz) decompress_flag="-J" ;;
+                    *.tar.zst) decompress_flag="--use-compress-program='zstd -d'" ;;
+                esac
+
+                if ! tar -xf "$archive" $decompress_flag -O "$path" > "$output" 2>/dev/null; then
+                    echo "Failed to extract '$path' from '$archive'"
+                else
+                    echo "Extracted '$path' to '$output'"
+                fi
+                ;;
+            *)
+                echo "Archive type not supported for selective extraction: '$archive'"
+                return 1
+                ;;
+        esac
+    done
+}
 q_extract "$@"
+
