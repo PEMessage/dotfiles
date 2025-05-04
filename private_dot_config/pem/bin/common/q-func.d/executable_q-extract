@@ -13,27 +13,42 @@ q_extract() {
     local archive
     local action="extract_all"
     local filelists=()
+    local other_args=()
+    local executable=false
 
-    # Parse arguments
-    case "$1" in
-        --list|-l)
-            action="list"
-            shift
-            archive="$1"
-            ;;
-        *)
-            archive="$1"
-            shift
-            [ "$#" -gt 0 ] &&
-                action="extract_one"
-            filelists=("$@")
-            ;;
-    esac
+    while [[ "$#" -gt 0 ]]; do
+        case "$1" in
+            --list|-l)
+                action="list"
+                list_flag=1
+                shift
+                ;;
+            -x)
+                executable=true
+                shift
+                ;;
+            *)
+                other_args+=("$1")
+                shift
+                ;;
+        esac
+    done
+    set -- "${other_args[@]}"
 
+    # Second pass: handle archive and file lists
+    archive="$1"
+    shift
     [ -f "$archive" ] || {
         echo "'$archive' is not a valid file!"
         return 1
     }
+
+    if [[ "$action" != "list" && "$#" -gt 0 ]]; then
+        action="extract_one"
+        filelists=("$@")
+    fi
+
+
 
     # 1. Determine file type and select binary + base arguments
     local bin
@@ -84,6 +99,9 @@ q_extract() {
                         return 1
                         ;;
                 esac
+                if [ "$executable" = true ] ; then
+                    chmod a+x "$output"
+                fi
             done
             ;;
 
