@@ -38,7 +38,11 @@ fetch_release_data() {
     local version="$2"
     local api_url
     
-    api_url="https://api.github.com/repos/${repo}/releases/tags/${version}"
+    if [ "${version}" = latest ] ; then
+        api_url="https://api.github.com/repos/${repo}/releases/latest"
+    else
+        api_url="https://api.github.com/repos/${repo}/releases/tags/${version}"
+    fi
     echo "[Info]: Fetching release data for version $version from GitHub..."
     
     echo "[Info]: Runing: RELEASE_DATA=\"\$(curl -sL \"$api_url\")\""
