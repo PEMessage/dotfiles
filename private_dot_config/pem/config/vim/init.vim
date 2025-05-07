@@ -1534,16 +1534,21 @@ call plug#begin(pe_runtimepath . '/plugged')
             return !col || getline('.')[col - 1]  =~ '\s'
         endfunction
 
-        inoremap <silent><expr> <TAB>
+        imap <silent><expr> <TAB>
                     \ pumvisible() ? "\<C-n>" :
+                    \ vsnip#jumpable(1) ? '<Plug>(vsnip-jump-next)' :
                     \ <SID>check_back_space() ? "\<TAB>" :
                     \ asyncomplete#force_refresh()
-        inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+        " inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+        imap  <silent><expr> <S-Tab>
+                    \ pumvisible() ? "\<C-p>" :
+                    \ vsnip#jumpable(-1) ? '<Plug>(vsnip-jump-prev)' :
+                    \ "\<C-h>"
         inoremap <expr> <C-c>   pumvisible() ? "\<Esc>" : "\<C-c>"
 
 
         inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
-        imap <c-space> <Plug>(asyncomplete_force_refresh)
+        " imap <c-space> <Plug>(asyncomplete_force_refresh)
 
         if has('patch-8.0.1494')
             Plug 'hrsh7th/vim-vsnip'
