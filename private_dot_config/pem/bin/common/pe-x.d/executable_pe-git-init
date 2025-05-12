@@ -37,6 +37,7 @@ git_config_global alias.st 'status --short --branch'
 git_config_global alias.lg 'log --oneline --graph'
 git_config_global alias.di 'diff'
 git_config_global alias.dis 'diff --staged'
+git_config_global alias.dfs 'diff --staged'
 git_config_global alias.ddf 'difftool --ignore-submodules --dir-diff --no-symlinks --tool=dirdiff'
 git_config_global difftool.dirdiff.cmd 'dirdiff $LOCAL $REMOTE'
 git_config_global alias.rflog 'reflog --date=format:'"'"'%y-%m-%d %H:%M'"'"
