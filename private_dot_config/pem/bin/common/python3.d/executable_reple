@@ -104,6 +104,7 @@ BUILTIN_RULE = {'bcl': {'compile': '{compiler} {cflags} -o {bin_fname} {code_fna
          'template_args': {'line_epilogue': '',
                            'template_begin': '#include <cstdlib>\n'
                                              '#include <cstdio>\n'
+                                             '#include <cassert>\n'
                                              '#include <unistd.h>\n'
                                              '#include <vector>\n'
                                              '#include <iostream>\n'

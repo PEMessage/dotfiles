@@ -1522,6 +1522,19 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'prabirshrestha/asyncomplete-buffer.vim' , Cond(g:pe_competesys == 'async')
 
         Plug 'wellle/tmux-complete.vim' , Cond(g:pe_competesys == 'async')
+            let g:tmuxcomplete#asyncomplete_source_options = {
+            \ 'name':      'tmuxcomplete',
+            \ 'whitelist': ['*'],
+            \ 'priority': 10,
+            \ 'config': {
+            \     'splitmode':      'words',
+            \     'filter_prefix':   1,
+            \     'show_incomplete': 1,
+            \     'sort_candidates': 0,
+            \     'scrollback':      0,
+            \     'truncate':        0
+            \     }
+            \ }
         Plug 'rafamadriz/friendly-snippets' , Cond(g:pe_competesys == 'async')
         Plug 'prabirshrestha/asyncomplete-file.vim' , Cond(g:pe_competesys == 'async')
 
@@ -1721,7 +1734,7 @@ call plug#end()
 " 7.2 Async complete
 " -------------------------------------------
 if exists('*asyncomplete#register_source')
-    call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options({
+    au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options({
                 \ 'name': 'buffer',
                 \ 'allowlist': ['*'],
                 \ 'blocklist': ['go'],

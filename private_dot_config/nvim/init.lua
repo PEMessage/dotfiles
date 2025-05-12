@@ -1279,6 +1279,7 @@ require("lazy").setup({
             require("mason-lspconfig").setup_handlers({
                 function (server_name)
                     require("lspconfig")[server_name].setup{
+                        inlay_hints = { enabled = true },
                         autostart = false
                     }
                 end,
@@ -1307,6 +1308,7 @@ require("lazy").setup({
                 ["pylsp"] = function ()
                     lspconfig.pylsp.setup({
                         autostart = true,
+                        inlay_hints = { enabled = true },
                         settings = {
                             -- @See:
                             -- https://neovim.discourse.group/t/pylsp-config-is-not-taken-into-account/1846
