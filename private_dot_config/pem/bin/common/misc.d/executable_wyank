@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-
 get_cache_dir() {
     (
         # 2. check /mnt/c
@@ -19,15 +18,16 @@ get_cache_dir() {
         fi
         echo "$DOWNLOAD_PATH"
     )
+
 }
 
 
 
 get_download_path() {
     file="$1"
-    if [ -x "$file" ]; then
+    if [ -e "$file" ]; then
         cd "$(dirname "$file")"
-    else 
+    else
         cd "$(get_cache_dir)"
         rsync --progress -r "$1" .
     fi
