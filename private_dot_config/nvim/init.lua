@@ -1349,7 +1349,11 @@ require("lazy").setup({
                 --         cmd = { "java-language-server" },
                 --     })
                 -- end,
-                ["clangd"] = function () lspconfig.clangd.setup({ autostart = true }) end,
+                ["clangd"] = function () lspconfig.clangd.setup(
+                    {
+                        autostart = true,
+                        inlay_hints = { enabled = true },
+                    }) end,
                 ["gopls"] = function () lspconfig.gopls.setup({ autostart = true }) end,
                 -- ["jdtls"] = function () end, -- Leave it to nvim-jdtls
                 ["jdtls"] = function ()
