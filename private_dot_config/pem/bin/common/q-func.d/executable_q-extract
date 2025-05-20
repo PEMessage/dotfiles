@@ -66,6 +66,7 @@ q_extract() {
         *.gz)              bin="gunzip"; args=() ;;
         *.Z)               bin="uncompress"; args=() ;;
         *.zst)             bin="zstd"; args=(-d) ;;
+        *.xz)             bin="unxz"; args=() ;;
         *)                 echo "Unsupported archive type: '$archive'"; return 1 ;;
     esac
 
@@ -111,6 +112,7 @@ q_extract() {
                 unzip)  "$bin" -l "$archive" ;;
                 rar)    "$bin" v "$archive" ;;
                 7z)     "$bin" l "$archive" ;;
+                xz)     "$bin" -l "$archive" ;;
                 *)      echo "Listing not supported for $bin"; return 1 ;;
             esac
             ;;
