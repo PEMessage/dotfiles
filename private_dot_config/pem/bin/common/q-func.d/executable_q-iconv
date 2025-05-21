@@ -13,6 +13,10 @@ q_iconv() {
         [ "$origin_locale" = 'UTF-8' ] ;then
         return 0
     fi
+    if [ "$origin_locale" = GB18030 ] ; then 
+        # Some GB18030 will cause iconv fail, so using GB2312
+        origin_locale=GB2312
+    fi
 
     cp -a "$1" "$1.bak"
     echo cp -a "$1" "$1.bak"
