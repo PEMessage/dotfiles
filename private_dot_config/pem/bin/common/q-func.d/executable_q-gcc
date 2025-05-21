@@ -59,6 +59,7 @@ else
         if [[ "$arg" =~ ^-O[0-9s]?$ \
             || "$arg" =~ ^-I \
             || "$arg" =~ ^-L \
+            || "$arg" =~ ^-std \
             || "$arg" =~ ^-l ]]; then
             compiler_flags+=("$arg")
         else

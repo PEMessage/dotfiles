@@ -996,6 +996,16 @@ call plug#begin(pe_runtimepath . '/plugged')
         " autocmd BufNewFile,BufRead *.s,*.S set filetype=arm " arm = armv6/7
     Plug 'rubberduck203/aosp-vim'
         autocmd BufNewFile,BufRead *.bp set filetype=json " arm = armv6/7
+    " Plug 'fedorenchik/fasm.vim' " in Vim9, we have it as builtin
+        autocmd BufNewFile,BufRead *.fasm set filetype=fasm
+        " See quickrun-exec-format
+        let g:quickrun_config = {
+                    \   'fasm': {
+                    \     'command': 'fasm',
+                    \     'exec': ['%c %s','chmod a+x %s:r', '%s:r'],
+                    \     'tempfile': '%{tempname()}',
+                    \   },
+                    \ }
     " Plug 'sheerun/vim-polyglot'
     Plug 'mtdl9/vim-log-highlighting'
     Plug 'udalov/kotlin-vim'

@@ -290,8 +290,8 @@
     set -g @thumbs-hint-fg-color '#d76971'
     set -g @thumbs-select-fg-color '#d76971'
     set -g @thumbs-multi-fg-color '#ffff00'
-    set -g @thumbs-regexp-1 '(\S+)' # Match emails
-    set -g @thumbs-upcase-command 'tmux send-keys "{}"'
+    set -g @thumbs-regexp-1 ' (\W+) ' # Match emails
+    set -g @thumbs-command 'tmux send-keys "{}"'
 
     # Plugin tmux-plugins/tmux-copycat
     # ----------------------------
