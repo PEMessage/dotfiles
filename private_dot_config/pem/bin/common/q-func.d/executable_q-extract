@@ -1,5 +1,14 @@
 #!/bin/bash
 
+DRYRUN=0
+
+runcmd() {
+    if [ "$DRYRUN" == 1 ] ; then
+        echo "$@"
+    else
+        "$@"
+    fi
+}
 q_extract() {
     # Usage help
     if [ $# -eq 0 ]; then
@@ -18,6 +27,10 @@ q_extract() {
 
     while [[ "$#" -gt 0 ]]; do
         case "$1" in
+            -p)
+                DRYRUN=1
+                shift
+                ;;
             --list|-l)
                 action="list"
                 list_flag=1
@@ -74,10 +87,10 @@ q_extract() {
     case "$action" in
         extract_all)
             case "$bin" in
-                tar)    "$bin" "${args[@]}" -xvf "$archive" ;;
-                unzip)  "$bin" "$archive" ;;
-                rar|7z) "$bin" "${args[@]}" "$archive" ;;
-                *)      "$bin" "${args[@]}" "$archive" ;;
+                tar)    runcmd "$bin" "${args[@]}" -xvf "$archive" ;;
+                unzip)  runcmd "$bin" "$archive" ;;
+                rar|7z) runcmd "$bin" "${args[@]}" "$archive" ;;
+                *)      runcmd "$bin" "${args[@]}" "$archive" ;;
             esac
             ;;
 
@@ -90,10 +103,10 @@ q_extract() {
 
                 case "$bin" in
                     tar)
-                        "$bin" "${args[@]}" -xf  "$archive" -O "$path" > "$output"
+                        runcmd "$bin" "${args[@]}" -xf  "$archive" -O "$path" > "$output"
                         ;;
                     unzip)
-                        "$bin" -p "$archive" "$path" > "$output"
+                        runcmd "$bin" -p "$archive" "$path" > "$output"
                         ;;
                     *)
                         echo "Selective extraction not supported for $bin"
@@ -108,11 +121,11 @@ q_extract() {
 
         list)
             case "$bin" in
-                tar)    "$bin" "${args[@]}" -tf "$archive" ;;
-                unzip)  "$bin" -l "$archive" ;;
-                rar)    "$bin" v "$archive" ;;
-                7z)     "$bin" l "$archive" ;;
-                xz)     "$bin" -l "$archive" ;;
+                tar)    runcmd "$bin" "${args[@]}" -tf "$archive" ;;
+                unzip)  runcmd "$bin" -l "$archive" ;;
+                rar)    runcmd "$bin" v "$archive" ;;
+                7z)     runcmd "$bin" l "$archive" ;;
+                xz)     runcmd "$bin" -l "$archive" ;;
                 *)      echo "Listing not supported for $bin"; return 1 ;;
             esac
             ;;
