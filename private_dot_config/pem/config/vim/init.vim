@@ -2364,7 +2364,7 @@ endif
         call system("tmux select-pane -t " . g:pem_tmux_pane_id)
     endfunction
 
-    command! -nargs=* -complete=file TermdebugExCommand call TermdebugWrapper(<f-args>)
+    command! -nargs=* -complete=file TermdebugEx call TermdebugWrapper(<f-args>)
 
     function! TermdebugWrapper(...) abort
         if !exists(':TermdebugCommand')
