@@ -2343,10 +2343,10 @@ endif
 
     let g:termdebug_config = {}
     let g:termdebug_config['command'] = "gdb-multiarch"
-    let g:termdebug_config['evaluate_in_popup'] = 1
-    let g:termdebug_config['map_plus'] = 1
-    let g:termdebug_config['map_mins'] = 1
-    let g:termdebug_config['variables_window'] = 1
+    let g:termdebug_config['evaluate_in_popup'] = v:true
+    let g:termdebug_config['map_plus'] = v:true
+    let g:termdebug_config['map_mins'] = v:true
+    let g:termdebug_config['variables_window'] = v:true
 
     function! TmuxFocusCurrentPane()
         " Check if we're running inside tmux

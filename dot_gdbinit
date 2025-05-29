@@ -2407,8 +2407,8 @@ try:
 except ImportError as e:
     print("Not able to run GEP")
     raise e
-    
-    
+
+
 
 
 # directory, file = os.path.split(__file__)
@@ -3185,7 +3185,7 @@ end
 
     # info vtbl [expr]
     # info variables vtable for CLASS
-    set print vtbl on 
+    set print vtbl on
 
     # 为了观察一个对象的虚表和相应虚表的内容，可以在启动gdb后设置如下命令
     set print demangle on
@@ -3247,9 +3247,9 @@ define hfstack
 
     # Restore LR and PC from the stack frame
     # LR is the 6th entry (0-based index 5)
-    set $lr = $frame_ptr[5]  
+    set $lr = $frame_ptr[5]
     # PC is the 7th entry (0-based index 6)
-    set $pc = $frame_ptr[6] 
+    set $pc = $frame_ptr[6]
 
     # Print backtrace
     bt
@@ -3267,7 +3267,7 @@ end
  define freertos-growdown-stack
   printf "Task %s stack usage: (pxCurrentTCB->pcTaskName)\n",  pxCurrentTCB->pcTaskName
   # See uxTaskGetStackHighWaterMark, pucEndOfStack == (pxCurrentTCB->pxStack) if portSTACK_GROWTH < 0 (向下生长)
-  printf "  Stack end(Lowwest valid): 0x%x      (pxCurrentTCB->pxStack)\n",      pxCurrentTCB->pxStack    
+  printf "  Stack end(Lowwest valid): 0x%x      (pxCurrentTCB->pxStack)\n",      pxCurrentTCB->pxStack
   printf "  Stack current Top       : 0x%x      (pxCurrentTCB->pxTopOfStack)\n", pxCurrentTCB->pxTopOfStack
   printf "  Stack Remain            : %d bytes  (pxCurrentTCB->pxTopOfStack - pxCurrentTCB->pxStack)\n", pxCurrentTCB->pxTopOfStack - pxCurrentTCB->pxStack
   printf "  High water mark         : %d bytes  (uxTaskGetStackHighWaterMark(pxCurrentTCB))\n", uxTaskGetStackHighWaterMark(pxCurrentTCB)
@@ -3298,25 +3298,59 @@ Use this when you want to switch between editing in separate windows
 and editing in your terminal.
 end
 
-
-# ==========================================
-# 5. python plug start
-# ==========================================
+# 3.5 LL Command(respect PEM_GDB variable)
+# -------------------------------------------
 python
-import os
-SKIP_LIST = os.environ.get("PEM_GDB_SKIP", default="all").lower()
 
-if "all" not in SKIP_LIST:
+SUBCOMMANDS = ['gep', 'dashboard']
+PEM_GDB = os.environ.get("PEM_GDB", default="").lower()
 
-    if "dashboard" not in SKIP_LIST:
-        Dashboard.start()
-
-    if "gep" not in SKIP_LIST:
+def LoadLL(cmd):
+    if "gep" in cmd:
         try:
             gep_main()
         except Exception as e:
             traceback.print_tb(e.__traceback__)
-            print_warning( "Something went wrong when running GEP, please report an issue on https://github.com/lebr0nli/GEP/issues with the traceback above, thanks!")
+    elif "dashboard" in cmd:
+        Dashboard.start()
+    else:
+        print(f"Unknown subcommand or skipped: {subcommand}")
+
+class LLCommand(gdb.Command):
+    """Custom 'll' command that supports subcommands like 'gep' and 'dashboard'"""
+
+    # List of all available subcommands
+
+    def __init__(self):
+        super(LLCommand, self).__init__("ll", gdb.COMMAND_USER)
+
+    def invoke(self, arg, from_tty):
+
+        args = gdb.string_to_argv(arg)
+        if not args:
+            print("Usage: ll <subcommand>")
+            print("Available subcommands:", ' '.join(self.SUBCOMMANDS))
+            return
+
+        subcommand = args[0].lower()
+        LoadLL(subcommand)
+
+
+    def complete(self, text, word):
+        # This method provides tab completion
+        if not text:
+            # Show all subcommands if at start
+            return SUBCOMMANDS
+        else:
+            # Filter subcommands that start with the current word
+            return [cmd for cmd in SUBCOMMANDS if cmd.startswith(word)]
+
+# Register the command
+LLCommand()
+
+for cmd in SUBCOMMANDS:
+    if cmd in PEM_GDB.split(','):
+        LoadLL(cmd)
 end
 
 
