@@ -2341,6 +2341,13 @@ endif
                     \ ])})
     endfunction
 
+    let g:termdebug_config = {}
+    let g:termdebug_config['command'] = "gdb-multiarch"
+    let g:termdebug_config['evaluate_in_popup'] = 1
+    let g:termdebug_config['map_plus'] = 1
+    let g:termdebug_config['map_mins'] = 1
+    let g:termdebug_config['variables_window'] = 1
+
     function! TmuxFocusCurrentPane()
         " Check if we're running inside tmux
         if ! ( exists('$TMUX') && g:pem_tmux_pane_id != '' && g:pem_tmux_window_id != '' )
@@ -2355,6 +2362,22 @@ endif
         " Focus on this pane in tmux
         call system("tmux select-window -t " . g:pem_tmux_window_id)
         call system("tmux select-pane -t " . g:pem_tmux_pane_id)
+    endfunction
+
+    command! -nargs=* -complete=file TermdebugExCommand call TermdebugWrapper(<f-args>)
+
+    function! TermdebugWrapper(...) abort
+        if !exists(':TermdebugCommand')
+            packadd termdebug
+        endif
+
+        if a:0 > 0
+            execute 'TermdebugCommand ' .  join(a:000, ' ')
+            execute 'Source'
+            execute 'wincmd L'
+            nnoremap M :Evaluate<CR>
+            nnoremap _ :Down<CR>
+        endif
     endfunction
 
 

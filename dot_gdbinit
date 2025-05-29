@@ -3304,7 +3304,7 @@ end
 # ==========================================
 python
 import os
-SKIP_LIST = os.environ.get("PEM_GDB_SKIP", default="").lower()
+SKIP_LIST = os.environ.get("PEM_GDB_SKIP", default="all").lower()
 
 if "all" not in SKIP_LIST:
 
