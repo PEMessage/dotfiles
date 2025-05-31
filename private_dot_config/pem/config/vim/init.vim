@@ -15,7 +15,7 @@ let g:startify_custom_header = [
 " Description: This is my VIM8+/NeoVIM configuration
 " Last Modified:  2024-03-12 19:39
 " +++++++++++++++++++++++++++++++++++++++++++
-" 
+"
 
 
 
@@ -46,7 +46,7 @@ let g:startify_custom_header = [
     let s:PECommentColor = {"gui": "#00af87", "cterm": "246", "cterm16": "7"}
     " let s:PECompleteSys  = "asyncomplete"
     let g:pe_competesys=""
-    
+
     let g:lightline = {
                 \ 'colorscheme': 'selenized_black',
                 \ 'active': {
@@ -113,11 +113,14 @@ let g:startify_custom_header = [
     set updatetime=700
     set linebreak
     set wildmenu
+    " set wildmode=longest,longest:full " bash like
+    set wildmode=longest:full,full
+    set wildoptions=pum
     " set nomore
-    
+
     " Quick Snippet
     " Snippet: put =execute('map')  将built in pager 内容放置到当前buffer
-    " Snippet: w !sudo tee % > /dev/null 
+    " Snippet: w !sudo tee % > /dev/null
     "   :w    – Write a file (actually buffer).
     "   !sudo – Call shell with sudo command.
     "   tee   – The output of write (vim :w) command redirected using tee.
@@ -214,7 +217,7 @@ let g:startify_custom_header = [
     " (hide special char for better read)
     " But I dont need this
     let g:vim_json_conceal = 0
-    
+
 
 
     set backspace=eol,start,indent " 类似所有编辑器的删除键
@@ -242,7 +245,7 @@ let g:startify_custom_header = [
 
 	runtime ftplugin/man.vim
     runtime macros/matchit.vim
-    
+
     " augroup previewWindowPosition
     "     au!
     "     autocmd BufWinEnter * call PreviewWindowPosition()
@@ -295,8 +298,8 @@ let g:startify_custom_header = [
     " See: source $VIMRUNTIME/defaults.vim for more
     " Put these in an autocmd group, so that you can revert them with:
     " ":augroup vimStartup | exe 'au!' | augroup END"
-    
-    
+
+
 
 
     " When editing a file, always jump to the last known cursor position.
@@ -383,7 +386,7 @@ let g:startify_custom_header = [
     " Also:
     "   能新split出一个窗口来再跳转到定义，
     "   比会把当前窗口切换走了的 <C-]> 好用。
-    "   use <C-W>] 
+    "   use <C-W>]
     "       <C-W>}
     " set tags=./.tags;,.tags
     set tags=./tags;,tags,./.tags;,.tags
@@ -471,10 +474,10 @@ let g:startify_custom_header = [
 " -------------------------------------------
     nnoremap <leader>rcc  :w<CR> :source %<CR> " Re:Configuration
 
-    function! PERCEdit() 
+    function! PERCEdit()
         if exists('g:pe_rc["file"]') && !empty(g:pe_rc['file'])
             execute 'tabedit ' . g:pe_rc['file']
-        else 
+        else
             execute 'tabedit ' . '~/.vimrc'
         endif
     endfunction
@@ -541,8 +544,10 @@ let g:startify_custom_header = [
     "    so we use :help 'wildcharm' as a workaround.
     " See: https://www.reddit.com/r/vim/comments/hyxo4u/usefulness_of_ctrlg_and_ctrlt_while_searching/
     set wildcharm=<C-z>
+    " cnoremap <Tab> <C-F>A<C-N>
     cnoremap <expr> <Tab>   getcmdtype() =~ '[\/?]' ? "<C-g>" : "<C-z>"
     cnoremap <expr> <S-Tab> getcmdtype() =~ '[\/?]' ? "<C-t>" : "<S-Tab>"
+    cnoremap <expr> <C-c>   pumvisible() ? "<C-e>" : "<C-c>"
 
     vnoremap tt :s/\s\+$//e<CR>:set nohls<CR>
     " See: v_p v_P swap function between these
@@ -609,9 +614,6 @@ let g:startify_custom_header = [
     let g:netrw_sort_sequence = '[\/]$,*'
     let g:netrw_hide = 1
 
-" -------------------------------------------
-" 5.2 Buffer mapping
-" -------------------------------------------
     autocmd FileType netrw call s:RemoveNetrwMap()
     function! s:RemoveNetrwMap()
         if hasmapto('<Plug>NetrwRefresh')
@@ -639,9 +641,21 @@ let g:startify_custom_header = [
         endif
     endfunction
 
-    nnoremap <silent><leader>b  :Lexplore<CR>:resize 25%<CR>
+    nnoremap <silent><leader>b  :Lexplore<CR>
 
-    " command! PEWrite execute 'w !sudo tee % <bar> edit! ' 
+
+    function! s:MapCmdWin()
+        " by remap it to clear origin mapping, to avoid some wild behavior
+        nnoremap <buffer> <C-c> <C-c>
+        nnoremap <buffer> <enter> <enter>
+    endfunction
+    autocmd CmdwinEnter * call s:MapCmdWin()
+
+" -------------------------------------------
+" 5.2 Buffer mapping
+" -------------------------------------------
+
+    " command! PEWrite execute 'w !sudo tee % <bar> edit! '
     " cnoremap w!! execute 'silent! write !sudo tee % >/dev/null' <bar> edit!
     function! PEWrite()
         " Credit: https://stackoverflow.com/questions/2600783/how-does-the-vim-write-with-sudo-trick-work
@@ -662,7 +676,7 @@ let g:startify_custom_header = [
 " 6. VIM Plug-in Zone (Part1)
 " ===========================================
 call plug#begin(pe_runtimepath . '/plugged')
-    " helper 
+    " helper
     function! Cond(cond, ...)
         let opts = get(a:000, 0, {})
         return a:cond ? opts : extend(opts, { 'on': [], 'for': [] })
@@ -679,12 +693,15 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
         noremap <silent> <C-e> :FZF<CR>
-        noremap <silent> <C-f> :Marks<CR>
+        " Note: complict with cmdwin (q/ or CTRL-F in command mode)
+        " noremap <silent> <C-f> :Marks<CR>
+        noremap <silent> <C-r> :History<CR>
         noremap <leader>ft :BTags<CR>
         command VMaps call fzf#vim#maps('x')
-    Plug 'Yggdroot/LeaderF'
-        let g:Lf_ShortcutF = ''
-        let g:Lf_ShortcutF = ''
+        let g:fzf_preview_window = []
+    " Plug 'Yggdroot/LeaderF'
+    "     let g:Lf_ShortcutF = ''
+    "     let g:Lf_ShortcutF = ''
     " Plug 'linrongbin16/fzfx.vim'
     Plug 'tacahiroy/ctrlp-funky'
     Plug 'ctrlpvim/ctrlp.vim'
@@ -704,7 +721,7 @@ call plug#begin(pe_runtimepath . '/plugged')
                     \}
         " nnoremap <c-f> :CtrlPBufTag<Cr>
 
-        noremap <silent> <C-r> :CtrlPMRU<CR>
+        " noremap <silent> <C-r> :CtrlPMRU<CR>
         noremap <silent> <C-p> :CtrlPBuffer<CR>
         " noremap <silent> <C-t> :CtrlPBufTagAll<CR>
         " nnoremap <Leader>fu :CtrlPFunky<Cr>
@@ -725,7 +742,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         "     autocmd filetype fzf tnoremap  <buffer> <C-o> <enter>
         " augroup END
         " JUST USE <C-M> AS ENTER
-        
+
 
     Plug 'mg979/vim-visual-multi', {'branch': 'master'}
         let g:M_default_mappings = 0
@@ -796,6 +813,9 @@ call plug#begin(pe_runtimepath . '/plugged')
     "     nnoremap f :F<CR>
     " Plug 'preservim/nerdtree'
     "     nnoremap <leader>n :NERDTreeFocus<CR>
+    " if (v:version >= 901)
+    "     Plug 'girishji/vimsuggest'
+    " endif
 
 
 
@@ -830,7 +850,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         if exists('g:ovr_textproc_inline_script')
             expand(g:textproc_inline_script,g:ovr_textproc_inline_script)
         endif
-           
+
         " Test: example
         " let g:textproc_inline_script['jq'] = 'jq'
         " let g:textproc_inline_script['z_bashtest'] = 'bash -c "echo 123"'
@@ -847,15 +867,15 @@ call plug#begin(pe_runtimepath . '/plugged')
           \ 'a"'  :0,
           \ 'i''' :0,
           \ 'a''' :0,
-          \ 'i]'  :0, 
-          \ 'a]'  :0, 
-          \ 'i)'  :0, 
-          \ 'a)'  :0, 
-          \ 'i}'  :1, 
-          \ 'a}'  :1, 
-          \ 'iB'  :0, 
-          \ 'il'  :0, 
-          \ 'iF'  :0, 
+          \ 'i]'  :0,
+          \ 'a]'  :0,
+          \ 'i)'  :0,
+          \ 'a)'  :0,
+          \ 'i}'  :1,
+          \ 'a}'  :1,
+          \ 'iB'  :0,
+          \ 'il'  :0,
+          \ 'iF'  :0,
           \ }
         map <CR> <Plug>(expand_region_expand)
         map <BS> <Plug>(expand_region_shrink)
@@ -865,10 +885,10 @@ call plug#begin(pe_runtimepath . '/plugged')
                 " \ 'i''' :1,
                 " \ 'i]'  :1,
                 " \ 'iB'  :1,
-          " \ 'ib'  :0, 
-          " \ 'ab'  :0, 
-          " \ 'ii'  :0, 
-          " \ 'ai'  :0, 
+          " \ 'ib'  :0,
+          " \ 'ab'  :0,
+          " \ 'ii'  :0,
+          " \ 'ai'  :0,
 
 
 " -------------------------------------------
@@ -945,9 +965,9 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:indentLine_concealcursor='in'
         let g:indentLine_conceallevel=1
     Plug 'mhinz/vim-startify'
-        nnoremap <leader>st :tab new<CR>:Startify<CR> 
+        nnoremap <leader>st :tab new<CR>:Startify<CR>
         " Most Recent File MRF
-        nnoremap <leader>sb :Startify<CR> 
+        nnoremap <leader>sb :Startify<CR>
         " Most Recent File MRF
         let g:startify_session_dir = pe_cachedir . "/session"
         " Plug 'ap/vim-buftabline'
@@ -1139,7 +1159,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         endif
         Plug 'voldikss/vim-floaterm'
             if exists('&termwinkey')
-                set termwinkey=<C-x> 
+                set termwinkey=<C-x>
             endif
 
             tnoremap <m-q> <c-\><c-n>
@@ -1150,7 +1170,7 @@ call plug#begin(pe_runtimepath . '/plugged')
             else
                 let g:floaterm_wintype = 'split'
                 let g:floaterm_position = 'botright'
-                let g:floaterm_height = 0.3 
+                let g:floaterm_height = 0.3
             endif
 
             function! TermKeyMap()
@@ -1185,7 +1205,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         noremap  <silent><M-S-k> :TmuxNavigateUp<cr>
         noremap  <silent><M-S-l> :TmuxNavigateRight<cr>
 
-        
+
         inoremap  <silent><M-S-h> <C-o>:TmuxNavigateLeft<cr>
         inoremap  <silent><M-S-j> <C-o>:TmuxNavigateDown<cr>
         inoremap  <silent><M-S-k> <C-o>:TmuxNavigateUp<cr>
@@ -1306,7 +1326,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         " 7 or f: Find this file
         " 8 or i: Find files #including this file
         " 9 or a: Find places where this symbol is assigned a value
-    " Changelog: 
+    " Changelog:
     "   only set cscopequickfix in native mode
     Plug 'PEMessage/gutentags_plus'
         let g:gutentags_plus_nomap = 1
@@ -1339,7 +1359,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         noremap <silent> <leader>gi :GscopeFind i <C-R>=expand("<cfile>")<cr><cr>
 
         noremap <silent> <leader>ga :GscopeFind a <C-R><C-W><cr>
-        
+
         " " Go Symbol
         " noremap <silent> gs :GscopeFind s <C-R><C-W><cr>
         " " Go Defintion
@@ -1420,7 +1440,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     endfunction
     command! Ctoggle call ToggleQuickfix()
     nnoremap <leader>cc  :call ToggleQuickfix()<CR>
-    nnoremap <silent> <M-S-T> :call ToggleQuickfix()<CR> 
+    nnoremap <silent> <M-S-T> :call ToggleQuickfix()<CR>
 
     " Move cursor in quickfix preview
     function! QuickfixArrowPreview(direction)
@@ -1507,26 +1527,26 @@ call plug#begin(pe_runtimepath . '/plugged')
 
     " if v:version >= 9000
     "     let g:pe_competesys = 'vim'
-    " elseif v:version >= 802 && ! has('win32') 
+    " elseif v:version >= 802 && ! has('win32')
     "     let g:pe_competesys = 'easy'
-    " if has('win32') && v:version >= 800 
+    " if has('win32') && v:version >= 800
     "     let g:pe_competesys = 'async'
     if v:version >= 802
         let g:pe_competesys = 'async'
     elseif has('patch-7.4.775')
         " Good enought for buffer
         let g:pe_competesys = 'apt'
-    else 
+    else
         let g:pe_competesys = 'apt'
     endif
     " let g:pe_competesys = 'apt'
-    
+
 
 " -------------------------------------------
 " 6.11.1 Complete Engine (async)
 " -------------------------------------------
 
-    " Buggy buffer 
+    " Buggy buffer
     Plug 'prabirshrestha/async.vim' , Cond(g:pe_competesys == 'async')
     Plug 'prabirshrestha/asyncomplete.vim' , Cond(g:pe_competesys == 'async')
     Plug 'prabirshrestha/asyncomplete-buffer.vim' , Cond(g:pe_competesys == 'async')
@@ -1549,7 +1569,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         Plug 'prabirshrestha/asyncomplete-file.vim' , Cond(g:pe_competesys == 'async')
 
     Plug 'prabirshrestha/asyncomplete-lsp.vim'
-    if g:pe_competesys == 'async' 
+    if g:pe_competesys == 'async'
         let g:asyncomplete_auto_popup = 1
 
         function! s:check_back_space() abort
@@ -1567,10 +1587,11 @@ call plug#begin(pe_runtimepath . '/plugged')
                     \ pumvisible() ? "\<C-p>" :
                     \ vsnip#jumpable(-1) ? '<Plug>(vsnip-jump-prev)' :
                     \ "\<C-h>"
-        inoremap <expr> <C-c>   pumvisible() ? "\<Esc>" : "\<C-c>"
+        " See wildmenu CTRL-E  - 结束补全，回到选择匹配之前的状态
+        inoremap <expr> <C-c>  pumvisible() ? "\<C-e>" : "\<C-c>"
 
 
-        inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
+        inoremap <expr> <cr>   pumvisible() ? asyncomplete#close_popup() : "\<cr>"
         " imap <c-space> <Plug>(asyncomplete_force_refresh)
 
         if has('patch-8.0.1494')
@@ -1585,7 +1606,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     " Disable due to casully eatting some keyhit
     " Plug 'jayli/vim-easycomplete', Cond(g:pe_competesys == 'easy')
     "     Plug 'SirVer/ultisnips' , Cond(g:pe_competesys == 'easy' && has('python3'))
-        
+
     "     let g:easycomplete_nerd_font = 0
     "     " See: https://github.com/jayli/vim-easycomplete/issues/131
     "     let g:easycomplete_lsp_checking = 0
@@ -1607,8 +1628,8 @@ call plug#begin(pe_runtimepath . '/plugged')
 
     " Plug 'garbas/vim-snipmate' , Cond(g:pe_competesys == 'mu')
     " Plug 'MarcWeber/vim-addon-mw-utils' , Cond(g:pe_competesys == 'mu')
-    
-    if g:pe_competesys == 'mu' 
+
+    if g:pe_competesys == 'mu'
         " 6.11.3.1 Gernal Setting
         " -------------------------------------------
         set completeopt+=menuone
@@ -1618,7 +1639,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         " See: https://github.com/lifepillar/vim-mucomplete/issues/153
         " Mucomplete is automatically inserting completions without trigger
         " set completeopt+=longest
-        
+
         set completeopt-=preview
 
         set shortmess+=c   " Shut off completion messages
@@ -1696,17 +1717,17 @@ call plug#begin(pe_runtimepath . '/plugged')
         endif
 
     endif
-    
-    
+
+
                     " \ 'default' : ['nsnp'],
-    
-    
+
+
 " -------------------------------------------
 " 6.11.3 Complete Engine (apt)
 " -------------------------------------------
 "  se
     Plug 'skywind3000/vim-auto-popmenu' , Cond(g:pe_competesys == 'apt')
-    if g:pe_competesys == 'apt' 
+    if g:pe_competesys == 'apt'
         let g:apc_enable_ft = {'text':1, '*':1, 'vim':1}
         set cpt=.,k,w,b
         set completeopt=menu,menuone,noselect
@@ -1723,7 +1744,7 @@ call plug#begin(pe_runtimepath . '/plugged')
 " -------------------------------------------
     Plug 'prabirshrestha/vim-lsp'
         let g:lsp_diagnostics_virtual_text_enabled = 0 " this will cause display random empty line when cursor move
-        let g:lsp_diagnostics_echo_cursor = 1 
+        let g:lsp_diagnostics_echo_cursor = 1
         if has('patch-9.0.0167')
             let g:lsp_inlay_hints_enabled = 1
             " same as Comment
@@ -2131,7 +2152,7 @@ endif
     map <silent> <Leader>y y:<C-U>call Yank(@0)<CR>
     xmap <silent> <space>  y:<C-U>call Yank(@0)<CR>
 
-    " Credit: 
+    " Credit:
     " https://stackoverflow.com/questions/13194428/is-better-way-to-zoom-windows-in-vim-than-zoomwin
     function! s:ZoomToggle() abort
         if exists('t:zoomed') && t:zoomed
@@ -2149,7 +2170,7 @@ endif
     nnoremap <silent> <M-S-z> :ZoomToggle<CR>
 
 
-    " Credit: guitong.wu 
+    " Credit: guitong.wu
     function! s:Duplication()
         let f = expand("%:p:h")."/"
         let filename = input("[Duplicant] Please input filename:".f )
@@ -2239,7 +2260,7 @@ endif
         " Get the current value of the option
         exe 'let current_value =' . a:option
         let choices_list = a:choices
-        
+
         let index = index(choices_list, current_value) " Find the index of the current value in the choices
         " " Toggle the index to get the next option
         if index == -1
@@ -2253,9 +2274,9 @@ endif
             let cmd = 'let ' . a:option . ' = ' . '''' . new_value . ''''
         elseif type(new_value) == 0 " number
             let cmd = 'let ' . a:option . ' = ' . new_value
-        else 
+        else
             echo "Unknow type"
-            return 
+            return
         endif
         echo  'Loop Option ' . (index + 1) .  ' of ' . len(a:choices) . ' by running: ' . cmd
 
