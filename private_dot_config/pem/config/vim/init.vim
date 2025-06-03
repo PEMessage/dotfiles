@@ -115,7 +115,11 @@ let g:startify_custom_header = [
     set wildmenu
     " set wildmode=longest,longest:full " bash like
     set wildmode=longest:full,full
-    set wildoptions=pum
+
+    " See: https://github.com/vim/vim/commit/3908ef5017a6b4425727013588f72cc7343199b9
+    if has('patch-8.2.4325')
+        set wildoptions=pum
+    endif
     " set nomore
     
     " Quick Snippet
