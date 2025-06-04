@@ -1762,6 +1762,20 @@ call plug#begin(pe_runtimepath . '/plugged')
         endif
     Plug 'jiz4oh/vim-lspfuzzy'
     Plug 'mattn/vim-lsp-settings'
+    let g:lsp_settings = {
+                \   'pylsp': {
+                \     'workspace_config': {
+                \       'pylsp': {
+                \         'configurationSources': ['flake8'],
+                \         'plugins': {
+                \           'autopep8': {'enabled': v:true},
+                \           'yapf': {'enabled': v:false},
+                \           'pycodestyle': {'indent_size': 4},
+                \         }
+                \       }
+                \     }
+                \   }
+                \}
 call plug#end()
 
 " 7. VIM Plug-in Zone (Part2)
