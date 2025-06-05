@@ -171,7 +171,9 @@
 # --------------------------------
     # mouse support
     set-option -g mouse on
-    bind-key -n C-M-m run-shell 'tmux-toggle-mouse toggle #{pane_tty}'
+    # bind-key -n C-M-m run-shell 'tmux-toggle-mouse toggle #{pane_tty}'
+    # https://superuser.com/a/1858501
+    set -s command-alias[10] toggle-mouse="run-shell \"tmux-toggle-mouse toggle #{pane_tty}\""
     bind-key -n C-M-r run-shell 'tmux-edit-history'
     # bind-key -n C-M-i run-shell 'tmux-debug #{pane_tty}'
 
