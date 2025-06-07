@@ -2214,6 +2214,14 @@ endif
         return ''
     endfunc
 
+    function! Tapi_Api(bid, arglist)
+        let cmd =  a:arglist[0]
+        let args = a:arglist[1]
+        silent exec cmd . ' ' . fnameescape(args)
+        echo  cmd . ' ' . fnameescape(args)
+        return ''
+    endfunc
+
     command! -nargs=+ -complete=command Redir let s:reg = @@ | redir @"> | silent execute <q-args> | redir END | tab new | pu | 1,2d_ | let @@ = s:reg
 
 

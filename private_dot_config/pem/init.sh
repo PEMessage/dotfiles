@@ -117,7 +117,7 @@
     alias cnl='LC_ALL=zh_CN.UTF-8 LANG=zh_CN.UTF-8'
     alias nvi="nvim"
 
-    alias nvim-lazy='NVIM_APPNAME=lazynvim nvim'
+    # alias nvim-lazy='NVIM_APPNAME=lazynvim nvim'
     alias mv='mv -i'
     alias rm='rm -i'
     alias cp='cp -i'
@@ -187,6 +187,27 @@
                         ;;
                     *.d)
                         PATH="$PATH:$xbin"
+                        ;;
+                esac
+            }
+        done ; unset xbin
+
+        for xbin in \
+            "$x/bin/extra"/*.d 
+        do
+            [ -d "$xbin" ] && {
+                case "$xbin" in
+                    */vim.d)
+                        if [ -n "$VIM_TERMINAL" ] ; then
+                            if [ -z "$PEM_PRE_PATH" ] ; then
+                                # Only for first loop
+                                # Do not append useless ':' before PATH
+                                # Which will casuse '::' in PATH
+                                PEM_PRE_PATH="$xbin"
+                            else
+                                PEM_PRE_PATH="$PEM_PRE_PATH:$xbin"
+                            fi
+                        fi
                         ;;
                 esac
             }
