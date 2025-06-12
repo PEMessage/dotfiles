@@ -42,10 +42,11 @@ cp Microsoft/config-wsl .config
 # CONFIG_STAGING=y" | tee -a .config
 ./scripts/config --file .config \
     --enable CONFIG_ANDROID \
-    --enable CONFIG_ASHMEM \
     --enable CONFIG_ANDROID_BINDER_IPC \
     --set-str CONFIG_ANDROID_BINDER_DEVICES "binder,hwbinder,vndbinder" \
-    --enable CONFIG_ANDROID_BINDERFS
+    --enable CONFIG_ANDROID_BINDERFS \
+    --enable CONFIG_STAGING \
+    --enable CONFIG_ASHMEM
 make olddefconfig
 
 # compile
