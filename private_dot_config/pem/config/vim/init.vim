@@ -673,6 +673,7 @@ let g:startify_custom_header = [
     endfunction
     command! PEWrite :call PEWrite()
     command! PWrite :call PEWrite()
+    command! ConvertUTF :w ++enc=utf-8 % | e %
 
     " command! PWrite call SudoSaveFile()
     " function! SudoSaveFile() abort
@@ -1038,6 +1039,10 @@ call plug#begin(pe_runtimepath . '/plugged')
     " Plug 'sheerun/vim-polyglot'
     Plug 'mtdl9/vim-log-highlighting'
     Plug 'udalov/kotlin-vim'
+    if has('patch-8.2.4980')
+        Plug 'bfrg/vim-cmake-help'
+        autocmd FileType cmake nnoremap <buffer> K :CMakeHelpPopup <C-R><C-W><CR>
+    endif
     " Plug 'gburca/vim-logcat'
     Plug 'chrisbra/Colorizer' , { 'on': 'ColorToggle' }
     Plug 'powerman/vim-plugin-AnsiEsc' , { 'on': 'AnsiEsc' }
@@ -1102,6 +1107,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         command! Gqf GitGutterQuickFix | copen
         nmap [c <Plug>(GitGutterPrevHunk)
         nmap ]c <Plug>(GitGutterNextHunk)
+        nmap <leader>u ::GitGutterUndoHunk<CR>
     Plug 'will133/vim-dirdiff' , { 'on': [ 'DirDiff' ] }
         let g:DirDiffWindowSize = 7
     Plug 'samoshkin/vim-mergetool'

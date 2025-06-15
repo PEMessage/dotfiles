@@ -31,7 +31,7 @@ get_download_path() {
         cd "$(get_cache_dir)"
         rsync --progress -r "$1" .
     fi
-    /mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe Set-Clipboard -Path "$(basename "$file")"
+    /mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe Set-Clipboard -Path "'$(basename "$file")'"
 }
 
 
