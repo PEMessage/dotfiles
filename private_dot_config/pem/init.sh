@@ -167,6 +167,21 @@
 
         # common PATH
         for xbin in \
+            "$x/bin/extra"/*.d 
+        do
+            [ -d "$xbin" ] && {
+                case "$xbin" in
+                    */vim.d) if [ -n "$VIM_TERMINAL" ] ; then
+                        PEM_PRE_PATH="$PEM_PRE_PATH:$xbin"
+                    fi ;;
+                    */wsl.d) if [ "$PEM_OS_VARIANT" = wsl2 ] ; then
+                        PEM_PRE_PATH="$PEM_PRE_PATH:$xbin"
+                    fi ;;
+                esac
+            }
+        done ; unset xbin
+
+        for xbin in \
             "$x/bin"/*.d \
             "$x/bin/arch/${PEM_OS}-${PEM_ARCH}"/*.d \
             "$x/bin/common"/*.d \
@@ -174,46 +189,16 @@
         do
             [ -d "$xbin" ] && {
                 case "$xbin" in
-                    *.pre.d)
-                        # will be preappend to $PATH later
-                        if [ -z "$PEM_PRE_PATH" ] ; then
-                            # Only for first loop
-                            # Do not append useless ':' before PATH
-                            # Which will casuse '::' in PATH
-                            PEM_PRE_PATH="$xbin"
-                        else
-                            PEM_PRE_PATH="$PEM_PRE_PATH:$xbin"
-                        fi
-                        ;;
-                    *.d)
-                        PATH="$PATH:$xbin"
-                        ;;
+                    *.pre.d) PEM_PRE_PATH="$PEM_PRE_PATH:$xbin" ;;
+                    *.d) PATH="$PATH:$xbin" ;;
                 esac
             }
         done ; unset xbin
 
-        for xbin in \
-            "$x/bin/extra"/*.d 
-        do
-            [ -d "$xbin" ] && {
-                case "$xbin" in
-                    */vim.d)
-                        if [ -n "$VIM_TERMINAL" ] ; then
-                            if [ -z "$PEM_PRE_PATH" ] ; then
-                                # Only for first loop
-                                # Do not append useless ':' before PATH
-                                # Which will casuse '::' in PATH
-                                PEM_PRE_PATH="$xbin"
-                            else
-                                PEM_PRE_PATH="$PEM_PRE_PATH:$xbin"
-                            fi
-                        fi
-                        ;;
-                esac
-            }
-        done ; unset xbin
     done ; unset x
+    # reduce useless :, to avoid '::' in PATH(cause add . to PATH)
     if [ -n "$PEM_PRE_PATH" ] ; then
+        PEM_PRE_PATH="${PEM_PRE_PATH#*:}" # Remove up to first :
         PATH="$PEM_PRE_PATH:$PATH"
     fi
 
