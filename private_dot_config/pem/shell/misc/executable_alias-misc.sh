@@ -1,4 +1,3 @@
-alias ffapt='ffpm i'
 alias rsync='rsync --progress'
 alias s="git status --short --branch"
 alias vit='vim $(command ls -tp | grep -v / |  head -n1)'
@@ -15,6 +14,7 @@ alias vi="vim" # if we dont use package manger vim, we shouldn't use package man
 # -i, --input-file=<FILE>
 alias q-aria2c='aria2c -c -s 16 -x 16'
 alias q-less='less -R --mouse -X'
+alias q-sudo='sudo -E env "PATH=$PATH"'
 
 # alias ttt='command ls -tp | head -n1'
 ttt() {
