@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Check if an argument was provided
+if [ $# -eq 0 ]; then
+    echo "Error: No executable specified"
+    echo "Usage: $0 <executable>"
+    exit 1
+fi
+
+# Run vim with TermdebugEx command
+exec vim -c "TermdebugEx $1"
