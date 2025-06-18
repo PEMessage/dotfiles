@@ -1107,7 +1107,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         command! Gqf GitGutterQuickFix | copen
         nmap [c <Plug>(GitGutterPrevHunk)
         nmap ]c <Plug>(GitGutterNextHunk)
-        nmap <leader>u ::GitGutterUndoHunk<CR>
+        nmap <leader>u :GitGutterUndoHunk<CR>
     Plug 'will133/vim-dirdiff' , { 'on': [ 'DirDiff' ] }
         let g:DirDiffWindowSize = 7
     Plug 'samoshkin/vim-mergetool'
