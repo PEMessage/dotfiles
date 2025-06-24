@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Check if an argument was provided
 if [ $# -eq 0 ]; then
@@ -7,5 +7,15 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
+
+# Build properly quoted arguments
+cmd="TermdebugEx"
+for arg in "$@"; do
+    # Escape any existing quotes and wrap in quotes
+    arg="${arg//\'/\'\\\'\'}"
+    cmd="$cmd '$arg'"
+done
+
 # Run vim with TermdebugEx command
-exec vim -c "TermdebugEx $*"
+# echo vim -c "---$cmd---"
+exec vim -c "$cmd"
