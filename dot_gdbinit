@@ -211,3 +211,4 @@ if True:
 Plug.end()
 end
 
+# vim: filetype=python
