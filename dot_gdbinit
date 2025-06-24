@@ -13,7 +13,7 @@ class PlugBootStrap(gdb.Command):
 
     def bootstrap(self, force_update=False):
         # Path configurations
-        plugin_dir = os.path.expanduser("~/.config/gdb")
+        plugin_dir = os.path.expanduser(os.path.join("~", ".config", "gdb"))
         plugin_path = os.path.join(plugin_dir, "gdbplug.py")
         raw_plugin_url = "https://raw.githubusercontent.com/PEMessage/gdbplug/main/gdbplug.py"
 
@@ -30,8 +30,6 @@ class PlugBootStrap(gdb.Command):
                 print(f"Installation failed: {e}")
                 sys.exit(1)
         gdb.execute("source {}".format(plugin_path))
-
-
 PlugBootStrap().bootstrap()
 end
 
