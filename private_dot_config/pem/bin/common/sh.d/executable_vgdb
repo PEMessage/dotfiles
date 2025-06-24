@@ -8,4 +8,4 @@ if [ $# -eq 0 ]; then
 fi
 
 # Run vim with TermdebugEx command
-exec vim -c "TermdebugEx $1"
+exec vim -c "TermdebugEx $*"
