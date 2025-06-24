@@ -11,9 +11,14 @@ fi
 # Build properly quoted arguments
 cmd="TermdebugEx"
 for arg in "$@"; do
-    # Escape any existing quotes and wrap in quotes
-    arg="${arg//\'/\'\\\'\'}"
-    cmd="$cmd '$arg'"
+    # Check if argument contains spaces
+    if [[ "$arg" =~ [[:space:]] ]]; then
+        # Escape single quotes and wrap in quotes
+        arg="${arg//\'/\'\\\'\'}"
+        cmd="$cmd '$arg'"
+    else
+        cmd="$cmd $arg"
+    fi
 done
 
 # Run vim with TermdebugEx command

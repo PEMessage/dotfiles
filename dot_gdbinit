@@ -216,6 +216,7 @@ python
 Plug.begin(autoload='none')
 if True:
     Plug.plug('lebr0nli/GEP')
+    Plug.plug('PEMessage/regdiff-gdb', autoload=True)
 Plug.end()
 end
 
