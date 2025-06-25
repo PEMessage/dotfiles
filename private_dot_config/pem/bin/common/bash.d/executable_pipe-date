@@ -6,7 +6,8 @@ command="$1"
 shift
 
 # Example Usage:
-# git commit --amend --date="$(date -d "$(git log --format="%cI" -n1 | cut -d'T' -f1) 23:54:33 +0800" | pipe-date '-2 hours -23 min' | pipe-date random '3' --rfc-email)"
+# git commit --amend --date="$(date -d "$(git log --format="%cI" -n1 | cut -dT -f1) 23:54:33 +0800" | pipe-date "-2 hours -23 min" | pipe-date random "3" --rfc-email)"
+# git rebase -i 48ace6be393bffed0ed9e4 --exec 'git commit --amend --no-edit --date="$(date -d "$(git log --format="%cI" -n1 | cut -dT -f1) 23:54:33 +0800" | pipe-date "-2 hours -23 min" | pipe-date random "3" --rfc-email)"' --autostash
 if [ "$command" = random  ]; then
     # Handle random hour mode (second script)
     hour="$1"
