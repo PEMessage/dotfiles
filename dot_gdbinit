@@ -1,10 +1,14 @@
+
+# noqa E501
 python
 import os
 import subprocess
 import sys
 
+
 class PlugBootStrap(gdb.Command):
     """Update or install the gdbplug.py plugin"""
+
     def __init__(self):
         super(PlugBootStrap, self).__init__("update-plug", gdb.COMMAND_USER)
 
@@ -30,6 +34,8 @@ class PlugBootStrap(gdb.Command):
                 print(f"Installation failed: {e}")
                 sys.exit(1)
         gdb.execute("source {}".format(plugin_path))
+
+
 PlugBootStrap().bootstrap()
 end
 
@@ -169,20 +175,21 @@ end
 # ==========================================
 
 python
-from __future__ import print_function
+from __future__ import print_function  # noqa E402
 
-import gdb
-import string
-import subprocess
-import sys
+import gdb  # noqa E402
+import string  # noqa E402
+import subprocess  # noqa E402
+import sys  # noqa E402
+
 
 class ShellPipe (gdb.Command):
     "Command to pipe gdb internal command output to external commands."
 
     def __init__(self):
-        super (ShellPipe, self).__init__("shell-pipe",
-                gdb.COMMAND_DATA,
-                gdb.COMPLETE_NONE, True)
+        super(ShellPipe, self).__init__("shell-pipe",
+                                        gdb.COMMAND_DATA,
+                                        gdb.COMPLETE_NONE, True)
         gdb.execute("alias -a sp = shell-pipe", True)
 
     def invoke(self, arg, from_tty):
@@ -206,12 +213,15 @@ class ShellPipe (gdb.Command):
             shell_process.communicate(output.encode('utf-8'))
         else:
             sys.stdout.write(output)
+
+
 ShellPipe()
 
 
-# Thanks to: https://stackoverflow.com/questions/1262639/multiple-commands-in-gdb-separated-by-some-sort-of-delimiter
+# Thanks to: https://stackoverflow.com/questions/1262639/multiple-commands-in-gdb-separated-by-some-sort-of-delimiter  # noqa
 class Cmds(gdb.Command):
     """run multiple commands separated by ';'"""
+
     def __init__(self):
         gdb.Command.__init__(
                 self,
@@ -226,14 +236,14 @@ class Cmds(gdb.Command):
             # from_tty is passed in from invoke.
             # These commands should be considered interactive if the command
             # that invoked them is interactive.
-            # to_string is false. We just want to write the output of the commands, not capture it.
+            # to_string is false. We just want to write the output of the commands, not capture it.  # noqa
             gdb.execute(fragment, from_tty=from_tty, to_string=False)
         print()
+
+
 Cmds()
 
 end
-
-
 
 
 python
