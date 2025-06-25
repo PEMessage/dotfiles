@@ -41,6 +41,7 @@ git_config_global alias.dis 'diff --staged'
 git_config_global alias.dfs 'diff --staged'
 git_config_global alias.ddf 'difftool --ignore-submodules --dir-diff --no-symlinks --tool=dirdiff'
 git_config_global difftool.dirdiff.cmd 'dirdiff $LOCAL $REMOTE'
+git_config_global difftool.xxd.cmd "bash -c 'vimdiff <(xxd \$1) <(xxd \$2)' -- \$LOCAL \$REMOTE"
 git_config_global alias.rflog 'reflog --date=format:'"'"'%y-%m-%d %H:%M'"'"
 git_config_global alias.contain \
     '!func() { head=HEAD ; [ "$2" ] && head="$2" ; git merge-base --is-ancestor $1 $head ; } ; func'
@@ -70,3 +71,4 @@ git_config_global alias.remove-file-from-branch-history '!sh -c '"'"'git filter-
 git_config_global alias.reproduced-online-stat 'log --graph --stat --format="%C(auto)%h%C(reset) %C(auto)%d %C(bold blue)%s%C(reset)"'
 git_config_global alias.reset-author \
     "-c rebase.instructionFormat='%s%nexec GIT_COMMITTER_DATE=\"%cD\" GIT_AUTHOR_DATE=\"%aD\" git commit --amend --no-edit --reset-author' rebase -f"
+
