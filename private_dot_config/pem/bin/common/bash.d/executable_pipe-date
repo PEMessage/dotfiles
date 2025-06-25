@@ -1,0 +1,30 @@
+#!/bin/bash
+
+
+date="$(cat)"
+command="$1"
+shift
+
+# Example Usage:
+# git commit --amend --date="$(date -d "$(git log --format="%cI" -n1 | cut -d'T' -f1) 23:54:33 +0800" | pipe-date '-2 hours -23 min' | pipe-date random '3' --rfc-email)"
+if [ "$command" = random  ]; then
+    # Handle random hour mode (second script)
+    hour="$1"
+    shift
+    if [ ! "$hour" = 0 ]; then
+        random_seconds="$(echo "$(( RANDOM )) % (3600 * $hour)" | bc)"
+    else
+        random_seconds=0
+    fi
+    expression=" + $random_seconds seconds"
+else
+    # Handle expression mode (first script)
+    expression="$command"
+    if [ "$expression" ]; then
+        expression="+ $expression"
+    else
+        expression=""
+    fi
+fi
+
+date -d "$date $expression "  "$@"
