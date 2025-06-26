@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-
-
 def bit_diff(input1, input2, bit_len=64):
     """
     Compare two values and display a bitwise difference visualization.
@@ -11,6 +9,12 @@ def bit_diff(input1, input2, bit_len=64):
         input2: Second input (can be string in any base or integer)
         bit_len: Number of bits to compare (default: 64)
     """
+    # ANSI color codes
+    RED = '\033[91m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RESET = '\033[0m'
+
     # Parse inputs allowing for different bases (0x for hex, 0b for binary, etc.)
     num1 = int(input1, 0) if isinstance(input1, str) else input1
     num2 = int(input2, 0) if isinstance(input2, str) else input2
@@ -27,27 +31,41 @@ def bit_diff(input1, input2, bit_len=64):
     # Prepare the visualization
     separator = '-' * (bit_len + 2)
     header = f"Bit Difference ({bit_len}-bit)\n"
-    header = f"Input 1: {num1} (0x{num1:016x})\n"
-    header = f"Input 2: {num2} (0x{num2:016x})\n"
+    header += f"Input 1: {num1} (0x{num1:016x})\n"
+    header += f"Input 2: {num2} (0x{num2:016x})\n"
     header += f"Diff Mask: 0x{diff:016x} (Decimal: {diff})\n"
 
     print(header)
     print(f"{'Input 1:':<9}", end='')
     for i in range(bit_len-1, -1, -1):
-        print('1' if num1 & (1 << i) else '0', end='')
+        bit = '1' if num1 & (1 << i) else '0'
+        if diff & (1 << i) and bit == '1':
+            print(f"{RED}{bit}{RESET}", end='')
+        elif diff & (1 << i):
+            print(f"{YELLOW}{bit}{RESET}", end='')
+        else:
+            print(bit, end='')
     print()
 
     print(f"{'Input 2:':<9}", end='')
     for i in range(bit_len-1, -1, -1):
-        print('1' if num2 & (1 << i) else '0', end='')
+        bit = '1' if num2 & (1 << i) else '0'
+        if diff & (1 << i) and bit == '1':
+            print(f"{GREEN}{bit}{RESET}", end='')
+        elif diff & (1 << i):
+            print(f"{YELLOW}{bit}{RESET}", end='')
+        else:
+            print(bit, end='')
     print()
 
     print(separator)
     print(f"{'Diff:':<9}", end='')
     for i in range(bit_len-1, -1, -1):
         bit_pos = bit_len - i - 1  # 0-based position
-        if diff & (1 << i):
-            print('^', end='')
+        if diff & (1 << i) and num1 & (1 << i):
+            print(f'{RED}^{RESET}', end='')
+        elif diff & (1 << i) and num2 & (1 << i):
+            print(f'{GREEN}^{RESET}', end='')
         else:
             print(' ', end='')
     print()
@@ -57,11 +75,14 @@ def bit_diff(input1, input2, bit_len=64):
     if diff == 0:
         print("  No bits differ")
     else:
-        for i in range(bit_len):
+        for i in range(bit_len-1, -1, -1):
             if diff & (1 << i):
                 pos = i
                 bit_mask = 1 << i
-                print(f"  Bit {pos:2d}: Mask=0x{bit_mask:016x} (1<<{pos})")
+                if num1 & (1 << i):
+                    print(f"  {RED}Bit {pos:2d}{RESET}: Mask=0x{bit_mask:x} (1<<{pos})")
+                else:
+                    print(f"  {GREEN}Bit {pos:2d}{RESET}: Mask=0x{bit_mask:x} (1<<{pos})")
 
 
 if __name__ == "__main__":
