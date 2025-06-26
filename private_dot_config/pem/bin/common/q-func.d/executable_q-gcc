@@ -10,8 +10,26 @@ if [ "$1" = clean ] ; then
     exit 0
 fi
 
-source_file="$1"
+first_args="$1"
 shift  # Remove source file from arguments list
+echo "$@"
+
+if [ "$first_args" = "INTERNAL_CALL" ] ; then
+    source_file="$1"
+    shift
+elif [ -f "$first_args" ] ; then
+    head10="$(head -n10 "$first_args" | grep '//.*q-gcc' | cut -d : -f 2-)"
+    echo "$head10"
+    source_file="$first_args"
+    if [ -n "$head10" ] ; then
+        $0 INTERNAL_CALL $source_file $head10 "$@"
+        exit $?
+    fi
+else
+    echo "Unknow file"
+    exit 1
+fi
+
 
 if [ -t 1 ] ; then
     greenF="\e[1;32m"
@@ -45,7 +63,9 @@ for arg in "$@"; do
 done
 
 # Handle the two cases for separating compiler flags and program arguments
-if [ ${#after_double_dash[@]} -ne 0 ]; then
+# Not use this,` q-gcc right_referenc.cpp -fno-elide-constructors --`  (will not be treated as flag, but prgram args)
+# if [ ${#after_double_dash[@]} -ne 0 ]; then 
+if [ "$first_found_double_dash" = true ]; then
     # Case 1: -- was found, everything after is program args
     compiler_flags=("${pre_compiler_flags[@]}" "${before_double_dash[@]}")
     program_args=("${after_double_dash[@]}")
