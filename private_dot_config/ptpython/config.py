@@ -11,7 +11,7 @@ __all__ = ["configure"]
 
 
 def configure(repl):
-    repl.enable_mouse_support = False
+    repl.enable_mouse_support = True
     repl.enable_auto_suggest = True
     repl.color_depth = "DEPTH_24_BIT"
     repl.min_brightness = 0.4
@@ -22,11 +22,20 @@ def configure(repl):
         ' Pressing Control-B will insert "pdb.set_trace()" '
         event.cli.current_buffer.insert_text('\nimport pdb; pdb.set_trace()\n')
 
-    # Debug Only
-    # @repl.add_key_binding(Keys.ControlQ)
-    # def _(event):
-    #     a = repl
-    #     pudb.set_trace()
+    try:
+        # Debug Only
+        import pudb
+
+        @repl.add_key_binding(Keys.ControlQ)
+        def _(event):
+            # a = repl
+            pudb.set_trace()
+    except:  # noqa E261
+        # print("pudb not load")
+        pass
+    else:
+        # print("pudb is load, your could use CtrlQ to call it")
+        pass
 
     @repl.add_key_binding(Keys.ControlT)
     def _(event):
@@ -51,6 +60,11 @@ def configure(repl):
         'q_bwrite': q_bwrite,
     })
     '''))
+
+    # Your could use CtrlQ using pudb, to play with repl
+    repl.get_globals().update({
+        'ptpython_self_repl': repl
+        })
 
 
 
