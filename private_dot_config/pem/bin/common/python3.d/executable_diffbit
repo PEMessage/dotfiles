@@ -103,7 +103,7 @@ if __name__ == "__main__":
             return default
     import sys
     if len(sys.argv) != 3 and len(sys.argv) != 4:
-        print("Usage: python bit_diff.py <input1> <input2>")
+        print("Usage: python bit_diff.py <input1> <input2> <mask>")
         print("Example: python bit_diff.py 0b1101 0b1011")
         print("Example: python bit_diff.py 123 456")
         print("Example: python bit_diff.py 0xdeadbeef 0xdeadbabe")

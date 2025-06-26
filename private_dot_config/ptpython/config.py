@@ -6,6 +6,7 @@ from prompt_toolkit.styles import Style
 from ptpython.layout import CompletionVisualisation
 # import pudb
 from textwrap import dedent
+from ptpython.style import get_all_styles
 
 __all__ = ["configure"]
 
@@ -61,10 +62,37 @@ def configure(repl):
     })
     '''))
 
+    def style_cycler():
+        """Generator that cycles through all available ptpython styles."""
+
+        # all_styles = list(get_all_styles())
+        all_styles = ['paraiso-dark', 'native', 'rainbow_dash', 'stata-dark']
+        index = 0
+
+        while True:
+            style_name = all_styles[index]
+            yield style_name
+
+            # Move to next index, wrap around if needed
+            index = (index + 1) % len(all_styles)
+
+    style_generator = style_cycler()
+
+    def next_style():
+        """Apply the next color scheme in the cycle."""
+        style = next(style_generator)
+        repl.use_code_colorscheme(style)
+        print(f"Applied style: {style}")
+
     # Your could use CtrlQ using pudb, to play with repl
     repl.get_globals().update({
-        'ptpython_self_repl': repl
+        'ptpython_self_repl': repl,
+        'ptpython_next_style': next_style
         })
+
+    # https://github.com/prompt-toolkit/ptpython/issues/45
+    # list(ptpython.style.get_all_styles())
+    repl.use_code_colorscheme('native')
 
 
 
