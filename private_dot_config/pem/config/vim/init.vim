@@ -2007,6 +2007,7 @@ endif
         nmap <buffer> <leader>lo :LspCallHierarchyOutgoing<CR>
         nmap <buffer> <M-h> :LspDocumentSwitchSourceHeader<CR>
         nnoremap <leader>av :Vista vim_lsp<CR>
+        nnoremap <buffer> <leader>q :LspCodeAction --ui=float<CR>
         " nnoremap <buffer> <expr><c-f> lsp#scroll(+4)
         " nnoremap <buffer> <expr><c-d> lsp#scroll(-4)
 

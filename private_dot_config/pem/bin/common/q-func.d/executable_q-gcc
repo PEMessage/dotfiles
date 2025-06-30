@@ -12,7 +12,6 @@ fi
 
 first_args="$1"
 shift  # Remove source file from arguments list
-echo "$@"
 
 if [ "$first_args" = "INTERNAL_CALL" ] ; then
     source_file="$1"
@@ -80,6 +79,7 @@ else
             || "$arg" =~ ^-I \
             || "$arg" =~ ^-L \
             || "$arg" =~ ^-std \
+            || "$arg" =~ ^-D \
             || "$arg" =~ ^-l ]]; then
             compiler_flags+=("$arg")
         else
