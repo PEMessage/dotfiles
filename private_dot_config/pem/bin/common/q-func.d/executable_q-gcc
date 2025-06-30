@@ -17,7 +17,7 @@ if [ "$first_args" = "INTERNAL_CALL" ] ; then
     source_file="$1"
     shift
 elif [ -f "$first_args" ] ; then
-    head10="$(head -n10 "$first_args" | grep '//.*q-gcc' | cut -d : -f 2-)"
+    head10="$(head -n10 "$first_args" | grep '//.*q-gcc:' | cut -d : -f 2-)"
     echo "$head10"
     source_file="$first_args"
     if [ -n "$head10" ] ; then
