@@ -17,3 +17,26 @@ a2p() {
     echo $PATH | tr ':' '\n' | grep -v '^$' | head -n5
     echo '...'
 }
+
+
+
+# in order use - in function name, using ksh style declare
+function q-activate() {
+    local current_dir="$PWD"
+    local found=0
+
+    while [ "$current_dir" != "/" ]; do
+        if [ -d "$current_dir/.venv" ]; then
+            found=1
+            break
+        fi
+        current_dir=$(dirname "$current_dir")
+    done
+
+    if [ "$found" -eq 0 ]; then
+        echo "No .venv directory found in any parent directory"
+        return 1
+    else
+        source "$current_dir/.venv/bin/activate"
+    fi
+}
