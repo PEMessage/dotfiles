@@ -1029,13 +1029,6 @@ call plug#begin(pe_runtimepath . '/plugged')
     " Plug 'fedorenchik/fasm.vim' " in Vim9, we have it as builtin
         autocmd BufNewFile,BufRead *.fasm set filetype=fasm
         " See quickrun-exec-format
-        let g:quickrun_config = {
-                    \   'fasm': {
-                    \     'command': 'fasm',
-                    \     'exec': ['%c %s','chmod a+x %s:r', '%s:r'],
-                    \     'tempfile': '%{tempname()}',
-                    \   },
-                    \ }
     " Plug 'sheerun/vim-polyglot'
     Plug 'mtdl9/vim-log-highlighting'
     Plug 'udalov/kotlin-vim'
@@ -1400,7 +1393,26 @@ call plug#begin(pe_runtimepath . '/plugged')
 
     Plug 'skywind3000/asyncrun.vim'
     Plug 'thinca/vim-quickrun'
+        let g:quickrun_config = {}
+        " Thanks to:
+        " https://github.com/koturn/vim-config/blob/29d0eb63f061427295fbe0591d2fe8cd7fb5225f/autoload/pluginconfig.vim#L22
+        let g:quickrun_config['_'] = {
+                    \   'runner': 'job',      
+                    \   'outputter': 'error',
+                    \   'outputter/error': 'quickfix',
+                    \   'outputter/error/success': 'buffer',
+                    \   'outputter/buffer/split': ':botright',
+                    \   'outputter/buffer/close_on_empty': 1,
+                    \   'hook/shebang/enable': !has('win32') && !has('win64')
+                    \ }
+
+        let g:quickrun_config['fasm'] = {
+                    \     'command': 'fasm',
+                    \     'exec': ['%c %s','chmod a+x %s:r', '%s:r'],
+                    \     'tempfile': '%{tempname()}',
+                    \ }
         nnoremap <leader>rr :QuickRun<CR>
+        command! -nargs=* QGCC execute 'QuickRun q-gcc <args>'
         " $VIM_FILEPATH  - File name of current buffer with full path
         " $VIM_FILENAME  - File name of current buffer without path
         " $VIM_FILEDIR   - Full path of current buffer without the file name
