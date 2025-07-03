@@ -1223,6 +1223,11 @@ call plug#begin(pe_runtimepath . '/plugged')
         tnoremap  <silent><M-S-j> <cmd>TmuxNavigateDown<cr>
         tnoremap  <silent><M-S-k> <cmd>TmuxNavigateUp<cr>
         tnoremap  <silent><M-S-l> <cmd>TmuxNavigateRight<cr>
+
+        cnoremap  <silent><M-S-h> <cmd>TmuxNavigateLeft<cr>
+        cnoremap  <silent><M-S-j> <cmd>TmuxNavigateDown<cr>
+        cnoremap  <silent><M-S-k> <cmd>TmuxNavigateUp<cr>
+        cnoremap  <silent><M-S-l> <cmd>TmuxNavigateRight<cr>
         " Tmux Like
         nnoremap <silent><M-S-C> :vsplit<CR>
         nnoremap <silent><M-S-X> :confirm q<CR>
