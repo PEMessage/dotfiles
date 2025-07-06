@@ -2018,6 +2018,11 @@ endif
         nmap <buffer> ]d <plug>(lsp-next-diagnostic)
         nmap <buffer> K <plug>(lsp-hover)
 
+        " THANKS:
+        " https://github.com/h-wata/dotfiles/blob/fdb2ff699d840e67517039ea1db590c2c18c723b/dot_vim/_config/lsp.vim
+        nmap <buffer> <leader>F <plug>(lsp-document-format)
+        xmap <buffer> <leader>F <plug>(lsp-document-range-format)
+
         " Extra Map
         nmap <buffer> <leader>lt :LspTypeHierarchy<CR>
         nmap <buffer> <leader>li :LspCallHierarchyIncoming<CR>
