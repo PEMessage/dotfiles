@@ -32,12 +32,21 @@
 
 outprint = 'TRACE_ME_OUT;\t//<<==--TracePoint!\n'
 inprint = 'TRACE_ME_IN;\t//<<==--TracePoint!\n'
-defprint = """
+defprint1 = """
 #include <sys/time.h>
 #define TRACE_ME_IN struct timeval tp ; gettimeofday ( &tp , nullptr ); printf("[%4ld.%4ld] In: %s\\n",tp.tv_sec , tp.tv_usec,__PRETTY_FUNCTION__);
 #define TRACE_ME_OUT gettimeofday ( &tp , nullptr ); printf("[%4ld.%4ld] Out: %s\\n",tp.tv_sec , tp.tv_usec,__PRETTY_FUNCTION__);
-
 """
+
+defprint2 = """
+#include <stdio.h>
+// extern int INDENT; // chose 1
+// int INDENT = 0; // chose 2
+#define TRACE_ME_IN  do { printf("I:");                            int i = 0; for ( i = 0; i < INDENT; i++) {printf("  ");} printf("%s-%d {\n",    __func__, __LINE__); INDENT++; } while(0)
+#define TRACE_ME_OUT do { printf("O:"); if (INDENT > 0 ) INDENT--; int i = 0; for ( i = 0; i < INDENT; i++) {printf("  ");} printf("} // %s-%d\n", __func__, __LINE__);           } while(0)
+"""
+
+defprint = defprint2
 
 fileExts = ['*.c','*.cpp','*.cc']
 
