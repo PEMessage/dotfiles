@@ -42,8 +42,8 @@ defprint2 = """
 #include <stdio.h>
 // extern int INDENT; // chose 1
 // int INDENT = 0; // chose 2
-#define TRACE_ME_IN  do { printf("I:");                            int i = 0; for ( i = 0; i < INDENT; i++) {printf("  ");} printf("%s-%d {\n",    __func__, __LINE__); INDENT++; } while(0)
-#define TRACE_ME_OUT do { printf("O:"); if (INDENT > 0 ) INDENT--; int i = 0; for ( i = 0; i < INDENT; i++) {printf("  ");} printf("} // %s-%d\n", __func__, __LINE__);           } while(0)
+#define TRACE_ME_IN  do { printf("I:");                            int i = 0; for ( i = 0; i < INDENT; i++) {printf("  ");} printf("%s-%d {\\n",    __func__, __LINE__); INDENT++; } while(0)
+#define TRACE_ME_OUT do { printf("O:"); if (INDENT > 0 ) INDENT--; int i = 0; for ( i = 0; i < INDENT; i++) {printf("  ");} printf("} // %s-%d\\n", __func__, __LINE__);           } while(0)
 """
 
 defprint = defprint2
@@ -236,7 +236,7 @@ def main():
     filelist = []
     if len(args.files ) == 0 :
         for fileext in fileExts:
-            filelist += glob.glob('.\\**\\'+fileext, recursive=args.recursive)
+            filelist += glob.glob('./**/'+fileext, recursive=args.recursive)
     else:
         # For Python 2 where argparse does not return Unicode.
         args.files = [filename.decode(sys.getfilesystemencoding())
