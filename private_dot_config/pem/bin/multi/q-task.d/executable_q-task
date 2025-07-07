@@ -20,6 +20,32 @@ usage() {
     echo "CONF_DBEUG      : $CONF_DBEUG"
 }
 
+zsh_completion() {
+    cat <<'EOF'
+#compdef q-task
+
+_q-task() {
+    local -a commands tasks
+
+    commands=(
+        '-h:Show help'
+        '-l:List all tasks'
+        '--shell:Generate shell completion'
+    )
+
+    if [[ $words[2] == -* || $CURRENT -eq 2 ]]; then
+        _describe 'command' commands
+    else
+        # Get task list from 'q-task -l' command
+        tasks=(${(f)"$(q-task -l 2>/dev/null)"})
+        _describe 'task' tasks
+    fi
+}
+
+compdef _q-task q-task
+EOF
+}
+
 
 main() {
     [ -n "$1" ] || {
@@ -36,6 +62,12 @@ main() {
                 cd "$CONF_BUCKET_DIR"
                 find . -type f -name '*sh'
             )
+            ;;
+        --shell)
+            case $2 in
+                zsh) zsh_completion;;
+                *);;
+            esac
             ;;
         *)
             [ -f "$CONF_BUCKET_DIR/$1" ] && bash "$CONF_BUCKET_DIR/$1" || {
