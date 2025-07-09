@@ -13,7 +13,8 @@ import sys
 import subprocess
 from typing import List, Tuple
 
-import click
+# import click
+import argparse
 
 MYDIR = os.path.dirname(os.path.abspath(sys.argv[0]))
 
@@ -161,10 +162,11 @@ def get_cmd_path() -> str:
     return "cmd.exe"
 
 
-@click.command()
-@click.option("--logfile")
-@click.argument("file_or_url")
-def main(logfile, file_or_url):
+# @click.command()
+# @click.option("--logfile")
+# @click.argument("file_or_url")
+# def main(logfile, file_or_url):
+def main():
     """Drop-in replacement for xdg-open on WSL systems that will open filename or URL using Windows.
 
     Use this to have your WSL X-application open files and links in the corresponding Windows application.
@@ -178,6 +180,13 @@ def main(logfile, file_or_url):
     it is passed as a standard full "D:\\my\\path\\file.ext" to Windows for handling. If it is on the WSL
     filesystem, it is transformed to a "wsl$\\"-style URI and passed to Windows for handling.
     """
+    parser = argparse.ArgumentParser(description=main.__doc__)
+    parser.add_argument("--logfile", help="Path to log file")
+    parser.add_argument("file_or_url", help="File path or URL to open")
+
+    args = parser.parse_args()
+    logfile = args.logfile
+    file_or_url = args.file_or_url
 
     if logfile is not None:
         file_handler = logging.FileHandler(logfile)
