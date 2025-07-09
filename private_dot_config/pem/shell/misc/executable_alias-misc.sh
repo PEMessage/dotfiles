@@ -14,6 +14,8 @@ alias vi="vim" # if we dont use package manger vim, we shouldn't use package man
 # -i, --input-file=<FILE>
 alias q-aria2c='aria2c -c -s 16 -x 16'
 alias q-less='less -R --mouse -X'
+# `sudo -E` will passthough all env expect PATH
+# `env "PATH=$PATH"` will using first ARGS as PATH to run following command
 alias q-sudo='sudo -E env "PATH=$PATH"'
 
 # alias ttt='command ls -tp | head -n1'

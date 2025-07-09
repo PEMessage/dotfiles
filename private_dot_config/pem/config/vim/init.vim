@@ -1770,8 +1770,8 @@ call plug#begin(pe_runtimepath . '/plugged')
 " -------------------------------------------
 " 6.12 debug adapter
 " -------------------------------------------
-    " Plug 'puremourning/vimspector'
-    "     let g:vimspector_enable_mappings = 'HUMAN'
+    Plug 'puremourning/vimspector'
+        let g:vimspector_enable_mappings = 'HUMAN'
 " -------------------------------------------
 " 6.13 LSP
 " -------------------------------------------
