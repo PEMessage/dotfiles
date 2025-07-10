@@ -1074,6 +1074,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     "     xmap ga <Plug>(EasyAlign)
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-commentary'
+    Plug 'vim-scripts/DoxygenToolkit.vim'
     " Using :verbose and :set together will (likely) tell you
     " the file and line number where the option was last set.
     " Can you do the following after opening a kotlin file?
@@ -1786,6 +1787,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         endif
     Plug 'jiz4oh/vim-lspfuzzy'
     Plug 'mattn/vim-lsp-settings'
+    Plug 'm-pilia/vim-ccls'
     let g:lsp_settings = {
                 \   'pylsp': {
                 \     'workspace_config': {
@@ -1800,6 +1802,7 @@ call plug#begin(pe_runtimepath . '/plugged')
                 \     }
                 \   }
                 \}
+    Plug 'PEMessage/jorenar-lsp-calltree'
 call plug#end()
 
 " 7. VIM Plug-in Zone (Part2)
