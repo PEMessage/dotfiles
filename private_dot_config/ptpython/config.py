@@ -12,7 +12,7 @@ __all__ = ["configure"]
 
 
 def configure(repl):
-    repl.enable_mouse_support = True
+    repl.enable_mouse_support = False
     repl.enable_auto_suggest = True
     repl.color_depth = "DEPTH_24_BIT"
     repl.min_brightness = 0.4
@@ -93,6 +93,10 @@ def configure(repl):
     # https://github.com/prompt-toolkit/ptpython/issues/45
     # list(ptpython.style.get_all_styles())
     repl.use_code_colorscheme('native')
+
+    @repl.add_key_binding(Keys.ControlK)
+    def _(event):
+        repl.enable_mouse_support = False if repl.enable_mouse_support else True
 
 
 

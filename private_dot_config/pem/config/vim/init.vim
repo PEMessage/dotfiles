@@ -1787,9 +1787,13 @@ call plug#begin(pe_runtimepath . '/plugged')
         endif
     Plug 'jiz4oh/vim-lspfuzzy'
     Plug 'mattn/vim-lsp-settings'
-    Plug 'm-pilia/vim-ccls'
-    let g:lsp_settings = {
-                \   'pylsp': {
+    Plug 'rhysd/vim-healthcheck'
+    " Uncomment this to debug lsp.
+    "   java: For jdtls, we must openjdk21
+    " let g:lsp_log_verbose = 1
+    " let g:lsp_log_file = expand('~/vim-lsp.log')
+    let g:lsp_settings = {}
+    let g:lsp_settings['pylsp'] = {
                 \     'workspace_config': {
                 \       'pylsp': {
                 \         'configurationSources': ['flake8'],
@@ -1801,7 +1805,10 @@ call plug#begin(pe_runtimepath . '/plugged')
                 \       }
                 \     }
                 \   }
-                \}
+    let g:lsp_settings['vim-language-server'] = { 'disabled': 1, } 
+    " let g:lsp_settings['eclipse-jdt-ls'] = {
+    "             \ 'root_uri_patterns'  : ['.root'],
+    "             \}
     Plug 'PEMessage/jorenar-lsp-calltree'
 call plug#end()
 
