@@ -18,6 +18,9 @@ __px3_smartone() {
                 -d|--docker)
                     fnd="$fnd -m systemd -E docker.service"
                 ;;
+                -g|--gradle)
+                    fnd="$fnd -m gradle"
+                ;;
                 *)
                     fnd="$fnd $opt"
                 ;;
@@ -143,6 +146,33 @@ __px3()
                 export PEM_PROXY_ALL=""
             fi
             ;;
+
+        gradle)
+            (
+                override_file="local.properties"
+                if [ "$key" = "http_proxy" ]; then
+                    inter="http"
+                elif [ "$key" = "https_proxy" ]; then
+                    inter="https"
+                elif [ "$key" = "sock5h_proxy" ]; then
+                    inter="sock"
+                else
+                    echo "Gradle Unknow key" >&2
+                    return 1
+                fi
+
+                hostkey=systemProp.$inter.proxyHost
+                portkey=systemProp.$inter.proxyPort
+                # Process shell commands
+                if [ "$action" == "set" ]; then
+                    echo "$hostkey=$ip"
+                    echo "$portkey=$port"
+                else
+                    true
+                fi
+            )
+            ;;
+
 
         systemd)
             if [ -z "$ext_arg" ]; then
