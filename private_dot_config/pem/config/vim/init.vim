@@ -1790,8 +1790,14 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'rhysd/vim-healthcheck'
     " Uncomment this to debug lsp.
     "   java: For jdtls, we must openjdk21
+    "   java: jdtls must match gradle project verion,
+    "         change vim-lsp-settings/installer/install-eclipse-jdt-ls.sh
+    "         jdk17: https://download.eclipse.org/jdtls/milestones/1.20.0/jdt-language-server-1.20.0-202302201605.tar.gz
     " let g:lsp_log_verbose = 1
     " let g:lsp_log_file = expand('~/vim-lsp.log')
+    Plug 'hsanson/vim-android'
+        " using GradleGenClassPathFile to gen .classpath
+        " make sure that you could built it successfully
     let g:lsp_settings = {}
     let g:lsp_settings['pylsp'] = {
                 \     'workspace_config': {
