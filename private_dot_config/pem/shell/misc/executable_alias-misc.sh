@@ -17,6 +17,7 @@ alias q-less='less -R --mouse -X'
 # `sudo -E` will passthough all env expect PATH
 # `env "PATH=$PATH"` will using first ARGS as PATH to run following command
 alias q-sudo='sudo -E env "PATH=$PATH"'
+alias q-xxd='xxd -R always'
 
 # alias ttt='command ls -tp | head -n1'
 ttt() {
