@@ -1357,16 +1357,16 @@ require("lazy").setup({
                 ["gopls"] = function () lspconfig.gopls.setup({ autostart = true }) end,
                 -- ["jdtls"] = function () end, -- Leave it to nvim-jdtls
                 ["jdtls"] = function ()
-                    -- Leave it to nvim-jdtls
-                    local mason_root = require('mason.settings').current.install_root_dir
-                    lspconfig.jdtls.setup({
-                        autostart = true,
-                        init_options = {
-                            bundles = {
-                                -- vim.fn.glob(mason_root .. 'packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar'),
-                            }
-                        }
-                    })
+                    -- leave it to jdtls
+                    -- local mason_root = require('mason.settings').current.install_root_dir
+                    -- lspconfig.jdtls.setup({
+                    --     autostart = true,
+                    --     init_options = {
+                    --         bundles = {
+                    --             -- vim.fn.glob(mason_root .. 'packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar'),
+                    --         }
+                    --     }
+                    -- })
                 end,
 
             })
@@ -1403,18 +1403,36 @@ require("lazy").setup({
     {
         'mfussenegger/nvim-jdtls',
         version = false, -- set this if you want to always pull the latest change
+        -- ft = { "java" }, -- THIS IS KEY, if not this, everything will broken
+        -- UPDATE: this will cause jump to class not work as expect, but other function will do work
+        -- See: https://github.com/mfussenegger/nvim-jdtls/issues/639#issuecomment-3079720936
         dependencies = {
             -- 'mfussenegger/nvim-dap',
             'williamboman/mason.nvim',
             'williamboman/mason-lspconfig.nvim',
-            -- "neovim/nvim-lspconfig",
+            "neovim/nvim-lspconfig",
         },
-        opts = {
-            -- cmd = {'jdtls'},
-            -- root_dir = vim.fs.dirname(vim.fs.find({'gradlew', '.git', 'mvnw', '.root'}, { upward = true })[1]),
-        },
-        config = function (_, opts)
-            -- require('jdtls').start_or_attach(opts)
+        -- opts = {
+        --     cmd = {}, -- leave to config staged
+        --     root_dir = vim.fs.dirname(vim.fs.find({'gradlew', '.git', 'mvnw', '.root'}, { upward = true })[1]),
+        -- },
+        config = function ()
+            -- We using mason-lspconfig, not using it according to readme
+            local jdtls = require('jdtls')
+            opts = {
+                cmd = require('lspconfig').jdtls.document_config.default_config.cmd,
+                -- See: https://github.com/mfussenegger/nvim-jdtls?tab=readme-ov-file#configuration-verbose
+                root_dir = require("jdtls.setup").find_root({ ".git", "mvnw", "gradlew" }),
+            }
+
+            vim.api.nvim_create_autocmd("Filetype", {
+				pattern = "java",
+				callback = function()
+                    require("jdtls").start_or_attach(opts)
+				end,
+			})
+            -- vim.inspect(opts)
+            -- jdtls.start_or_attach(opts)
         end
     },
     -- -------------------------------------------
@@ -2019,3 +2037,5 @@ vim.cmd [[
 
 ]]
 vim.keymap.set('v', '&', ':<C-u>call VisualSelection(\'fa\')<CR>:set hls<CR>', { silent = true })
+
+
