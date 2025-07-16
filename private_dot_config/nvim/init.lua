@@ -1357,12 +1357,13 @@ require("lazy").setup({
                 ["gopls"] = function () lspconfig.gopls.setup({ autostart = true }) end,
                 -- ["jdtls"] = function () end, -- Leave it to nvim-jdtls
                 ["jdtls"] = function ()
+                    -- Leave it to nvim-jdtls
                     local mason_root = require('mason.settings').current.install_root_dir
                     lspconfig.jdtls.setup({
                         autostart = true,
                         init_options = {
                             bundles = {
-                                vim.fn.glob(mason_root .. 'packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar'),
+                                -- vim.fn.glob(mason_root .. 'packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar'),
                             }
                         }
                     })
@@ -1399,21 +1400,23 @@ require("lazy").setup({
         end,
     },
     -- { 'bfredl/nvim-luadev' },
-    -- {
-    --     'mfussenegger/nvim-jdtls',
-    --     dependencies = {
-    --         'mfussenegger/nvim-dap',
-    --         'williamboman/mason.nvim',
-    --         "neovim/nvim-lspconfig",
-    --         -- 'williamboman/mason-lspconfig.nvim',
-    --     },
-    --     opts = {
-    --         root_dir = vim.fs.dirname(vim.fs.find({'gradlew', '.git', 'mvnw', '.root'}, { upward = true })[1]),
-    --     },
-    --     config = function (_, opts)
-    --         require('jdtls').start_or_attach(opts)
-    --     end
-    -- },
+    {
+        'mfussenegger/nvim-jdtls',
+        version = false, -- set this if you want to always pull the latest change
+        dependencies = {
+            -- 'mfussenegger/nvim-dap',
+            'williamboman/mason.nvim',
+            'williamboman/mason-lspconfig.nvim',
+            -- "neovim/nvim-lspconfig",
+        },
+        opts = {
+            -- cmd = {'jdtls'},
+            -- root_dir = vim.fs.dirname(vim.fs.find({'gradlew', '.git', 'mvnw', '.root'}, { upward = true })[1]),
+        },
+        config = function (_, opts)
+            -- require('jdtls').start_or_attach(opts)
+        end
+    },
     -- -------------------------------------------
     -- 5.9 DAP Plug
     -- -------------------------------------------
