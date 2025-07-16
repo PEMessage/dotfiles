@@ -1792,7 +1792,10 @@ call plug#begin(pe_runtimepath . '/plugged')
     "   java: For jdtls, we must openjdk21
     "   java: jdtls must match gradle project verion,
     "         change vim-lsp-settings/installer/install-eclipse-jdt-ls.sh
-    "         jdk17: https://download.eclipse.org/jdtls/milestones/1.20.0/jdt-language-server-1.20.0-202302201605.tar.gz
+    "         jdk17: 1.43.0 (December 19th, 2024) , 1.44 Bump minimum required Java Execution Environment from 17 to 21. See #3358, #3363.
+    "         Also see: https://github.com/redhat-developer/vscode-java/wiki/JDK-Requirements
+    "                   https://github.com/redhat-developer/vscode-java/wiki/JDK-Requirements#java.configuration.runtimes
+    "                   recommand way: using 21 for jdtls, and setup other by config
     " let g:lsp_log_verbose = 1
     " let g:lsp_log_file = expand('~/vim-lsp.log')
     Plug 'hsanson/vim-android'
@@ -1811,7 +1814,22 @@ call plug#begin(pe_runtimepath . '/plugged')
                 \       }
                 \     }
                 \   }
-    let g:lsp_settings['vim-language-server'] = { 'disabled': 1, } 
+    " See: https://github.com/iamcco/vim-language-server/issues/39#issuecomment-1677120809
+    " Add support to jump to runtimefiles
+    let g:lsp_settings['vim-language-server'] = { 
+                \   'disabled': 1,
+                \   'initialization_options': {
+                \     'indexes': {
+                \       "runtimepath": v:true,
+                \       "time": 100,
+                \       "count": 3,
+                \     },
+                \     'suggest': {
+                \       "fromVimruntime": v:true,
+                \       "fromRuntimepath": v:true,
+                \     },
+                \   }
+                \ } 
     " let g:lsp_settings['eclipse-jdt-ls'] = {
     "             \ 'root_uri_patterns'  : ['.root'],
     "             \}
