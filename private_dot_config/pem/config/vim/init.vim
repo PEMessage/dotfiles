@@ -1793,9 +1793,13 @@ call plug#begin(pe_runtimepath . '/plugged')
     "   java: jdtls must match gradle project verion,
     "         change vim-lsp-settings/installer/install-eclipse-jdt-ls.sh
     "         jdk17: 1.43.0 (December 19th, 2024) , 1.44 Bump minimum required Java Execution Environment from 17 to 21. See #3358, #3363.
-    "         Also see: https://github.com/redhat-developer/vscode-java/wiki/JDK-Requirements
-    "                   https://github.com/redhat-developer/vscode-java/wiki/JDK-Requirements#java.configuration.runtimes
-    "                   recommand way: using 21 for jdtls, and setup other by config
+    "  Also see: https://github.com/redhat-developer/vscode-java/wiki/JDK-Requirements#java.configuration.runtimes
+    "
+    "  Recommand way:
+    "      using latest jdk for jdtls, and setup project jdk by
+    "      File: gradle.properties
+    "      org.gradle.java.home=/usr/lib/jvm/java-1.17.0-openjdk-amd64
+
     " let g:lsp_log_verbose = 1
     " let g:lsp_log_file = expand('~/vim-lsp.log')
     Plug 'hsanson/vim-android'
