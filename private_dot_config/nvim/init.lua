@@ -929,6 +929,7 @@ require("lazy").setup({
                     require('telescope.builtin').buffers(
                         require('telescope.themes').get_dropdown{
                             -- previewer = false,
+                            sort_lastused = true,
                             attach_mappings = function (_,map)
                                 map( {'i','n'}, '<C-p>',
                                     function(...)
