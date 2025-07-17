@@ -4,6 +4,7 @@ STOP='\e[0m'
 temp=$(chezmoi source-path)
 
 
+GIT_ADD_OPT=""
 for x in "$@"
 do
     if [ "$x" = "-d" ] ; then 
@@ -14,7 +15,11 @@ do
         cd -
         exit 0
     fi
+    if [ "$x" = '-i' ]; then
+        GIT_ADD_OPT="$GIT_ADD_OPT -i"
+    fi
 done
+
 
 
 echo "${GREEN}INFO${STOP}: ""chezmoi re-add all trackfile"
@@ -25,7 +30,7 @@ chezmoi re-add
 echo "${GREEN}INFO${STOP}: ""Add File to source"
 # exit
 cd $temp
-git add .
+git add $GIT_ADD_OPT .
 
 echo "${GREEN}INFO${STOP}: ""Are you sure commit with this change?"
 if [ -z "$1" ]; then

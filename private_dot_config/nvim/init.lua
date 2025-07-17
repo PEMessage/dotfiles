@@ -144,10 +144,14 @@ require("lazy").setup({
         end,
         opts = {
             defaults = {
-                ["g"] = { name = "+goto" },
-                ["]"] = { name = "+next" },
-                ["["] = { name = "+prev" },
-                ["<leader>n"] = { name = "+Line Nuber" } -- @Line-Number
+                { "<leader>n", group = "Line Nuber" },
+                { "[", group = "prev" },
+                { "]", group = "next" },
+                { "g", group = "goto" },
+                -- ["g"] = { name = "+goto" },
+                -- ["]"] = { name = "+next" },
+                -- ["["] = { name = "+prev" },
+                -- ["<leader>n"] = { name = "+Line Nuber" } -- @Line-Number
             }
             -- your configuration comes here
             -- or leave it empty to use the default settings
@@ -155,8 +159,8 @@ require("lazy").setup({
         },
         config = function(_, opts)
             local wk = require("which-key")
-            wk.setup(opts)
-            wk.register(opts.defaults)
+            -- wk.setup(opts)
+            wk.add(opts.defaults)
 
         end,
     },
@@ -1038,8 +1042,8 @@ require("lazy").setup({
             },
             init = function()
                 local wk = require('which-key')
-                wk.register({
-                    ["<leader>f"] = { name = "Fuzzy Find (Telescope)" },
+                wk.add({
+                    { "<leader>n", group = "LineNumber Options" },
                 })
             end
         },
@@ -1848,9 +1852,6 @@ local section = function ()
 
 
     -- Also see @Line-Number
-    wk.register({
-        ["<leader>n"] = { name = "+LineNumber Options" }
-    })
     vim.keymap.set("n", "<leader>nu",
         function() PE.ToggleOpts("number") end,
         { desc = "Toggle Line Numbers" })
@@ -1861,8 +1862,8 @@ local section = function ()
     -- vim.keymap.set('v','tt','<cmd>s/\\s\\+$//e<cr>',{ desc = 'Clean tail spaces'})
     vim.cmd [[ vnoremap tt :s/\s\+$//e<CR> ]]
 
-    wk.register({
-        ["<leader>t"] = { name = "+Tabe Options" }
+    wk.add({
+        { "<leader>t", group = "Tabe Options" },
     })
     vim.keymap.set("n", "<leader>tb", '<cmd>tab ball<cr>',
         { desc = "Tab Ball buffers" })
