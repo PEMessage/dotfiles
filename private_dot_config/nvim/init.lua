@@ -1427,7 +1427,7 @@ require("lazy").setup({
             opts = {
                 cmd = require('lspconfig').jdtls.document_config.default_config.cmd,
                 -- See: https://github.com/mfussenegger/nvim-jdtls?tab=readme-ov-file#configuration-verbose
-                root_dir = require("jdtls.setup").find_root({ ".git", "mvnw", "gradlew" }),
+                root_dir = require("jdtls.setup").find_root({ ".git", "mvnw", "gradlew", "javaroot" }),
             }
 
             vim.api.nvim_create_autocmd("Filetype", {

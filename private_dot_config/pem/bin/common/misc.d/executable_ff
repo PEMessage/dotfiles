@@ -3,8 +3,8 @@ ff_path() {
     echo $PATH | tr : '\n' | xargs -I{} find {} -maxdepth 1 -type f 2>/dev/null | fzf --query="$1"
 }
 
-ff_ffpm(){
-    ffpm i "$@"
+ff_pm(){
+    pm i "$@"
 }
 
 ff_man() {
@@ -71,7 +71,7 @@ main() {
             ;;
         apt|pacman|rpm)
             shift
-            ff_ffpm "$@"
+            ff_pm "$@"
             ;;
         man)
             shift
