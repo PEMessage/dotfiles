@@ -1800,8 +1800,10 @@ call plug#begin(pe_runtimepath . '/plugged')
     "      File: gradle.properties
     "      org.gradle.java.home=/usr/lib/jvm/java-1.17.0-openjdk-amd64
 
-    " let g:lsp_log_verbose = 1
-    " let g:lsp_log_file = expand('~/vim-lsp.log')
+    if $PEM_VIM_DEBUG_LSP == '1'
+        let g:lsp_log_verbose = 1
+        let g:lsp_log_file = expand('~/vim-lsp.log')
+    endif
     Plug 'hsanson/vim-android'
         " using GradleGenClassPathFile to gen .classpath
         " make sure that you could built it successfully
