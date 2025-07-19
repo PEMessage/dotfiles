@@ -1439,6 +1439,7 @@ require("lazy").setup({
                         path = '/usr/lib/jvm/java-1.17.0-openjdk-amd64/',
                     },
                 }
+                return runtime
             end
 
             -- We using mason-lspconfig, not using it according to readme
@@ -1460,22 +1461,30 @@ require("lazy").setup({
                         },
                     },
                 },
-                settings = {
-                    java = {
-                        configuration = {
-                            runtimes = get_runtime_dir(),
-                        },
-                        jdt = {
-                            ls = {
-                                -- See:
-                                -- https://github.com/eclipse-jdtls/eclipse.jdt.ls/issues/3284#issuecomment-2577158493
-                                androidSupport = {
-                                    enabled = true, -- Enable Android support
-                                },
-                            },
-                        },
-                    },
-                },
+                -- DO NOT SET SETTINGS, UNLESS YOU KNOW EVERYTHING IT WILL OVERWRITE DEFAULT ONE
+                -- settings = {
+                --     java = {
+                        -- configuration = {
+                        --     runtimes = get_runtime_dir(),
+                        -- },
+                        -- import = {
+                        --     gradle = {
+                        --         -- See: https://www.reddit.com/r/neovim/comments/1m3v9kk/jdtls_keeps_regenerating_my_classpath_for_a/
+                        --         -- do not let jdtls generate .classpath, manually generate it
+                        --         enabled = false,
+                        --     },
+                        -- },
+                        -- jdt = {
+                        --     ls = {
+                        --         -- See:
+                        --         -- https://github.com/eclipse-jdtls/eclipse.jdt.ls/issues/3284#issuecomment-2577158493
+                        --         androidSupport = {
+                        --             enabled = true, -- Enable Android support
+                        --         },
+                        --     },
+                        -- },
+                --     },
+                -- },
             }
 
             vim.api.nvim_create_autocmd("Filetype", {
