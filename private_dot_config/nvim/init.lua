@@ -1422,12 +1422,60 @@ require("lazy").setup({
         --     root_dir = vim.fs.dirname(vim.fs.find({'gradlew', '.git', 'mvnw', '.root'}, { upward = true })[1]),
         -- },
         config = function ()
+            -- See: https://zhuanlan.zhihu.com/p/574746992
+            -- And: https://github.com/redhat-developer/vscode-java/wiki/JDK-Requirements#java.configuration.runtimes
+            local function get_runtime_dir()
+                local runtime = {
+                    {
+                        name = 'JavaSE-11',
+                        path = '/usr/lib/jvm/java-11-openjdk-amd64/',
+                    },
+                    {
+                        name = 'JavaSE-1.8',
+                        path = '/usr/lib/jvm/java-1.8.0-openjdk-amd64/',
+                    },
+                    {
+                        name = 'JavaSE-17',
+                        path = '/usr/lib/jvm/java-1.17.0-openjdk-amd64/',
+                    },
+                }
+            end
+
             -- We using mason-lspconfig, not using it according to readme
             local jdtls = require('jdtls')
             opts = {
                 cmd = require('lspconfig').jdtls.document_config.default_config.cmd,
                 -- See: https://github.com/mfussenegger/nvim-jdtls?tab=readme-ov-file#configuration-verbose
                 root_dir = require("jdtls.setup").find_root({ ".git", "mvnw", "gradlew", "javaroot" }),
+                init_options = {
+                    settings = {
+                        java = {
+                            import = {
+                                gradle = {
+                                    -- See: https://www.reddit.com/r/neovim/comments/1m3v9kk/jdtls_keeps_regenerating_my_classpath_for_a/
+                                    -- do not let jdtls generate .classpath, manually generate it
+                                    enabled = false,
+                                },
+                            },
+                        },
+                    },
+                },
+                settings = {
+                    java = {
+                        configuration = {
+                            runtimes = get_runtime_dir(),
+                        },
+                        jdt = {
+                            ls = {
+                                -- See:
+                                -- https://github.com/eclipse-jdtls/eclipse.jdt.ls/issues/3284#issuecomment-2577158493
+                                androidSupport = {
+                                    enabled = true, -- Enable Android support
+                                },
+                            },
+                        },
+                    },
+                },
             }
 
             vim.api.nvim_create_autocmd("Filetype", {
