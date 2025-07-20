@@ -1713,14 +1713,40 @@ require("lazy").setup({
             -- map(0, "n", "go", "<cmd>Lspsaga show_line_diagnostics<cr>", {silent = true, noremap = true})
             -- map(0, "n", "K",  "<cmd>Lspsaga hover_doc<cr>", {silent = true, noremap = true})
             --
-            local map = vim.keymap.set
-            map( "n", "<F2>", "<cmd>Lspsaga rename<cr>", {silent = true, noremap = true})
-            map( "n", "gk", "<cmd>Lspsaga code_action<cr>", {silent = true, noremap = true})
-            map( "x", "gk", ":<c-u>Lspsaga range_code_action<cr>", {silent = true, noremap = true})
-            map( "n", "gd", "<cmd>Lspsaga  peek_definition<cr>", {silent = true,noremap = true})
-            map( "n", "go", "<cmd>Lspsaga show_line_diagnostics<cr>", {silent = true, noremap = true})
-            map( "n", "Q", "<cmd>Lspsaga finder tyd+ref+imp+def<cr>", {silent = true, noremap = true})
-            map( "n", "<C-q>", "<cmd>Lspsaga code_action<cr>", {silent = true, noremap = true})
+        -- Set up LSP keymaps only when LSP attaches to a buffer
+        vim.api.nvim_create_autocmd('LspAttach', {
+            group = vim.api.nvim_create_augroup('LspsagaKeymaps', {}),
+            callback = function(args)
+                local client = vim.lsp.get_client_by_id(args.data.client_id)
+                -- Skip jdtls
+
+                local map = vim.keymap.set
+                local bufnr = args.buf
+
+                map('n', '<F2>', '<cmd>Lspsaga rename<cr>', { silent = true, noremap = true, buffer = bufnr })
+                map('n', 'gk', '<cmd>Lspsaga code_action<cr>', { silent = true, noremap = true, buffer = bufnr })
+                map('x', 'gk', ':<c-u>Lspsaga range_code_action<cr>', { silent = true, noremap = true, buffer = bufnr })
+                if client and client.name == 'jdtls' then
+                    -- map('n', 'gd', '<cmd>Lspsaga peek_definition<cr>', { silent = true, noremap = true, buffer = bufnr })
+                    -- lspsaga can't handle JDT:// well using old style <C-]>
+                    map("n", "gd", "<C-]>", { silent = true, noremap = true, buffer = bufnr })
+                else
+                    map('n', 'gd', '<cmd>Lspsaga peek_definition<cr>', { silent = true, noremap = true, buffer = bufnr })
+                end
+                map('n', 'go', '<cmd>Lspsaga show_line_diagnostics<cr>', { silent = true, noremap = true, buffer = bufnr })
+                map('n', 'Q', '<cmd>Lspsaga finder tyd+ref+imp+def<cr>', { silent = true, noremap = true, buffer = bufnr })
+                map('n', '<C-q>', '<cmd>Lspsaga code_action<cr>', { silent = true, noremap = true, buffer = bufnr })
+            end,
+        })
+
+            -- local map = vim.keymap.set
+            -- map( "n", "<F2>", "<cmd>Lspsaga rename<cr>", {silent = true, noremap = true})
+            -- map( "n", "gk", "<cmd>Lspsaga code_action<cr>", {silent = true, noremap = true})
+            -- map( "x", "gk", ":<c-u>Lspsaga range_code_action<cr>", {silent = true, noremap = true})
+            -- map( "n", "gd", "<cmd>Lspsaga  peek_definition<cr>", {silent = true,noremap = true})
+            -- map( "n", "go", "<cmd>Lspsaga show_line_diagnostics<cr>", {silent = true, noremap = true})
+            -- map( "n", "Q", "<cmd>Lspsaga finder tyd+ref+imp+def<cr>", {silent = true, noremap = true})
+            -- map( "n", "<C-q>", "<cmd>Lspsaga code_action<cr>", {silent = true, noremap = true})
         end,
         dependencies = {
             'nvim-treesitter/nvim-treesitter', -- optional
