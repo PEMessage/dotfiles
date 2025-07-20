@@ -143,25 +143,28 @@ require("lazy").setup({
             vim.o.timeoutlen = 300
         end,
         opts = {
-            defaults = {
-                { "<leader>n", group = "Line Nuber" },
-                { "[", group = "prev" },
-                { "]", group = "next" },
-                { "g", group = "goto" },
-                -- ["g"] = { name = "+goto" },
-                -- ["]"] = { name = "+next" },
-                -- ["["] = { name = "+prev" },
-                -- ["<leader>n"] = { name = "+Line Nuber" } -- @Line-Number
-            }
+            delay = 2000,
+            plugins = {
+                spelling = {
+                    enabled = true, -- enabling this will show WhichKey when pressing z= to select spelling suggestions
+                    suggestions = 5, -- how many suggestions should be shown in the list?
+                },
+            },
             -- your configuration comes here
             -- or leave it empty to use the default settings
             -- refer to the configuration section below
         },
         config = function(_, opts)
             local wk = require("which-key")
-            -- wk.setup(opts)
-            wk.add(opts.defaults)
+            local defaults = {
+                { "<leader>n", group = "Line Nuber" },
+                { "[", group = "prev" },
+                { "]", group = "next" },
+                { "g", group = "goto" },
 
+            }
+            wk.setup(opts)
+            wk.add(defaults)
         end,
     },
 
@@ -742,6 +745,7 @@ require("lazy").setup({
                 'python',
                 'vimdoc',
                 'bash',
+                'kotlin',
             },
             incremental_selection = {
                 enable = true,
@@ -1922,6 +1926,9 @@ local section = function ()
 
     vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to Next diagnostic' })
     vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to Pervious diagnostic' })
+
+    -- Lsp
+    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, { desc = 'Go to Declaration' })
 
     -- -------------------------------------------
     -- 6.2 Leader Keymap
