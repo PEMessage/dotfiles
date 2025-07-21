@@ -123,6 +123,8 @@ local section = function ()
     vim.o.splitright = true      -- 水平切割窗口时，默认在右边显示新窗口
 
     vim.diagnostic.config({ virtual_text = false })
+    vim.g.inlay_hints_visible = true
+    vim.lsp.inlay_hint.enable(true)
 
 end
 section()
@@ -1455,6 +1457,9 @@ require("lazy").setup({
                 init_options = {
                     settings = {
                         java = {
+                            inlayhints = {
+                                parameterNames = { enabled = true },
+                            },
                             import = {
                                 gradle = {
                                     -- See: https://www.reddit.com/r/neovim/comments/1m3v9kk/jdtls_keeps_regenerating_my_classpath_for_a/

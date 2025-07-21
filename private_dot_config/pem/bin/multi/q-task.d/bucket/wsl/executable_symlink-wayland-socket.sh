@@ -22,7 +22,7 @@
 #           sudo waydroid upgrade -o
 #   Run:
 #       export GALLIUM_DRIVER=d3d12 weston --backend=wayland-backend.so
-#       Inside weston: waydroid session start
+#       Inside weston: waydroid session start // run waydroid session stop (only if RuntimeError: Already tracking a session )
 #       Inside weston: waydroid show-full-ui
 #
 #   Dev:
