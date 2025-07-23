@@ -1839,6 +1839,9 @@ call plug#begin(pe_runtimepath . '/plugged')
     " let g:lsp_settings['eclipse-jdt-ls'] = {
     "             \ 'root_uri_patterns'  : ['.root'],
     "             \}
+    " let g:lsp_settings['clangd'] = {
+    "             \ 'args': ['123']
+    "             \ }
     Plug 'PEMessage/jorenar-lsp-calltree'
 call plug#end()
 

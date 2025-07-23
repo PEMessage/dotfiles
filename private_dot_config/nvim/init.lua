@@ -1313,8 +1313,36 @@ require("lazy").setup({
                     })
 
                 end,
-                ['rust_analyzer'] = function () 
+                ['rust_analyzer'] = function ()
                     lspconfig.rust_analyzer.setup({ autostart = true })
+                end,
+                ['neocmake'] = function ()
+                    local configs = require("lspconfig.configs")
+                    local nvim_lsp = require("lspconfig")
+                    if not configs.neocmake then
+                        configs.neocmake = {
+                            autostart = true,
+                            default_config = {
+                                cmd = { "neocmakelsp", "--stdio" },
+                                filetypes = { "cmake" },
+                                root_dir = function(fname)
+                                    return nvim_lsp.util.find_git_ancestor(fname)
+                                end,
+                                single_file_support = true,-- suggested
+                                -- on_attach = on_attach, -- on_attach is the on_attach function you defined
+                                init_options = {
+                                    format = {
+                                        enable = true
+                                    },
+                                    lint = {
+                                        enable = true
+                                    },
+                                    scan_cmake_in_package = true -- default is true
+                                }
+                            }
+                        }
+                        nvim_lsp.neocmake.setup({})
+                    end
                 end,
                 ["pylsp"] = function ()
                     lspconfig.pylsp.setup({
@@ -1933,7 +1961,21 @@ local section = function ()
     vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to Pervious diagnostic' })
 
     -- Lsp
+    vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition, { desc = 'Go to Declaration' })
     vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, { desc = 'Go to Declaration' })
+    -- Format entire document (Normal mode)
+    vim.keymap.set('n', '<leader>F', vim.lsp.buf.format, { desc = 'Format entire document' })
+    -- Format selected range (Visual mode)
+    vim.keymap.set('v', '<leader>F', function()
+        local start_row = vim.api.nvim_buf_get_mark(0, '<')[1]
+        local end_row = vim.api.nvim_buf_get_mark(0, '>')[1]
+        vim.lsp.buf.format({
+            range = {
+                ['start'] = { start_row, 0 },
+                ['end'] = { end_row, 0 },
+            },
+        })
+    end, { desc = 'Format selected range' })
 
     -- -------------------------------------------
     -- 6.2 Leader Keymap
