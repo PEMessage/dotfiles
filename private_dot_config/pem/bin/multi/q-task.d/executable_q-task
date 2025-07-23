@@ -70,10 +70,14 @@ main() {
             esac
             ;;
         *)
-            [ -f "$CONF_BUCKET_DIR/$1" ] && bash "$CONF_BUCKET_DIR/$1" || {
+            if [ ! -f "$CONF_BUCKET_DIR/$1" ] ; then
                 echo "[Err]: Unknow task(file not exist)"
                 echo "[Err]: use '-l' to check all task"
-            }
+            fi
+            Q_TASK_SCRIPT="$CONF_BUCKET_DIR/$1"
+            shift
+            bash "$Q_TASK_SCRIPT" "$@"
+            ;;
     esac
 
 }
