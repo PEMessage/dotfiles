@@ -14,7 +14,7 @@ start_line=$((linenum - 3))
 end_line=$((linenum + 3))
 
 # Simple rg search for the function name
-result=$(rg --glob '*.bak' -n -- "$funcname" | awk -F: -v start="$start_line" -v end="$end_line" '$2 >= start && $2 <= end')
+result=$(rg --glob '!*.bak' -n -- "$funcname" | awk -F: -v start="$start_line" -v end="$end_line" '$2 >= start && $2 <= end')
 
 if [ -z "$result" ]; then
     echo "No match found for '$funcname' near line $linenum (±3 lines)"
@@ -23,23 +23,8 @@ fi
 
 # Extract first match and open in vim
 file=$(echo "$result" | head -n1 | cut -d: -f1)
-file="${file%.bak}" # rm bak end
-
-# rg -n -- "$funcname" "$file" | 
-#     awk -F: -v target="$linenum" '{diff = $1 - target; if (diff < 0) diff = -diff; print diff ":" $1}' | 
-#     sort -n | 
-#     head -n1 | 
-#     cut -d: -f2
-# Reuse rg to search in the original file and find the nearest line to linenum
-match_line="$(rg -n -- "$funcname" "$file" | 
-    awk -F: -v target="$linenum" '{diff = $1 - target; if (diff < 0) diff = -diff; print diff ":" $1}' | 
-    sort -n | 
-    head -n1 | 
-    cut -d: -f2)"
+match_line=$(echo "$result" | head -n1 | cut -d: -f2)
 
 if [ -n "$match_line" ]; then
-    # match_line=$(echo "$result" | head -n1 | cut -d: -f2)
     vim "+$match_line" "$file"
 fi
-
-

@@ -793,7 +793,6 @@ require("lazy").setup({
     {
         'Bekaboo/dropbar.nvim',
         enabled = true,
-        version = '8f8ae08',
         opts = {
             sources = {
                 path = {
