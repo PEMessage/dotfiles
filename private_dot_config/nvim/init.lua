@@ -1504,6 +1504,7 @@ require("lazy").setup({
                         },
                     },
                 },
+            }
                 -- DO NOT SET SETTINGS, UNLESS YOU KNOW EVERYTHING IT WILL OVERWRITE DEFAULT ONE
                 -- settings = {
                 --     java = {
@@ -1528,6 +1529,15 @@ require("lazy").setup({
                         -- },
                 --     },
                 -- },
+            local dap = require('dap')
+            dap.configurations.java = {
+                {
+                    type = 'java';
+                    request = 'attach';
+                    name = "Debug (Attach) - Remote";
+                    hostName = "127.0.0.1";
+                    port = 5005;
+                },
             }
 
             vim.api.nvim_create_autocmd("Filetype", {
