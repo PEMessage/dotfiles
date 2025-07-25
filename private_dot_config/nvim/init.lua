@@ -824,85 +824,84 @@ require("lazy").setup({
                 end
             },
             icons = {
-                enable = false,
+                -- enable = false,
                 ui  = {
                     bar = {
                         separator = ' > '
                     },
                 },
-                -- kinds = {
-                    -- symbols = {
-                    --     Array = '[ ',
-                    --     Boolean = '',
-                    --     BreakStatement = '',
-                    --     Call = 'f ',
-                    --     CaseStatement = '',
-                    --     Class = 'C ',
-                    --     Color = '',
-                    --     Constant = '',
-                    --     Constructor = '',
-                    --     ContinueStatement = '',
-                    --     Copilot = '',
-                    --     Declaration = '',
-                    --     Delete = '',
-                    --     DoStatement = '',
-                    --     Enum = 'E ',
-                    --     EnumMember = 'e ',
-                    --     Event = 'E ',
-                    --     Field = '.',
-                    --     File = '',
-                    --     Folder = '',
-                    --     ForStatement = '',
-                    --     Function = 'f ',
-                    --     H1Marker = '', -- Used by markdown treesitter parser
-                    --     H2Marker = '',
-                    --     H3Marker = '',
-                    --     H4Marker = '',
-                    --     H5Marker = '',
-                    --     H6Marker = '',
-                    --     Identifier = 'i ',
-                    --     IfStatement = '(',
-                    --     Interface = 'I ',
-                    --     Keyword = 'k',
-                    --     List = '[]',
-                    --     Log = '',
-                    --     Lsp = '',
-                    --     Macro = '',
-                    --     MarkdownH1 = '', -- Used by builtin markdown source
-                    --     MarkdownH2 = '',
-                    --     MarkdownH3 = '',
-                    --     MarkdownH4 = '',
-                    --     MarkdownH5 = '',
-                    --     MarkdownH6 = '',
-                    --     Method = '.f ',
-                    --     Module = '# ',
-                    --     Namespace = '{ ',
-                    --     Null = '',
-                    --     Number = 'n ',
-                    --     Object = 'o ',
-                    --     Operator = '+ ',
-                    --     Package = '# ',
-                    --     Pair = '()',
-                    --     Property = 'p ',
-                    --     Reference = '& ',
-                    --     Regex = 're',
-                    --     Repeat = '',
-                    --     Scope = '{ ',
-                    --     Snippet = '',
-                    --     Specifier = '',
-                    --     Statement = '( ',
-                    --     String = 's ',
-                    --     Struct = 'S ',
-                    --     SwitchStatement = '( ',
-                    --     Terminal = '',
-                    --     Text = 's ',
-                    --     Type = 'T ',
-                    --     TypeParameter = 'p ',
-                    --     Unit = '# ',
-                    --     Value = 'v ',
-                    --     Variable = 'v ',
-                    --     WhileStatement = '( ',
-                    -- }
+                -- symbols = {
+                --         Array = '[ ',
+                --         Boolean = '',
+                --         BreakStatement = '',
+                --         Call = 'f ',
+                --         CaseStatement = '',
+                --         Class = 'C ',
+                --         Color = '',
+                --         Constant = '',
+                --         Constructor = '',
+                --         ContinueStatement = '',
+                --         Copilot = '',
+                --         Declaration = '',
+                --         Delete = '',
+                --         DoStatement = '',
+                --         Enum = 'E ',
+                --         EnumMember = 'e ',
+                --         Event = 'E ',
+                --         Field = '.',
+                --         File = '',
+                --         Folder = '',
+                --         ForStatement = '',
+                --         Function = 'f ',
+                --         H1Marker = '', -- Used by markdown treesitter parser
+                --         H2Marker = '',
+                --         H3Marker = '',
+                --         H4Marker = '',
+                --         H5Marker = '',
+                --         H6Marker = '',
+                --         Identifier = 'i ',
+                --         IfStatement = '(',
+                --         Interface = 'I ',
+                --         Keyword = 'k',
+                --         List = '[]',
+                --         Log = '',
+                --         Lsp = '',
+                --         Macro = '',
+                --         MarkdownH1 = '', -- Used by builtin markdown source
+                --         MarkdownH2 = '',
+                --         MarkdownH3 = '',
+                --         MarkdownH4 = '',
+                --         MarkdownH5 = '',
+                --         MarkdownH6 = '',
+                --         Method = '.f ',
+                --         Module = '# ',
+                --         Namespace = '{ ',
+                --         Null = '',
+                --         Number = 'n ',
+                --         Object = 'o ',
+                --         Operator = '+ ',
+                --         Package = '# ',
+                --         Pair = '()',
+                --         Property = 'p ',
+                --         Reference = '& ',
+                --         Regex = 're',
+                --         Repeat = '',
+                --         Scope = '{ ',
+                --         Snippet = '',
+                --         Specifier = '',
+                --         Statement = '( ',
+                --         String = 's ',
+                --         Struct = 'S ',
+                --         SwitchStatement = '( ',
+                --         Terminal = '',
+                --         Text = 's ',
+                --         Type = 'T ',
+                --         TypeParameter = 'p ',
+                --         Unit = '# ',
+                --         Value = 'v ',
+                --         Variable = 'v ',
+                --         WhileStatement = '( ',
+                --     }
                 -- }
             }
         },
@@ -1446,7 +1445,7 @@ require("lazy").setup({
         -- UPDATE: this will cause jump to class not work as expect, but other function will do work
         -- See: https://github.com/mfussenegger/nvim-jdtls/issues/639#issuecomment-3079720936
         dependencies = {
-            -- 'mfussenegger/nvim-dap',
+            'mfussenegger/nvim-dap',
             'williamboman/mason.nvim',
             'williamboman/mason-lspconfig.nvim',
             "neovim/nvim-lspconfig",
@@ -1478,11 +1477,18 @@ require("lazy").setup({
 
             -- We using mason-lspconfig, not using it according to readme
             local jdtls = require('jdtls')
+            local mason_root = require('mason.settings').current.install_root_dir
             opts = {
                 cmd = require('lspconfig').jdtls.document_config.default_config.cmd,
                 -- See: https://github.com/mfussenegger/nvim-jdtls?tab=readme-ov-file#configuration-verbose
                 root_dir = require("jdtls.setup").find_root({ ".git", "mvnw", "gradlew", "javaroot" }),
                 init_options = {
+                    bundles = {
+                        vim.fn.glob(
+                            mason_root .. "/packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar",
+                            1
+                        ),
+                    },
                     settings = {
                         java = {
                             inlayhints = {
@@ -1593,7 +1599,7 @@ require("lazy").setup({
                     --         port = 5005,
                     --     },
                     -- }
-                    require('mason-nvim-dap').default_setup(config)
+                    -- require('mason-nvim-dap').default_setup(config)
                 end
             }
         },
