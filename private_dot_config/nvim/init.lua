@@ -830,84 +830,18 @@ require("lazy").setup({
                         separator = ' > '
                     },
                 },
-                -- symbols = {
-                --         Array = '[ ',
-                --         Boolean = '',
-                --         BreakStatement = '',
-                --         Call = 'f ',
-                --         CaseStatement = '',
-                --         Class = 'C ',
-                --         Color = '',
-                --         Constant = '',
-                --         Constructor = '',
-                --         ContinueStatement = '',
-                --         Copilot = '',
-                --         Declaration = '',
-                --         Delete = '',
-                --         DoStatement = '',
-                --         Enum = 'E ',
-                --         EnumMember = 'e ',
-                --         Event = 'E ',
-                --         Field = '.',
-                --         File = '',
-                --         Folder = '',
-                --         ForStatement = '',
-                --         Function = 'f ',
-                --         H1Marker = '', -- Used by markdown treesitter parser
-                --         H2Marker = '',
-                --         H3Marker = '',
-                --         H4Marker = '',
-                --         H5Marker = '',
-                --         H6Marker = '',
-                --         Identifier = 'i ',
-                --         IfStatement = '(',
-                --         Interface = 'I ',
-                --         Keyword = 'k',
-                --         List = '[]',
-                --         Log = '',
-                --         Lsp = '',
-                --         Macro = '',
-                --         MarkdownH1 = '', -- Used by builtin markdown source
-                --         MarkdownH2 = '',
-                --         MarkdownH3 = '',
-                --         MarkdownH4 = '',
-                --         MarkdownH5 = '',
-                --         MarkdownH6 = '',
-                --         Method = '.f ',
-                --         Module = '# ',
-                --         Namespace = '{ ',
-                --         Null = '',
-                --         Number = 'n ',
-                --         Object = 'o ',
-                --         Operator = '+ ',
-                --         Package = '# ',
-                --         Pair = '()',
-                --         Property = 'p ',
-                --         Reference = '& ',
-                --         Regex = 're',
-                --         Repeat = '',
-                --         Scope = '{ ',
-                --         Snippet = '',
-                --         Specifier = '',
-                --         Statement = '( ',
-                --         String = 's ',
-                --         Struct = 'S ',
-                --         SwitchStatement = '( ',
-                --         Terminal = '',
-                --         Text = 's ',
-                --         Type = 'T ',
-                --         TypeParameter = 'p ',
-                --         Unit = '# ',
-                --         Value = 'v ',
-                --         Variable = 'v ',
-                --         WhileStatement = '( ',
-                --     }
-                -- }
             }
         },
         config = function(_,opts)
             vim.cmd [[ highlight! link WinBar StatusLine ]]
             vim.cmd [[ highlight! link WinBarNC StatusLineNC ]]
+
+            -- Setup defconfig to '', a workaround for using icons.disable will cause DAP-UI report error
+            local def_symbols = require('dropbar.configs').opts.icons.kinds.symbols
+            for key, _ in pairs(def_symbols) do
+                def_symbols[key] = ""
+            end
+
             require('dropbar').setup(opts)
             local dropbar_api = require('dropbar.api')
             vim.keymap.set('n', '<Leader>;', dropbar_api.pick, { desc = 'Pick symbols in winbar' })
@@ -1592,24 +1526,7 @@ require("lazy").setup({
                 -- mason not implementation it
                 -- javadbg = nil,
                 javadbg = function (config)
-                    -- local mason_root = require('mason.settings').current.install_root_dir
-                    -- local bundles = {
-                    --     vim.fn.glob(
-                    --         mason_root .. "/packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar",
-                    --         1
-                    --     ),
-                    -- }
-                    --
-                    -- config.adapters = {
-                    --     {
-                    --         type = "java",
-                    --         request = "attach",
-                    --         name = "Debug (Attach) - Remote",
-                    --         hostName = "127.0.0.1",
-                    --         port = 5005,
-                    --     },
-                    -- }
-                    -- require('mason-nvim-dap').default_setup(config)
+                    -- leava it to nvim-jdtls to setup
                 end
             }
         },
