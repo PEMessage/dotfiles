@@ -1471,6 +1471,8 @@ require("lazy").setup({
                     name = "Debug (Attach) - Remote";
                     hostName = "127.0.0.1";
                     port = 5005;
+                    -- for multi project, using this
+                    -- projectName = "settings_info",
                 },
             }
 
@@ -1576,8 +1578,25 @@ require("lazy").setup({
             "mfussenegger/nvim-dap",
             "nvim-neotest/nvim-nio"
         },
-        config = function ()
-            require("dapui").setup()
+        opts = {
+            controls = {
+                element = "repl",
+                enabled = true,
+                icons = {
+                    disconnect = "D",
+                    pause = "S",
+                    play = "C",
+                    run_last = "R",
+                    step_back = "<",
+                    step_into = "v",
+                    step_out = "^",
+                    step_over = ">",
+                    terminate = "X"
+                }
+            },
+        },
+        config = function (_, opts)
+            require("dapui").setup(opts)
             vim.api.nvim_create_user_command('DapUiToggle', function() require('dapui').toggle() end, { nargs = 0 })
         end,
     },
