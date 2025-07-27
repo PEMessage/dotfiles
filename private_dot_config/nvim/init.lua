@@ -1473,6 +1473,8 @@ require("lazy").setup({
                     port = 5005;
                     -- for multi project, using this
                     -- projectName = "settings_info",
+                    -- Also See: https://source.android.com/docs/core/tests/debug/gdb?hl=zh-cn#app-startup
+                    -- Also See: https://codeberg.org/mfussenegger/nvim-dap/wiki/Java
                 },
             }
 
