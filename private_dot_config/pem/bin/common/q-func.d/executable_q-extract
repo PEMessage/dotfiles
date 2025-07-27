@@ -67,7 +67,7 @@ q_extract() {
     local bin
     local args
     case "$archive" in
-        *.tar.bz2|*.tbz2)  bin="tar"; args=(-j) ;;
+        *.tar.bz2|*.tbz2|*.tbz)  bin="tar"; args=(-j) ;;
         *.tar.gz|*.tgz)     bin="tar"; args=(-z) ;;
         *.tar.xz)           bin="tar"; args=(-J) ;;
         *.tar.zst)          bin="tar"; args=(--use-compress-program='zstd -d') ;;
