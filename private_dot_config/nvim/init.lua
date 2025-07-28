@@ -1589,10 +1589,10 @@ require("lazy").setup({
                     pause = "S",
                     play = "C",
                     run_last = "R",
-                    step_back = "<",
-                    step_into = "v",
-                    step_out = "^",
-                    step_over = ">",
+                    step_back = "←",
+                    step_into = "↓",
+                    step_out = "↑",
+                    step_over = "→",
                     terminate = "X"
                 }
             },
@@ -1600,6 +1600,20 @@ require("lazy").setup({
         config = function (_, opts)
             require("dapui").setup(opts)
             vim.api.nvim_create_user_command('DapUiToggle', function() require('dapui').toggle() end, { nargs = 0 })
+        end,
+    },
+    {
+        'Weissle/persistent-breakpoints.nvim',
+        dependencies = {
+            "mfussenegger/nvim-dap",
+        },
+        config = function (_, _)
+            require('persistent-breakpoints').setup({
+                load_breakpoints_event = { "BufReadPost" },
+            })
+            local keyopts = { noremap = true, silent = true }
+            local keymap = vim.api.nvim_set_keymap
+            keymap("n", "<F1>", "<cmd>lua require('persistent-breakpoints.api').toggle_breakpoint()<CR>", keyopts)
         end,
     },
     -- {
@@ -1630,13 +1644,6 @@ require("lazy").setup({
     --     config = function ()
     --         require('dap-go').setup()
     --     end
-    -- },
-    -- {
-    --     "rcarriga/nvim-dap-ui",
-    --     dependencies = {"mfussenegger/nvim-dap"},
-    --     config = function ()
-    --         require("dapui").setup()
-    --     end,
     -- },
     {
 
