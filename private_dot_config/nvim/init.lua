@@ -1596,6 +1596,11 @@ require("lazy").setup({
                     terminate = "X"
                 }
             },
+            icons = {
+                collapsed = "*",
+                current_frame = ">",
+                expanded = "-"
+            },
         },
         config = function (_, opts)
             require("dapui").setup(opts)
