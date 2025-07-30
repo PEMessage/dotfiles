@@ -861,15 +861,13 @@ call plug#begin(pe_runtimepath . '/plugged')
             \'change_attri': 'bash -c ''sed -E "/<project/ {s@$1=\"(\S*)\"@$1=\"$2\"@g}"'' -- ',
             \'sort_inline': 'bash -c ''tr "$1" "\n" | sort | join_line "$1" '' -- ',
             \}
-        if exists('g:ovr_textproc_inline_script')
-            expand(g:textproc_inline_script,g:ovr_textproc_inline_script)
-        endif
+        " if exists('g:ovr_textproc_inline_script')
+        "     extend(g:textproc_inline_script, g:ovr_textproc_inline_script)
+        " endif
 
         " Test: example
         " let g:textproc_inline_script['jq'] = 'jq'
         " let g:textproc_inline_script['z_bashtest'] = 'bash -c "echo 123"'
-
-
 
     Plug 'terryma/vim-expand-region'
         let g:expand_region_text_objects = {
@@ -1064,6 +1062,7 @@ call plug#begin(pe_runtimepath . '/plugged')
 " 6.4 Locale
 " -------------------------------------------
     Plug 'yianwillis/vimcdoc'
+    Plug 'voldikss/vim-translator'
     " Plug 'brglng/vim-im-select'
     if has('win32')
         let g:im_select_default = '1033'
@@ -2508,6 +2507,47 @@ endif
         endif
     endfunction
 
+    function! JsonEncodeFiltered(dict) abort
+        " Create a filtered copy of the dictionary
+        let l:filtered = {}
+        for [l:Key, l:Value] in items(a:dict)
+            " Try to encode the value to check if it's supported
+            try
+                call json_encode(l:Value)
+                let l:filtered[l:Key] = l:Value
+            catch /E1161:/
+                " Skip unsupported values (E474 is the JSON encoding error)
+            endtry
+        endfor
+        return json_encode(filtered)
+    endfunction
+
+    function! LspDumpInfo() abort
+        let l:servers = lsp#get_server_names()
+
+        if empty(l:servers)
+            echohl WarningMsg
+            echomsg 'No LSP servers are currently active'
+            echohl None
+            return
+        endif
+
+        if len(l:servers) != 1
+            echohl WarningMsg
+            echomsg 'Multiple LSP servers found. Please specify which server: ' . join(l:servers, ', ')
+            echohl None
+        endif
+
+        let l:server_name = l:servers[0]
+        let l:info = lsp#get_server_info(l:server_name)
+        let l:content = JsonEncodeFiltered(l:info)
+
+        " Create new buffer and set content
+        new
+        setlocal buftype=nofile bufhidden=hide noswapfile
+        call setline(1, split(l:content, '\n'))
+    endfunction
+    command! LspDumpInfo call LspDumpInfo()
 
     " You can map this to a key, for example:
     " nnoremap <Leader>h :call HighlightCurrentLineTemporarily()<CR>
