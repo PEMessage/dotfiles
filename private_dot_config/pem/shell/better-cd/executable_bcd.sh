@@ -9,7 +9,7 @@ bcd()
         local op="cd"
     fi
 
-    if [ "$#" = 0 ] ; then
+    if [ "$1" = - ] ; then
         local input="$(</dev/stdin)"
     else 
         local input="$*"
