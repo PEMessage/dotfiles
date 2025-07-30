@@ -24,15 +24,19 @@ PE.logo = {
 
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
-    vim.fn.system({
-        "git",
-        "clone",
-        "--filter=blob:none",
-        "https://github.com/folke/lazy.nvim.git",
-        "--branch=stable", -- latest stable release
-        lazypath,
-    })
+---@diagnostic disable-next-line: undefined-field
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+    local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+    local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+    if vim.v.shell_error ~= 0 then
+        vim.api.nvim_echo({
+            { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+            { out, "WarningMsg" },
+            { "\nPress any key to exit..." },
+        }, true, {})
+        vim.fn.getchar()
+        os.exit(1)
+    end
 end
 vim.opt.rtp:prepend(lazypath)
 local LazyUtil = require("lazy.core.util")
@@ -338,6 +342,7 @@ require("lazy").setup({
         "folke/snacks.nvim",
         priority = 1000,
         lazy = false,
+        ---@diagnostic disable-next-line: undefined-doc-name
         ---@type snacks.Config
         opts = {
             -- your configuration comes here
@@ -1233,6 +1238,7 @@ require("lazy").setup({
                         on_init = function(client)
                             if client.workspace_folders then
                                 local path = client.workspace_folders[1].name
+                                ---@diagnostic disable-next-line: undefined-field
                                 if path ~= vim.fn.stdpath('config') and (vim.uv.fs_stat(path..'/.luarc.json') or vim.uv.fs_stat(path..'/.luarc.jsonc')) then
                                     return
                                 end
@@ -1410,6 +1416,7 @@ require("lazy").setup({
         config = function ()
             -- See: https://zhuanlan.zhihu.com/p/574746992
             -- And: https://github.com/redhat-developer/vscode-java/wiki/JDK-Requirements#java.configuration.runtimes
+            ---@diagnostic disable-next-line: unused-function
             local function get_runtime_dir()
                 local runtime = {
                     {
@@ -1431,7 +1438,7 @@ require("lazy").setup({
             -- We using mason-lspconfig, not using it according to readme
             local jdtls = require('jdtls')
             local mason_root = require('mason.settings').current.install_root_dir
-            opts = {
+            local opts = {
                 cmd = require('lspconfig').jdtls.document_config.default_config.cmd,
                 -- See: https://github.com/mfussenegger/nvim-jdtls?tab=readme-ov-file#configuration-verbose
                 root_dir = require("jdtls.setup").find_root({ ".git", "mvnw", "gradlew", "javaroot" }),
@@ -1439,7 +1446,7 @@ require("lazy").setup({
                     bundles = {
                         vim.fn.glob(
                             mason_root .. "/packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar",
-                            1
+                            true
                         ),
                     },
                     settings = {
@@ -1964,8 +1971,8 @@ local section = function ()
         { desc = "Go to Previous Paste", noremap = true }
     )
 
-    vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to Next diagnostic' })
-    vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to Pervious diagnostic' })
+    vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1, float = true }) end, { desc = 'Go to previous diagnostic' })
+    vim.keymap.set('n', ']d', function() vim.diagnostic.jump({ count =  1, float = true }) end, { desc = 'Go to next diagnostic' })
 
     -- Lsp
     vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition, { desc = 'Go to Declaration' })
@@ -2019,11 +2026,11 @@ local section = function ()
 
     -- Function to toggle diagnostics
     function PE.ToggleDiagnostics()
-        local disabled = vim.diagnostic.is_disabled()
-        if disabled then
-            vim.diagnostic.enable()
+        local enabled = not vim.diagnostic.is_enabled()
+        if enabled then
+            vim.diagnostic.enable(false)
         else
-            vim.diagnostic.disable()
+            vim.diagnostic.enable()
         end
     end
     vim.keymap.set('n', '<leader>`d', PE.ToggleDiagnostics, { noremap = true, silent = true , desc = "Toggle diagnostic" })
