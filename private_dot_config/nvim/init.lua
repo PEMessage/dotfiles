@@ -1229,12 +1229,32 @@ require("lazy").setup({
                 end,
                 -- Next, you can provide targeted overrides for specific servers.
                 ["lua_ls"] = function ()
-                    lspconfig.lua_ls.setup({
+                    require'lspconfig'.lua_ls.setup {
+                        on_init = function(client)
+                            if client.workspace_folders then
+                                local path = client.workspace_folders[1].name
+                                if path ~= vim.fn.stdpath('config') and (vim.uv.fs_stat(path..'/.luarc.json') or vim.uv.fs_stat(path..'/.luarc.jsonc')) then
+                                    return
+                                end
+                            end
+
+                            client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
+                                runtime = {
+                                    version = 'LuaJIT'
+                                },
+                                -- Make the server aware of Neovim runtime files
+                                workspace = {
+                                    checkThirdParty = false,
+                                    library = {
+                                        vim.env.VIMRUNTIME
+                                    }
+                                }
+                            })
+                        end,
                         autostart = true,
                         settings = {
                             Lua = {
                                 diagnostics = {
-                                    globals = { "vim" },
                                     neededFileStatus = {
                                         ['codestyle-check'] = 'None!',
                                         ["unused-local"] = 'None!',
@@ -1243,8 +1263,7 @@ require("lazy").setup({
                                 }
                             }
                         }
-                    })
-
+                    }
                 end,
                 ['rust_analyzer'] = function ()
                     lspconfig.rust_analyzer.setup({ autostart = true })
@@ -1765,6 +1784,28 @@ require("lazy").setup({
         keys = {
             { "<leader>av", "<cmd>Vista!!<cr>", desc = "Open Vista bar" },
         }
+    },
+    {
+        'ldelossa/litee.nvim',
+        event = "VeryLazy",
+        opts = {
+            notify = { enabled = false },
+            panel = {
+                orientation = "right",
+                panel_size = 30,
+            },
+        },
+        config = function(_, opts) require('litee.lib').setup(opts) end
+    },
+    {
+        'ldelossa/litee-calltree.nvim',
+        dependencies = 'ldelossa/litee.nvim',
+        event = "VeryLazy",
+        opts = {
+            on_open = "panel",
+            map_resize_keys = false,
+        },
+        config = function(_, opts) require('litee.calltree').setup(opts) end
     },
     -- -------------------------------------------
     -- 5.10 AI
