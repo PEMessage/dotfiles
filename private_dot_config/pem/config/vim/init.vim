@@ -249,7 +249,9 @@ let g:startify_custom_header = [
 
 	runtime ftplugin/man.vim
     runtime macros/matchit.vim
-    packadd! editorconfig
+    if has('patch-9.1.1591')
+        packadd! editorconfig
+    endif
 
     " augroup previewWindowPosition
     "     au!
