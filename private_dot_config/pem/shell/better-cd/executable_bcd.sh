@@ -54,17 +54,19 @@ tcd() {
         if [ -e "$current_dir/$target" ]; then
             cd "$current_dir"
             return 0
-        elif [ "$(basename "$current_dir")" = "$target" ] ; then
-            cd "$current_dir"
-            return 0
+        # elif [ "$(basename "$current_dir")" = "$target" ] ; then
+        #     cd "$current_dir"
+        #     return 0
         fi
         current_dir="$(dirname "$current_dir")"
     done
 
     echo "No parent directory containing $target found; staying in $(pwd)."
+    return 1
 }
 
 alias rcd='tcd .repo'
+alias lcd='bcd `tcd filelist.txt && cat filelist.txt | fzf | xargs readlink -f`'
 
 scd() {
 
