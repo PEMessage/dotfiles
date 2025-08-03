@@ -68,6 +68,7 @@ fi
 
 set -x
 # Run the container
+# For v2.6.12 you could compile using `make CC=gcc-3.7 defconfig; make CC=gcc-3.7`
 docker run --rm -it \
     -v "$PWD":/home/$CURRENT_USER/src \
-    linux26-builder /bin/bash
+    linux26-builder /bin/bash "$@"

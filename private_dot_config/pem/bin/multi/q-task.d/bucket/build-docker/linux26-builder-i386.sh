@@ -70,4 +70,4 @@ set -x
 # Run the container
 docker run --rm -it \
     -v "$PWD":/home/$CURRENT_USER/src \
-    linux26-builder-i386 /bin/bash
+    linux26-builder-i386 /bin/bash "$@"
