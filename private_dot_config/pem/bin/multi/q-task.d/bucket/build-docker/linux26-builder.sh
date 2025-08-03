@@ -14,7 +14,7 @@ if ! docker image inspect linux26-builder >/dev/null 2>&1; then
                                       --build-arg GROUPNAME="$CURRENT_GROUP" \
                                       --build-arg UID="$CURRENT_UID" \
                                       --build-arg GID="$CURRENT_GID" - <<EOF
-FROM i386/ubuntu:14.04
+FROM ubuntu:14.04
 
 RUN sed -i 's@archive.ubuntu.com@mirrors.aliyun.com@g' /etc/apt/sources.list && \
     sed -i 's@security.ubuntu.com@mirrors.aliyun.com@g' /etc/apt/sources.list && \
@@ -22,7 +22,29 @@ RUN sed -i 's@archive.ubuntu.com@mirrors.aliyun.com@g' /etc/apt/sources.list && 
 
 RUN apt-get update 
 RUN apt-get install -y build-essential
-RUN apt-get install -y libncurses5-dev automake pkg-config libevent-dev bear bash sudo
+RUN apt-get install -y libncurses5-dev automake pkg-config libevent-dev bear bash sudo wget
+RUN apt-get install -y make bin86 gcc-multilib
+
+# Thanks to: https://github.com/ultraji/linux-0.12/blob/5202224e0f656cc0ea93b7cd6bf7418298527922/src/code/setup.sh#L31
+SHELL ["/bin/bash", "-c"]
+RUN set -x && mkdir -p /tmp/gcc-3.4 && \
+    cd /tmp/gcc-3.4 && \
+    DOWNLOAD_LIST=(\
+        "gcc-3.4-base_3.4.6-6ubuntu3_amd64.deb" \
+        "gcc-3.4_3.4.6-6ubuntu3_amd64.deb" \
+        "cpp-3.4_3.4.6-6ubuntu3_amd64.deb" \
+        "g++-3.4_3.4.6-6ubuntu3_amd64.deb" \
+        "libstdc++6-dev_3.4.6-6ubuntu3_amd64.deb" \
+    ) && \
+    for deb in \${DOWNLOAD_LIST[*]}; do \
+        wget http://old-releases.ubuntu.com/ubuntu/pool/universe/g/gcc-3.4/\${deb} || \
+        { echo "Failed to download \${deb}"; exit 1; }; \
+    done && \
+    dpkg -i *.deb >/dev/null && \
+    apt-get install -y -f >/dev/null && \
+    cd / && \
+    rm -rf /tmp/gcc-3.4
+
 
 # Create user matching host user
 ARG USERNAME
