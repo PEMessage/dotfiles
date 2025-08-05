@@ -1991,6 +1991,9 @@ local section = function ()
         })
     end, { desc = 'Format selected range' })
 
+    vim.keymap.set('x', 'p', 'P', { noremap = true })
+    vim.keymap.set('x', 'P', 'p', { noremap = true })
+
     -- -------------------------------------------
     -- 6.2 Leader Keymap
     -- -------------------------------------------
