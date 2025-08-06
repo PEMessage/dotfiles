@@ -2549,5 +2549,8 @@ endif
     endfunction
     command! LspDumpInfo call LspDumpInfo()
 
+    " command! AsUtf8 execute '%!iconv -t utf-8' | set fileencoding=utf-8
+    command! -nargs=0 AsUtf8 silent execute '%!iconv -t utf-8 2>/dev/null' | silent set fileencoding=utf-8 | redraw!
+
     " You can map this to a key, for example:
     " nnoremap <Leader>h :call HighlightCurrentLineTemporarily()<CR>
