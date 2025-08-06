@@ -46,6 +46,25 @@ RUN set -x && mkdir -p /tmp/gcc-2.95 && \
     cd / && \
     rm -rf /tmp/gcc-2.95
 
+RUN set -x && mkdir -p /tmp/gcc-3.4 && \
+    cd /tmp/gcc-3.4 && \
+    DOWNLOAD_LIST=(\
+        "gcc-3.4-base_3.4.6-6ubuntu5_i386.deb" \
+        "gcc-3.4_3.4.6-6ubuntu5_i386.deb" \
+        "g++-3.4_3.4.6-6ubuntu5_i386.deb" \
+        "cpp-3.4_3.4.6-6ubuntu5_i386.deb" \
+        "libstdc++6-dev_3.4.6-6ubuntu5_i386.deb" \
+        "libstdc++6-pic_3.4.6-6ubuntu5_i386.deb" \
+    ) && \
+    for deb in \${DOWNLOAD_LIST[*]}; do \
+        wget http://old-releases.ubuntu.com/ubuntu/pool/universe/g/gcc-3.4/\${deb} || \
+        { echo "Failed to download \${deb}"; exit 1; }; \
+    done && \
+    dpkg -i *.deb >/dev/null && \
+    apt-get install -y -f >/dev/null && \
+    cd / && \
+    rm -rf /tmp/gcc-3.4
+
 # Create user matching host user
 ARG USERNAME
 ARG GROUPNAME
