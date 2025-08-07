@@ -653,7 +653,7 @@ let g:startify_custom_header = [
         endif
     endfunction
 
-    nnoremap <silent><leader>b  :Explore<CR>
+    " nnoremap <silent><leader>b  :Explore<CR>
 
 
     function! s:MapCmdWin()
@@ -756,6 +756,8 @@ call plug#begin(pe_runtimepath . '/plugged')
         " augroup END
         " JUST USE <C-M> AS ENTER
 
+    Plug 'lambdalisue/vim-fern'
+        nnoremap <silent><leader>b  :Fern . -drawer<CR>
 
     Plug 'mg979/vim-visual-multi', {'branch': 'master'}
         let g:M_default_mappings = 0
