@@ -29,6 +29,7 @@ git_config_global diff.tool vimdiff
 # git_config_global core.fsmonitor true
 
 git_config_global alias.pk cherry-pick
+git_config_global alias.ck checkout
 git_config_global alias.co checkout
 git_config_global alias.fw 'merge --ff-only'
 git_config_global alias.re 'remote -v'
