@@ -105,7 +105,7 @@ let g:startify_custom_header = [
     "             | |    + files marks saved
     "             | + lines saved each register (new name for ", vi6.2)
     "             + save/restore buffer list
-    set viminfo='300,<50,s10,h
+    set viminfo='600,<50,s10,h
     set helplang=cn      " 设置中文帮助手册
     set nowrap           " 关闭自动换行
     set ruler            " 显示光标位置
@@ -705,56 +705,84 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'PEMessage/vim-fixkey'
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
-        noremap <silent> <C-e> :FZF<CR>
-        " Note: complict with cmdwin (q/ or CTRL-F in command mode)
-        " noremap <silent> <C-f> :Marks<CR>
-        noremap <silent> <C-r> :History<CR>
-        noremap <leader>ft :BTags<CR>
-        command VMaps call fzf#vim#maps('x')
-        let g:fzf_preview_window = []
-    " Plug 'Yggdroot/LeaderF'
-    "     let g:Lf_ShortcutF = ''
-    "     let g:Lf_ShortcutF = ''
-    " Plug 'linrongbin16/fzfx.vim'
-    Plug 'tacahiroy/ctrlp-funky'
-    Plug 'ctrlpvim/ctrlp.vim'
-        " NOTE: !!! will cause mru error !!! not use it
-        " if has('python3') || has('python' )
-        "     Plug 'FelikZ/ctrlp-py-matcher'
-        "     let g:ctrlp_match_func = { 'match': 'pymatcher#PyMatch' }
-        " endif
-        let g:ctrlp_map = ''
-        let g:ctrlp_root_markers = ['.root', 'repo', '.git']
-        let g:ctrlp_max_depth = 3
-        let g:ctrlp_mruf_max = 250
-        let g:ctrlp_mruf_relative = 1
-        let g:ctrlp_prompt_mappings = {
-                    \ 'ToggleType(1)':        ['<c-up>'],
-                    \ 'ToggleType(-1)':       ['<c-down>'],
-                    \}
-        " nnoremap <c-f> :CtrlPBufTag<Cr>
+            noremap <silent> <C-e> :FZF<CR>
+    if (v:version >= 901)
+        Plug 'Donaldttt/fuzzyy'
+            noremap <silent> <C-p> :FuzzyBuffer<CR>
+            noremap <silent> <C-r> :FuzzyMru<CR>
+            let g:fuzzyy_window_layout = { 'mru': { 'preview': 0 } }
+            let g:fuzzyy_keymaps = {
+                        \ 'menu_up': ["\<c-p>", "\<Up>"],
+                        \ 'menu_down': ["\<c-n>", "\<Down>"],
+                        \ 'menu_select': ["\<CR>"],
+                        \ 'preview_up': ["\<c-i>"],
+                        \ 'preview_down': ["\<c-f>"],
+                        \ 'preview_up_half_page': ["\<c-u>"],
+                        \ 'preview_down_half_page': ["\<c-d>"],
+                        \ 'cursor_begining': ["\<c-a>"],
+                        \ 'cursor_end': ["\<c-e>"],
+                        \ 'cursor_word_left': ["\<C-Left>", "\<S-Left>", "\<C-b>", "\<C-h>"],
+                        \ 'cursor_word_right': ["\<C-Right>", "\<S-Right>", "\<C-f>", "\<C-l>"],
+                        \ 'backspace': ["\<bs>"],
+                        \ 'delete_word': ["\<C-w>"],
+                        \ 'delete_all': ["\<c-k>"],
+                        \ 'delete_prefix': [],
+                        \ 'exit': ["\<Esc>", "\<c-c>", "\<c-[>"],
+                        \ }
+        " Plug 'girishji/scope.vim'
+        "     " let g:using_plugin_scope = 1
+    else
+            " Note: complict with cmdwin (q/ or CTRL-F in command mode)
+            " noremap <silent> <C-f> :Marks<CR>
+            noremap <silent> <C-r> :History<CR>
+            noremap <leader>ft :BTags<CR>
+            command VMaps call fzf#vim#maps('x')
+            let g:fzf_preview_window = []
+        " Plug 'Yggdroot/LeaderF'
+        "     let g:Lf_ShortcutF = ''
+        "     let g:Lf_ShortcutF = ''
+        " Plug 'linrongbin16/fzfx.vim'
+        " Plug 'tacahiroy/ctrlp-funky'
 
-        " noremap <silent> <C-r> :CtrlPMRU<CR>
-        noremap <silent> <C-p> :CtrlPBuffer<CR>
-        " noremap <silent> <C-t> :CtrlPBufTagAll<CR>
-        " nnoremap <Leader>fu :CtrlPFunky<Cr>
-        " nnoremap <leader>cm :\<C-U>FzfxCommands<CR>
-        " nnoremap <C-S-p> :\<C-U>FzfxCommands<CR>
+        " Plug 'ctrlpvim/ctrlp.vim'
+            " NOTE: !!! will cause mru error !!! not use it
+            " if has('python3') || has('python' )
+            "     Plug 'FelikZ/ctrlp-py-matcher'
+            "     let g:ctrlp_match_func = { 'match': 'pymatcher#PyMatch' }
+            " endif
+            let g:ctrlp_map = ''
+            let g:ctrlp_root_markers = ['.root', 'repo', '.git']
+            let g:ctrlp_max_depth = 3
+            let g:ctrlp_mruf_max = 250
+            let g:ctrlp_mruf_relative = 1
+            let g:ctrlp_prompt_mappings = {
+                        \ 'ToggleType(1)':        ['<c-up>'],
+                        \ 'ToggleType(-1)':       ['<c-down>'],
+                        \}
+            " nnoremap <c-f> :CtrlPBufTag<Cr>
+
+            " noremap <silent> <C-r> :CtrlPMRU<CR>
+            noremap <silent> <C-p> :CtrlPBuffer<CR>
+            " noremap <silent> <C-t> :CtrlPBufTagAll<CR>
+            " nnoremap <Leader>fu :CtrlPFunky<Cr>
+            " nnoremap <leader>cm :\<C-U>FzfxCommands<CR>
+            " nnoremap <C-S-p> :\<C-U>FzfxCommands<CR>
 
 
-        " nnoremap <leader>fbr :\<C-U>FzfxBranches<CR>
+            " nnoremap <leader>fbr :\<C-U>FzfxBranches<CR>
 
-        " nnoremap <leader>fg :\<C-U>FzfxLiveGrep<CR>
-        " nnoremap <leader>ff :\<C-U>FzfxFiles<CR>
-        " nnoremap <space>fw :\<C-U>FzfxLiveGrep<CR>
-        " if has('autocmd')
-        "     autocmd filetype fzf
-        " else
-        " augroup PE_FZF_GROUP
-        "     autocmd!
-        "     autocmd filetype fzf tnoremap  <buffer> <C-o> <enter>
-        " augroup END
-        " JUST USE <C-M> AS ENTER
+            " nnoremap <leader>fg :\<C-U>FzfxLiveGrep<CR>
+            " nnoremap <leader>ff :\<C-U>FzfxFiles<CR>
+            " nnoremap <space>fw :\<C-U>FzfxLiveGrep<CR>
+            " if has('autocmd')
+            "     autocmd filetype fzf
+            " else
+            " augroup PE_FZF_GROUP
+            "     autocmd!
+            "     autocmd filetype fzf tnoremap  <buffer> <C-o> <enter>
+            " augroup END
+            " JUST USE <C-M> AS ENTER
+    endif
 
     Plug 'lambdalisue/vim-fern'
         nnoremap <silent><leader>b  :Fern . -drawer<CR>
@@ -1876,6 +1904,12 @@ if exists('*asyncomplete#register_source')
                 \ }))
 endif
 
+" if g:using_plugin_scope == 1
+"     call scope#popup#OptionsSet({
+"                 \ 'maxheight': 30,
+"                 \ 'emacsKeys': v:true,
+"                 \ })
+" endif
 
 " -------------------------------------------
 " 7.3 Expand region
