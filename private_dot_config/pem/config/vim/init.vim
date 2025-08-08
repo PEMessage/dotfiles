@@ -711,6 +711,8 @@ call plug#begin(pe_runtimepath . '/plugged')
             noremap <silent> <C-p> :FuzzyBuffer<CR>
             noremap <silent> <C-r> :FuzzyMru<CR>
             let g:fuzzyy_window_layout = { 'mru': { 'preview': 0 } }
+            " Windows terminal work wire for M-f and M-b, don't know why it
+            " doesn't work for vim9script plugin, has to add \x80FJ \x80FK
             let g:fuzzyy_keymaps = {
                         \ 'menu_up': ["\<c-p>", "\<Up>"],
                         \ 'menu_down': ["\<c-n>", "\<Down>"],
@@ -721,8 +723,8 @@ call plug#begin(pe_runtimepath . '/plugged')
                         \ 'preview_down_half_page': ["\<c-d>"],
                         \ 'cursor_begining': ["\<c-a>"],
                         \ 'cursor_end': ["\<c-e>"],
-                        \ 'cursor_word_left': ["\<C-Left>", "\<S-Left>", "\<C-b>", "\<C-h>"],
-                        \ 'cursor_word_right': ["\<C-Right>", "\<S-Right>", "\<C-f>", "\<C-l>"],
+                        \ 'cursor_word_left': ["\<C-Left>", "\<S-Left>", "\<M-b>", "\<C-h>", "\x80FJ"],
+                        \ 'cursor_word_right': ["\<C-Right>", "\<S-Right>", "\<M-f>", "\<C-l>", "\x80FK"],
                         \ 'backspace': ["\<bs>"],
                         \ 'delete_word': ["\<C-w>"],
                         \ 'delete_all': ["\<c-k>"],
