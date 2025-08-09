@@ -1107,19 +1107,38 @@ call plug#begin(pe_runtimepath . '/plugged')
     "     nmap ga <Plug>(EasyAlign)
     "     xmap ga <Plug>(EasyAlign)
     Plug 'tpope/vim-surround'
-    Plug 'tpope/vim-commentary'
+    " Plug 'tpope/vim-commentary'
+    Plug 'preservim/nerdcommenter'
+        let g:NERDSpaceDelims = 1
+        let g:NERDCreateDefaultMappings = 0
+        let g:NERDCompactSexyComs = 1
+        " THANKS: https://github.com/sisrfeng/cfg_nvim/blob/09cc4926a0fef9291747a673b8c96eb9f03a5379/begin_PL_end.vim#L227
+        let g:NERDCommentEmptyLines =  1 " Allow commenting and inverting empty lines (useful when commenting a region)
+        let g:NERDTrimTrailingWhitespace =  1 " Enable trimming of trailing whitespace when uncommenting
+
+        " THANKS: https://github.com/lmburns/dotfiles/blob/f7c1f3644337868afc7de8a547565242c409efb6/.vim/autoload/plugs/comment.vim#L12
+        nnoremap <silent>gcc :call nerdcommenter#Comment(0,"toggle")<CR>
+        xnoremap <silent><nowait> gc :call nerdcommenter#Comment(0, "Toggle")<CR>
+        xnoremap <silent> gx :call nerdcommenter#Comment(0, "Sexy")<CR>
+        nnoremap <leader>ca  :call nerdcommenter#SwitchToAlternativeDelimiters(1)<CR>
+        let g:NERDCustomDelimiters = {
+                    \ 'python': {'left': '#'},
+                    \ 'lua':  {'left': '--', 'leftAlt': '', 'rightAlt': ''},
+                    \ 'just': {'left': '#', 'leftAlt': '', 'rightAlt': ''}
+                    \ }
+
     Plug 'vim-scripts/DoxygenToolkit.vim'
     " Using :verbose and :set together will (likely) tell you
     " the file and line number where the option was last set.
     " Can you do the following after opening a kotlin file?
     " verbose set commentstring?
-        augroup VIMCOMMENT
-            autocmd!
-            autocmd FileType apache setlocal commentstring=#\ %s
-            autocmd FileType python setlocal commentstring=#\ %s
-            autocmd FileType cpp setlocal commentstring=//\ %s
-            autocmd FileType c setlocal commentstring=//\ %s
-        augroup END
+        " augroup VIMCOMMENT
+        "     autocmd!
+        "     autocmd FileType apache setlocal commentstring=#\ %s
+        "     autocmd FileType python setlocal commentstring=#\ %s
+        "     autocmd FileType cpp setlocal commentstring=//\ %s
+        "     " autocmd FileType c setlocal commentstring=//\ %s
+        " augroup END
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-fugitive'
         let g:fugitive_legacy_commands = 1
