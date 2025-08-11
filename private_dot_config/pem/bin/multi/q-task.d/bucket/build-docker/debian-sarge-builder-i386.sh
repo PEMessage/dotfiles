@@ -44,5 +44,6 @@ fi
 set -x
 # Run the container
 docker run --rm -it \
-    -v "$PWD":/home/$CURRENT_USER/src \
+    -v "$PWD":"$PWD" \
+    -w "$PWD" \
     debian-sarge-builder-i386 /bin/bash "$@"
