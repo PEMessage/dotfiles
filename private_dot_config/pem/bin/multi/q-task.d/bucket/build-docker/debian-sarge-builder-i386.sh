@@ -20,6 +20,7 @@ FROM debian/eol:sarge
 
 RUN apt-get update 
 RUN apt-get -y install gcc-2.95 ncurses-dev build-essential make
+RUN apt-get -y install sudo wget gawk
 
 # Create user matching host user
 ARG USERNAME
