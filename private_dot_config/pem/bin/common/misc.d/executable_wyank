@@ -24,6 +24,11 @@ get_cache_dir() {
 
 
 get_download_path() {
+    if [ "$1" = -n ] ; then
+        nocopy=1
+        shift
+    fi
+
     file="$1"
     if [ -e "$file" ]; then
         cd "$(dirname "$file")"
@@ -31,11 +36,13 @@ get_download_path() {
         cd "$(get_cache_dir)"
         rsync --progress -r "$1" .
     fi
-    /mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe Set-Clipboard -Path "'$(basename "$file")'"
+    if [ -z "$nocopy" ] ; then
+        /mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe Set-Clipboard -Path "'$(basename "$file")'"
+    fi
 }
 
 
-get_download_path "$1"
+get_download_path "$@"
 
 
 
