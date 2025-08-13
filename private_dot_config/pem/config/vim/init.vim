@@ -746,7 +746,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         " Plug 'linrongbin16/fzfx.vim'
         " Plug 'tacahiroy/ctrlp-funky'
 
-        " Plug 'ctrlpvim/ctrlp.vim'
+        Plug 'ctrlpvim/ctrlp.vim'
             " NOTE: !!! will cause mru error !!! not use it
             " if has('python3') || has('python' )
             "     Plug 'FelikZ/ctrlp-py-matcher'
