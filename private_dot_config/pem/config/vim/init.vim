@@ -707,13 +707,13 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'junegunn/fzf.vim'
             noremap <silent> <C-e> :FZF<CR>
     if (v:version >= 901)
-        Plug 'Donaldttt/fuzzyy'
+        Plug 'vim-fuzzbox/fuzzbox.vim'
             noremap <silent> <C-p> :FuzzyBuffer<CR>
             noremap <silent> <C-r> :FuzzyMru<CR>
-            let g:fuzzyy_window_layout = { 'mru': { 'preview': 0 } }
+            let g:fuzzbox_window_layout = { 'mru': { 'preview': 0 } }
             " Windows terminal work wire for M-f and M-b, don't know why it
             " doesn't work for vim9script plugin, has to add \x80FJ \x80FK
-            let g:fuzzyy_keymaps = {
+            let g:fuzzbox_keymaps = {
                         \ 'menu_up': ["\<c-p>", "\<Up>"],
                         \ 'menu_down': ["\<c-n>", "\<Down>"],
                         \ 'menu_select': ["\<CR>"],
