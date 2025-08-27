@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+import sys
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: python3 trim_lines.py [trim_option]")
+        print("Trim options:")
+        print("  left    - trim only leading whitespace")
+        print("  right   - trim only trailing whitespace")
+        print("  both    - trim both leading and trailing whitespace (default)")
+        sys.exit(1)
+
+    trim_option = sys.argv[1].lower()
+
+    lines = sys.stdin.read().splitlines()
+
+    # Trim lines based on the specified option
+    if trim_option == "left":
+        trimmed_lines = [line.lstrip() for line in lines]
+    elif trim_option == "right":
+        trimmed_lines = [line.rstrip() for line in lines]
+    elif trim_option == "both":
+        trimmed_lines = [line.strip() for line in lines]
+    else:
+        print(f"Error: Invalid trim option '{trim_option}'")
+        print("Valid options: left, right, both")
+        sys.exit(1)
+
+    # Output each trimmed line
+    for line in trimmed_lines:
+        print(line)
+
+if __name__ == "__main__":
+    main()
