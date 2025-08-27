@@ -706,7 +706,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'junegunn/fzf'
     Plug 'junegunn/fzf.vim'
             noremap <silent> <C-e> :FZF<CR>
-    if (v:version >= 901)
+    if (0)
         Plug 'vim-fuzzbox/fuzzbox.vim'
             noremap <silent> <C-p> :FuzzyBuffer<CR>
             noremap <silent> <C-r> :FuzzyMru<CR>
@@ -1107,7 +1107,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     "     nmap ga <Plug>(EasyAlign)
     "     xmap ga <Plug>(EasyAlign)
     Plug 'tpope/vim-surround'
-    " Plug 'tpope/vim-commentary'
+    Plug 'tpope/vim-commentary'
     Plug 'preservim/nerdcommenter'
         let g:NERDSpaceDelims = 1
         let g:NERDCreateDefaultMappings = 0
@@ -1117,8 +1117,8 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:NERDTrimTrailingWhitespace =  1 " Enable trimming of trailing whitespace when uncommenting
 
         " THANKS: https://github.com/lmburns/dotfiles/blob/f7c1f3644337868afc7de8a547565242c409efb6/.vim/autoload/plugs/comment.vim#L12
-        nnoremap <silent>gcc :call nerdcommenter#Comment(0,"toggle")<CR>
-        xnoremap <silent><nowait> gc :call nerdcommenter#Comment(0, "Toggle")<CR>
+        " nnoremap <silent>gcc :call nerdcommenter#Comment(0,"toggle")<CR>
+        " xnoremap <silent><nowait> gc :call nerdcommenter#Comment(0, "Toggle")<CR>
         xnoremap <silent> gx :call nerdcommenter#Comment(0, "Sexy")<CR>
         nnoremap <leader>ca  :call nerdcommenter#SwitchToAlternativeDelimiters(1)<CR>
         let g:NERDCustomDelimiters = {
