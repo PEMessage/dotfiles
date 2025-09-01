@@ -736,6 +736,7 @@ require("lazy").setup({
             indent = { enable = { 'python','lua'  } },
             ensure_installed = {
                 'json',
+                'xml',
                 'css',
                 'vim',
                 'lua',
@@ -865,6 +866,10 @@ require("lazy").setup({
     -- 5.5 Telescope Setting
     -- -------------------------------------------
     {
+        'nvim-telescope/telescope-fzf-native.nvim',
+        build = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release'
+    },
+    {
         'nvim-telescope/telescope.nvim', tag = '0.1.8',
         enabled = true,
         dependencies = { 'nvim-lua/plenary.nvim' },
@@ -918,6 +923,15 @@ require("lazy").setup({
             { "<leader>tt", "<cmd>Telescope<cr>", desc = "Telescope All" },
         },
         opts = {
+            extensions = {
+                fzf = {
+                    fuzzy = true,                    -- false will only do exact matching
+                    override_generic_sorter = true,  -- override the generic sorter
+                    override_file_sorter = true,     -- override the file sorter
+                    case_mode = "smart_case",        -- or "ignore_case" or "respect_case"
+                    -- the default case_mode is "smart_case"
+                }
+            },
             defaults = {
 
                 mappings = {
@@ -989,6 +1003,12 @@ require("lazy").setup({
                 wk.add({
                     { "<leader>n", group = "LineNumber Options" },
                 })
+            end,
+
+            config = function(_, opts)
+                local telescope = require('telescope')
+                telescope.setup(opts)
+                telescope.load_extension('fzf')
             end
         },
     },
@@ -1434,12 +1454,28 @@ require("lazy").setup({
                 }
                 return runtime
             end
+            local env = {
+                HOME = vim.uv.os_homedir(),
+                XDG_CACHE_HOME = os.getenv 'XDG_CACHE_HOME',
+                JDTLS_JVM_ARGS = os.getenv 'JDTLS_JVM_ARGS',
+            }
+
+            local cache_dir = ( env.XDG_CACHE_HOME and env.XDG_CACHE_HOME or env.HOME .. '/.cache' ) .. '/jdtls'
 
             -- We using mason-lspconfig, not using it according to readme
             local jdtls = require('jdtls')
             local mason_root = require('mason.settings').current.install_root_dir
+            local root_markers = {'gradlew'}
+            local root_dir = require('jdtls.setup').find_root(root_markers)
             local opts = {
-                cmd = require('lspconfig').jdtls.document_config.default_config.cmd,
+                -- cmd = require('lspconfig').jdtls.document_config.default_config.cmd,
+                cmd = {
+                    require('lspconfig').jdtls.document_config.default_config.cmd[1],
+                    '-configuration',
+                    cache_dir .. '/config',
+                    '-data',
+                    cache_dir .. '/workspace/' .. vim.fn.fnamemodify(root_dir, ":p:h:t")
+                },
                 -- See: https://github.com/mfussenegger/nvim-jdtls?tab=readme-ov-file#configuration-verbose
                 root_dir = require("jdtls.setup").find_root({ ".git", "mvnw", "gradlew", "javaroot" }),
                 init_options = {
