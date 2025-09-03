@@ -56,10 +56,6 @@
 # -----------------------------------------
 # Complete Setting Zone
 # -----------------------------------------
-    # Complete and Prompt 
-    # See: https://thevaluable.dev/zsh-completion-guide-examples/
-    # :completion:<function>:<completer>:<command>:<argument>:<tag>
-    autoload -Uz compinit && compinit
 
     # Part 1 zsytle
     # man zshcompsys - Search for “Standard Tags”
@@ -140,6 +136,11 @@
 # -----------------------------------------
 
     source ~/.config/pem/init.sh
+
+    # Complete and Prompt 
+    # See: https://thevaluable.dev/zsh-completion-guide-examples/
+    # :completion:<function>:<completer>:<command>:<argument>:<tag>
+    autoload -Uz compinit && compinit
     # source ~/.config/chezmoi/chezmoi.zsh
     # source ~/.config/pem/shell/fzf/fzf-ff.sh
     # source ~/.config/pem/shell/vless/vless.sh

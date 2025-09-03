@@ -13,6 +13,7 @@ usage() {
     echo
     echo "-l: print all task list"
     echo "-h: print this help page"
+    echo "--shell SHELL: tab complete for SHELL"
     echo
     echo "CONF:"
     echo
@@ -33,7 +34,7 @@ _q-task() {
         '--shell:Generate shell completion'
     )
 
-    if [[ $words[2] == -* || $CURRENT -eq 2 ]]; then
+    if [[ $words[2] == -* ]]; then
         _describe 'command' commands
     else
         # Get task list from 'q-task -l' command
@@ -60,7 +61,7 @@ main() {
         -l)
             (
                 cd "$CONF_BUCKET_DIR"
-                find . -type f -name '*sh'
+                find . -type f -name '*sh' | sed 's@^./@@g'
             )
             ;;
         --shell)
