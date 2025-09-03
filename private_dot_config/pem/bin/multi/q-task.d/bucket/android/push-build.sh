@@ -22,7 +22,11 @@ push_build_to_device() {
 
     for file in "${files[@]}"; do
         # Convert Unix path to Windows-style (if needed, though bash typically uses Unix paths)
-        local wfile=$(echo "$file" | sed 's/\//\\/g')
+        if [[ "$ADB" == *.exe ]]; then
+            local wfile=$(echo "$file" | sed 's/\//\\/g')
+        else
+            local wfile="$file"
+        fi
 
         # Get directory name and create local directory
         local dirname=$(dirname "$file")
