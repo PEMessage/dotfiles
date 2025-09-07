@@ -1149,6 +1149,12 @@ require("lazy").setup({
 
     },
     {
+        "j-hui/fidget.nvim",
+        opts = {
+            -- options
+        },
+    },
+    {
         "ray-x/lsp_signature.nvim",
         enabled = false,
         event = "VeryLazy",

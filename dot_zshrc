@@ -82,6 +82,7 @@
 
     # 设置默认命令行提示符
     autoload -Uz color && colors
+    autoload -Uz compinit && compinit
     export PS1
     PS1="["
     PS1+="%{$fg_bold[blue]%}%n@%m%{$reset_color%}"
@@ -140,9 +141,12 @@
     # Complete and Prompt 
     # See: https://thevaluable.dev/zsh-completion-guide-examples/
     # :completion:<function>:<completer>:<command>:<argument>:<tag>
-    autoload -Uz compinit && compinit
     # source ~/.config/chezmoi/chezmoi.zsh
     # source ~/.config/pem/shell/fzf/fzf-ff.sh
     # source ~/.config/pem/shell/vless/vless.sh
 
+# -----------------------------------------
+# Post init.sh
+# -----------------------------------------
+    compinit # re run compinit, if new compdef func define in init.sh, we need compinit to reload it
 
