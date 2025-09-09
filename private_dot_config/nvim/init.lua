@@ -1504,6 +1504,11 @@ require("lazy").setup({
                                     enabled = false,
                                 },
                             },
+                            jdt = {
+                                ls = {
+                                    androidSupport = true,
+                                },
+                            },
                         },
                     },
                 },
