@@ -1457,6 +1457,10 @@ require("lazy").setup({
                         name = 'JavaSE-17',
                         path = '/usr/lib/jvm/java-1.17.0-openjdk-amd64/',
                     },
+                    {
+                        name = 'JavaSE-21',
+                        path = '/usr/lib/jvm/java-21-openjdk-amd64/',
+                    },
                 }
                 return runtime
             end
@@ -1477,6 +1481,7 @@ require("lazy").setup({
                 -- cmd = require('lspconfig').jdtls.document_config.default_config.cmd,
                 cmd = {
                     require('lspconfig').jdtls.document_config.default_config.cmd[1],
+                    '--jvm-arg=-Dlog.level=ALL',
                     '-configuration',
                     cache_dir .. '/config',
                     '-data',
@@ -1492,11 +1497,15 @@ require("lazy").setup({
                         ),
                     },
                     settings = {
+                        configuration = {
+                            runtimes = get_runtime_dir(),
+                        },
                         java = {
                             contentProvider = { preferred = 'fernflower' },
                             inlayhints = {
                                 parameterNames = { enabled = true },
                             },
+                            -- autobuild = { enabled = true },
                             import = {
                                 gradle = {
                                     -- See: https://www.reddit.com/r/neovim/comments/1m3v9kk/jdtls_keeps_regenerating_my_classpath_for_a/
@@ -1508,6 +1517,10 @@ require("lazy").setup({
                                 ls = {
                                     androidSupport = true,
                                 },
+                            },
+                            references = {
+                                includeAccessors = true,
+                                includeDecompiledSources = true,
                             },
                         },
                     },
