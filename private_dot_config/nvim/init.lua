@@ -1288,6 +1288,9 @@ require("lazy").setup({
             vim.lsp.config("clangd", {
                 inlay_hints = { enabled = true },
             })
+            vim.lsp.config("rust_analyzer", {
+                inlay_hints = { enabled = true },
+            })
             vim.lsp.config("pylsp", {
                 inlay_hints = { enabled = true },
                 settings = {
