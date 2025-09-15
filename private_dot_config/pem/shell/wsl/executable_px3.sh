@@ -19,6 +19,7 @@ __px3_smartone() {
                     fnd="$fnd -m systemd -E docker.service"
                 ;;
                 -g|--gradle)
+                    echo
                     echo "# px -g >> gradle.properties"
                     echo "# org.gradle.java.home=/usr/lib/jvm/java-1.XX.0-openjdk-amd64/"
                     fnd="$fnd -m gradle"
