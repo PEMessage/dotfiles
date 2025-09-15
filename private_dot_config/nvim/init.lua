@@ -1222,6 +1222,7 @@ require("lazy").setup({
         'williamboman/mason-lspconfig.nvim',
         dependencies = {
             'williamboman/mason.nvim',
+            'neovim/nvim-lspconfig',
         },
         opts = {
             ensure_installed = {
@@ -1232,197 +1233,100 @@ require("lazy").setup({
                 -- 'ccls'
 
             },
-            automatic_installation = true,
+            automatic_enable = {
+                "lua_ls",
+                'rust_analyzer',
+                'neocmake',
+                "clangd",
+                "pylsp",
+                "gopls",
+                -- "jdtls" -- leave it to nvim-jdtls
+            }
         },
         config = function(_,opts)
+            vim.lsp.config('lua_ls', {
+                on_init = function(client)
+                    if client.workspace_folders then
+                        local path = client.workspace_folders[1].name
+                        if path ~= vim.fn.stdpath('config') and (vim.uv.fs_stat(path..'/.luarc.json') or vim.uv.fs_stat(path..'/.luarc.jsonc')) then
+                            return
+                        end
+                    end
+
+                    client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
+                        runtime = {
+                            -- Tell the language server which version of Lua you're using
+                            -- (most likely LuaJIT in the case of Neovim)
+                            version = 'LuaJIT'
+                        },
+                        -- Make the server aware of Neovim runtime files
+                        workspace = {
+                            checkThirdParty = false,
+                            library = {
+                                vim.env.VIMRUNTIME
+                                -- Depending on the usage, you might want to add additional paths here.
+                                -- "${3rd}/luv/library"
+                                -- "${3rd}/busted/library",
+                            }
+                            -- or pull in all of 'runtimepath'. NOTE: this is a lot slower and will cause issues when working on your own configuration (see https://github.com/neovim/nvim-lspconfig/issues/3189)
+                            -- library = vim.api.nvim_get_runtime_file("", true)
+                        }
+                    })
+                end,
+                settings = {
+                    Lua = {
+                        diagnostics = {
+                            neededFileStatus = {
+                                ['codestyle-check'] = 'None!',
+                                ["unused-local"] = 'None!',
+                                ["empty-block"] = "None!",
+                            }
+                        }
+                    }
+                }
+            })
+            vim.lsp.config("clangd", {
+                inlay_hints = { enabled = true },
+            })
+            vim.lsp.config("pylsp", {
+                inlay_hints = { enabled = true },
+                settings = {
+                    -- @See:
+                    -- https://neovim.discourse.group/t/pylsp-config-is-not-taken-into-account/1846
+                    -- Like I mentioned on your issue,
+                    -- you need to have a nested pylsp table under settings
+                    -- (according to their documentation)
+                    pylsp = {
+                        configurationSources = {
+                            'pycodestyle',
+                        },
+                        plugins = {
+                            -- yapf = {
+                            --     enabled = true,
+                            -- },
+                            pycodestyle = {
+                                enabled = true,
+                                ignore = {
+                                    -- 'W391',
+                                    'E111', -- E111 indentation is not a multiple of 4
+                                    'E114', -- E114 indentation is not a multiple of 4 (comment)
+                                    'E206', -- E266 too many leading '#' for block comment
+                                    'W504', -- W504 line break after binary operator
+                                    'E501', -- E501 line too long (80 > 79 characters)
+                                    'W391', -- W391 blank line at end of file
+                                    'E302', -- E302 expected 2 blank lines, found 1
+                                    'E303', -- E303 too many blank lines (3)
+                                    -- 'E261', -- E261 at least two spaces before inline comment
+                                },
+                            }
+                        }
+                    }
+                }
+            })
             require("mason-lspconfig").setup(opts)
         end,
 
     },
-    {
-        "neovim/nvim-lspconfig",
-        event = { "BufReadPre", "BufNewFile" },
-        dependencies = {
-            'williamboman/mason.nvim',
-            'williamboman/mason-lspconfig.nvim',
-        },
-        config = function(_,opts)
-            -- --------------------------------
-            -- mason-lspconfig Config Zone
-            -- --------------------------------
-            local lspconfig = require('lspconfig')
-            require("mason-lspconfig").setup_handlers({
-                function (server_name)
-                    require("lspconfig")[server_name].setup{
-                        inlay_hints = { enabled = true },
-                        autostart = false
-                    }
-                end,
-                -- Next, you can provide targeted overrides for specific servers.
-                ["lua_ls"] = function ()
-                    require'lspconfig'.lua_ls.setup {
-                        on_init = function(client)
-                            if client.workspace_folders then
-                                local path = client.workspace_folders[1].name
-                                ---@diagnostic disable-next-line: undefined-field
-                                if path ~= vim.fn.stdpath('config') and (vim.uv.fs_stat(path..'/.luarc.json') or vim.uv.fs_stat(path..'/.luarc.jsonc')) then
-                                    return
-                                end
-                            end
-
-                            client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
-                                runtime = {
-                                    version = 'LuaJIT'
-                                },
-                                -- Make the server aware of Neovim runtime files
-                                workspace = {
-                                    checkThirdParty = false,
-                                    library = {
-                                        vim.env.VIMRUNTIME
-                                    }
-                                }
-                            })
-                        end,
-                        autostart = true,
-                        settings = {
-                            Lua = {
-                                diagnostics = {
-                                    neededFileStatus = {
-                                        ['codestyle-check'] = 'None!',
-                                        ["unused-local"] = 'None!',
-                                        ["empty-block"] = "None!",
-                                    }
-                                }
-                            }
-                        }
-                    }
-                end,
-                ['rust_analyzer'] = function ()
-                    lspconfig.rust_analyzer.setup({ autostart = true })
-                end,
-                ['neocmake'] = function ()
-                    local configs = require("lspconfig.configs")
-                    local nvim_lsp = require("lspconfig")
-                    if not configs.neocmake then
-                        configs.neocmake = {
-                            autostart = true,
-                            default_config = {
-                                cmd = { "neocmakelsp", "--stdio" },
-                                filetypes = { "cmake" },
-                                root_dir = function(fname)
-                                    return nvim_lsp.util.find_git_ancestor(fname)
-                                end,
-                                single_file_support = true,-- suggested
-                                -- on_attach = on_attach, -- on_attach is the on_attach function you defined
-                                init_options = {
-                                    format = {
-                                        enable = true
-                                    },
-                                    lint = {
-                                        enable = true
-                                    },
-                                    scan_cmake_in_package = true -- default is true
-                                }
-                            }
-                        }
-                        nvim_lsp.neocmake.setup({})
-                    end
-                end,
-                ["pylsp"] = function ()
-                    lspconfig.pylsp.setup({
-                        autostart = true,
-                        inlay_hints = { enabled = true },
-                        settings = {
-                            -- @See:
-                            -- https://neovim.discourse.group/t/pylsp-config-is-not-taken-into-account/1846
-                            -- Like I mentioned on your issue,
-                            -- you need to have a nested pylsp table under settings
-                            -- (according to their documentation)
-                            pylsp = {
-                                configurationSources = {
-                                    'pycodestyle',
-                                },
-                                plugins = {
-                                    -- yapf = {
-                                    --     enabled = true,
-                                    -- },
-                                    pycodestyle = {
-                                        enabled = true,
-                                        ignore = {
-                                            -- 'W391',
-                                            'E111', -- E111 indentation is not a multiple of 4
-                                            'E114', -- E114 indentation is not a multiple of 4 (comment)
-                                            'E206', -- E266 too many leading '#' for block comment
-                                            'W504', -- W504 line break after binary operator
-                                            'E501', -- E501 line too long (80 > 79 characters)
-                                            'W391', -- W391 blank line at end of file
-                                            'E302', -- E302 expected 2 blank lines, found 1
-                                            'E303', -- E303 too many blank lines (3)
-                                            -- 'E261', -- E261 at least two spaces before inline comment
-                                        },
-                                    }
-                                }
-                            }
-                        }
-                    })
-                end,
-                -- ["java_language_server"] = function ()
-                --     lspconfig.java_language_server.setup({
-                --         autostart = true,
-                --         cmd = { "java-language-server" },
-                --     })
-                -- end,
-                ["clangd"] = function () lspconfig.clangd.setup(
-                    {
-                        autostart = true,
-                        inlay_hints = { enabled = true },
-                    }) end,
-                ["gopls"] = function () lspconfig.gopls.setup({ autostart = true }) end,
-                -- ["jdtls"] = function () end, -- Leave it to nvim-jdtls
-                ["jdtls"] = function ()
-                    -- leave it to jdtls
-                    -- local mason_root = require('mason.settings').current.install_root_dir
-                    -- lspconfig.jdtls.setup({
-                    --     autostart = true,
-                    --     init_options = {
-                    --         bundles = {
-                    --             -- vim.fn.glob(mason_root .. 'packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar'),
-                    --         }
-                    --     }
-                    -- })
-                end,
-
-            })
-
-
-            -- --------------------------------
-            -- lspconfig Config Zone
-            -- --------------------------------
-            -- vim.diagnostic.disable()
-            -- require'lspconfig'.ccls.setup{
-            --     -- filetypes = { "c", "cpp", "objc", "objcpp", "asm" },
-            -- }
-            -- vim.api.nvim_create_autocmd('LspAttach', {
-            --     group = vim.api.nvim_create_augroup('UserLspConfig', {}),
-            --     callback = function(ev)
-            --         -- Enable completion triggered by <c-x><c-o>
-            --         -- vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
-            --
-            --         -- Buffer local mappings.
-            --         -- See `:help vim.lsp.*` for documentation on any of the below functions
-            --         local local_opt = { buffer = ev.buf }
-            --         vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, local_opt)
-            --         vim.keymap.set('n', 'gd', vim.lsp.buf.definition, local_opt)
-            --         vim.keymap.set('n', 'K', vim.lsp.buf.hover, local_opt)
-            --         vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, local_opt)
-            --         vim.keymap.set({ 'n', 'v' }, 'gla', vim.lsp.buf.code_action, local_opt)
-            --         vim.keymap.set('n', 'gr', vim.lsp.buf.references, local_opt)
-            --     end,
-            -- })
-
-        end,
-    },
-    -- { 'bfredl/nvim-luadev' },
     {
         'mfussenegger/nvim-jdtls',
         version = false, -- set this if you want to always pull the latest change
