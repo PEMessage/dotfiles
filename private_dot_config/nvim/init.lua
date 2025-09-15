@@ -392,7 +392,7 @@ require("lazy").setup({
         config = function(_,opts)
             require('lualine').setup({
                 options = {
-                 theme = 'auto',
+                    theme = 'auto',
                     icons_enabled = false,
                     component_separators = { left = '|', right = '|' },
                     section_separators = { left = '', right = '' },
@@ -869,7 +869,11 @@ require("lazy").setup({
     -- -------------------------------------------
     {
         'nvim-telescope/telescope-fzf-native.nvim',
-        build = 'cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release'
+        dependencies = { 'nvim-telescope/telescope.nvim' },
+        build = 'make',
+        config = function(_, opts)
+            require("telescope").load_extension("fzf")
+        end
     },
     {
         'nvim-telescope/telescope.nvim', tag = '0.1.8',
@@ -885,6 +889,9 @@ require("lazy").setup({
                         require('telescope.themes').get_dropdown{
                             -- previewer = false,
                             sort_lastused = true,
+                            path_display = {
+                                shorten = { len = 2, exclude = {1, 2, -3, -2, -1} }
+                            },
                             attach_mappings = function (_,map)
                                 map( {'i','n'}, '<C-p>',
                                     function(...)
@@ -915,12 +922,21 @@ require("lazy").setup({
                     )
                 end,
                 desc = "MRU"
+            }, {
+                "<C-e>",
+                function()
+                    require('telescope.builtin').find_files({
+                        path_display = {
+                            shorten = { len = 3, exclude = {1, 2, -3, -2, -1} }
+                        }
+                    })
+                end,
+                desc = "Telescope Find Files"
             },
             { "<leader>tm", "<cmd>Telescope man_pages<cr>", desc = "Telescope Man Pages" },
             { "<leader>td", "<cmd>Telescope lsp_definitions<cr>", desc = "Telescope LSP Define" },
             { "<leader>th", "<cmd>Telescope help_tags<cr>", desc = "Telescope Help Pages" },
             { "<leader>tf", "<cmd>Telescope find_files<cr>", desc = "Telescope Find Files" },
-            { "<C-e>", "<cmd>Telescope find_files<cr>", desc = "Telescope Find Files" },
             { "<leader>tg", "<cmd>Telescope live_grep<cr>", desc = "Telescope Live Grep" },
             { "<leader>tt", "<cmd>Telescope<cr>", desc = "Telescope All" },
         },
@@ -1008,9 +1024,8 @@ require("lazy").setup({
             end,
 
             config = function(_, opts)
-                local telescope = require('telescope')
-                telescope.setup(opts)
-                telescope.load_extension('fzf')
+                -- local telescope = require('telescope')
+                require('telescope').setup(opts)
             end
         },
     },
