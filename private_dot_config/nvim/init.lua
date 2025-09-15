@@ -871,8 +871,23 @@ require("lazy").setup({
         'nvim-telescope/telescope-fzf-native.nvim',
         dependencies = { 'nvim-telescope/telescope.nvim' },
         build = 'make',
+        opts = {
+            -- Also See: https://github.com/debugloop/telescope-undo.nvim
+            -- don't use `defaults = { }` here, do this in the main telescope spec
+            extensions = {
+                fzf = {
+                    fuzzy = true,                    -- false will only do exact matching
+                    override_generic_sorter = true,  -- override the generic sorter
+                    override_file_sorter = true,     -- override the file sorter
+                    case_mode = "smart_case",        -- or "ignore_case" or "respect_case"
+                    -- the default case_mode is "smart_case"
+                }
+            },
+        },
         config = function(_, opts)
-            require("telescope").load_extension("fzf")
+            local telescope = require("telescope")
+            telescope.setup(opts)
+            telescope.load_extension("fzf")
         end
     },
     {
@@ -941,15 +956,6 @@ require("lazy").setup({
             { "<leader>tt", "<cmd>Telescope<cr>", desc = "Telescope All" },
         },
         opts = {
-            extensions = {
-                fzf = {
-                    fuzzy = true,                    -- false will only do exact matching
-                    override_generic_sorter = true,  -- override the generic sorter
-                    override_file_sorter = true,     -- override the file sorter
-                    case_mode = "smart_case",        -- or "ignore_case" or "respect_case"
-                    -- the default case_mode is "smart_case"
-                }
-            },
             defaults = {
 
                 mappings = {
