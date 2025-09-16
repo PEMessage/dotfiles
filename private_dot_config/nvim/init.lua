@@ -678,6 +678,8 @@ require("lazy").setup({
                 { silent = true, desc = "Previous git changed line"  } )
             vim.keymap.set( 'n',  ']c', '<cmd>Gitsigns next_hunk<cr>' ,
                 { silent = true, desc = "Next git changed line"  } )
+            vim.keymap.set( 'n',  '<leader>u', '<cmd>Gitsigns reset_hunk<cr>' ,
+                { silent = true, desc = "Reset git hunk"  } )
         end
     },
     {
@@ -1235,11 +1237,14 @@ require("lazy").setup({
             },
             automatic_enable = {
                 "lua_ls",
-                'rust_analyzer',
-                'neocmake',
+                "rust_analyzer",
+                "neocmake",
                 "clangd",
                 "pylsp",
                 "gopls",
+                "bashls",
+                -- "kotlin_language_server",
+                "kotlin_lsp", -- See: https://github.com/desugar-64/kotlin-lsp-workspace-generator for android
                 -- "jdtls" -- leave it to nvim-jdtls
             }
         },
@@ -1290,6 +1295,12 @@ require("lazy").setup({
             })
             vim.lsp.config("rust_analyzer", {
                 inlay_hints = { enabled = true },
+            })
+            vim.lsp.config("kotlin_lsp", {
+                inlay_hints = { enabled = true },
+                root_markers = {
+                    'workspace.json', -- Used to integrate your own build system
+                }
             })
             vim.lsp.config("pylsp", {
                 inlay_hints = { enabled = true },
