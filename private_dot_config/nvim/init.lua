@@ -1264,8 +1264,8 @@ require("lazy").setup({
                 "pylsp",
                 "gopls",
                 "bashls",
-                -- "kotlin_language_server",
-                "kotlin_lsp", -- See: https://github.com/desugar-64/kotlin-lsp-workspace-generator for android
+                "kotlin_language_server",
+                -- "kotlin_lsp", -- See: https://github.com/desugar-64/kotlin-lsp-workspace-generator for android
                 -- "jdtls" -- leave it to nvim-jdtls
             }
         },
@@ -1507,6 +1507,11 @@ require("lazy").setup({
             vim.api.nvim_create_autocmd("Filetype", {
 				pattern = "java",
 				callback = function()
+                    local current_file = vim.fn.expand("%:p")
+                    -- Exclude paths containing /tmp/kotlinlangserver
+                    if string.match(current_file, "/tmp/kotlinlangserver") then
+                        return
+                    end
                     require("jdtls").start_or_attach(opts)
 				end,
 			})
