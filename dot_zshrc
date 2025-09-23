@@ -82,7 +82,7 @@
 
     # 设置默认命令行提示符
     autoload -Uz color && colors
-    autoload -Uz compinit # && compinit # delay compinit to end of this file
+    autoload -Uz compinit && compinit
     export PS1
     PS1="["
     PS1+="%{$fg_bold[blue]%}%n@%m%{$reset_color%}"
@@ -148,5 +148,3 @@
 # -----------------------------------------
 # Post init.sh
 # -----------------------------------------
-    compinit # re run compinit, if new compdef func define in init.sh, we need compinit to reload it
-

@@ -177,6 +177,9 @@
                     */wsl.d) if [ "$PEM_OS_VARIANT" = wsl2 ] ; then
                         PEM_PRE_PATH="$PEM_PRE_PATH:$xbin"
                     fi ;;
+                    */zsh.d) if [ "$PEM_SHELL" = zsh ] ; then
+                        fpath=("$xbin" $fpath)
+                    fi ;;
                 esac
             }
         done ; unset xbin
