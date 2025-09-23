@@ -1545,6 +1545,33 @@ require("lazy").setup({
                     ['.restart'] = dap.restart,
                 },
             })
+
+            dap.adapters.gdb = {
+                id = 'gdb',
+                type = 'executable',
+                command = 'gdb',
+                args = { '--quiet', '--interpreter=dap' },
+            }
+
+            local gdb = {
+                name = 'Run native GDB Dap',
+                type = 'gdb',
+                request = 'launch',
+                -- This requires special handling of 'run_last', see
+                -- https://github.com/mfussenegger/nvim-dap/issues/1025#issuecomment-1695852355
+                program = function()
+                    local path = vim.fn.input({
+                        prompt = 'Path to executable: ',
+                        default = vim.fn.getcwd() .. '/',
+                        completion = 'file',
+                    })
+
+                    return (path and path ~= '') and path or dap.ABORT
+                end,
+            }
+            dap.configurations.c = {  gdb }
+            dap.configurations.cpp = { gdb }
+
         end
     },
     {
