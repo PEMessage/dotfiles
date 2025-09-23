@@ -8,10 +8,17 @@ commands=(
     '--shell:Generate shell completion'
 )
 
-if [[ $words[2] == -* ]]; then
-    _describe 'command' commands
-else
-    # Get task list from 'q-task -l' command
-    tasks=(${(f)"$(q-task -l 2>/dev/null)"})
-    _describe 'task' tasks
-fi
+case $CURRENT in
+    2) 
+        if [[ $words[2] == -* ]]; then
+            _describe 'command' commands
+        else
+            # Get task list from 'q-task -l' command
+            tasks=(${(f)"$(q-task -l 2>/dev/null)"})
+            _describe 'task' tasks
+        fi
+    ;;
+    *)
+        _files
+    ;;
+esac
