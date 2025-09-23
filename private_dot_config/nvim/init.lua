@@ -1562,7 +1562,26 @@ require("lazy").setup({
                 -- javadbg = nil,
                 javadbg = function (config)
                     -- leava it to nvim-jdtls to setup
-                end
+                end,
+                cppdbg = function (config) -- cpptools in mason
+                    config.configurations = vim.list_extend(config.configurations, {
+                        {
+                            name = 'Attach to gdb-multiarch :1234',
+                            type = 'cppdbg',
+                            request = 'launch',
+                            MIMode = 'gdb',
+                            miDebuggerServerAddress = 'localhost:1234',
+                            miDebuggerPath = vim.fn.exepath('gdb-multiarch'),
+                            cwd = '${workspaceFolder}',
+                            program = function()
+                                return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+                            end,
+                        },
+                    })
+                    config.adapters.options = { initialize_timeout_sec = 180 },
+
+                    require('mason-nvim-dap').default_setup(config)
+                end,
             }
         },
         config = function(_,opts)
