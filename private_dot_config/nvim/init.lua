@@ -1236,7 +1236,12 @@ require("lazy").setup({
 
         "williamboman/mason.nvim",
         cmd = "Mason",
-
+        opts = {
+            registries = {
+                "github:PEMessage/mason-registry", -- custom mason registries
+                "github:mason-org/mason-registry",
+            },
+        },
         config = function(_, opts)
             require("mason").setup(opts)
         end,
@@ -1424,7 +1429,7 @@ require("lazy").setup({
                     '-configuration',
                     cache_dir .. '/config',
                     '-data',
-                    cache_dir .. '/workspace/' .. vim.fn.fnamemodify(root_dir, ":p:h:t")
+                    cache_dir .. '/workspace/' .. vim.fn.fnamemodify(root_dir, ":p:h:t"),
                 },
                 -- See: https://github.com/mfussenegger/nvim-jdtls?tab=readme-ov-file#configuration-verbose
                 root_dir = require("jdtls.setup").find_root({ ".git", "mvnw", "gradlew", "javaroot" }),
