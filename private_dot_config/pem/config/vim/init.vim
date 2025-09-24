@@ -2531,6 +2531,7 @@ endif
     let g:termdebug_config['map_plus'] = v:true
     let g:termdebug_config['map_mins'] = v:true
     let g:termdebug_config['variables_window'] = v:true
+    let g:termdebug_config['timeout'] = 3000 " 1000 ~ 10s, for large elf like linux kernel
 
     function! TmuxFocusCurrentPane()
         " Check if we're running inside tmux
