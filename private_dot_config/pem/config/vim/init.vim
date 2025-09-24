@@ -2525,14 +2525,6 @@ endif
                     \ ])})
     endfunction
 
-    let g:termdebug_config = {}
-    let g:termdebug_config['command'] = "gdb-multiarch"
-    let g:termdebug_config['evaluate_in_popup'] = v:true
-    let g:termdebug_config['map_plus'] = v:true
-    let g:termdebug_config['map_mins'] = v:true
-    let g:termdebug_config['variables_window'] = v:true
-    let g:termdebug_config['timeout'] = 3000 " 1000 ~ 10s, for large elf like linux kernel
-
     function! TmuxFocusCurrentPane()
         " Check if we're running inside tmux
         if ! ( exists('$TMUX') && g:pem_tmux_pane_id != '' && g:pem_tmux_window_id != '' )
@@ -2541,15 +2533,21 @@ endif
             echohl None
             return
         endif
-
         " Get tmux pane ID for current vim instance
-
         " Focus on this pane in tmux
         call system("tmux select-window -t " . g:pem_tmux_window_id)
         call system("tmux select-pane -t " . g:pem_tmux_pane_id)
     endfunction
 
-    command! -nargs=* -complete=file TermdebugEx call TermdebugWrapper(<f-args>)
+    " Temrdebug config
+    " ----------------
+    let g:termdebug_config = {}
+    let g:termdebug_config['command'] = "gdb-multiarch"
+    let g:termdebug_config['evaluate_in_popup'] = v:true
+    let g:termdebug_config['map_plus'] = v:true
+    let g:termdebug_config['map_mins'] = v:true
+    let g:termdebug_config['variables_window'] = v:true
+    let g:termdebug_config['timeout'] = 3000 " 1000 ~ 10s, for large elf like linux kernel
 
     function! TermdebugWrapper(...) abort
         if !exists(':TermdebugCommand')
@@ -2564,6 +2562,48 @@ endif
             nnoremap _ :Down<CR>
         endif
     endfunction
+
+    function! TermdebugSetConfig(...)
+        let s:termdebug_extra_args = copy(a:000)
+        " echomsg s:termdebug_extra_args
+        " return
+
+        function! CommandAddArgs(gdb_cmd, pty) abort
+            let l:cmd = copy(a:gdb_cmd)
+
+            " Add extra arguments if they exist
+            if exists('s:termdebug_extra_args') && !empty(s:termdebug_extra_args)
+                call extend(l:cmd, s:termdebug_extra_args)
+            endif
+
+            " Add all fixed arguments at once using extend()
+            let l:fixed_args = [
+                        \ '-quiet',
+                        \ '-iex', 'set pagination off',
+                        \ '-iex', 'set mi-async on',
+                        \ '-tty', a:pty,
+                        \ '-ex', 'echo startupdone\n'
+                        \ ]
+            call extend(l:cmd, l:fixed_args)
+
+            echomsg l:cmd
+            return l:cmd
+        endfunction
+
+        let g:termdebug_config['command_add_args'] = function('CommandAddArgs')
+    endfunction
+
+    function! TermdebugHandleArrays(gdb_encoded, proc_encoded, delim)
+        let gdb_args =  split(system('printf "%s" ''' . a:gdb_encoded . ''' | base64 -d'), a:delim, 1)
+        let proc_args = split(system('printf "%s" ''' . a:proc_encoded . ''' | base64 -d'), a:delim, 1)
+        echomsg gdb_args
+        call call('TermdebugSetConfig', gdb_args)
+        call call('TermdebugWrapper', proc_args)
+    endfunction
+
+    command! -nargs=* -complete=file TermdebugWrapper call TermdebugWrapper(<f-args>)
+    command! -nargs=* -complete=file TermdebugSetConfig call TermdebugSetConfig(<f-args>)
+
 
     function! JsonEncodeFiltered(dict) abort
         " Create a filtered copy of the dictionary

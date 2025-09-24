@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Check if an argument was provided
 if [ $# -eq 0 ]; then
     echo "Error: No executable specified"
@@ -7,20 +6,58 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-
-# Build properly quoted arguments
-cmd="TermdebugEx"
+before_double_dash=()
+after_double_dash=()
+first_found_double_dash=false
 for arg in "$@"; do
-    # Check if argument contains spaces
-    if [[ "$arg" =~ [[:space:]] ]]; then
-        # Escape single quotes and wrap in quotes
-        arg="${arg//\'/\'\\\'\'}"
-        cmd="$cmd '$arg'"
+    if [ "$arg" = "--" ] && [ "$first_found_double_dash" = false ] ; then
+        first_found_double_dash=true
+        continue
+    fi
+
+    if $first_found_double_dash; then
+        after_double_dash+=("$arg")
     else
-        cmd="$cmd $arg"
+        before_double_dash+=("$arg")
     fi
 done
 
-# Run vim with TermdebugEx command
-# echo vim -c "---$cmd---"
-exec vim -c "$cmd"
+
+if [ "$first_found_double_dash" = true ]; then
+    # Case 1: -- was found, everything after is program args
+    gdb_args=("${before_double_dash[@]}")
+    proc_args=("${after_double_dash[@]}")
+
+else
+    # Case 2: -- not found, need to separate compiler flags from program args
+    gdb_args=()
+    proc_args=()
+
+    args=("${before_double_dash[@]}")
+    i=0
+
+    while [ $i -lt ${#args[@]} ]; do
+
+        if [[ "${args[i]}" =~ ^-ex ]]; then
+            gdb_args+=("${args[i]}")
+            i=$((i + 1))
+            gdb_args+=("${args[i]}")
+            i=$((i + 1))
+        else
+            proc_args+=("$arg")
+            i=$((i + 1))
+        fi
+    done
+fi
+
+declare -p gdb_args
+declare -p proc_args
+
+
+# Encode arrays to base64 to avoid all parsing issues
+# using >>@@<<=> as spliter of each args
+DELIM='<@>GDB_DELIM<@>'
+gdb_args_encoded=$(printf  "%s$DELIM" "${gdb_args[@]}" | head -c -$((${#DELIM})) | base64)
+proc_args_encoded=$(printf "%s$DELIM" "${proc_args[@]}" | head -c -$((${#DELIM})) | base64)
+
+vim -c "call TermdebugHandleArrays('$gdb_args_encoded', '$proc_args_encoded', '$DELIM')"
