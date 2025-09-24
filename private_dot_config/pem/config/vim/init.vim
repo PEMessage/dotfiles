@@ -2547,7 +2547,7 @@ endif
     let g:termdebug_config['map_plus'] = v:true
     let g:termdebug_config['map_mins'] = v:true
     let g:termdebug_config['variables_window'] = v:true
-    let g:termdebug_config['timeout'] = 3000 " 1000 ~ 10s, for large elf like linux kernel
+    let g:termdebug_config['timeout'] = 6000 " 1000 ~ 10s, for large elf like linux kernel
 
     function! TermdebugWrapper(...) abort
         if !exists(':TermdebugCommand')
@@ -2572,9 +2572,6 @@ endif
             let l:cmd = copy(a:gdb_cmd)
 
             " Add extra arguments if they exist
-            if exists('s:termdebug_extra_args') && !empty(s:termdebug_extra_args)
-                call extend(l:cmd, s:termdebug_extra_args)
-            endif
 
             " Add all fixed arguments at once using extend()
             let l:fixed_args = [
@@ -2586,7 +2583,11 @@ endif
                         \ ]
             call extend(l:cmd, l:fixed_args)
 
-            echomsg l:cmd
+            if exists('s:termdebug_extra_args') && !empty(s:termdebug_extra_args)
+                call extend(l:cmd, s:termdebug_extra_args)
+            endif
+
+            " echomsg l:cmd
             return l:cmd
         endfunction
 
@@ -2596,7 +2597,7 @@ endif
     function! TermdebugHandleArrays(gdb_encoded, proc_encoded, delim)
         let gdb_args =  split(system('printf "%s" ''' . a:gdb_encoded . ''' | base64 -d'), a:delim, 1)
         let proc_args = split(system('printf "%s" ''' . a:proc_encoded . ''' | base64 -d'), a:delim, 1)
-        echomsg gdb_args
+        echomsg proc_args
         call call('TermdebugSetConfig', gdb_args)
         call call('TermdebugWrapper', proc_args)
     endfunction

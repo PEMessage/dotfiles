@@ -44,7 +44,7 @@ else
             gdb_args+=("${args[i]}")
             i=$((i + 1))
         else
-            proc_args+=("$arg")
+            proc_args+=("${args[i]}")
             i=$((i + 1))
         fi
     done
