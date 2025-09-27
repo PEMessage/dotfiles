@@ -1424,7 +1424,8 @@ require("lazy").setup({
             local opts = {
                 -- cmd = require('lspconfig').jdtls.document_config.default_config.cmd,
                 cmd = {
-                    require('lspconfig').jdtls.document_config.default_config.cmd[1],
+                    -- require('lspconfig').jdtls.document_config.default_config.cmd[1],
+                    'jdtls',
                     '--jvm-arg=-Dlog.level=ALL',
                     '-configuration',
                     cache_dir .. '/config',
