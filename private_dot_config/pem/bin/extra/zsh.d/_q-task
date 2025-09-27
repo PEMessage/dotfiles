@@ -5,8 +5,17 @@ local -a commands tasks
 commands=(
     '-h:Show help'
     '-l:List all tasks'
-    '--shell:Generate shell completion'
+    '-e:Edit tasks'
 )
+
+task=""
+
+
+get_task() {
+    if [ -z "$task" ] ; then
+        tasks=(${(f)"$(q-task -l 2>/dev/null)"})
+    fi
+}
 
 case $CURRENT in
     2) 
@@ -14,7 +23,13 @@ case $CURRENT in
             _describe 'command' commands
         else
             # Get task list from 'q-task -l' command
-            tasks=(${(f)"$(q-task -l 2>/dev/null)"})
+            get_task
+            _describe 'task' tasks
+        fi
+    ;;
+    3)
+        if [[ $words[2] == -e ]]; then
+            get_task
             _describe 'task' tasks
         fi
     ;;
