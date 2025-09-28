@@ -1316,11 +1316,25 @@ require("lazy").setup({
                     }
                 }
             })
-            vim.lsp.config("clangd", {
+            vim.lsp.config("*", {
                 inlay_hints = { enabled = true },
             })
-            vim.lsp.config("rust_analyzer", {
-                inlay_hints = { enabled = true },
+            -- Thanks to:
+            -- https://github.com/derekzyl/nvim/blob/6537239beda2b54925bd7640cf384d086c7dc4ea/lua/inlay_hint.lua#L56C1-L67C7
+            vim.lsp.config("gopls", {
+                settings = {
+                    gopls = {
+                        hints = {
+                            assignVariableTypes = true,
+                            compositeLiteralFields = true,
+                            compositeLiteralTypes = true,
+                            constantValues = true,
+                            functionTypeParameters = true,
+                            parameterNames = true,
+                            rangeVariableTypes = true,
+                        },
+                    },
+                },
             })
             vim.lsp.config("kotlin_lsp", {
                 inlay_hints = { enabled = true },
