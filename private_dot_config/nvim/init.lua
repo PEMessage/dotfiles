@@ -1753,7 +1753,7 @@ require("lazy").setup({
         -- Note: this also have barbecue.nvim feature something like
         -- nvim › init.lua › 󰅨 require("lazy").setup ›  [25]
         enabled = true,
-        event = "VeryLazy",
+        event = "LspAttach",
         config = function()
             require('lspsaga').setup({
                 ui = {
@@ -1826,13 +1826,13 @@ require("lazy").setup({
                 map('n', '<F2>', '<cmd>Lspsaga rename<cr>', { silent = true, noremap = true, buffer = bufnr })
                 map('n', 'gk', '<cmd>Lspsaga code_action<cr>', { silent = true, noremap = true, buffer = bufnr })
                 map('x', 'gk', ':<c-u>Lspsaga range_code_action<cr>', { silent = true, noremap = true, buffer = bufnr })
-                if client and client.name == 'jdtls' then
-                    -- map('n', 'gd', '<cmd>Lspsaga peek_definition<cr>', { silent = true, noremap = true, buffer = bufnr })
-                    -- lspsaga can't handle JDT:// well using old style <C-]>
+                -- if client and client.name == 'jdtls' then
+                --     -- map('n', 'gd', '<cmd>Lspsaga peek_definition<cr>', { silent = true, noremap = true, buffer = bufnr })
+                --     -- lspsaga can't handle JDT:// well using old style <C-]>
                     map("n", "gd", "<C-]>", { silent = true, noremap = true, buffer = bufnr })
-                else
-                    map('n', 'gd', '<cmd>Lspsaga peek_definition<cr>', { silent = true, noremap = true, buffer = bufnr })
-                end
+                -- else
+                --     map('n', 'gd', '<cmd>Lspsaga peek_definition<cr>', { silent = true, noremap = true, buffer = bufnr })
+                -- end
                 map('n', 'go', '<cmd>Lspsaga show_line_diagnostics<cr>', { silent = true, noremap = true, buffer = bufnr })
                 map('n', 'Q', '<cmd>Lspsaga finder tyd+ref+imp+def<cr>', { silent = true, noremap = true, buffer = bufnr })
                 map('n', '<C-q>', '<cmd>Lspsaga code_action<cr>', { silent = true, noremap = true, buffer = bufnr })
