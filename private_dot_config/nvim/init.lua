@@ -1754,99 +1754,85 @@ require("lazy").setup({
         -- nvim › init.lua › 󰅨 require("lazy").setup ›  [25]
         enabled = true,
         event = "LspAttach",
-        config = function()
-            require('lspsaga').setup({
-                ui = {
-                    code_action = '*',
-                    devicon = false,
+        opts = {
+            ui = {
+                code_action = '*',
+                devicon = false,
+            },
+            code_action = {
+                keys = {
+                    quit = { 'q', '<ESC>', '<C-c>' },
+                    exec = '<CR>',
+                }
+            },
+            lightbulb = {
+                enable = true,
+                sign = false,
+                virtual_text = true,
+                -- debounce = 50,
+            },
+            rename = {
+                keys = {
+                    quit = { '<ESC>', '<C-c>' },
+                    exec = '<CR>',
+                }
+            },
+            symbol_in_winbar = {
+                enable = false,
+                separator = ' > '
+            },
+            finder = {
+                max_height = 0.6,
+                keys = {
+                    vsplit = {'v','s'},
+                    quit = { '<ESC>', '<C-c>','q' },
+                    tabe = {'<enter>','t'}
+                }
+            },
+            definition = {
+                width = 0.6,
+                height = 0.5,
+                save_pos = false,
+                keys = {
+                    quit = { 'q', '<ESC>', '<C-c>' },
+                    edit = { '<C-w>o', '<enter>','<C-]>' },
+                    vsplit = { '<C-w>v', '<space>' },
+                    split = '<C-w>i',
+                    tabe = '<C-w>t',
+                    tabnew = '<C-w>n',
                 },
-                code_action = {
-                    keys = {
-                        quit = { 'q', '<ESC>', '<C-c>' },
-                        exec = '<CR>',
-                    }
-                },
-                lightbulb = {
-                    enable = true,
-                    sign = false,
-                    virtual_text = true,
-                    -- debounce = 50,
-                },
-                rename = {
-                    keys = {
-                        quit = { '<ESC>', '<C-c>' },
-                        exec = '<CR>',
-                    }
-                },
-                symbol_in_winbar = {
-                    enable = false,
-                    separator = ' > '
-                },
-                finder = {
-                    max_height = 0.6,
-                    keys = {
-                        vsplit = {'v','s'},
-                        quit = { '<ESC>', '<C-c>','q' },
-                        tabe = {'<enter>','t'}
-                    }
-                },
-                definition = {
-                    width = 0.6,
-                    height = 0.5,
-                    save_pos = false,
-                    keys = {
-                        quit = { 'q', '<ESC>', '<C-c>' },
-                        edit = { '<C-w>o', '<enter>','<C-]>' },
-                        vsplit = { '<C-w>v', '<space>' },
-                        split = '<C-w>i',
-                        tabe = '<C-w>t',
-                        tabnew = '<C-w>n',
-                    },
-                },
+            },
+        },
+        config = function(_, opts)
+            require('lspsaga').setup(opts)
 
-            })
-            -- local map = vim.api.nvim_buf_set_keymap
-            -- map(0, "n", "<F2>", "<cmd>Lspsaga rename<cr>", {silent = true, noremap = true})
-            -- map(0, "n", "gk", "<cmd>Lspsaga code_action<cr>", {silent = true, noremap = true})
-            -- map(0, "x", "gk", ":<c-u>Lspsaga range_code_action<cr>", {silent = true, noremap = true})
-            -- map(0, "n", "gd", "<cmd>Lspsaga  peek_definition<cr>", {silent = true,noremap = true})
-            -- map(0, "n", "go", "<cmd>Lspsaga show_line_diagnostics<cr>", {silent = true, noremap = true})
-            -- map(0, "n", "K",  "<cmd>Lspsaga hover_doc<cr>", {silent = true, noremap = true})
-            --
-        -- Set up LSP keymaps only when LSP attaches to a buffer
-        vim.api.nvim_create_autocmd('LspAttach', {
-            group = vim.api.nvim_create_augroup('LspsagaKeymaps', {}),
-            callback = function(args)
-                local client = vim.lsp.get_client_by_id(args.data.client_id)
-                -- Skip jdtls
+            vim.api.nvim_create_autocmd('LspAttach', {
+                group = vim.api.nvim_create_augroup('LspsagaKeymaps', {}),
+                callback = function(args)
+                    local client = vim.lsp.get_client_by_id(args.data.client_id)
 
-                local map = vim.keymap.set
-                local bufnr = args.buf
+                    local map = vim.keymap.set
+                    local bufnr = args.buf
 
-                map('n', '<F2>', '<cmd>Lspsaga rename<cr>', { silent = true, noremap = true, buffer = bufnr })
-                map('n', 'gk', '<cmd>Lspsaga code_action<cr>', { silent = true, noremap = true, buffer = bufnr })
-                map('x', 'gk', ':<c-u>Lspsaga range_code_action<cr>', { silent = true, noremap = true, buffer = bufnr })
-                -- if client and client.name == 'jdtls' then
-                --     -- map('n', 'gd', '<cmd>Lspsaga peek_definition<cr>', { silent = true, noremap = true, buffer = bufnr })
-                --     -- lspsaga can't handle JDT:// well using old style <C-]>
+                    map('n', '<F2>', '<cmd>Lspsaga rename<cr>', { silent = true, noremap = true, buffer = bufnr })
+                    map('n', 'gk', '<cmd>Lspsaga code_action<cr>', { silent = true, noremap = true, buffer = bufnr })
+                    map('x', 'gk', ':<c-u>Lspsaga range_code_action<cr>', { silent = true, noremap = true, buffer = bufnr })
+                    -- if client and client.name == 'jdtls' then
+                    --     -- map('n', 'gd', '<cmd>Lspsaga peek_definition<cr>', { silent = true, noremap = true, buffer = bufnr })
+                    --     -- lspsaga can't handle JDT:// well using old style <C-]>
+                    -- else
+                    --     map('n', 'gd', '<cmd>Lspsaga peek_definition<cr>', { silent = true, noremap = true, buffer = bufnr })
+                    -- end
                     map("n", "gd", "<C-]>", { silent = true, noremap = true, buffer = bufnr })
-                -- else
-                --     map('n', 'gd', '<cmd>Lspsaga peek_definition<cr>', { silent = true, noremap = true, buffer = bufnr })
-                -- end
-                map('n', 'go', '<cmd>Lspsaga show_line_diagnostics<cr>', { silent = true, noremap = true, buffer = bufnr })
-                map('n', 'Q', '<cmd>Lspsaga finder tyd+ref+imp+def<cr>', { silent = true, noremap = true, buffer = bufnr })
-                map('n', '<C-q>', '<cmd>Lspsaga code_action<cr>', { silent = true, noremap = true, buffer = bufnr })
-            end,
-        })
+                    map('n', 'go', '<cmd>Lspsaga show_line_diagnostics<cr>', { silent = true, noremap = true, buffer = bufnr })
+                    map('n', 'Q', '<cmd>Lspsaga finder tyd+ref+imp+def<cr>', { silent = true, noremap = true, buffer = bufnr })
+                    map('n', '<C-q>', '<cmd>Lspsaga code_action<cr>', { silent = true, noremap = true, buffer = bufnr })
 
-            -- local map = vim.keymap.set
-            -- map( "n", "<F2>", "<cmd>Lspsaga rename<cr>", {silent = true, noremap = true})
-            -- map( "n", "gk", "<cmd>Lspsaga code_action<cr>", {silent = true, noremap = true})
-            -- map( "x", "gk", ":<c-u>Lspsaga range_code_action<cr>", {silent = true, noremap = true})
-            -- map( "n", "gd", "<cmd>Lspsaga  peek_definition<cr>", {silent = true,noremap = true})
-            -- map( "n", "go", "<cmd>Lspsaga show_line_diagnostics<cr>", {silent = true, noremap = true})
-            -- map( "n", "Q", "<cmd>Lspsaga finder tyd+ref+imp+def<cr>", {silent = true, noremap = true})
-            -- map( "n", "<C-q>", "<cmd>Lspsaga code_action<cr>", {silent = true, noremap = true})
+                    if client and client.name == 'clangd' then
+                        map('n', '<m-h>', '<cmd>LspClangdSwitchSourceHeader<cr>', { silent = true, noremap = true, buffer = bufnr })
+                    end
+                end,
+            })
         end,
         dependencies = {
             'nvim-treesitter/nvim-treesitter', -- optional
