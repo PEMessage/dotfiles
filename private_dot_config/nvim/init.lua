@@ -1279,6 +1279,7 @@ require("lazy").setup({
                 on_init = function(client)
                     if client.workspace_folders then
                         local path = client.workspace_folders[1].name
+                        ---@diagnostic disable-next-line: undefined-field
                         if path ~= vim.fn.stdpath('config') and (vim.uv.fs_stat(path..'/.luarc.json') or vim.uv.fs_stat(path..'/.luarc.jsonc')) then
                             return
                         end
@@ -1423,6 +1424,7 @@ require("lazy").setup({
                 return runtime
             end
             local env = {
+                ---@diagnostic disable-next-line: undefined-field
                 HOME = vim.uv.os_homedir(),
                 XDG_CACHE_HOME = os.getenv 'XDG_CACHE_HOME',
                 JDTLS_JVM_ARGS = os.getenv 'JDTLS_JVM_ARGS',
@@ -1569,7 +1571,7 @@ require("lazy").setup({
             }
 
             local gdb = {
-                name = 'Run native GDB Dap',
+                name = 'Run native GDB DAP',
                 type = 'gdb',
                 request = 'launch',
                 -- This requires special handling of 'run_last', see
@@ -1584,7 +1586,7 @@ require("lazy").setup({
                     return (path and path ~= '') and path or dap.ABORT
                 end,
             }
-            dap.configurations.c = {  gdb }
+            dap.configurations.c = { gdb }
             dap.configurations.cpp = { gdb }
 
         end
@@ -1625,8 +1627,7 @@ require("lazy").setup({
                             end,
                         },
                     })
-                    config.adapters.options = { initialize_timeout_sec = 180 },
-
+                    config.adapters.options = { initialize_timeout_sec = 180 }
                     require('mason-nvim-dap').default_setup(config)
                 end,
             }
@@ -1718,35 +1719,6 @@ require("lazy").setup({
             keymap("n", "<F1>", "<cmd>lua require('persistent-breakpoints.api').toggle_breakpoint()<CR>", keyopts)
         end,
     },
-    -- {
-    --     "jay-babu/mason-nvim-dap.nvim",
-    --     dependencies = {
-    --         "mfussenegger/nvim-dap",
-    --         'williamboman/mason.nvim',
-    --     },
-    --     opts = {
-    --         ensure_installed = {
-    --             "delev",
-    --             -- 'ccls'
-    --         },
-    --         handlers = {},
-    --     },
-    --     config = function (_,opts)
-    --         require("mason-nvim-dap").setup(opts)
-    --     end
-    -- },
-    -- {
-    --     "mfussenegger/nvim-dap",
-    --     dependencies = {
-    --         'williamboman/mason.nvim',
-    --     },
-    -- },
-    -- {
-    --     "leoluz/nvim-dap-go",
-    --     config = function ()
-    --         require('dap-go').setup()
-    --     end
-    -- },
     {
 
         'nvimdev/lspsaga.nvim',
