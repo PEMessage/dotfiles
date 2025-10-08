@@ -242,3 +242,6 @@ ssh_symbol = ""
 
 [haxe]
 disabled = true
+
+[battery]
+disabled = true
