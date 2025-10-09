@@ -38,6 +38,7 @@ main() {
             )
             ;;
         -e)
+            shift
             Q_TASK_SCRIPT="$CONF_BUCKET_DIR/$1"
             shift
             vim "$Q_TASK_SCRIPT"

@@ -11,9 +11,9 @@ __px3_smartone() {
     # Credit: https://github.com/rupa/z/blob/master/z.sh
     while [ "$1" ]; do case "$1" in
         --) while [ "$1" ]; do shift; narg="$narg $1";done;;
-        -*) 
+        -*)
             opt="$1"
-            shift 
+            shift
             case $opt in
                 -d|--docker)
                     fnd="$fnd -m systemd -E docker.service"
@@ -24,6 +24,9 @@ __px3_smartone() {
                     echo "# org.gradle.java.home=/usr/lib/jvm/java-1.XX.0-openjdk-amd64/"
                     fnd="$fnd -m gradle"
                 ;;
+                -n|--npm)
+                    fnd="$fnd -m npm"
+                ;;
                 *)
                     fnd="$fnd $opt"
                 ;;
@@ -33,10 +36,10 @@ __px3_smartone() {
     esac ; done
     eval set -- "$fnd"
 
-    
+
 
     if [ "$PEM_OS_VARIANT" = wsl2 ] ||
-        uname -a | grep -i wsl2 >/dev/null 2>&1 ; then 
+        uname -a | grep -i wsl2 >/dev/null 2>&1 ; then
         if [ "$(wslinfo  --networking-mode 2>/dev/null)" = mirrored ] ; then
             local hostip="localhost"
         else
@@ -92,7 +95,7 @@ __px3()
             m) mode="$OPTARG" ;;
             a) action="$OPTARG" ;;
             k)
-                key="$OPTARG" 
+                key="$OPTARG"
                 upper_key=$(echo "$key" | tr '[:lower:]' '[:upper:]' )
                 ;;
             i) ip="$OPTARG" ;;
@@ -113,7 +116,7 @@ __px3()
         *) echo "Invalid action: $action. Must be 'set' or 'unset'." >&2; return 1 ;;
     esac
 
-    
+
 
     if [ -n "$ip" ] &&  [ -n "$port" ] ; then
         ip_port="$ip:$port"
@@ -175,7 +178,23 @@ __px3()
                 fi
             )
             ;;
+        npm)
+            if [ "$key" = "http_proxy" ]; then
+                inner_key="npm_config_proxy"
+            elif [ "$key" = "https_proxy" ]; then
+                inner_key="npm_config_https_proxy"
+            else
+                return 1
+            fi
 
+            if [ "$action" == "set" ]; then
+                echo "export $inner_key=\"$value\""
+                eval "export $inner_key=\"$value\""
+            else
+                echo "unset $inner_key"
+                eval "unset $inner_key"
+            fi
+            ;;
 
         systemd)
             if [ -z "$ext_arg" ]; then
@@ -195,7 +214,7 @@ __px3()
 
                 # Process systemd commands
                 if [[ "$action" == "set" ]]; then
-                    echo "Environment=\"$key=$value\"" | sudo tee -a "$override_file" 
+                    echo "Environment=\"$key=$value\"" | sudo tee -a "$override_file"
                     echo "Environment=\"$upper_key=$value\"" | sudo tee -a "$override_file"
                 else
                     # Remove matching environment variables
