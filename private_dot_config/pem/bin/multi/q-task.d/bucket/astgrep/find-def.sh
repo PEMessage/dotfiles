@@ -22,4 +22,4 @@ rule:
 '
 
 ast-grep scan --json --inline-rules "$INLINE_RULE" "$@" |
-     jq -r '.[] | "\(.file):\(.range.start.line):\(.range.start.column): \(.text)"'
+     jq -r '.[] | "\(.file):\(.range.start.line):\(.range.start.column):\(.text)"'

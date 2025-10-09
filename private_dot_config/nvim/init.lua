@@ -1437,6 +1437,12 @@ require("lazy").setup({
             local mason_root = require('mason.settings').current.install_root_dir
             local root_markers = {'gradlew'}
             local root_dir = require('jdtls.setup').find_root(root_markers)
+            local executable = 'jdtls'
+
+            if vim.fn.executable(executable) ~= 1 then
+                return
+            end
+
             local opts = {
                 -- cmd = require('lspconfig').jdtls.document_config.default_config.cmd,
                 cmd = {
