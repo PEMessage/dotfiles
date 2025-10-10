@@ -2183,6 +2183,23 @@ function PE.MouseSet(arg)
     vim.o.mouse = arg
 end
 
+
+function PE.ToggleQuickfix()
+    local wininfos = vim.fn.getwininfo()
+    local has_quickfix = vim.tbl_contains(
+        vim.tbl_map(function(wininfo) return wininfo.quickfix end, wininfos),
+        1
+    )
+
+    if not has_quickfix then
+        vim.cmd('botright copen')
+    else
+        vim.cmd('cclose')
+    end
+end
+vim.keymap.set('n', '<leader>cc', PE.ToggleQuickfix, { desc = 'Toggle quickfix window' })
+vim.keymap.set('n', '<m-s-t>', PE.ToggleQuickfix, { desc = 'Toggle quickfix window' })
+
 -- 7.1 Vim Function Zone(I just tired)
 -- ===========================================
 vim.cmd [[
