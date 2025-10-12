@@ -1238,7 +1238,7 @@ require("lazy").setup({
         cmd = "Mason",
         opts = {
             registries = {
-                "github:PEMessage/mason-registry", -- custom mason registries
+                -- "github:PEMessage/mason-registry", -- custom mason registries, not used since 1.50.0 jdtls merged
                 "github:mason-org/mason-registry",
             },
         },
