@@ -2354,6 +2354,41 @@ endif
         return ''
     endfunc
 
+    function! Tapi_ApiV2(bid, arglist)
+        if len(a:arglist) < 2
+            echoerr 'Tapi_ApiHide: At least2 arg [action] [cmd] [args...]'
+            return ''
+        endif
+
+        let action = a:arglist[0]
+        let cmd = a:arglist[1]
+        let args = join(a:arglist[2:], ' ')
+
+        " Validate action
+        if index(['hide', 'toggle', 'none'], action) == -1
+            echoerr 'Tapi_ApiHide:Invalid action，must be hide|toggle|none'
+            return ''
+        endif
+
+        " Execute FloatermHide for hide and toggle actions
+        if action ==# 'hide' || action ==# 'toggle'
+            silent exec 'FloatermHide'
+        endif
+
+        " Execute the command
+        if !empty(cmd)
+            let full_cmd = cmd . (empty(args) ? '' : ' ' . fnameescape(args))
+            silent exec full_cmd
+            echo full_cmd
+        endif
+
+        " Execute FloatermShow for toggle action
+        if action ==# 'toggle'
+            silent exec 'FloatermShow'
+        endif
+
+    endfunction
+
     command! -nargs=+ -complete=command Redir let s:reg = @@ | redir @"> | silent execute <q-args> | redir END | tab new | pu | 1,2d_ | let @@ = s:reg
 
 

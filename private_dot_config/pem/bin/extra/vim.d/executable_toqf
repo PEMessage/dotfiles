@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# sendtoqf - send output to Vim's quickfix
+
+sendtoqf() {
+    local temp_file input
+
+    # Read input
+    if [ -t 0 ]; then
+        if [ $# -eq 0 ]; then
+            echo "Usage: sendtoqf <text> or pipe output to sendtoqf" >&2
+            return 1
+        fi
+        input=$(printf '%s\n' "$@")
+    else
+        input=$(cat)
+    fi
+
+    # Create temp file
+    temp_file=$(mktemp /tmp/vim_qf_XXXXXX)
+    printf '%s' "$input" > "$temp_file"
+
+    # Use Vim's cfile command to read the file into quickfix
+    printf '\033]51;["call", "Tapi_ApiV2", ["toggle", "cfile", "%s"]]\007' "$temp_file"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    sendtoqf "$@"
+fi

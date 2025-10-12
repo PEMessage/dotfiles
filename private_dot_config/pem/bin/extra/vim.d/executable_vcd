@@ -30,4 +30,4 @@ if [ -z "$1" ] ; then
 else
     name="$(absolute_path """$1""")"
 fi
-printf '\033]51;["call", "Tapi_Api", ["cd", "%s"]]\007' "$name"
+printf '\033]51;["call", "Tapi_ApiV2", ["none", "cd", "%s"]]\007' "$name"
