@@ -1838,6 +1838,25 @@ call plug#begin(pe_runtimepath . '/plugged')
             highlight default link lspInlayHintsParameter  Comment
             highlight default link lspInlayHintsType  lspInlayHintsParameter
         endif
+
+        " Thanks: https://github.com/prabirshrestha/vim-lsp/issues/1312#issuecomment-1125822917
+        let g:lsp_diagnostics_enabled = 1 " turn on diagnostics by default
+        let g:my_lsp_diagnostics_enabled = 1
+        function s:LSPDiagnosticsToggle()
+            if g:my_lsp_diagnostics_enabled == 1
+                call lsp#disable_diagnostics_for_buffer()
+                let g:my_lsp_diagnostics_enabled = 0
+                echo "LSP Diagnostics : off"
+            else
+                call lsp#enable_diagnostics_for_buffer()
+                let g:my_lsp_diagnostics_enabled = 1
+                echo "LSP Diagnostics : on"
+            endif
+        endfunction
+
+        command LSPDiagnosticsToggle call s:LSPDiagnosticsToggle()
+        nnoremap `d :LSPDiagnosticsToggle<CR>
+
     Plug 'jiz4oh/vim-lspfuzzy'
     Plug 'mattn/vim-lsp-settings'
     Plug 'rhysd/vim-healthcheck'
