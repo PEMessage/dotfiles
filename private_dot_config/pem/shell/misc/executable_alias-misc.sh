@@ -5,6 +5,7 @@ alias lvim='vim -c "normal '\''0"'
 alias lvi='vim -c "normal '\''0"'
 alias msudo="sudo env \"PATH=\$PATH\""
 alias vi="vim" # if we dont use package manger vim, we shouldn't use package manger vi
+alias rgv="rg --vimgrep"
 
 # -c, --continue [true|false]
 # -s, --split=<N>
