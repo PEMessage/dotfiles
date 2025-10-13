@@ -114,11 +114,14 @@ let g:startify_custom_header = [
     set linebreak
     set wildmenu
     " set wildmode=longest,longest:full " bash like
-    set wildmode=longest:full,full
+    set wildmode=noselect:lastused,full
 
     " See: https://github.com/vim/vim/commit/3908ef5017a6b4425727013588f72cc7343199b9
     if has('patch-8.2.4325')
         set wildoptions=pum
+    endif
+    if has('patch-9.1.1576')
+        autocmd CmdlineChanged [:] call wildtrigger()
     endif
     " set nomore
 
@@ -554,7 +557,8 @@ let g:startify_custom_header = [
     " cnoremap <Tab> <C-F>A<C-N>
     cnoremap <expr> <Tab>   getcmdtype() =~ '[\/?]' ? "<C-g>" : "<C-z>"
     cnoremap <expr> <S-Tab> getcmdtype() =~ '[\/?]' ? "<C-t>" : "<S-Tab>"
-    cnoremap <expr> <C-c>   pumvisible() ? "<C-e>" : "<C-c>"
+    " CTRL-E See wildmenu for more
+    cnoremap <expr> <C-c>   pumvisible() ? "<C-y>" : "<C-c>"
 
     vnoremap tt :s/\s\+$//e<CR>:set nohls<CR>
     " See: v_p v_P swap function between these
@@ -786,6 +790,10 @@ call plug#begin(pe_runtimepath . '/plugged')
             " JUST USE <C-M> AS ENTER
     endif
 
+    Plug 'mhinz/vim-grepper'
+        let g:grepper = {}
+        let g:grepper.tools = ['rg', 'git']
+        noremap <leader>gg :Grepper<CR>
     Plug 'lambdalisue/vim-fern'
         nnoremap <silent><leader>b  :Fern . -drawer<CR>
 
@@ -1405,7 +1413,7 @@ call plug#begin(pe_runtimepath . '/plugged')
                     \ 'name': '+gtag'
                     \}
         noremap <silent> <leader>gs :GscopeFind s <C-R><C-W><cr>
-        noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
+        " noremap <silent> <leader>gg :GscopeFind g <C-R><C-W><cr>
 
         " search symbol under cursor
         " Caution: This will interface cgn, so dont use it
@@ -1675,8 +1683,7 @@ call plug#begin(pe_runtimepath . '/plugged')
                     \ vsnip#jumpable(-1) ? '<Plug>(vsnip-jump-prev)' :
                     \ "\<C-h>"
         " See wildmenu CTRL-E  - 结束补全，回到选择匹配之前的状态
-        inoremap <expr> <C-c>  pumvisible() ? "\<C-e>" : "\<C-c>"
-
+        inoremap <expr> <C-c>  pumvisible() ? "\<C-y>\<C-c>" : "\<C-c>"
 
         inoremap <expr> <cr>   pumvisible() ? asyncomplete#close_popup() : "\<cr>"
         " imap <c-space> <Plug>(asyncomplete_force_refresh)
@@ -2541,7 +2548,6 @@ endif
 
     " Create a command that takes one or more arguments
     command! -nargs=* PEGrep call PEGrep(<f-args>)
-    nnoremap <leader>gg :PEGrep<CR>
 
     function! InspectHightlight ()
         for i1 in synstack(line("."), col("."))
