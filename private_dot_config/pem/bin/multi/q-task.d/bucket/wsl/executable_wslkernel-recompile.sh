@@ -40,13 +40,22 @@ cp Microsoft/config-wsl .config
 # CONFIG_ANDROID_BINDER_DEVICES="binder,hwbinder,vndbinder"
 # CONFIG_ANDROID_BINDER_IPC_SELFTEST=y
 # CONFIG_STAGING=y" | tee -a .config
+#
+# WSL Cuttlefish support, thanks to
+#   https://www.zhihu.com/question/307130942/answer/2948560140
+#   https://issuetracker.google.com/issues/329130377
+# Also need --enable_sandbox=false to make it work
+# Full Cmd:
+#   HOME=$PWD ./bin/launch_cvd --enable_sandbox=false -webrtc_sig_server_port=8449
 ./scripts/config --file .config \
     --enable CONFIG_ANDROID \
     --enable CONFIG_ANDROID_BINDER_IPC \
     --set-str CONFIG_ANDROID_BINDER_DEVICES "binder,hwbinder,vndbinder" \
     --enable CONFIG_ANDROID_BINDERFS \
     --enable CONFIG_STAGING \
-    --enable CONFIG_ASHMEM
+    --enable CONFIG_ASHMEM \
+    --enable CONFIG_KVM_GUEST \
+    --enable CONFIG_VHOST_VSOCK
 make olddefconfig
 
 # compile
