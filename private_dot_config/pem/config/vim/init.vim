@@ -792,8 +792,20 @@ call plug#begin(pe_runtimepath . '/plugged')
 
     Plug 'mhinz/vim-grepper'
         let g:grepper = {}
-        let g:grepper.tools = ['rg', 'git']
-        noremap <leader>gg :Grepper<CR>
+        let g:grepper.tools = ['rg', 'rgi', 'git']
+        let g:grepper.rg = {
+                    \ 'grepprg':    'rg --vimgrep',
+                    \ 'grepformat': '%f:%l:%c:%m,%f'
+                    \ }
+        let g:grepper.rgi = {
+                    \ 'grepprg':    'rg -i --vimgrep',
+                    \ 'grepformat': '%f:%l:%c:%m,%f'
+                    \ }
+        noremap <C-k> viw<plug>(GrepperOperator)
+        let g:grepper.operator = {}
+        let g:grepper.operator.prompt = 1
+        vnoremap <C-k> <plug>(GrepperOperator)
+
     Plug 'lambdalisue/vim-fern'
         nnoremap <silent><leader>b  :Fern . -drawer<CR>
 
