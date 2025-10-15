@@ -1,0 +1,185 @@
+#!/usr/bin/env python3
+"""
+unixdosfix - Automatically detect and convert line endings between Unix (LF) and DOS (CRLF) formats.
+
+This program analyzes a file to determine the predominant line ending style
+and converts it to the consistent format based on the majority.
+"""
+
+import os
+import sys
+import argparse
+import subprocess
+from pathlib import Path
+
+
+def detect_line_endings(file_path):
+    """
+    Detect the line endings in a file and return counts for CRLF and LF.
+
+    Args:
+        file_path (str): Path to the file to analyze
+
+    Returns:
+        tuple: (crlf_count, lf_count, total_lines)
+    """
+    crlf_count = 0
+    lf_count = 0
+    total_lines = 0
+
+    try:
+        with open(file_path, 'rb') as file:
+            content = file.read()
+
+        # Convert to string for line-by-line analysis
+        lines = content.split(b'\n')
+        total_lines = len(lines)
+
+        for i, line in enumerate(lines):
+            if line.endswith(b'\r'):
+                crlf_count += 1
+            # All but the last line (if it doesn't end with newline)
+            elif i < total_lines - 1:
+                lf_count += 1
+
+        # Handle the case where last line has LF
+        if total_lines > 0 and not content.endswith(b'\n'):
+            lf_count += 1
+
+    except Exception as e:
+        print(f"Error reading file {file_path}: {e}", file=sys.stderr)
+        return 0, 0, 0
+
+    return crlf_count, lf_count, total_lines
+
+
+def convert_file(file_path, to_dos=True, backup=False):
+    """
+    Convert a file between Unix and DOS line endings.
+
+    Args:
+        file_path (str): Path to the file to convert
+        to_dos (bool): If True, convert to DOS (CRLF), else to Unix (LF)
+        backup (bool): If True, create backup file
+    """
+    try:
+        if to_dos:
+            # Convert to DOS (CRLF)
+            cmd = ['unix2dos']
+            if backup:
+                cmd.append('-b')
+            cmd.append(file_path)
+            subprocess.run(cmd, check=True)
+            print(f"Converted {file_path} to DOS format (CRLF)")
+        else:
+            # Convert to Unix (LF)
+            cmd = ['dos2unix']
+            if backup:
+                cmd.append('-b')
+            cmd.append(file_path)
+            subprocess.run(cmd, check=True)
+            print(f"Converted {file_path} to Unix format (LF)")
+
+    except subprocess.CalledProcessError as e:
+        print(f"Error converting file {file_path}: {e}", file=sys.stderr)
+    except FileNotFoundError:
+        tool = 'unix2dos' if to_dos else 'dos2unix'
+        print(
+            f"Error: {tool} not found. Please install it first.", file=sys.stderr)
+        print("On Ubuntu/Debian: sudo apt install dos2unix", file=sys.stderr)
+        print("On CentOS/RHEL: sudo yum install dos2unix", file=sys.stderr)
+
+
+def process_file(file_path, threshold=0.6, backup=False, verbose=False, force=None):
+    """
+    Process a single file to detect and fix line endings.
+
+    Args:
+        file_path (str): Path to the file to process
+        threshold (float): Ratio threshold for conversion decision (0.5-1.0)
+        backup (bool): Whether to create backup files
+        verbose (bool): Whether to show detailed information
+        force (str): Force conversion to 'unix', 'dos', or None for auto
+    """
+    if not os.path.exists(file_path):
+        print(f"Error: File {file_path} does not exist", file=sys.stderr)
+        return
+
+    crlf_count, lf_count, total_lines = detect_line_endings(file_path)
+
+    if total_lines == 0:
+        if verbose:
+            print(f"{file_path}: Empty file, skipping")
+        return
+
+    crlf_ratio = crlf_count / total_lines if total_lines > 0 else 0
+    lf_ratio = lf_count / total_lines if total_lines > 0 else 0
+
+    if verbose:
+        print(f"{file_path}: CRLF: {crlf_count}/{total_lines} ({crlf_ratio:.1%}), "
+              f"LF: {lf_count}/{total_lines} ({lf_ratio:.1%})")
+
+    # Determine conversion direction
+    if force is not None:
+        if force == 'dos':
+            convert_file(file_path, to_dos=True, backup=backup)
+        elif force == 'unix':
+            convert_file(file_path, to_dos=False, backup=backup)
+    else:
+        if crlf_ratio > threshold:
+            convert_file(file_path, to_dos=True, backup=backup)
+        elif lf_ratio > threshold:
+            convert_file(file_path, to_dos=False, backup=backup)
+        else:
+            if verbose:
+                print(f"{file_path}: Mixed line endings, converting to Unix format")
+            convert_file(file_path, to_dos=False, backup=backup)
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Automatically detect and convert line endings between Unix (LF) and DOS (CRLF) formats',
+    )
+    parser.add_argument('files', nargs='+', help='Files to process')
+    parser.add_argument('-t', '--threshold', type=float, default=0.6,
+                        help='Threshold ratio for conversion decision (0.5-1.0, default: 0.6)')
+    parser.add_argument('-b', '--backup', action='store_true',
+                        help='Create backup files with .bak extension')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='Verbose output')
+    parser.add_argument('--force', choices=['unix', 'dos'],
+                        help='Force conversion to specified format')
+
+    args = parser.parse_args()
+
+    # Validate threshold
+    if args.threshold < 0.5 or args.threshold > 1.0:
+        print("Error: Threshold must be between 0.5 and 1.0", file=sys.stderr)
+        sys.exit(1)
+
+    # Check if required tools are available
+    try:
+        subprocess.run(['dos2unix', '--version'],
+                       capture_output=True, check=True)
+        subprocess.run(['unix2dos', '--version'],
+                       capture_output=True, check=True)
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print("Warning: dos2unix/unix2dos tools not found or not in PATH",
+              file=sys.stderr)
+        print("Please install them for full functionality", file=sys.stderr)
+
+    # Process each file
+    for file_pattern in args.files:
+        for file_path in Path('.').glob(file_pattern):
+            if file_path.is_file():
+                process_file(
+                    str(file_path),
+                    threshold=args.threshold,
+                    backup=args.backup,
+                    verbose=args.verbose,
+                    force=args.force
+                )
+
+
+if __name__ == '__main__':
+    main()
