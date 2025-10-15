@@ -589,21 +589,31 @@ let g:startify_custom_header = [
             call CmdLine("vimgrep " . '/'. l:pattern . '/' . ' **/*.')
         elseif a:direction == 'replace'
             call CmdLine("%s" . '/'. l:pattern . '/')
+
         elseif a:direction == 'f'
             execute "normal /" . l:pattern . "\<CR>"
+        elseif a:direction == 'fs'
+            let @/= l:pattern
+
         elseif a:direction == 'fa'
             let l:tmp = @/
             let l:pattern = l:tmp . "\\|" . l:pattern
             echo l:pattern
             execute "normal /" . l:pattern . "\<CR>"
+        elseif a:direction == 'fsa'
+            let l:tmp = @/
+            let l:pattern = l:tmp . "\\|" . l:pattern
+            echo l:pattern
+            let @/= l:pattern
+
         endif
 
         let @/ = l:pattern
         let @" = l:saved_reg
         " set hls
     endfunction
-    vnoremap <silent> * :<C-u>call VisualSelection('f')<CR>:set hls<CR>
-    vnoremap <silent> & :<C-u>call VisualSelection('fa')<CR>:set hls<CR>
+    vnoremap <silent> * :<C-u>call VisualSelection('fs')<CR>:set hls<CR>
+    vnoremap <silent> & :<C-u>call VisualSelection('fsa')<CR>:set hls<CR>
     vnoremap <silent> # :<C-u>call VisualSelection('b')<CR>:set hls<CR>
 " 5. Netrw Setting
 " ===========================================
@@ -882,7 +892,13 @@ call plug#begin(pe_runtimepath . '/plugged')
     "     Plug 'girishji/vimsuggest'
     " endif
 
-
+    Plug 'inkarkat/vim-ingo-library'
+    Plug 'inkarkat/vim-mark'
+        let g:mw_no_mappings = 1
+        let g:mwAutoLoadMarks = 1
+        nmap <Leader>M <Plug>MarkToggle
+        xmap <Leader>m <Plug>MarkSet
+        nmap <Leader>m <Plug>MarkSet
 
 
 " -------------------------------------------
