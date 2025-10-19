@@ -2656,6 +2656,7 @@ endif
         endif
 
         if a:0 > 0
+            " echomsg 'TermdebugCommand ' .  join(a:000, ' ')
             execute 'TermdebugCommand ' .  join(a:000, ' ')
             execute 'Source'
             execute 'wincmd L'
@@ -2693,12 +2694,18 @@ endif
         endfunction
 
         let g:termdebug_config['command_add_args'] = function('CommandAddArgs')
+        " echomsg g:termdebug_config
     endfunction
 
     function! TermdebugHandleArrays(gdb_encoded, proc_encoded, delim)
-        let gdb_args =  split(system('printf "%s" ''' . a:gdb_encoded . ''' | base64 -d'), a:delim, 1)
-        let proc_args = split(system('printf "%s" ''' . a:proc_encoded . ''' | base64 -d'), a:delim, 1)
-        echomsg proc_args
+        let gdb_decoded = system('printf "%s" ''' . a:gdb_encoded . ''' | base64 -d')
+        let proc_decoded = system('printf "%s" ''' . a:proc_encoded . ''' | base64 -d')
+
+        let gdb_args = gdb_decoded == '' ? [] : split(gdb_decoded, a:delim, 1)
+        let proc_args = proc_decoded == '' ? [] : split(proc_decoded, a:delim, 1)
+
+        " echomsg gdb_args
+        " echomsg proc_args
         call call('TermdebugSetConfig', gdb_args)
         call call('TermdebugWrapper', proc_args)
     endfunction
