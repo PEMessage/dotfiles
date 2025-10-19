@@ -2443,6 +2443,19 @@ endif
 
     endfunction
 
+    function! s:Capture(bang, cmd)
+        let message = execute(a:cmd)
+
+        if a:bang
+            new
+            setlocal buftype=nofile bufhidden=hide noswapfile
+        endif
+
+        call append('.', split(message, '\r\?\n'))
+        redraw!
+    endfunction
+
+    command! -bang -nargs=+ -complete=command Capture call <SID>Capture("<bang>" == '!', <q-args>)
     command! -nargs=+ -complete=command Redir let s:reg = @@ | redir @"> | silent execute <q-args> | redir END | tab new | pu | 1,2d_ | let @@ = s:reg
 
 
@@ -2577,7 +2590,7 @@ endif
     " Create a command that takes one or more arguments
     command! -nargs=* PEGrep call PEGrep(<f-args>)
 
-    function! InspectHightlight ()
+    function! InspectHighlight ()
         for i1 in synstack(line("."), col("."))
             let i2 = synIDtrans(i1)
             let n1 = synIDattr(i1, "name")
@@ -2585,7 +2598,7 @@ endif
             echo n1 "->" n2
         endfor
     endfunction
-    command! InspectHightlight  call InspectHightlight()
+    command! InspectHighlight  call InspectHighlight()
 
 
     function! HighlightCurrentLineTemporarily()
