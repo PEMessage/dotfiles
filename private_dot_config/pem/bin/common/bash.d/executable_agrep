@@ -103,6 +103,7 @@ esac
 
 
 FORMATTER='.[] | '
+FORMATTER+='.lines as $lines | ($lines|length) as $total |'
 FORMATTER+='"'
 FORMATTER+='\($path_color)\(.file)\($nc)'
 FORMATTER+='\($colon_color):\($nc)'
@@ -122,12 +123,17 @@ FORMATTER+='\($colon_color):\($nc)'
 # FORMATTER+='"'
 #
 # 3. try to deal with multiline
-FORMATTER+='\(.lines[0:.charCount.leading])'
-FORMATTER+='\($match_color)\(.lines[.charCount.leading:-.charCount.trailing])\($nc)'
-FORMATTER+='\(.lines[-.charCount.trailing:])'
+# FORMATTER+='\(.lines[0:.charCount.leading])'
+# FORMATTER+='\($match_color)\(.lines[.charCount.leading:-.charCount.trailing])\($nc)'
+# FORMATTER+='\(.lines[-.charCount.trailing:])'
+# FORMATTER+='"'
+#
+# 4. Deal with charCount.trailing is zero
+FORMATTER+='\($lines[0:.charCount.leading])'
+FORMATTER+='\($match_color)\($lines[.charCount.leading:$total-.charCount.trailing])\($nc)'
+FORMATTER+='\($lines[$total-.charCount.trailing:])'
 FORMATTER+='"'
 
-# ast-grep scan --json --inline-rules "$INLINE_RULE" "${others[@]}" 
 ast-grep scan --json --inline-rules "$INLINE_RULE" "${others[@]}" |
      jq --arg path_color "$PURPLE" \
         --arg colon_color "$BLUE" \
