@@ -102,7 +102,7 @@ esac
 
 
 
-FORMATTER='.[] | '
+FORMATTER='. | '
 FORMATTER+='.lines as $lines | ($lines|length) as $total |'
 FORMATTER+='"'
 FORMATTER+='\($path_color)\(.file)\($nc)'
@@ -134,8 +134,10 @@ FORMATTER+='\($match_color)\($lines[.charCount.leading:$total-.charCount.trailin
 FORMATTER+='\($lines[$total-.charCount.trailing:])'
 FORMATTER+='"'
 
-ast-grep scan --json --inline-rules "$INLINE_RULE" "${others[@]}" |
-     jq --arg path_color "$PURPLE" \
+# ast-grep scan --json=stream --inline-rules "$INLINE_RULE" "${others[@]}"
+ast-grep scan --json=stream --inline-rules "$INLINE_RULE" "${others[@]}" |
+     jq \
+        --arg path_color "$PURPLE" \
         --arg colon_color "$BLUE" \
         --arg line_color "$GREEN" \
         --arg match_color "$RED" \
