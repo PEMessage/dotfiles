@@ -28,16 +28,23 @@ else
     MATCH_COLOR=''
 fi
 
+
 mode=""
 ignore_case=""
+globs=()
 regex=""
 others=()
 
-for arg in "$@"; do
-    if [[ -z "$mode" &&  ( "$arg" == -t || "$arg" == -f ) ]]; then
+for ((i=1; i<=$#; i++)); do
+    arg="${!i}"
+
+    if [[ -z "$mode" && ( "$arg" == -t || "$arg" == -f ) ]]; then
         mode="$arg"
     elif [[ $arg = "-i" ]]; then
         ignore_case=1
+    elif [[ $arg = "-g" ]]; then
+        ((i++))
+        globs=("--globs" "${!i}")
     elif [[ -z "$regex" ]]; then
         regex="$arg"
     else
@@ -135,7 +142,7 @@ FORMATTER+='\($lines[$total-.charCount.trailing:])'
 FORMATTER+='"'
 
 # ast-grep scan --json=stream --inline-rules "$INLINE_RULE" "${others[@]}"
-ast-grep scan --json=stream --inline-rules "$INLINE_RULE" "${others[@]}" |
+ast-grep scan "${globs[@]}" --json=stream --inline-rules "$INLINE_RULE" "${others[@]}" |
      jq \
         --arg path_color "$PURPLE" \
         --arg colon_color "$BLUE" \
