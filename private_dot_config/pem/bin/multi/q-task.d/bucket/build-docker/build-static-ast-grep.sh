@@ -14,7 +14,7 @@ docker run -t \
 
     mkdir ast-grep && cd ast-grep &&
 
-    git clone https://github.com/ast-grep/ast-grep.git . -b 0.34.4 &&
+    git clone https://github.com/ast-grep/ast-grep.git . -b 0.39.6 &&
 
     RUSTFLAGS='-C target-feature=+crt-static' cargo build --release --target x86_64-unknown-linux-musl --bin ast-grep
 
