@@ -1144,6 +1144,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     "     xmap ga <Plug>(EasyAlign)
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-commentary'
+    Plug 'tpope/vim-unimpaired'
     Plug 'preservim/nerdcommenter'
         let g:NERDSpaceDelims = 1
         let g:NERDCreateDefaultMappings = 0
