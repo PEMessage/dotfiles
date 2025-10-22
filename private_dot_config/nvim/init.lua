@@ -239,7 +239,7 @@ require("lazy").setup({
     {
         -- active indent guide and indent text objects
         -- indent animation
-        "echasnovski/mini.indentscope",
+        "nvim-mini/mini.indentscope",
         version = false, -- wait till new 0.7.0 release to put it back on semver
         enabled = true,
         event = { "BufReadPre", "BufNewFile" },
