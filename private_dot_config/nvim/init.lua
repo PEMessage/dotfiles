@@ -756,6 +756,7 @@ require("lazy").setup({
                 'vimdoc',
                 'bash',
                 'kotlin',
+                'javascript',
             },
             incremental_selection = {
                 enable = true,
@@ -1270,6 +1271,7 @@ require("lazy").setup({
                 "gopls",
                 "bashls",
                 "kotlin_language_server",
+                "ts_ls",
                 -- "kotlin_lsp", -- See: https://github.com/desugar-64/kotlin-lsp-workspace-generator for android
                 -- "jdtls" -- leave it to nvim-jdtls
             }
