@@ -38,7 +38,7 @@ others=()
 for ((i=1; i<=$#; i++)); do
     arg="${!i}"
 
-    if [[ -z "$mode" && ( "$arg" == -t || "$arg" == -f ) ]]; then
+    if [[ -z "$mode" && ( "$arg" == -t || "$arg" == -f || "$arg" = -c ) ]]; then
         mode="$arg"
     elif [[ $arg = "-i" ]]; then
         ignore_case=1
@@ -78,7 +78,7 @@ rule:
 
 TYPE_INLINE_RULE='
 ---
-id: find-class-or-struct-cpp
+id: find-type-cpp
 language: cpp
 rule:
   kind: type_identifier
@@ -86,14 +86,33 @@ rule:
     any:
       - kind: class_specifier
       - kind: struct_specifier
+      - kind: enum_specifier
   regex: '$regex'
 ---
-id: find-struct-c
+id: find-type-c
 language: c
 rule:
   kind: type_identifier
   inside:
-    kind: struct_specifier
+    any:
+      - kind: class_specifier
+      - kind: struct_specifier
+      - kind: enum_specifier
+  regex: '$regex'
+'
+
+CALL_INLINE_RULE='
+---
+id: find-call-cpp
+language: cpp
+rule:
+  kind: call_expression
+  regex: '$regex'
+---
+id: find-call-c
+language: c
+rule:
+  kind: call_expression
   regex: '$regex'
 '
 
@@ -102,6 +121,8 @@ case "$mode" in
     -f) INLINE_RULE="$FUNC_INLINE_RULE"
     ;;
     -t) INLINE_RULE="$TYPE_INLINE_RULE"
+    ;;
+    -c) INLINE_RULE="$CALL_INLINE_RULE"
     ;;
     *) INLINE_RULE="$FUNC_INLINE_RULE"
     ;;
@@ -141,7 +162,7 @@ FORMATTER+='\($match_color)\($lines[.charCount.leading:$total-.charCount.trailin
 FORMATTER+='\($lines[$total-.charCount.trailing:])'
 FORMATTER+='"'
 
-# ast-grep scan --json=stream --inline-rules "$INLINE_RULE" "${others[@]}"
+ast-grep scan "${globs[@]}" --json=stream --inline-rules "$INLINE_RULE" "${others[@]}"
 ast-grep scan "${globs[@]}" --json=stream --inline-rules "$INLINE_RULE" "${others[@]}" |
      jq \
         --arg path_color "$PURPLE" \
