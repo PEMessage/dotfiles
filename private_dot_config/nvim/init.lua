@@ -892,6 +892,45 @@ require("lazy").setup({
         end
     },
     {
+        "jmacadie/telescope-hierarchy.nvim",
+        dependencies = {
+            {
+                "nvim-telescope/telescope.nvim",
+                dependencies = { "nvim-lua/plenary.nvim" },
+            },
+        },
+        keys = {
+            { -- lazy style key map
+                -- Choose your own keys, this works for me
+                "<leader>si",
+                "<cmd>Telescope hierarchy incoming_calls<cr>",
+                desc = "LSP: [S]earch [I]ncoming Calls",
+            },
+            {
+                "<leader>so",
+                "<cmd>Telescope hierarchy outgoing_calls<cr>",
+                desc = "LSP: [S]earch [O]utgoing Calls",
+            },
+        },
+        opts = {
+            -- don't use `defaults = { }` here, do this in the main telescope spec
+            extensions = {
+                hierarchy = {
+                    disable_devicons = true,
+                    scroll_strategy = 'limit',
+                },
+                -- no other extensions here, they can have their own spec too
+            },
+        },
+        config = function(_, opts)
+            -- Calling telescope's setup from multiple specs does not hurt, it will happily merge the
+            -- configs for us. We won't use data, as everything is in it's own namespace (telescope
+            -- defaults, as well as each extension).
+            require("telescope").setup(opts)
+            require("telescope").load_extension("hierarchy")
+        end,
+    },
+    {
         'nvim-telescope/telescope.nvim', tag = '0.1.8',
         enabled = true,
         dependencies = { 'nvim-lua/plenary.nvim' },
@@ -976,6 +1015,14 @@ require("lazy").setup({
                         ["<C-k>"] = function(...)
                             return require("telescope.actions").move_selection_previous(...)
                         end,
+                        ["<C-d>"] = function(...)
+                            local action_set = require("telescope.actions.set")
+                            action_set.shift_selection(..., 3)
+                        end,
+                        ["<C-u>"] = function(...)
+                            local action_set = require("telescope.actions.set")
+                            action_set.shift_selection(..., -3)
+                        end,
                         ["<C-l>"] = function(...)
                             return require("telescope.actions").select_default(...)
                         end,
@@ -997,6 +1044,20 @@ require("lazy").setup({
                         end,
                     },
                     n = {
+                        ["<C-j>"] = function(...)
+                            return require("telescope.actions").move_selection_next(...)
+                        end,
+                        ["<C-k>"] = function(...)
+                            return require("telescope.actions").move_selection_previous(...)
+                        end,
+                        ["<C-d>"] = function(...)
+                            local action_set = require("telescope.actions.set")
+                            action_set.shift_selection(..., 3)
+                        end,
+                        ["<C-u>"] = function(...)
+                            local action_set = require("telescope.actions.set")
+                            action_set.shift_selection(..., -3)
+                        end,
                         ["q"] = function(...)
                             return require("telescope.actions").close(...)
                         end,

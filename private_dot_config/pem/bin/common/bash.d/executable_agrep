@@ -162,7 +162,7 @@ FORMATTER+='\($match_color)\($lines[.charCount.leading:$total-.charCount.trailin
 FORMATTER+='\($lines[$total-.charCount.trailing:])'
 FORMATTER+='"'
 
-ast-grep scan "${globs[@]}" --json=stream --inline-rules "$INLINE_RULE" "${others[@]}"
+# ast-grep scan "${globs[@]}" --json=stream --inline-rules "$INLINE_RULE" "${others[@]}"
 ast-grep scan "${globs[@]}" --json=stream --inline-rules "$INLINE_RULE" "${others[@]}" |
      jq \
         --arg path_color "$PURPLE" \
