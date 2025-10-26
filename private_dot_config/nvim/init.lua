@@ -1882,15 +1882,24 @@ require("lazy").setup({
         },
     },
     {
-        'liuchengxu/vista.vim',
-        config = function ()
-            vim.g.vista_echo_cursor_strategy = 'scroll'
-            vim.cmd [[ let g:vista#renderer#enable_icon = 0 ]]
-        end,
-        keys = {
-            { "<leader>av", "<cmd>Vista!!<cr>", desc = "Open Vista bar" },
-        }
+        'stevearc/aerial.nvim',
+        opts = {},
+        -- Optional dependencies
+        dependencies = {
+            "nvim-treesitter/nvim-treesitter",
+            -- "nvim-tree/nvim-web-devicons"
+        },
     },
+    -- {
+    --     'liuchengxu/vista.vim',
+    --     config = function ()
+    --         vim.g.vista_echo_cursor_strategy = 'scroll'
+    --         vim.cmd [[ let g:vista#renderer#enable_icon = 0 ]]
+    --     end,
+    --     keys = {
+    --         { "<leader>av", "<cmd>Vista!!<cr>", desc = "Open Vista bar" },
+    --     }
+    -- },
     {
         'ldelossa/litee.nvim',
         event = "VeryLazy",
