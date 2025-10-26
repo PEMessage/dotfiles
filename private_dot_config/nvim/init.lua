@@ -947,6 +947,9 @@ require("lazy").setup({
                             path_display = {
                                 shorten = { len = 2, exclude = {1, 2, -3, -2, -1} }
                             },
+                            layout_config = {
+                                width = 0.8,
+                            },
                             attach_mappings = function (_,map)
                                 map( {'i','n'}, '<C-p>',
                                     function(...)
