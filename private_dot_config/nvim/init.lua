@@ -981,6 +981,7 @@ require("lazy").setup({
                 "<C-e>",
                 function()
                     require('telescope.builtin').find_files({
+                        previewer = false,
                         path_display = {
                             shorten = { len = 3, exclude = {1, 2, -3, -2, -1} }
                         }
