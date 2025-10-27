@@ -1177,6 +1177,8 @@ call plug#begin(pe_runtimepath . '/plugged')
             autocmd FileType c setlocal commentstring=//\ %s
         augroup END
     Plug 'tpope/vim-repeat'
+        " Without this line, will map nmap <C-R> <Plug>(RepeatRedo) by default
+        nmap <leader><C-R> <Plug>(RepeatRedo)
     Plug 'tpope/vim-fugitive'
         let g:fugitive_legacy_commands = 1
     " Plug 'tpope/vim-vinegar'
