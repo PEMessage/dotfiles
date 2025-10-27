@@ -61,6 +61,8 @@ local section = function ()
     -- -------------------------------------------
     -- 3.3 Search Zone
     -- -------------------------------------------
+    vim.o.ignorecase = true  --  smartcase depend this options
+    -- use `/\C` to temporay disable this
     vim.o.smartcase = true   -- 智能搜索大小写判断，默认忽略大小写，除非搜索内容包含大写字母
     vim.o.incsearch = true   -- 查找输入时动态增量显示查找结果
     vim.o.hlsearch  = true   -- 高亮搜索内容
