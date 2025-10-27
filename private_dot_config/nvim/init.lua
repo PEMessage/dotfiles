@@ -1859,23 +1859,9 @@ require("lazy").setup({
                     local map = vim.keymap.set
                     local bufnr = args.buf
 
-                    map('n', '<F2>', '<cmd>Lspsaga rename<cr>', { silent = true, noremap = true, buffer = bufnr })
-                    map('n', 'gk', '<cmd>Lspsaga code_action<cr>', { silent = true, noremap = true, buffer = bufnr })
-                    map('x', 'gk', ':<c-u>Lspsaga range_code_action<cr>', { silent = true, noremap = true, buffer = bufnr })
-                    -- if client and client.name == 'jdtls' then
-                    --     -- map('n', 'gd', '<cmd>Lspsaga peek_definition<cr>', { silent = true, noremap = true, buffer = bufnr })
-                    --     -- lspsaga can't handle JDT:// well using old style <C-]>
-                    -- else
-                    --     map('n', 'gd', '<cmd>Lspsaga peek_definition<cr>', { silent = true, noremap = true, buffer = bufnr })
-                    -- end
-                    map("n", "gd", "<C-]>", { silent = true, noremap = true, buffer = bufnr })
                     map('n', 'go', '<cmd>Lspsaga show_line_diagnostics<cr>', { silent = true, noremap = true, buffer = bufnr })
                     map('n', 'Q', '<cmd>Lspsaga finder tyd+ref+imp+def<cr>', { silent = true, noremap = true, buffer = bufnr })
                     map('n', '<C-q>', '<cmd>Lspsaga code_action<cr>', { silent = true, noremap = true, buffer = bufnr })
-
-                    if client and client.name == 'clangd' then
-                        map('n', '<m-h>', '<cmd>LspClangdSwitchSourceHeader<cr>', { silent = true, noremap = true, buffer = bufnr })
-                    end
                 end,
             })
         end,
@@ -2075,6 +2061,9 @@ local section = function ()
     vim.keymap.set("v", "<M-j>", ":m '>+1<cr>gv=gv", { desc = "Move down" })
     vim.keymap.set("v", "<M-k>", ":m '<-2<cr>gv=gv", { desc = "Move up" })
 
+    vim.keymap.set('x', 'p', 'P', { noremap = true })
+    vim.keymap.set('x', 'P', 'p', { noremap = true })
+
     -- Jump Section
     vim.keymap.set(
         "n", "gp",
@@ -2102,8 +2091,39 @@ local section = function ()
         })
     end, { desc = 'Format selected range' })
 
-    vim.keymap.set('x', 'p', 'P', { noremap = true })
-    vim.keymap.set('x', 'P', 'p', { noremap = true })
+
+
+
+    vim.api.nvim_create_autocmd('LspAttach', {
+        group = vim.api.nvim_create_augroup('LspCustomKeyMaps', {}),
+        callback = function(args)
+            local client = vim.lsp.get_client_by_id(args.data.client_id)
+
+            local bufnr = args.buf
+
+            vim.keymap.set('n', '<F2>', vim.lsp.buf.rename,
+                { silent = true, noremap = true, buffer = bufnr, desc = 'Rename' }
+            )
+
+            vim.keymap.set('n', 'gk', vim.lsp.buf.code_action,
+                { silent = true, noremap = true, buffer = bufnr, desc = 'Code Action' }
+            )
+            vim.keymap.set('x', 'gk', vim.lsp.buf.code_action,
+                { silent = true, noremap = true, buffer = bufnr, desc = 'Range Code Action' }
+            )
+
+            vim.keymap.set("n", "gd", vim.lsp.buf.definition,
+                { silent = true, noremap = true, buffer = bufnr, desc = 'Goto Definition' }
+            )
+            vim.keymap.set("n", "gr", vim.lsp.buf.references,
+                { silent = true, noremap = true, buffer = bufnr, nowait = true, desc = 'Goto Reference' }
+            )
+
+            if client and client.name == 'clangd' then
+                vim.keymap.set('n', '<m-h>', '<cmd>LspClangdSwitchSourceHeader<cr>', { silent = true, noremap = true, buffer = bufnr })
+            end
+        end,
+    })
 
     -- -------------------------------------------
     -- 6.2 Leader Keymap
