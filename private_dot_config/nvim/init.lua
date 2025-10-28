@@ -1,4 +1,3 @@
-
 -- +++++++++++++++++++++++++++++++++++++++++++
 -- File: init.lua
 -- Author: PEMessage
@@ -83,7 +82,7 @@ local section = function ()
     vim.cmd [[
         unmenu PopUp.How-to\ disable\ mouse
     ]]
-    vim.cmd [[ 
+    vim.cmd [[
         menu PopUp.Go\ to\ Define <c-]>
         menu PopUp.Back\  <c-t>
     ]]
@@ -641,6 +640,9 @@ require("lazy").setup({
     -- -------------------------------------------
     {
         'yianwillis/vimcdoc'
+    },
+    {
+        'axelf4/vim-strip-trailing-whitespace'
     },
     {
         'thinca/vim-quickrun',
@@ -1819,6 +1821,18 @@ require("lazy").setup({
             }
         end
     },
+    -- {
+    --     "cappyzawa/trim.nvim",
+    --     opts = {
+    --         trim_last_line = false,
+    --         trim_first_line = false,
+    --
+    --         trim_on_write = true,
+    --     },
+    --     config = function(_, opts)
+    --         require("trim").setup(opts)
+    --     end
+    -- },
     -- -------------------------------------------
     -- 5.9 DAP & LSP UI
     -- -------------------------------------------
@@ -2408,7 +2422,7 @@ vim.cmd [[
 
 vim.cmd [[ command! -nargs=+ -complete=command Redir let s:reg = @@ | redir @"> | silent execute <q-args> | redir END | new | pu | 1,2d_ | let @@ = s:reg ]]
 
-vim.cmd [[ 
+vim.cmd [[
     function! VisualSelection(direction) range
         let l:saved_reg = @"
         execute "normal! gvy"
@@ -2438,5 +2452,3 @@ vim.cmd [[
 
 ]]
 vim.keymap.set('v', '&', ':<C-u>call VisualSelection(\'fa\')<CR>:set hls<CR>', { silent = true })
-
-
