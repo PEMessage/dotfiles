@@ -53,7 +53,7 @@ def detect_line_endings(file_path):
     return crlf_count, lf_count, total_lines
 
 
-def convert_file(file_path, to_dos=True, backup=False):
+def convert_file(file_path, to_dos=True, backup=False, debug=False):
     """
     Convert a file between Unix and DOS line endings.
 
@@ -69,7 +69,10 @@ def convert_file(file_path, to_dos=True, backup=False):
             if backup:
                 cmd.append('-b')
             cmd.append(file_path)
-            subprocess.run(cmd, check=True)
+            if not debug:
+                subprocess.run(cmd, check=True)
+            else:
+                print(cmd)
             print(f"Converted {file_path} to DOS format (CRLF)")
         else:
             # Convert to Unix (LF)
@@ -77,7 +80,11 @@ def convert_file(file_path, to_dos=True, backup=False):
             if backup:
                 cmd.append('-b')
             cmd.append(file_path)
-            subprocess.run(cmd, check=True)
+            if not debug:
+                subprocess.run(cmd, check=True)
+            else:
+                print(cmd)
+
             print(f"Converted {file_path} to Unix format (LF)")
 
     except subprocess.CalledProcessError as e:
@@ -90,7 +97,7 @@ def convert_file(file_path, to_dos=True, backup=False):
         print("On CentOS/RHEL: sudo yum install dos2unix", file=sys.stderr)
 
 
-def process_file(file_path, threshold=0.6, backup=False, verbose=False, force=None):
+def process_file(file_path, threshold=0.6, backup=False, verbose=False, force=None, debug=False):
     """
     Process a single file to detect and fix line endings.
 
@@ -122,14 +129,14 @@ def process_file(file_path, threshold=0.6, backup=False, verbose=False, force=No
     # Determine conversion direction
     if force is not None:
         if force == 'dos':
-            convert_file(file_path, to_dos=True, backup=backup)
+            convert_file(file_path, to_dos=True, backup=backup, debug=debug)
         elif force == 'unix':
-            convert_file(file_path, to_dos=False, backup=backup)
+            convert_file(file_path, to_dos=False, backup=backup, debug=debug)
     else:
         if crlf_ratio > threshold:
-            convert_file(file_path, to_dos=True, backup=backup)
+            convert_file(file_path, to_dos=True, backup=backup, debug=debug)
         elif lf_ratio > threshold:
-            convert_file(file_path, to_dos=False, backup=backup)
+            convert_file(file_path, to_dos=False, backup=backup, deug=debug)
         else:
             if verbose:
                 print(f"{file_path}: Mixed line endings, converting to Unix format")
@@ -147,6 +154,8 @@ def main():
                         help='Create backup files with .bak extension')
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='Verbose output')
+    parser.add_argument('-d', '--debug', action='store_true',
+                        help='debug mode, dry run')
     parser.add_argument('--force', choices=['unix', 'dos'],
                         help='Force conversion to specified format')
 
@@ -177,7 +186,8 @@ def main():
                     threshold=args.threshold,
                     backup=args.backup,
                     verbose=args.verbose,
-                    force=args.force
+                    force=args.force,
+                    debug=args.debug
                 )
 
 
