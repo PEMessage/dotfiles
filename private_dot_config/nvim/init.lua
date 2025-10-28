@@ -961,6 +961,7 @@ require("lazy").setup({
     },
     {
         "jmacadie/telescope-hierarchy.nvim",
+        brnach = 'feature/type',
         dependencies = {
             {
                 "nvim-telescope/telescope.nvim",
