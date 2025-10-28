@@ -1518,6 +1518,13 @@ require("lazy").setup({
 
     },
     {
+        'p00f/clangd_extensions.nvim',
+        event = "LspAttach",
+        cmds = {
+            'ClangdTypeHierarchy'
+        }
+    },
+    {
         'mfussenegger/nvim-jdtls',
         version = false, -- set this if you want to always pull the latest change
         -- ft = { "java" }, -- THIS IS KEY, if not this, everything will broken
@@ -2159,9 +2166,6 @@ local section = function ()
         })
     end, { desc = 'Format selected range' })
 
-
-
-
     vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('LspCustomKeyMaps', {}),
         callback = function(args)
@@ -2189,6 +2193,27 @@ local section = function ()
 
             if client and client.name == 'clangd' then
                 vim.keymap.set('n', '<m-h>', '<cmd>LspClangdSwitchSourceHeader<cr>', { silent = true, noremap = true, buffer = bufnr })
+            end
+
+            -- Thanks to: https://github.com/sangoX35X/dotfiles/blob/7aa159668f476f4428422353f48a21fc26797dc4/nvim/lua/plugin/lsp.lua#L126
+            if client and client:supports_method('textDocument/typeHierarchy', bufnr) then
+                vim.api.nvim_create_user_command('LspTypeHierarchy',
+                    function(opts)
+                        local direction = opts.args or 'subtypes'
+                        if direction == 'subtypes' or direction == 'supertypes' then
+                            vim.lsp.buf.typehierarchy(direction)
+                        else
+                            vim.notify('LspTypeHierarchy: argument must be "subtypes" or "supertypes"', vim.log.levels.ERROR)
+                        end
+                    end,
+                    {
+                        nargs = '?',
+                        complete = function()
+                            return { 'subtypes', 'supertypes' }
+                        end,
+                        desc = 'Show type hierarchy (subtypes|supertypes)'
+                    }
+                )
             end
         end,
     })
