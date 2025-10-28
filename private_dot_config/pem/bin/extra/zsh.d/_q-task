@@ -31,6 +31,8 @@ case $CURRENT in
         if [[ $words[2] == -e ]]; then
             get_task
             _describe 'task' tasks
+        else
+            _files
         fi
     ;;
     *)
