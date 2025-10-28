@@ -819,6 +819,9 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'lambdalisue/vim-fern'
         nnoremap <silent><leader>b  :Fern . -drawer<CR>
 
+    Plug 'justinmk/vim-dirvish'
+    Plug 'roginfarrer/vim-dirvish-dovish', {'branch': 'main'}
+
     Plug 'mg979/vim-visual-multi', {'branch': 'master'}
         let g:M_default_mappings = 0
         let g:VM_mouse_mappings  = 0
@@ -1145,6 +1148,7 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-commentary'
     Plug 'tpope/vim-unimpaired'
+    Plug 'tpope/vim-eunuch'
     Plug 'preservim/nerdcommenter'
         let g:NERDSpaceDelims = 1
         let g:NERDCreateDefaultMappings = 0
