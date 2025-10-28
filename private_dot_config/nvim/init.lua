@@ -1579,7 +1579,10 @@ require("lazy").setup({
             local jdtls = require('jdtls')
             local mason_root = require('mason.settings').current.install_root_dir
             local root_markers = {'.jdtlsroot', '.repo', 'gradlew', 'settings.gradle.kts'}
-            local root_dir = require('jdtls.setup').find_root(root_markers):gsub('/', '_'):gsub('\\', '_')
+            local root_dir = require('jdtls.setup').find_root(root_markers)
+            if root_dir then
+                root_dir = root_dir:gsub('/', '_'):gsub('\\', '_')
+            end
             local executable = 'jdtls'
 
             if vim.fn.executable(executable) ~= 1 then
