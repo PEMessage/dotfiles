@@ -1578,8 +1578,8 @@ require("lazy").setup({
             -- We using mason-lspconfig, not using it according to readme
             local jdtls = require('jdtls')
             local mason_root = require('mason.settings').current.install_root_dir
-            local root_markers = {'gradlew'}
-            local root_dir = require('jdtls.setup').find_root(root_markers)
+            local root_markers = {'.jdtlsroot', '.repo', 'gradlew', 'settings.gradle.kts'}
+            local root_dir = require('jdtls.setup').find_root(root_markers):gsub('/', '_'):gsub('\\', '_')
             local executable = 'jdtls'
 
             if vim.fn.executable(executable) ~= 1 then
