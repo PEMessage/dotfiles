@@ -1580,7 +1580,7 @@ require("lazy").setup({
             -- We using mason-lspconfig, not using it according to readme
             local jdtls = require('jdtls')
             local mason_root = require('mason.settings').current.install_root_dir
-            local root_markers = {'.jdtlsroot', '.repo', 'gradlew', 'settings.gradle.kts'}
+            local root_markers = {'javaroot', '.repo', 'gradlew', 'settings.gradle.kts'}
             local root_dir = require('jdtls.setup').find_root(root_markers)
             if root_dir then
                 root_dir = root_dir:gsub('/', '_'):gsub('\\', '_')
@@ -1603,7 +1603,8 @@ require("lazy").setup({
                     cache_dir .. '/workspace/' .. vim.fn.fnamemodify(root_dir, ":p:h:t"),
                 },
                 -- See: https://github.com/mfussenegger/nvim-jdtls?tab=readme-ov-file#configuration-verbose
-                root_dir = require("jdtls.setup").find_root({ ".git", "mvnw", "gradlew", "javaroot" }),
+                -- See: https://github.com/eclipse-jdtls/eclipse.jdt.ls/wiki/Language-Server-Settings-&-Capabilities
+                root_dir = require("jdtls.setup").find_root(root_markers),
                 init_options = {
                     bundles = {
                         vim.fn.glob(
@@ -1626,6 +1627,10 @@ require("lazy").setup({
                                     -- See: https://www.reddit.com/r/neovim/comments/1m3v9kk/jdtls_keeps_regenerating_my_classpath_for_a/
                                     -- do not let jdtls generate .classpath, manually generate it
                                     enabled = false,
+                                    -- jvmArguments = "-Dhttp.proxyHost=127.0.0.1 -Dhttp.proxyPort=7890 -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=7890",
+                                    -- wrapper = {
+                                    --     enabled = false,
+                                    -- }
                                 },
                             },
                             jdt = {
