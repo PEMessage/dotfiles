@@ -1267,6 +1267,7 @@ require("lazy").setup({
                     end, { "i", "s" }),
                 }),
                 sources = cmp.config.sources({
+                    { name = 'lazydev' },
                     { name = 'buffer' },
                     { name = 'path' },
                     { name = 'nvim_lsp_signature_help' },
@@ -1413,48 +1414,50 @@ require("lazy").setup({
             }
         },
         config = function(_,opts)
-            vim.lsp.config('lua_ls', {
-                on_init = function(client)
-                    if client.workspace_folders then
-                        local path = client.workspace_folders[1].name
-                        ---@diagnostic disable-next-line: undefined-field
-                        if path ~= vim.fn.stdpath('config') and (vim.uv.fs_stat(path..'/.luarc.json') or vim.uv.fs_stat(path..'/.luarc.jsonc')) then
-                            return
-                        end
-                    end
-
-                    client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
-                        runtime = {
-                            -- Tell the language server which version of Lua you're using
-                            -- (most likely LuaJIT in the case of Neovim)
-                            version = 'LuaJIT'
-                        },
-                        -- Make the server aware of Neovim runtime files
-                        workspace = {
-                            checkThirdParty = false,
-                            library = {
-                                vim.env.VIMRUNTIME
-                                -- Depending on the usage, you might want to add additional paths here.
-                                -- "${3rd}/luv/library"
-                                -- "${3rd}/busted/library",
-                            }
-                            -- or pull in all of 'runtimepath'. NOTE: this is a lot slower and will cause issues when working on your own configuration (see https://github.com/neovim/nvim-lspconfig/issues/3189)
-                            -- library = vim.api.nvim_get_runtime_file("", true)
-                        }
-                    })
-                end,
-                settings = {
-                    Lua = {
-                        diagnostics = {
-                            neededFileStatus = {
-                                ['codestyle-check'] = 'None!',
-                                ["unused-local"] = 'None!',
-                                ["empty-block"] = "None!",
-                            }
-                        }
-                    }
-                }
-            })
+            -- vim.lsp.config('lua_ls', {
+            --     on_init = function(client)
+            --         if client.workspace_folders then
+            --             local path = client.workspace_folders[1].name
+            --             ---@diagnostic disable-next-line: undefined-field
+            --             if path ~= vim.fn.stdpath('config') and (vim.uv.fs_stat(path..'/.luarc.json') or vim.uv.fs_stat(path..'/.luarc.jsonc')) then
+            --                 return
+            --             end
+            --         end
+            --
+            --         client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
+            --             runtime = {
+            --                 -- Tell the language server which version of Lua you're using
+            --                 -- (most likely LuaJIT in the case of Neovim)
+            --                 version = 'LuaJIT'
+            --             },
+            --             -- Make the server aware of Neovim runtime files
+            --             workspace = {
+            --                 checkThirdParty = false,
+            --                 library = {
+            --                     vim.env.VIMRUNTIME
+            --                     -- Depending on the usage, you might want to add additional paths here.
+            --                     -- "${3rd}/luv/library"
+            --                     -- "${3rd}/busted/library",
+            --                 }
+            --                 -- or pull in all of 'runtimepath'.
+            --                 -- NOTE: this is a lot slower and will cause issues when working on your own configuration
+            --                 -- (see https://github.com/neovim/nvim-lspconfig/issues/3189)
+            --                 -- library = vim.api.nvim_get_runtime_file("", true)
+            --             }
+            --         })
+            --     end,
+            --     settings = {
+            --         Lua = {
+            --             diagnostics = {
+            --                 neededFileStatus = {
+            --                     ['codestyle-check'] = 'None!',
+            --                     ["unused-local"] = 'None!',
+            --                     ["empty-block"] = "None!",
+            --                 }
+            --             }
+            --         }
+            --     }
+            -- })
             vim.lsp.config("*", {
                 inlay_hints = { enabled = true },
             })
@@ -1699,6 +1702,17 @@ require("lazy").setup({
             -- vim.inspect(opts)
             -- jdtls.start_or_attach(opts)
         end
+    },
+    {
+        "folke/lazydev.nvim",
+        ft = "lua", -- only load on lua files
+        opts = {
+            library = {
+                -- See the configuration section for more details
+                -- Load luvit types when the `vim.uv` word is found
+                { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+            },
+        },
     },
     -- -------------------------------------------
     -- 5.9 DAP Plug
