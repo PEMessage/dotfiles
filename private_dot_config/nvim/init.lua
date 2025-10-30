@@ -263,6 +263,7 @@ require("lazy").setup({
         "lukas-reineke/indent-blankline.nvim",
         -- The indent that always exist one
         enabled = true,
+        main = 'ibl', -- Version 3, instead of indent_blankline
         event = { "BufReadPost", "BufNewFile" },
         -- Version 2
         -- config = function(_,opts)
@@ -274,35 +275,32 @@ require("lazy").setup({
         -- end
         --
         -- Version 3
-        opts = {
-            debounce = 100,
-            indent = {
-                char = "|",
-                -- This will causing telescope.colorscheme live show error !!!
-                -- DONT USE IT !!!
-                -- highlight = 'IndentBlanklineChar'
-            },
-            exclude = {
-                filetypes = {
-                    "help",
-                    "alpha",
-                    "dashboard",
-                    "neo-tree",
-                    "Trouble",
-                    "lazy",
-                    "mason"
-                }
-            },
-        },
-        config = function(_, opts)
-            --
+        opts = function(_, _)
             -- use Inspect/InspectTree to check highlight
             -- See: help hl-IblIndent
             -- Default: takes the values from |hl-Whitespace| when not defined ~
             -- So this set must be set before setup()
             vim.cmd [[highlight IblIndent guifg=#455574 gui=nocombine]]
-            require("ibl").setup(opts)
-
+            return {
+                debounce = 100,
+                indent = {
+                    char = "|",
+                    -- This will causing telescope.colorscheme live show error !!!
+                    -- DONT USE IT !!!
+                    -- highlight = 'IndentBlanklineChar'
+                },
+                exclude = {
+                    filetypes = {
+                        "help",
+                        "alpha",
+                        "dashboard",
+                        "neo-tree",
+                        "Trouble",
+                        "lazy",
+                        "mason"
+                    }
+                },
+            }
         end
     },
     {
@@ -715,6 +713,7 @@ require("lazy").setup({
         enabled = true,
         build = ":TSUpdate",
         event = { "BufReadPost", "BufNewFile" },
+        main = 'nvim-treesitter.configs',
         opts = {
             highlight = {
                 enable = true,
@@ -769,10 +768,6 @@ require("lazy").setup({
         keys = {
             { '<leader>ts', '<cmd>TSBufToggle highlight<CR>', mode = 'n', desc = 'Toggle Treesitter Highlight' },
         },
-        config = function(_,opts)
-            require("nvim-treesitter.configs").setup(opts)
-        end
-
     },
     {
         "nvim-treesitter/nvim-treesitter-context",
@@ -1214,32 +1209,24 @@ require("lazy").setup({
             -- options
         },
     },
-    {
-        "ray-x/lsp_signature.nvim",
-        enabled = false,
-        event = "VeryLazy",
-        opts = {
-            hint_prefix = {
-                above = "v",  -- when the hint is on the line above the current line
-                current = "<",  -- when the hint is on the same line
-                below = "^",  -- when the hint is on the line below the current line
-            },
-        },
-        config = function(_, opts)
-            require('lsp_signature').setup(opts)
-            vim.keymap.set({ 'n' }, '<C-k>',
-                function()
-                    require('lsp_signature').toggle_float_win()
-                end,
-                {
-                    silent = true,
-                    noremap = true,
-                    desc = 'toggle signature'
-                }
-            )
-
-        end
-    },
+    -- {
+    --     "ray-x/lsp_signature.nvim",
+    --     enabled = false,
+    --     event = "VeryLazy",
+    --     opts = {
+    --         hint_prefix = {
+    --             above = "v",  -- when the hint is on the line above the current line
+    --             current = "<",  -- when the hint is on the same line
+    --             below = "^",  -- when the hint is on the line below the current line
+    --         },
+    --     },
+    --     keys = {
+    --         {
+    --             "<C-k>", "<cmd>lua require('lsp_signature').toggle_float_win()<CR>",
+    --             mode = "i", desc = "Toggle signature", silent = true, noremap = true
+    --         },
+    --     },
+    -- },
     {
         'dstein64/nvim-scrollview',
         dependencies = {
@@ -1898,6 +1885,7 @@ require("lazy").setup({
     {
         'ldelossa/litee.nvim',
         event = "VeryLazy",
+        main = 'litee.lib',
         opts = {
             notify = { enabled = false },
             panel = {
@@ -1905,17 +1893,16 @@ require("lazy").setup({
                 panel_size = 30,
             },
         },
-        config = function(_, opts) require('litee.lib').setup(opts) end
     },
     {
         'ldelossa/litee-calltree.nvim',
         dependencies = 'ldelossa/litee.nvim',
         event = "VeryLazy",
+        main = 'litee.calltree',
         opts = {
             on_open = "panel",
             map_resize_keys = false,
         },
-        config = function(_, opts) require('litee.calltree').setup(opts) end
     },
     -- -------------------------------------------
     -- 5.10 AI
