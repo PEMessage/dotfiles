@@ -413,6 +413,7 @@ require("lazy").setup({
     },
     {
         'fei6409/log-highlight.nvim',
+        ft = 'log',
         opts = {}
     },
     -- {
@@ -465,6 +466,9 @@ require("lazy").setup({
     {
         "Zeioth/compiler.nvim",
         dependencies = { "stevearc/overseer.nvim", "nvim-telescope/telescope.nvim" },
+        -- cmd = {
+        --     'CompilerOpen', 'CompilerRedo', 'CompilerStop'
+        -- },
         opts = {},
         keys = {
             {
@@ -560,7 +564,8 @@ require("lazy").setup({
         'yianwillis/vimcdoc'
     },
     {
-        'axelf4/vim-strip-trailing-whitespace'
+        'axelf4/vim-strip-trailing-whitespace',
+        event = {'InsertEnter', 'BufEnter'}
     },
     {
         'thinca/vim-quickrun',
@@ -796,6 +801,7 @@ require("lazy").setup({
     {
         'Bekaboo/dropbar.nvim',
         enabled = true,
+        event = 'VeryLazy',
         opts = {
             sources = {
                 path = {
@@ -865,6 +871,7 @@ require("lazy").setup({
     {
         'nvim-telescope/telescope-fzf-native.nvim',
         dependencies = { 'nvim-telescope/telescope.nvim' },
+        event = 'VimEnter',
         build = 'make',
         opts = {
             -- Also See: https://github.com/debugloop/telescope-undo.nvim
@@ -1205,6 +1212,7 @@ require("lazy").setup({
     },
     {
         "j-hui/fidget.nvim",
+        event = 'VeryLazy',
         opts = {
             -- options
         },
@@ -1261,6 +1269,7 @@ require("lazy").setup({
 
         "williamboman/mason.nvim",
         cmd = "Mason",
+        event = 'VeryLazy',
         opts = {
             registries = {
                 -- "github:PEMessage/mason-registry", -- custom mason registries, not used since 1.50.0 jdtls merged
@@ -1270,6 +1279,7 @@ require("lazy").setup({
     },
     {
         'williamboman/mason-lspconfig.nvim',
+        event = 'BufEnter',
         dependencies = {
             'williamboman/mason.nvim',
             'neovim/nvim-lspconfig',
@@ -1410,6 +1420,7 @@ require("lazy").setup({
     {
         'p00f/clangd_extensions.nvim',
         event = "LspAttach",
+        ft = {'c', 'cpp'},
         cmds = {
             'ClangdTypeHierarchy'
         }
@@ -1417,7 +1428,7 @@ require("lazy").setup({
     {
         'mfussenegger/nvim-jdtls',
         version = false, -- set this if you want to always pull the latest change
-        -- ft = { "java" }, -- THIS IS KEY, if not this, everything will broken
+        ft = { "java" }, -- THIS IS KEY, if not this, everything will broken
         -- UPDATE: this will cause jump to class not work as expect, but other function will do work
         -- See: https://github.com/mfussenegger/nvim-jdtls/issues/639#issuecomment-3079720936
         dependencies = {
@@ -1478,6 +1489,16 @@ require("lazy").setup({
                 return
             end
 
+            vim.api.nvim_create_user_command('JdtWorkspaceDir',
+                function()
+                    vim.print(cache_dir .. '/workspace/' .. root_dir)
+                end,
+                {
+                    desc = 'Print the workspace directory path'
+                }
+            )
+
+
             local opts = {
                 -- cmd = require('lspconfig').jdtls.document_config.default_config.cmd,
                 cmd = {
@@ -1487,7 +1508,8 @@ require("lazy").setup({
                     '-configuration',
                     cache_dir .. '/config',
                     '-data',
-                    cache_dir .. '/workspace/' .. vim.fn.fnamemodify(root_dir, ":p:h:t"),
+                    cache_dir .. '/workspace/' .. root_dir
+                    -- cache_dir .. '/workspace/' .. vim.fn.fnamemodify(root_dir, ":p:h:t"),
                 },
                 -- See: https://github.com/mfussenegger/nvim-jdtls?tab=readme-ov-file#configuration-verbose
                 -- See: https://github.com/eclipse-jdtls/eclipse.jdt.ls/wiki/Language-Server-Settings-&-Capabilities
@@ -1698,9 +1720,9 @@ require("lazy").setup({
         dependencies = {
             'williamboman/mason.nvim',
         },
-        config = function ()
-            local util = require "formatter.util"
-            require("formatter").setup {
+        event = 'VeryLazy',
+        opts = function(_,_)
+            return {
                 logging = true,
                 log_level = vim.log.levels.WARN,
                 filetype = {
@@ -1737,7 +1759,6 @@ require("lazy").setup({
     -- -------------------------------------------
     {
         "rcarriga/nvim-dap-ui",
-        event = 'VeryLazy',
         cmd = { 'DapUiToggle' },
         dependencies = {
             "mfussenegger/nvim-dap",
@@ -1775,9 +1796,10 @@ require("lazy").setup({
         dependencies = {
             "mfussenegger/nvim-dap",
         },
+        cmd = { "PBToggleBreakpoint" },
         keys = {
             {
-                "<F1>", "<cmd>lua require('persistent-breakpoints.api').toggle_breakpoint()<CR>",
+                "<F1>", "<cmd>PBToggleBreakpoint<CR>",
                 mode = "n", desc = "Toggle breakpoint", noremap = true, silent = true
             },
         },
@@ -1865,6 +1887,7 @@ require("lazy").setup({
     },
     {
         'stevearc/aerial.nvim',
+        event = "VeryLazy",
         opts = {},
         -- Optional dependencies
         dependencies = {
@@ -1884,7 +1907,7 @@ require("lazy").setup({
     -- },
     {
         'ldelossa/litee.nvim',
-        event = "VeryLazy",
+        lazy = true,
         main = 'litee.lib',
         opts = {
             notify = { enabled = false },
@@ -1897,7 +1920,7 @@ require("lazy").setup({
     {
         'ldelossa/litee-calltree.nvim',
         dependencies = 'ldelossa/litee.nvim',
-        event = "VeryLazy",
+        event = "LspAttach",
         main = 'litee.calltree',
         opts = {
             on_open = "panel",
