@@ -558,10 +558,18 @@ require("lazy").setup({
     },
 
     -- -------------------------------------------
-    -- 5.3 Leagcy Plugin
+    -- 5.3 Legacy Plugin
     -- -------------------------------------------
     {
         'yianwillis/vimcdoc'
+    },
+    {
+        'tpope/vim-sleuth',
+        cmd = {'Sleuth'},
+        lazy = true,
+        init = function()
+            vim.cmd [[ command UnSleuth setlocal et sw=4 ts=4 ]]
+        end,
     },
     {
         'axelf4/vim-strip-trailing-whitespace',
