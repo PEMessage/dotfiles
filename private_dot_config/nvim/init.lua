@@ -511,60 +511,6 @@ require("lazy").setup({
                 win_height = 5,
             },
         },
-        config = function(_,opts)
-            local fn = vim.fn
-            function _G.qftf(info)
-                local items
-                local ret = {}
-                -- The name of item in list is based on the directory of quickfix window.
-                -- Change the directory for quickfix window make the name of item shorter.
-                -- It's a good opportunity to change current directory in quickfixtextfunc :)
-                --
-                -- local alterBufnr = fn.bufname('#') -- alternative buffer is the buffer before enter qf window
-                -- local root = getRootByAlterBufnr(alterBufnr)
-                -- vim.cmd(('noa lcd %s'):format(fn.fnameescape(root)))
-                --
-                if info.quickfix == 1 then
-                    items = fn.getqflist({id = info.id, items = 0}).items
-                else
-                    items = fn.getloclist(info.winid, {id = info.id, items = 0}).items
-                end
-                local limit = 31
-                local fnameFmt1, fnameFmt2 = '%-' .. limit .. 's', '…%.' .. (limit - 1) .. 's'
-                local validFmt = '%s │%5d:%-3d│%s %s'
-                for i = info.start_idx, info.end_idx do
-                    local e = items[i]
-                    local fname = ''
-                    local str
-                    if e.valid == 1 then
-                        if e.bufnr > 0 then
-                            fname = fn.bufname(e.bufnr)
-                            if fname == '' then
-                                fname = '[No Name]'
-                            else
-                                fname = fname:gsub('^' .. vim.env.HOME, '~')
-                            end
-                            -- char in fname may occur more than 1 width, ignore this issue in order to keep performance
-                            if #fname <= limit then
-                                fname = fnameFmt1:format(fname)
-                            else
-                                fname = fnameFmt2:format(fname:sub(1 - limit))
-                            end
-                        end
-                        local lnum = e.lnum > 99999 and -1 or e.lnum
-                        local col = e.col > 999 and -1 or e.col
-                        local qtype = e.type == '' and '' or ' ' .. e.type:sub(1, 1):upper()
-                        str = validFmt:format(fname, lnum, col, qtype, e.text)
-                    else
-                        str = e.text
-                    end
-                    table.insert(ret, str)
-                end
-                return ret
-            end
-            -- vim.o.qftf = '{info -> v:lua._G.qftf(info)}'
-            require('bqf').setup(opts)
-        end
     },
     {
         'kylechui/nvim-surround',
@@ -578,8 +524,8 @@ require("lazy").setup({
         event = "VeryLazy",
         opts = {},
         keys = {
-            { '<space>', function() require('hop').hint_char1() end, mode = 'n', desc = 'Hop to char', remap = true },
-            { '<leader>hp', function() require('hop').hint_patterns() end, desc = 'Hop Pattern', remap = true },
+            { '<space>', "<cmd>lua require('hop').hint_char1()<CR>", mode = 'n', desc = 'Hop to char', remap = true },
+            { '<leader>hp', "<cmd>lua require('hop').hint_patterns()<CR>", desc = 'Hop Pattern', remap = true },
         },
     },
     {
@@ -587,9 +533,8 @@ require("lazy").setup({
         event = "VeryLazy",
         enabled = false,
         opts = {},
-
         keys = {
-            { "<space>", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+            { "<space>", mode = { "n", "x", "o" }, "<cmd>lua require('flash').jump()<CR>" , desc = "Flash" },
             -- { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
             -- { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
             -- { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
@@ -715,17 +660,24 @@ require("lazy").setup({
             },
 
         },
-        config = function (_,opts)
-            require('gitsigns').setup(opts)
-            vim.keymap.set( 'n',  '<leader>`1', '<cmd>Gitsigns toggle_current_line_blame<cr>' ,
-                { silent = true, desc = "Toggle line blame"  } )
-            vim.keymap.set( 'n',  '[c', '<cmd>Gitsigns prev_hunk<cr>' ,
-                { silent = true, desc = "Previous git changed line"  } )
-            vim.keymap.set( 'n',  ']c', '<cmd>Gitsigns next_hunk<cr>' ,
-                { silent = true, desc = "Next git changed line"  } )
-            vim.keymap.set( 'n',  '<leader>u', '<cmd>Gitsigns reset_hunk<cr>' ,
-                { silent = true, desc = "Reset git hunk"  } )
-        end
+        keys = {
+            {
+                '<leader>`1', '<cmd>Gitsigns toggle_current_line_blame<cr>', mode = 'n',
+                desc = 'Toggle line blame', silent = true
+            },
+            {
+                '[c', '<cmd>Gitsigns prev_hunk<cr>', mode = 'n',
+                desc = 'Previous git changed line', silent = true
+            },
+            {
+                ']c', '<cmd>Gitsigns next_hunk<cr>', mode = 'n',
+                desc = 'Next git changed line', silent = true
+            },
+            {
+                '<leader>u', '<cmd>Gitsigns reset_hunk<cr>', mode = 'n',
+                desc = 'Reset git hunk', silent = true
+            },
+        },
     },
     {
         "christoomey/vim-tmux-navigator",
@@ -744,9 +696,9 @@ require("lazy").setup({
 
             -- 注册命令
             vim.cmd([[
-        command! -nargs=0 PEMouseON lua PE.MouseSet("a")
-        command! -nargs=0 PEMouseOFF lua PE.MouseSet("")
-        ]])
+                command! -nargs=0 PEMouseON lua PE.MouseSet("a")
+                command! -nargs=0 PEMouseOFF lua PE.MouseSet("")
+                ]])
 
         end
     },
@@ -814,9 +766,11 @@ require("lazy").setup({
             },
 
         },
+        keys = {
+            { '<leader>ts', '<cmd>TSBufToggle highlight<CR>', mode = 'n', desc = 'Toggle Treesitter Highlight' },
+        },
         config = function(_,opts)
             require("nvim-treesitter.configs").setup(opts)
-            vim.keymap.set('n','<leader>ts','<cmd>TSBufToggle highlight<CR>', { desc = 'Toggle Treesitter Highlight' })
         end
 
     },
@@ -1140,11 +1094,6 @@ require("lazy").setup({
                     { "<leader>n", group = "LineNumber Options" },
                 })
             end,
-
-            config = function(_, opts)
-                -- local telescope = require('telescope')
-                require('telescope').setup(opts)
-            end
         },
     },
 
@@ -1258,31 +1207,6 @@ require("lazy").setup({
 
             }
         end,
-        config = function(_,opts)
-            local cmp = require('cmp')
-            cmp.setup(opts)
-            -- cmp.setup.cmdline(':', {
-            --     mapping = cmp.mapping.preset.cmdline(),
-            --     -- view = {
-            --     --     entries = {name = 'wildmenu', separator = '|' }
-            --     -- },
-            --     sources = cmp.config.sources({
-            --         { name = 'path' }
-            --     }, {
-            --         { name = 'cmdline' }
-            --     })
-            -- })
-
-            -- cmp.setup.cmdline({ '/', '?' }, {
-            --     mapping = cmp.mapping.preset.cmdline(),
-            --
-            --     sources = {
-            --         { name = 'buffer' }
-            --     }
-            -- })
-
-        end
-
     },
     {
         "j-hui/fidget.nvim",
@@ -1321,15 +1245,16 @@ require("lazy").setup({
         dependencies = {
             'lewis6991/gitsigns.nvim',
         },
-        config = function ()
-            require('scrollview').setup({
-                excluded_filetypes = {'nerdtree'},
-                current_only = true,
-                -- base = 'buffer',
-                -- column = 80,
-                signs_on_startup = {'search','diagnostics','cursor', 'marks'},
-                -- signs_on_startup = {'all'},
-            })
+        opts = {
+            excluded_filetypes = {'nerdtree'},
+            current_only = true,
+            -- base = 'buffer',
+            -- column = 80,
+            signs_on_startup = {'search','diagnostics','cursor', 'marks'},
+            -- signs_on_startup = {'all'},
+        },
+        config = function (_, opts)
+            require('scrollview').setup(opts)
             require('scrollview.contrib.gitsigns').setup()
 
             vim.api.nvim_create_user_command('ScrollViewForceEnable',function()
@@ -1355,9 +1280,6 @@ require("lazy").setup({
                 "github:mason-org/mason-registry",
             },
         },
-        config = function(_, opts)
-            require("mason").setup(opts)
-        end,
     },
     {
         'williamboman/mason-lspconfig.nvim',
@@ -1780,10 +1702,6 @@ require("lazy").setup({
                 end,
             }
         },
-        config = function(_,opts)
-            require("mason-nvim-dap").setup(opts)
-        end,
-
     },
     -- -------------------------------------------
     -- 5.8 Linter
@@ -1870,20 +1788,25 @@ require("lazy").setup({
         dependencies = {
             "mfussenegger/nvim-dap",
         },
-        config = function (_, _)
-            require('persistent-breakpoints').setup({
-                load_breakpoints_event = { "BufReadPost" },
-            })
-            local keyopts = { noremap = true, silent = true }
-            local keymap = vim.api.nvim_set_keymap
-            keymap("n", "<F1>", "<cmd>lua require('persistent-breakpoints.api').toggle_breakpoint()<CR>", keyopts)
-        end,
+        keys = {
+            {
+                "<F1>", "<cmd>lua require('persistent-breakpoints.api').toggle_breakpoint()<CR>",
+                mode = "n", desc = "Toggle breakpoint", noremap = true, silent = true
+            },
+        },
+        opts = {
+            load_breakpoints_event = { "BufReadPost" },
+        },
     },
     {
 
         'nvimdev/lspsaga.nvim',
         -- Note: this also have barbecue.nvim feature something like
         -- nvim › init.lua › 󰅨 require("lazy").setup ›  [25]
+        dependencies = {
+            'nvim-treesitter/nvim-treesitter', -- optional
+            -- 'nvim-tree/nvim-web-devicons'     -- optional
+        },
         enabled = true,
         event = "LspAttach",
         opts = {
@@ -1952,10 +1875,6 @@ require("lazy").setup({
                 end,
             })
         end,
-        dependencies = {
-            'nvim-treesitter/nvim-treesitter', -- optional
-            -- 'nvim-tree/nvim-web-devicons'     -- optional
-        },
     },
     {
         'stevearc/aerial.nvim',
@@ -2041,7 +1960,7 @@ require("lazy").setup({
 
     -- -------------------------------------------
     --- @diagnostic disable-next-line: missing-fields
-}, { -- @Lazy.nvim Options
+}, {
         install = {
             -- install missing plugins on startup. This doesn't increase startup time.
             missing = true,
