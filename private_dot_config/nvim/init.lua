@@ -38,7 +38,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
     end
 end
 vim.opt.rtp:prepend(lazypath)
-local LazyUtil = require("lazy.core.util")
+-- local LazyUtil = require("lazy.core.util")
 
 vim.keymap.set('i', 'jj', '<C-[>')
 
@@ -177,26 +177,26 @@ require("lazy").setup({
 
     { 'projekt0n/github-nvim-theme' },
     { 'catppuccin/nvim' },
-    {
-        'uloco/bluloco.nvim',
-        lazy = false,
-        priority = 1000,
-        dependencies = { 'rktjmp/lush.nvim' },
-        config = function()
-            -- your optional config goes here, see below.
-            require("bluloco").setup({
-                style = "auto",               -- "auto" | "dark" | "light"
-                transparent = false,
-                italics = false,
-                terminal = vim.fn.has("gui_running") == 1, -- bluoco colors are enabled in gui terminals per default.
-                guicursor   = true,
-            })
-
-            vim.opt.termguicolors = true
-            vim.cmd('colorscheme bluloco')
-
-        end,
-    },
+    -- {
+    --     'uloco/bluloco.nvim',
+    --     lazy = false,
+    --     priority = 1000,
+    --     dependencies = { 'rktjmp/lush.nvim' },
+    --     config = function()
+    --         -- your optional config goes here, see below.
+    --         require("bluloco").setup({
+    --             style = "auto",               -- "auto" | "dark" | "light"
+    --             transparent = false,
+    --             italics = false,
+    --             terminal = vim.fn.has("gui_running") == 1, -- bluoco colors are enabled in gui terminals per default.
+    --             guicursor   = true,
+    --         })
+    --
+    --         vim.opt.termguicolors = true
+    --         vim.cmd('colorscheme bluloco')
+    --
+    --     end,
+    -- },
     {
         "Alexis12119/nightly.nvim",
         lazy = false,
@@ -210,27 +210,28 @@ require("lazy").setup({
         'navarasu/onedark.nvim',
         lazy = false,
         priority = 900,
-        config = function(_,opts)
-            require('onedark').setup {
-                style = 'deep',
-                colors = {
-                    pe_gray = "#7c8dab",    -- define a new color
-                    pe_blue = "#499cff",    -- define a new color
-                },
-                highlights = {
-                    Comment = {fg = '$pe_gray'},
-                    ['@comment'] = {fg = '$pe_gray'},
-                    ['@lsp.type.comment'] = {fg = '$pe_gray'},
-                },
+        opts = {
+            style = 'deep',
+            colors = {
+                pe_gray = "#7c8dab",    -- define a new color
+                pe_blue = "#499cff",    -- define a new color
+            },
+            highlights = {
+                Comment = {fg = '$pe_gray'},
+                ['@comment'] = {fg = '$pe_gray'},
+                ['@lsp.type.comment'] = {fg = '$pe_gray'},
+            },
 
-                code_style = {
-                    comments = 'none',
-                    keywords = 'none',
-                    functions = 'none',
-                    strings = 'none',
-                    variables = 'none'
-                },
-            }
+            code_style = {
+                comments = 'none',
+                keywords = 'none',
+                functions = 'none',
+                strings = 'none',
+                variables = 'none'
+            },
+        },
+        config = function(_,opts)
+            require('onedark').setup(opts)
             require('onedark').load()
         end,
     },
@@ -244,21 +245,19 @@ require("lazy").setup({
         version = false, -- wait till new 0.7.0 release to put it back on semver
         enabled = true,
         event = { "BufReadPre", "BufNewFile" },
-        config = function(_,opts)
+        opts = function()
             vim.api.nvim_create_autocmd("FileType", {
                 pattern = { "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy", "mason", "notify" },
                 callback = function()
                     vim.b.miniindentscope_disable = true
                 end,
             })
-            require('mini.indentscope').setup({
-                -- draw = { animation = require('mini.indentscope').gen_animation.none() },
+            vim.cmd [[highlight MiniIndentscopeSymbol guifg=#419cff gui=nocombine]]
+            return {
                 options = { try_as_border = true },
                 symbol = "│",
-
-            })
-            vim.cmd [[highlight MiniIndentscopeSymbol guifg=#419cff gui=nocombine]]
-        end
+            }
+        end,
     },
     {
         "lukas-reineke/indent-blankline.nvim",
@@ -275,35 +274,34 @@ require("lazy").setup({
         -- end
         --
         -- Version 3
-        config = function(_,opts)
+        opts = {
+            debounce = 100,
+            indent = {
+                char = "|",
+                -- This will causing telescope.colorscheme live show error !!!
+                -- DONT USE IT !!!
+                -- highlight = 'IndentBlanklineChar'
+            },
+            exclude = {
+                filetypes = {
+                    "help",
+                    "alpha",
+                    "dashboard",
+                    "neo-tree",
+                    "Trouble",
+                    "lazy",
+                    "mason"
+                }
+            },
+        },
+        config = function(_, opts)
             --
             -- use Inspect/InspectTree to check highlight
             -- See: help hl-IblIndent
             -- Default: takes the values from |hl-Whitespace| when not defined ~
             -- So this set must be set before setup()
             vim.cmd [[highlight IblIndent guifg=#455574 gui=nocombine]]
-            require("ibl").setup({
-
-                debounce = 100,
-                indent = {
-                    char = "|",
-                    -- This will causing telescope.colorscheme live show error !!!
-                    -- DONT USE IT !!!
-                    -- highlight = 'IndentBlanklineChar'
-                },
-                exclude = {
-                    filetypes = {
-                        "help",
-                        "alpha",
-                        "dashboard",
-                        "neo-tree",
-                        "Trouble",
-                        "lazy",
-                        "mason"
-                    }
-                },
-
-            })
+            require("ibl").setup(opts)
 
         end
     },
@@ -368,20 +366,18 @@ require("lazy").setup({
     },
     {
         'yamatsum/nvim-cursorline',
-        config = function ()
-            require('nvim-cursorline').setup {
-                cursorline = {
-                    enable = true,
-                    timeout = 1000,
-                    number = false,
-                },
-                cursorword = {
-                    enable = true,
-                    min_length = 3,
-                    hl = { underline = true },
-                }
+        opts = {
+            cursorline = {
+                enable = true,
+                timeout = 1000,
+                number = false,
+            },
+            cursorword = {
+                enable = true,
+                min_length = 3,
+                hl = { underline = true },
             }
-        end
+        }
     },
     {
         'nvim-lualine/lualine.nvim',
@@ -390,24 +386,22 @@ require("lazy").setup({
             -- 'nvim-tree/nvim-web-devicons',
             -- opt = true
         },
-        config = function(_,opts)
-            require('lualine').setup({
-                options = {
-                    theme = 'auto',
-                    icons_enabled = false,
-                    component_separators = { left = '|', right = '|' },
-                    section_separators = { left = '', right = '' },
-                },
-                sections = {
-                    lualine_a = {'mode'},
-                    lualine_b = {'branch', 'diff', 'diagnostics'},
-                    lualine_c = {'filename','searchcount'},
-                    lualine_x = {'encoding', 'fileformat', 'filetype'},
-                    lualine_y = {'progress'},
-                    lualine_z = {'location'}
-                },
-            })
-        end
+        opts = {
+            options = {
+                theme = 'auto',
+                icons_enabled = false,
+                component_separators = { left = '|', right = '|' },
+                section_separators = { left = '', right = '' },
+            },
+            sections = {
+                lualine_a = {'mode'},
+                lualine_b = {'branch', 'diff', 'diagnostics'},
+                lualine_c = {'filename','searchcount'},
+                lualine_x = {'encoding', 'fileformat', 'filetype'},
+                lualine_y = {'progress'},
+                lualine_z = {'location'}
+            },
+        }
     },
     {
         'akinsho/toggleterm.nvim',
@@ -421,9 +415,7 @@ require("lazy").setup({
     },
     {
         'fei6409/log-highlight.nvim',
-        config = function()
-            require('log-highlight').setup {}
-        end,
+        opts = {}
     },
     -- {
     --     'luochen1990/rainbow',
@@ -472,22 +464,23 @@ require("lazy").setup({
     --         require('jaq-nvim').setup(opts)
     --     end
     -- },
-    { -- This plugin
+    {
         "Zeioth/compiler.nvim",
-        -- cmd = {"CompilerOpen", "CompilerToggleResults", "CompilerRedo"},
         dependencies = { "stevearc/overseer.nvim", "nvim-telescope/telescope.nvim" },
         opts = {},
-        config = function (_,opts)
-            require('compiler').setup(opts)
-            -- Open compiler
-            vim.keymap.set('n', '<leader>rff', "<cmd>CompilerOpen<cr>", { noremap = true, silent = true })
-
-            -- Redo last selected option
-            vim.keymap.set('n', '<leader>rr',
-                "<cmd>CompilerStop<cr>" -- (Optional, to dispose all tasks before redo)
-                .. "<cmd>CompilerRedo<cr>",
-                { noremap = true, silent = true })
-        end
+        keys = {
+            {
+                '<leader>rff',
+                '<cmd>CompilerOpen<cr>',
+                mode = 'n', desc = 'Open Compiler', noremap = true, silent = true
+            },
+            {
+                '<leader>rr',
+                '<cmd>CompilerStop<cr><cmd>CompilerRedo<cr>',
+                mode = 'n', desc = 'Redo Last Compiler Option',
+                noremap = true, silent = true
+            },
+        },
     },
     { -- The task runner we use
         "stevearc/overseer.nvim",
@@ -505,10 +498,7 @@ require("lazy").setup({
     {
         'numToStr/Comment.nvim',
         event = "VeryLazy",
-        config = function(_,opts)
-            require('Comment').setup()
-        end
-
+        opts = {}
     },
     {
         'kevinhwang91/nvim-bqf',
@@ -579,33 +569,18 @@ require("lazy").setup({
     {
         'kylechui/nvim-surround',
         event = "VeryLazy",
-        config = function(_,opts)
-            require("nvim-surround").setup({
-                -- Configuration here, or leave empty to use defaults
-            })
-        end
+        opts = {},
     },
     {
         'phaazon/hop.nvim',
         branch = 'v2', -- optional but strongly recommended
         enabled = true,
         event = "VeryLazy",
-        config = function(_,opts)
-            local hop = require('hop')
-            hop.setup()
-            -- you can configure Hop the way you like here; see :h hop-config
-            -- hop.setup({
-            --     create_hl_autocmd = false,
-            -- })
-            vim.keymap.set('n', '<space>', function()
-                hop.hint_char1()
-            end, {remap=true, desc='Hop to char'})
-
-            vim.keymap.set('', '<leader>hp', function()
-                hop.hint_patterns()
-            end, {remap=true, desc='Hop Pattern'})
-            -- vim.api.nvim_command('highlight default link HopPreview HopNextKey' )
-        end
+        opts = {},
+        keys = {
+            { '<space>', function() require('hop').hint_char1() end, mode = 'n', desc = 'Hop to char', remap = true },
+            { '<leader>hp', function() require('hop').hint_patterns() end, desc = 'Hop Pattern', remap = true },
+        },
     },
     {
         'folke/flash.nvim',
@@ -1275,7 +1250,7 @@ require("lazy").setup({
                     { name = 'vsnip'}
                 }),
                 formatting = {
-                    format = function(entry, vim_item)
+                    format = function(_, vim_item)
                         vim_item.abbr = string.sub(vim_item.abbr, 1, 20)
                         return vim_item
                     end
@@ -1581,7 +1556,7 @@ require("lazy").setup({
             local cache_dir = ( env.XDG_CACHE_HOME and env.XDG_CACHE_HOME or env.HOME .. '/.cache' ) .. '/jdtls'
 
             -- We using mason-lspconfig, not using it according to readme
-            local jdtls = require('jdtls')
+            -- local jdtls = require('jdtls')
             local mason_root = require('mason.settings').current.install_root_dir
             local root_markers = {'javaroot', '.repo', 'gradlew', 'settings.gradle.kts'}
             local root_dir = require('jdtls.setup').find_root(root_markers)
@@ -1782,7 +1757,7 @@ require("lazy").setup({
                 -- See: https://github.com/jay-babu/mason-nvim-dap.nvim/tree/main/lua/mason-nvim-dap/mappings/adapters
                 -- mason not implementation it
                 -- javadbg = nil,
-                javadbg = function (config)
+                javadbg = function (_)
                     -- leava it to nvim-jdtls to setup
                 end,
                 cppdbg = function (config) -- cpptools in mason
@@ -1838,7 +1813,7 @@ require("lazy").setup({
                     }
                 }
             }
-        end
+        end,
     },
     -- {
     --     "cappyzawa/trim.nvim",
@@ -1966,7 +1941,7 @@ require("lazy").setup({
             vim.api.nvim_create_autocmd('LspAttach', {
                 group = vim.api.nvim_create_augroup('LspsagaKeymaps', {}),
                 callback = function(args)
-                    local client = vim.lsp.get_client_by_id(args.data.client_id)
+                    -- local client = vim.lsp.get_client_by_id(args.data.client_id)
 
                     local map = vim.keymap.set
                     local bufnr = args.buf
@@ -2033,7 +2008,15 @@ require("lazy").setup({
         enabled = false,
         version = false, -- set this if you want to always pull the latest change
         opts = {
-            -- add any opts here
+            provider = "ollama",
+            vendors = {
+                ollama = {
+                    __inherited_from = "openai",
+                    api_key_name = "",
+                    -- endpoint = "http://80/v1",
+                    model = "qwen2.5-coder",
+                },
+            },
         },
         -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
         build = "make",
@@ -2053,25 +2036,12 @@ require("lazy").setup({
                 ft = { "markdown", "Avante" },
             },
         },
-        config = function (_, opts)
-            require('avante_lib').load()
-            require('avante').setup ({
-                provider = "ollama",
-                vendors = {
-                    ollama = {
-                        __inherited_from = "openai",
-                        api_key_name = "",
-                        -- endpoint = "http://80/v1",
-                        model = "qwen2.5-coder",
-                    },
-                }
-            })
-        end
     },
 
 
     -- -------------------------------------------
-}, { -- Lazy.nvim Options
+    --- @diagnostic disable-next-line: missing-fields
+}, { -- @Lazy.nvim Options
         install = {
             -- install missing plugins on startup. This doesn't increase startup time.
             missing = true,
@@ -2355,7 +2325,7 @@ function PE.PrintTbl(tb)
     function RecuPrint(table , level)
         level = level or 1
         local indent = ""
-        for i = 1, level do
+        for _ = 1, level do
             indent = indent.."  "
         end
 
