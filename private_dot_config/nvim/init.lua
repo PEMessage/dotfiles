@@ -581,6 +581,7 @@ require("lazy").setup({
             { "<leader>rkk", mode = { "n" }, '<cmd>QuickRun<CR>', desc = "QuickRun" },
         },
     },
+    { 'wsdjeg/vim-fetch' },
     {
         "mg979/vim-visual-multi",
         event = 'VeryLazy',

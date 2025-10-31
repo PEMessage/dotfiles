@@ -818,6 +818,7 @@ call plug#begin(pe_runtimepath . '/plugged')
 
     Plug 'lambdalisue/vim-fern'
         nnoremap <silent><leader>b  :Fern . -drawer<CR>
+    Plug 'wsdjeg/vim-fetch'
 
     Plug 'justinmk/vim-dirvish'
     Plug 'roginfarrer/vim-dirvish-dovish', {'branch': 'main'}
