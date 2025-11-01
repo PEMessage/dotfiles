@@ -197,15 +197,14 @@ require("lazy").setup({
     --
     --     end,
     -- },
-    {
-        "Alexis12119/nightly.nvim",
-        lazy = false,
-        priority = 1000,
-        config = function()
-            vim.cmd.colorscheme "nightly"
-        end,
-    },
-
+    -- {
+    --     "Alexis12119/nightly.nvim",
+    --     lazy = false,
+    --     priority = 1000,
+    --     config = function()
+    --         vim.cmd.colorscheme "nightly"
+    --     end,
+    -- },
     {
         'navarasu/onedark.nvim',
         lazy = false,
@@ -802,6 +801,25 @@ require("lazy").setup({
             enable = false,
             max_lines = 3
         }
+    },
+    {
+        'HiPhish/rainbow-delimiters.nvim'
+    },
+    {
+        'ckolkey/ts-node-action',
+        opts = {},
+        keys = {
+            {
+                -- Choose your own keys, this works for me
+                "M",
+                '<cmd>lua require("ts-node-action").node_action()<CR>',
+                mode = {
+                    "v",
+                    "n"
+                },
+                desc = "Trigger Node Action",
+            },
+        },
     },
     {
         "utilyre/barbecue.nvim",
