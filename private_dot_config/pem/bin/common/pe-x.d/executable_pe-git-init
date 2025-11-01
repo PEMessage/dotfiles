@@ -41,7 +41,9 @@ git_config_global alias.di 'diff'
 git_config_global alias.dis 'diff --staged'
 git_config_global alias.dfs 'diff --staged'
 git_config_global alias.ddf 'difftool --ignore-submodules --dir-diff --no-symlinks --tool=dirdiff'
+git_config_global alias.nddf 'difftool --ignore-submodules --dir-diff --no-symlinks --tool=ndirdiff'
 git_config_global difftool.dirdiff.cmd 'dirdiff $LOCAL $REMOTE'
+git_config_global difftool.ndirdiff.cmd 'ndirdiff $LOCAL $REMOTE'
 git_config_global difftool.xxd.cmd "bash -c 'vimdiff <(xxd \$1) <(xxd \$2)' -- \$LOCAL \$REMOTE"
 git_config_global alias.rflog 'reflog --date=format:'"'"'%y-%m-%d %H:%M'"'"
 git_config_global alias.contain \

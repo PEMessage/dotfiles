@@ -183,7 +183,7 @@ let g:startify_custom_header = [
     "     set shortmess-=S
     " endif
 
-    set diffopt+=iwhite
+    set diffopt+=iwhite,linematch:60
     " zf to fold, zo to open, zd to delete
     set foldmethod=manual
 

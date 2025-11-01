@@ -56,7 +56,7 @@ local section = function ()
     vim.o.ffs          = 'unix,dos,mac' -- 文件换行符，默认使用 unix 换行符
     vim.o.mouse        = 'a'
     -- vim.o.diffopt = "linematch:60"
-    vim.o.diffopt = "internal,algorithm:patience"
+    vim.o.diffopt = vim.o.diffopt .. ",internal,algorithm:patience,iwhite"
     -- -------------------------------------------
     -- 3.3 Search Zone
     -- -------------------------------------------
@@ -215,11 +215,19 @@ require("lazy").setup({
             colors = {
                 pe_gray = "#7c8dab",    -- define a new color
                 pe_blue = "#499cff",    -- define a new color
+                bg0 = "#1f2329",
+                bg1 = "#282c34",
+                bg2 = "#30363f",
+                bg3 = "#323641",
+                bg_d = "#181b20",
+                bg_blue = "#61afef",
+                bg_yellow = "#e8c88c",
             },
             highlights = {
                 Comment = {fg = '$pe_gray'},
                 ['@comment'] = {fg = '$pe_gray'},
                 ['@lsp.type.comment'] = {fg = '$pe_gray'},
+                -- DiffAdd = {bg = '#8bcd5b', fg = '#1a212e'},
             },
 
             code_style = {
