@@ -692,6 +692,11 @@ require("lazy").setup({
         },
     },
     {
+        "julienvincent/hunk.nvim",
+        dependencies = { 'MunifTanjim/nui.nvim' },
+        cmd = { "DiffEditor" },
+    },
+    {
         "christoomey/vim-tmux-navigator",
         -- Do not use very lazy prevent not init
         -- event = 'VeryLazy',
