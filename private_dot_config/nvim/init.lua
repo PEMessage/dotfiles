@@ -2036,7 +2036,7 @@ require("lazy").setup({
                 runtime = "r ",
                 require = "req: ",
                 source = "src:  ",
-                start = "start",
+                start = "",
                 task = "t",
                 list = {
                     "-",
