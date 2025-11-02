@@ -709,18 +709,15 @@ require("lazy").setup({
     {
         "christoomey/vim-tmux-navigator",
         -- Do not use very lazy prevent not init
-        -- event = 'VeryLazy',
-        config = function()
+        lazy = true,
+        keys = {
+            { "<M-S-h>", "<cmd>TmuxNavigateLeft<cr>", mode = {"n", "i", "v", "t"}, desc = "Navigate Left" },
+            { "<M-S-j>", "<cmd>TmuxNavigateDown<cr>", mode = {"n", "i", "v", "t"}, desc = "Navigate Down" },
+            { "<M-S-k>", "<cmd>TmuxNavigateUp<cr>", mode = {"n", "i", "v", "t"}, desc = "Navigate Up" },
+            { "<M-S-l>", "<cmd>TmuxNavigateRight<cr>", mode = {"n", "i", "v", "t"}, desc = "Navigate Right" },
+        },
+        init = function()
             vim.g.tmux_navigator_no_mappings = 1
-            vim.keymap.set( {'n','i','v','t'},  '<M-S-h>', '<cmd>TmuxNavigateLeft<cr>' , { silent = true, desc = "Navigate Left"  } )
-            vim.keymap.set( {'n','i','v','t'},  '<M-S-j>', '<cmd>TmuxNavigateDown<cr>' , { silent = true, desc = "Navigate Down"  } )
-            vim.keymap.set( {'n','i','v','t'},  '<M-S-k>', '<cmd>TmuxNavigateUp<cr>'   , { silent = true, desc = "Navigate Up"    } )
-            vim.keymap.set( {'n','i','v','t'},  '<M-S-l>', '<cmd>TmuxNavigateRight<cr>', { silent = true, desc = "Navigate Right" } )
-
-
-            -- vim.keymap.set( 'n',  '<leader>`pon', ':set mouse=a<CR>', { silent = true, desc = "Mouse on" } )
-            -- vim.keymap.set( 'n',  '<leader>`pof', ':set mouse=<CR>', { silent = true, desc = "Mouse off" } )
-
             -- 注册命令
             vim.cmd([[
                 command! -nargs=0 PEMouseON lua PE.MouseSet("a")
