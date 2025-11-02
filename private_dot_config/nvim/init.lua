@@ -267,6 +267,12 @@ require("lazy").setup({
         end,
     },
     {
+        'nvim-mini/mini.icons',
+        opts = {
+            style = 'ascii',
+        }
+    },
+    {
         "lukas-reineke/indent-blankline.nvim",
         -- The indent that always exist one
         enabled = true,
@@ -703,6 +709,16 @@ require("lazy").setup({
     },
     {
         "julienvincent/hunk.nvim",
+        opts = {
+            -- icons = {
+            --     selected = "*",
+            --     deselected = "",
+            --     partially_selected = "",
+            --
+            --     folder_open = ">",
+            --     folder_closed = "-",
+            -- },
+        },
         dependencies = { 'MunifTanjim/nui.nvim' },
         cmd = { "DiffEditor" },
     },
