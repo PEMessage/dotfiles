@@ -579,6 +579,9 @@ require("lazy").setup({
         end,
     },
     {
+        'tpope/vim-rsi',
+    },
+    {
         'axelf4/vim-strip-trailing-whitespace',
         event = {'InsertEnter', 'BufEnter'}
     },
