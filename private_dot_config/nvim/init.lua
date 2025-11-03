@@ -751,72 +751,6 @@ require("lazy").setup({
     -- -------------------------------------------
     -- 5.4 Treesitter (HEAVY Zone after)
     -- -------------------------------------------
-    {
-        "nvim-treesitter/nvim-treesitter",
-        -- version = false, -- last release is way too old and doesn't work on Windows
-        -- enabled = false,
-        -- dependencies = {
-        --     'hiphish/rainbow-delimiters.nvim',
-        -- },
-        enabled = true,
-        build = ":TSUpdate",
-        event = { "BufReadPost", "BufNewFile" },
-        main = 'nvim-treesitter.configs',
-        opts = {
-            highlight = {
-                enable = true,
-                disable = { 'markdown', 'lua', 'make' },
-                additional_vim_regex_highlighting = false,
-            },
-            disable = function(lang,bufnr)
-                return lang == "ninjia" and vim.api.nvim_buf_line_count(bufnr) > 50000
-            end,
-            -- rainbow = {
-            --     enable = true,
-            --     -- disable = { "jsx", "cpp" }, list of languages you want to disable the plugin for
-            --     extended_mode = true, -- Also highlight non-bracket delimiters like html tags, boolean or table: lang -> boolean
-            --     max_file_lines = nil, -- Do not enable for files with more than n lines, int
-            --     -- colors = {}, -- table of hex strings
-            --     -- termcolors = {} -- table of colour name strings
-            -- },
-            indent = { enable = { 'python','lua'  } },
-            ensure_installed = {
-                'json',
-                'xml',
-                'css',
-                'vim',
-                'lua',
-                'c',
-                'cpp',
-                'make',
-                -- from lspsage:
-                -- You need to install the Treesitter markdown and markdown_inline parser.
-                -- If you are not sure if you have them, run :checkhealth
-                'markdown',
-                'markdown_inline',
-                'go',
-                'java',
-                'python',
-                'vimdoc',
-                'bash',
-                'kotlin',
-                'javascript',
-            },
-            incremental_selection = {
-                enable = true,
-                keymaps = {
-                    init_selection = '<CR>',
-                    node_incremental = '<CR>',
-                    node_decremental = '<BS>',
-                    scope_incremental = '<TAB>',
-                }
-            },
-
-        },
-        keys = {
-            { '<leader>ts', '<cmd>TSBufToggle highlight<CR>', mode = 'n', desc = 'Toggle Treesitter Highlight' },
-        },
-    },
     -- {
     --     'nvim-treesitter/nvim-treesitter',
     --     branch = 'main', -- required: main is the new rewrite
@@ -883,9 +817,16 @@ require("lazy").setup({
     --
     --                 local function enabled(feat, query)
     --                     local f = opts[feat] or {}
-    --                     return f.enable ~= false
-    --                         and not (type(f.disable) == "table" and vim.tbl_contains(f.disable, lang))
-    --                         and have(ft, query)
+    --                     if type(f.disable) == "table" and vim.tbl_contains(f.disable, lang) then
+    --                         return false
+    --                     end
+    --                     if type(f.enable) == "table" then
+    --                         return vim.tbl_contains(f.enable, lang) and have(ft, query)
+    --                     end
+    --                     if f.disable == true then
+    --                         return false
+    --                     end
+    --                     return have(ft, query)
     --                 end
     --
     --                 -- highlighting
@@ -906,40 +847,70 @@ require("lazy").setup({
     --         })
     --     end,
     -- },
-    -- {
-    --     "Corn207/ts-query-loader.nvim",
-    --     version = "*", -- Choose latest stable version
-    --     dependencies = {
-    --         "williamboman/mason.nvim",
-    --         "nvim-treesitter/nvim-treesitter",
-    --     },
-    --     opts = {
-    --         ensure_installed = {
-    --             'json',
-    --             'xml',
-    --             'css',
-    --             'vim',
-    --             'lua',
-    --             'c',
-    --             'cpp',
-    --             'make',
-    --             -- from lspsage:
-    --             -- You need to install the Treesitter markdown and markdown_inline parser.
-    --             -- If you are not sure if you have them, run :checkhealth
-    --             'markdown',
-    --             'markdown_inline',
-    --             'go',
-    --             'java',
-    --             'python',
-    --             'vimdoc',
-    --             'bash',
-    --             'kotlin',
-    --             'javascript',
-    --         },
-    --     },
-    -- },
+    {
+        'nvim-treesitter/nvim-treesitter',
+        dependencies = { 'williamboman/mason.nvim' },
+        branch = 'main', -- required: main is the new rewrite
+        build = ':TSUpdate', -- ensures parsers are updated
+        lazy = false, -- treesitter does NOT support lazy-loading
+    },
+    {
+        'MeanderingProgrammer/treesitter-modules.nvim',
+        dependencies = { 'nvim-treesitter/nvim-treesitter' },
+        opts = {
+            highlight = {
+                enable = true,
+                disable = { 'markdown', 'lua', 'make' },
+                additional_vim_regex_highlighting = false,
+            },
+            disable = function(lang,bufnr)
+                return lang == "ninjia" and vim.api.nvim_buf_line_count(bufnr) > 50000
+            end,
+            -- rainbow = {
+            --     enable = true,
+            --     -- disable = { "jsx", "cpp" }, list of languages you want to disable the plugin for
+            --     extended_mode = true, -- Also highlight non-bracket delimiters like html tags, boolean or table: lang -> boolean
+            --     max_file_lines = nil, -- Do not enable for files with more than n lines, int
+            --     -- colors = {}, -- table of hex strings
+            --     -- termcolors = {} -- table of colour name strings
+            -- },
+            indent = { enable = { 'python','lua'  } },
+            ensure_installed = {
+                'json',
+                'xml',
+                'css',
+                'vim',
+                'lua',
+                'c',
+                'cpp',
+                'make',
+                -- from lspsage:
+                -- You need to install the Treesitter markdown and markdown_inline parser.
+                -- If you are not sure if you have them, run :checkhealth
+                'markdown',
+                'markdown_inline',
+                'go',
+                'java',
+                'python',
+                'vimdoc',
+                'bash',
+                'kotlin',
+                'javascript',
+            },
+            incremental_selection = {
+                enable = true,
+                keymaps = {
+                    init_selection = '<CR>',
+                    node_incremental = '<CR>',
+                    node_decremental = '<BS>',
+                    scope_incremental = '<TAB>',
+                }
+            },
+        },
+    },
     {
         "nvim-treesitter/nvim-treesitter-context",
+        branch = 'main',
         opts = {
             enable = false,
             max_lines = 3
