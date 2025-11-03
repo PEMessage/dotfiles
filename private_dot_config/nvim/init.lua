@@ -1426,7 +1426,7 @@ require("lazy").setup({
         event = 'VeryLazy',
         opts = {
             registries = {
-                -- "github:PEMessage/mason-registry", -- custom mason registries, not used since 1.50.0 jdtls merged
+                "github:PEMessage/mason-registry", -- custom for tree-sitter-cli static
                 "github:mason-org/mason-registry",
             },
         }
@@ -1436,11 +1436,28 @@ require("lazy").setup({
         dependencies = {
             'williamboman/mason.nvim',
         },
-        opts = {
-            ensure_installed = {
-                'tree-sitter-cli',
-            },
-        },
+        opts = function()
+            local tree_sitter = 'tree-sitter-cli'  -- default
+
+            -- Check if we're on Linux and get distro info
+            if vim.fn.has('unix') == 1 then
+                local handle = io.open('/etc/os-release', 'r')
+                if handle then
+                    local content = handle:read('*a')
+                    handle:close()
+                    -- Check if it's Ubuntu 18.04
+                    if content:match('NAME=.*[Uu]buntu') and content:match('VERSION_ID="18%.04"') then
+                        tree_sitter = 'tree-sitter-cli-static'
+                    end
+                end
+            end
+
+            return {
+                ensure_installed = {
+                    tree_sitter,
+                },
+            }
+        end,
     },
     {
         'williamboman/mason-lspconfig.nvim',
