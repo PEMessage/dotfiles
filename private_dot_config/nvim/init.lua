@@ -861,6 +861,7 @@ require("lazy").setup({
     {
         'MeanderingProgrammer/treesitter-modules.nvim',
         dependencies = { 'nvim-treesitter/nvim-treesitter' },
+        lazy = false, -- treesitter does NOT support lazy-loading
         opts = {
             highlight = {
                 enable = true,
@@ -1092,7 +1093,9 @@ require("lazy").setup({
         end,
     },
     {
-        'nvim-telescope/telescope.nvim', tag = '0.1.8',
+        'nvim-telescope/telescope.nvim',
+        -- since we use nvim-treesitter main branch, we should use master bracnh
+        branch = 'master',
         enabled = true,
         dependencies = { 'nvim-lua/plenary.nvim' },
         cmd = "Telescope",
