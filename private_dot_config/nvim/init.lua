@@ -817,6 +817,127 @@ require("lazy").setup({
             { '<leader>ts', '<cmd>TSBufToggle highlight<CR>', mode = 'n', desc = 'Toggle Treesitter Highlight' },
         },
     },
+    -- {
+    --     'nvim-treesitter/nvim-treesitter',
+    --     branch = 'main', -- required: main is the new rewrite
+    --     build = ':TSUpdate', -- ensures parsers are updated
+    --     lazy = false, -- treesitter does NOT support lazy-loading
+    --     opts = {
+    --         ensure_installed = {
+    --             'json',
+    --             'xml',
+    --             'css',
+    --             'vim',
+    --             'lua',
+    --             'c',
+    --             'cpp',
+    --             'make',
+    --             -- from lspsage:
+    --             -- You need to install the Treesitter markdown and markdown_inline parser.
+    --             -- If you are not sure if you have them, run :checkhealth
+    --             'markdown',
+    --             'markdown_inline',
+    --             'go',
+    --             'java',
+    --             'python',
+    --             'vimdoc',
+    --             'bash',
+    --             'kotlin',
+    --             'javascript',
+    --         },
+    --         indent = { enable = true },
+    --         highlight = { enable = true },
+    --         folds = { enable = true },
+    --     },
+    --     config = function(_, opts)
+    --         -- Thanks:
+    --         -- https://www.reddit.com/r/neovim/comments/1kuj9xm/comment/mu6acjr/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+    --         -- https://github.com/xaaha/dev-env/blob/main/nvim/.config/nvim/lua/xaaha/plugins/lsp-nvim-treesitter.lua
+    --         local already_installed = require("nvim-treesitter.config").get_installed()
+    --         local need_install = vim.iter(opts.ensure_installed)
+    --             :filter(function(parser) return not vim.tbl_contains(already_installed, parser) end)
+    --             :totable()
+    --         require("nvim-treesitter").install(need_install)
+    --
+    --         local have = function (what, query)
+    --             what = what or vim.api.nvim_get_current_buf()
+    --             what = type(what) == "number" and vim.bo[what].filetype or what --[[@as string]]
+    --             local lang = vim.treesitter.language.get_lang(what)
+    --             if lang == nil or require("nvim-treesitter.config").get_installed()[lang] == nil then
+    --                 return false
+    --             end
+    --             if query and not vim.treesitter.query.get(lang, query) then
+    --                 return false
+    --             end
+    --             return true
+    --         end
+    --
+    --         -- https://github.com/LazyVim/LazyVim/blob/42c9f7152b9bd1a4f739b115390370c208dc2a55/lua/lazyvim/plugins/treesitter.lua#L101
+    --         vim.api.nvim_create_autocmd("FileType", {
+    --             group = vim.api.nvim_create_augroup("lazyvim_treesitter", { clear = true }),
+    --             callback = function(ev)
+    --                 local ft, lang = ev.match, vim.treesitter.language.get_lang(ev.match)
+    --                 if not have(ft) then
+    --                     return
+    --                 end
+    --
+    --                 local function enabled(feat, query)
+    --                     local f = opts[feat] or {}
+    --                     return f.enable ~= false
+    --                         and not (type(f.disable) == "table" and vim.tbl_contains(f.disable, lang))
+    --                         and have(ft, query)
+    --                 end
+    --
+    --                 -- highlighting
+    --                 if enabled("highlight", "highlights") then
+    --                     pcall(vim.treesitter.start, ev.buf)
+    --                 end
+    --
+    --                 -- indents
+    --                 if enabled("indent", "indents") then
+    --                     vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+    --                 end
+    --
+    --                 -- folds
+    --                 if enabled("folds", "folds") then
+    --                     vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+    --                 end
+    --             end,
+    --         })
+    --     end,
+    -- },
+    -- {
+    --     "Corn207/ts-query-loader.nvim",
+    --     version = "*", -- Choose latest stable version
+    --     dependencies = {
+    --         "williamboman/mason.nvim",
+    --         "nvim-treesitter/nvim-treesitter",
+    --     },
+    --     opts = {
+    --         ensure_installed = {
+    --             'json',
+    --             'xml',
+    --             'css',
+    --             'vim',
+    --             'lua',
+    --             'c',
+    --             'cpp',
+    --             'make',
+    --             -- from lspsage:
+    --             -- You need to install the Treesitter markdown and markdown_inline parser.
+    --             -- If you are not sure if you have them, run :checkhealth
+    --             'markdown',
+    --             'markdown_inline',
+    --             'go',
+    --             'java',
+    --             'python',
+    --             'vimdoc',
+    --             'bash',
+    --             'kotlin',
+    --             'javascript',
+    --         },
+    --     },
+    -- },
     {
         "nvim-treesitter/nvim-treesitter-context",
         opts = {
@@ -1336,6 +1457,17 @@ require("lazy").setup({
             registries = {
                 -- "github:PEMessage/mason-registry", -- custom mason registries, not used since 1.50.0 jdtls merged
                 "github:mason-org/mason-registry",
+            },
+        }
+    },
+    {
+        'WhoIsSethDaniel/mason-tool-installer.nvim',
+        dependencies = {
+            'williamboman/mason.nvim',
+        },
+        opts = {
+            ensure_installed = {
+                'tree-sitter-cli',
             },
         },
     },
