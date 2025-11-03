@@ -580,7 +580,8 @@ require("lazy").setup({
     -- 5.3 Legacy Plugin
     -- -------------------------------------------
     {
-        'yianwillis/vimcdoc'
+        'yianwillis/vimcdoc',
+        event = 'CmdlineEnter'
     },
     {
         'tpope/vim-sleuth',
@@ -592,6 +593,7 @@ require("lazy").setup({
     },
     {
         'tpope/vim-rsi',
+        event = { 'InsertEnter', 'CmdLineEnter' },
     },
     {
         'axelf4/vim-strip-trailing-whitespace',
@@ -634,6 +636,7 @@ require("lazy").setup({
     },
     {
         'PEMessage/vim-text-process',
+        event = { 'InsertEnter', 'CmdLineEnter' },
         config = function ()
             -- vim.g.textproc_inline_script = {
             --     ['format_json'] = 'python3 -c "import json.tool ; json.tool.main()"',
@@ -683,6 +686,7 @@ require("lazy").setup({
 
     {
         'lewis6991/gitsigns.nvim',
+        event = { "BufReadPre", "BufNewFile" },
         opts = {
             -- current_line_blame = true,
             current_line_blame_opts = {
@@ -911,6 +915,7 @@ require("lazy").setup({
     {
         "nvim-treesitter/nvim-treesitter-context",
         branch = 'main',
+        enabled = false,
         opts = {
             enable = false,
             max_lines = 3
