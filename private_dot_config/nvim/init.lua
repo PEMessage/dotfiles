@@ -429,6 +429,12 @@ require("lazy").setup({
         ft = 'log',
         opts = {}
     },
+    {
+        'MeanderingProgrammer/render-markdown.nvim',
+        -- if you use standalone mini plugins
+        dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' },
+        opts = {},
+    },
     -- {
     --     'luochen1990/rainbow',
     --     event = { "BufReadPost", "BufNewFile" },
