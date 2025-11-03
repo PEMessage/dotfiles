@@ -150,7 +150,8 @@ require("lazy").setup({
             vim.o.timeoutlen = 300
         end,
         opts = {
-            delay = 2000,
+            preset = "helix",
+            delay = 500,
             plugins = {
                 spelling = {
                     enabled = true, -- enabling this will show WhichKey when pressing z= to select spelling suggestions
@@ -1011,7 +1012,6 @@ require("lazy").setup({
 
             require('dropbar').setup(opts)
             local dropbar_api = require('dropbar.api')
-            vim.keymap.set('n', '<Leader>;', dropbar_api.pick, { desc = 'Pick symbols in winbar' })
             vim.keymap.set('n', '[;', dropbar_api.goto_context_start, { desc = 'Go to start of current context' })
             vim.keymap.set('n', '];', dropbar_api.select_next_context, { desc = 'Select next context' })
         end
