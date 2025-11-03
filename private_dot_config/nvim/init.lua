@@ -1447,7 +1447,7 @@ require("lazy").setup({
                     handle:close()
                     -- Check if it's Ubuntu 18.04
                     if content:match('NAME=.*[Uu]buntu') and content:match('VERSION_ID="18%.04"') then
-                        tree_sitter = 'tree-sitter-cli-static'
+                        tree_sitter = 'tree-sitter-cli-ub1804'
                     end
                 end
             end
