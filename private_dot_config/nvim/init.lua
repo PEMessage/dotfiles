@@ -715,6 +715,10 @@ require("lazy").setup({
                 '<leader>u', '<cmd>Gitsigns reset_hunk<cr>', mode = 'n',
                 desc = 'Reset git hunk', silent = true
             },
+            {
+                '<leader>a', '<cmd>Gitsigns stage_hunk<cr>', mode = 'n',
+                desc = 'Add(Stage) git hunk', silent = true
+            },
         },
     },
     {
