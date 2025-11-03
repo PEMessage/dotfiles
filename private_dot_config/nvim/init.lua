@@ -748,12 +748,6 @@ require("lazy").setup({
         },
         init = function()
             vim.g.tmux_navigator_no_mappings = 1
-            -- 注册命令
-            vim.cmd([[
-                command! -nargs=0 PEMouseON lua PE.MouseSet("a")
-                command! -nargs=0 PEMouseOFF lua PE.MouseSet("")
-                ]])
-
         end
     },
     -- -------------------------------------------
@@ -2392,7 +2386,9 @@ local section = function ()
         end
     end
     vim.keymap.set('n', '<leader>`d', PE.ToggleDiagnostics, { noremap = true, silent = true , desc = "Toggle diagnostic" })
-    -- Hide by default
+
+    vim.api.nvim_create_user_command('PEMouseON', function() vim.o.mouse = 'a' end, {})
+    vim.api.nvim_create_user_command('PEMouseOFF', function() vim.o.mouse = '' end, {})
 end ; section()
 
 -- 7. Function Zone
@@ -2497,11 +2493,6 @@ vim.api.nvim_set_keymap('', '<Leader>y', 'y:<C-U>lua PE.yank(vim.fn.getreg("@0")
     { noremap = false, silent = true, desc = "yank to 'yank'" })
 -- vim.keymap.set("v", "<leader>y",'"+y', { noremap = true, desc = "Copy to clipboard(Reg\")" })
 vim.keymap.set("x", "<space>",'y:<C-U>lua PE.yank(vim.fn.getreg("@0"))<CR>', { silent = true, noremap = true, desc = "yank to 'yank'" })
-
-
-function PE.MouseSet(arg)
-    vim.o.mouse = arg
-end
 
 
 function PE.ToggleQuickfix()
