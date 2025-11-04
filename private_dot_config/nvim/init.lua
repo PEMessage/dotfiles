@@ -922,6 +922,27 @@ require("lazy").setup({
         }
     },
     {
+        "Wansmer/sibling-swap.nvim",
+        opts = {
+            use_default_keymaps = false,
+        },
+        lazy = true,
+        keys = {
+            {
+                "[,",
+                '<cmd>lua require("sibling-swap").swap_with_left()<CR>',
+                mode = "n",
+                desc = "Swap with left sibling"
+            },
+            {
+                "],",
+                '<cmd>lua require("sibling-swap").swap_with_right()<CR>',
+                mode = "n",
+                desc = "Swap with right sibling"
+            }
+        }
+    },
+    {
         'HiPhish/rainbow-delimiters.nvim'
     },
     {
