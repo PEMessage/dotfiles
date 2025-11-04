@@ -55,10 +55,15 @@ else
     regex="$2"
 fi
 
+if [ -z "$OUT_DIR" ] ; then
+    OUT_DIR="out"
+fi
+
 
 if [ "$file" = auto ] ; then
     tcd .repo
-    files="$(find out/target/product -maxdepth 2 -name 'module-info.json')"
+    echo "Using OUTDIR: $OUT_DIR"
+    files="$(find $OUT_DIR/target/product -maxdepth 2 -name 'module-info.json')"
     for f in $files
     do
         echo "File: $f"
