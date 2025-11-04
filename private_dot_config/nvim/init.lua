@@ -444,9 +444,9 @@ require("lazy").setup({
             -- https://www.reddit.com/r/neovim/comments/1dvvdj3/how_to_easily_identify_highlight_groups/
             -- https://gist.github.com/roycrippen4/e65c8987f1e7a09959ea69e04362e15c
             -- https://gist.github.com/aaronedev/ef03f3460052ebd885bc08d5cc6bf190
-            vim.api.nvim_create_user_command("InspectFloat", function()
-                require("inspector").toggle_float_inspector()
-            end, {})
+            vim.api.nvim_create_user_command("InspectFloat",
+                'lua require("inspector").toggle_float_inspector()',
+                {})
 
             return {}
         end,
