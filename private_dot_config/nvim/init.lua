@@ -436,6 +436,21 @@ require("lazy").setup({
         dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' },
         opts = {},
     },
+    {
+        "PEMessage/inspector.nvim",
+        cmds = { 'InspectFloat' },
+        opts = function (_, _)
+            -- Thanks to:
+            -- https://www.reddit.com/r/neovim/comments/1dvvdj3/how_to_easily_identify_highlight_groups/
+            -- https://gist.github.com/roycrippen4/e65c8987f1e7a09959ea69e04362e15c
+            -- https://gist.github.com/aaronedev/ef03f3460052ebd885bc08d5cc6bf190
+            vim.api.nvim_create_user_command("InspectFloat", function()
+                require("inspector").toggle_float_inspector()
+            end, {})
+
+            return {}
+        end,
+    },
     -- {
     --     'luochen1990/rainbow',
     --     event = { "BufReadPost", "BufNewFile" },
@@ -553,10 +568,22 @@ require("lazy").setup({
     {
         'folke/flash.nvim',
         event = "VeryLazy",
-        enabled = false,
-        opts = {},
+        enabled = true,
+        opts = function ()
+            vim.cmd [[ highlight! link FlashMatch IncSearch ]]
+            return {
+                modes = {
+                    -- Disable search integration. Better to use "s" if I want flash search.
+                    -- If enabling this, make sure to remove the verymagic rebind
+                    -- (https://github.com/folke/flash.nvim/issues/278).
+                    search = {
+                        enabled = false,
+                    },
+                }
+            }
+        end,
         keys = {
-            { "<space>", mode = { "n", "x", "o" }, "<cmd>lua require('flash').jump()<CR>" , desc = "Flash" },
+            { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
             -- { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
             -- { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
             -- { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
