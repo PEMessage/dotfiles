@@ -438,7 +438,8 @@ require("lazy").setup({
     },
     {
         "PEMessage/inspector.nvim",
-        cmds = { 'InspectFloat' },
+        lazy = true,
+        cmd = { 'InspectFloat' },
         opts = function (_, _)
             -- Thanks to:
             -- https://www.reddit.com/r/neovim/comments/1dvvdj3/how_to_easily_identify_highlight_groups/
@@ -1658,7 +1659,7 @@ require("lazy").setup({
         'p00f/clangd_extensions.nvim',
         event = "LspAttach",
         ft = {'c', 'cpp'},
-        cmds = {
+        cmd = {
             'ClangdTypeHierarchy'
         }
     },
