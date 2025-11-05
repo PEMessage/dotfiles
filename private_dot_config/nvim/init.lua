@@ -243,6 +243,17 @@ require("lazy").setup({
             require('onedark').load()
         end,
     },
+    {
+        "backdround/improved-search.nvim",
+        keys = {
+            -- Search next / previous
+            { "n", "<cmd>lua require('improved-search').stable_next()<cr>", mode = {"n", "x", "o"}, desc = "Search next" },
+            { "N", "<cmd>lua require('improved-search').stable_previous()<cr>", mode = {"n", "x", "o"}, desc = "Search previous" },
+
+            -- Search selected text in visual mode
+            { "*", "<cmd>lua require('improved-search').in_place()<cr>", mode = "x", desc = "Search selection forward" },
+        },
+    },
     -- -------------------------------------------
     -- 5.1 Style Plugin
     -- -------------------------------------------
@@ -2396,6 +2407,28 @@ local section = function ()
         })
     end, { desc = 'Format selected range' })
 
+
+    vim.keymap.set('x', '&', function()
+        -- Save current search register
+        local prev_search = vim.fn.getreg('/')
+
+        local saved_register = vim.fn.getreg('v')
+        vim.cmd('noau normal! "vy')
+        local visual_selection = vim.fn.getreg('v')
+        vim.fn.setreg('v', saved_register)
+
+        local escaped_pattern = vim.fn.escape(visual_selection, '\\/.*$^~[]')
+
+        local new_pattern = escaped_pattern
+        if prev_search and prev_search ~= "" then
+            new_pattern = prev_search .. '\\|' .. escaped_pattern
+        end
+
+        vim.fn.setreg('/', new_pattern)
+        vim.fn.histadd('search', new_pattern)
+        vim.cmd('set hls')
+    end, { desc = 'Search selection and combine with previous' })
+
     vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('LspCustomKeyMaps', {}),
         callback = function(args)
@@ -2631,33 +2664,3 @@ vim.cmd [[
 
 vim.cmd [[ command! -nargs=+ -complete=command Redir let s:reg = @@ | redir @"> | silent execute <q-args> | redir END | new | pu | 1,2d_ | let @@ = s:reg ]]
 
-vim.cmd [[
-    function! VisualSelection(direction) range
-        let l:saved_reg = @"
-        execute "normal! gvy"
-
-        let l:pattern = escape(@", '\\/.*$^~[]')
-        let l:pattern = substitute(l:pattern, "\n$", "", "")
-
-        if a:direction == 'b'
-            execute "normal ?" . l:pattern . "\<CR>"
-        elseif a:direction == 'gv'
-            call CmdLine("vimgrep " . '/'. l:pattern . '/' . ' **/*.')
-        elseif a:direction == 'replace'
-            call CmdLine("%s" . '/'. l:pattern . '/')
-        elseif a:direction == 'f'
-            execute "normal /" . l:pattern . "\<CR>"
-        elseif a:direction == 'fa'
-            let l:tmp = @/
-            let l:pattern = l:tmp . "\\|" . l:pattern
-            echo l:pattern
-            execute "normal /" . l:pattern . "\<CR>"
-        endif
-
-        let @/ = l:pattern
-        let @" = l:saved_reg
-        " set hls
-    endfunction
-
-]]
-vim.keymap.set('v', '&', ':<C-u>call VisualSelection(\'fa\')<CR>:set hls<CR>', { silent = true })
