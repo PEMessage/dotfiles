@@ -254,6 +254,37 @@ require("lazy").setup({
             { "*", "<cmd>lua require('improved-search').in_place()<cr>", mode = "x", desc = "Search selection forward" },
         },
     },
+    {
+        'mangelozzi/rgflow.nvim',
+        opts = {
+            -- Set the default rip grep flags and options for when running a search via
+            -- RgFlow. Once changed via the UI, the previous search flags are used for
+            -- each subsequent search (until Neovim restarts).
+            cmd_flags = "--smart-case --fixed-strings --ignore --max-columns 200",
+
+            default_ui_mappings = true,
+            default_quickfix_mappings = false,
+
+            mappings = {
+                trigger = {
+                    n = {
+                        ["<c-k>"] = "open_cword",      -- Open UI - search pattern = <cword>
+                    },
+                    x = {
+                        ["<c-k>"] = "open_visual", -- Open UI - search pattern = current visual selection
+                    },
+                },
+                ui = {
+                    -- Normal mode maps
+                    n = {
+                        ["<c-c>"] = "close",         -- With the ui open, discard and close the UI window
+                    },
+                },
+            }
+
+
+        }
+    },
     -- -------------------------------------------
     -- 5.1 Style Plugin
     -- -------------------------------------------

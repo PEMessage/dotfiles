@@ -815,6 +815,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:grepper.operator = {}
         let g:grepper.operator.prompt = 1
         vnoremap <C-k> <plug>(GrepperOperator)
+    Plug 'duane9/nvim-rg'
 
     Plug 'lambdalisue/vim-fern'
         nnoremap <silent><leader>b  :Fern . -drawer<CR>
