@@ -649,6 +649,43 @@ require("lazy").setup({
     },
     { 'wsdjeg/vim-fetch' },
     {
+        "terryma/vim-expand-region",
+        dependencies = {
+            'kana/vim-textobj-user',
+            'kana/vim-textobj-line',
+        },
+        keys = {
+            { "<CR>", mode = { "n", "v", "x" }, "<Plug>(expand_region_expand)", desc = "Expand region expand" },
+            { "<BS>", mode = { "n", "v", "x" }, "<Plug>(expand_region_shrink)", desc = "Expand region shrink" },
+        },
+        init = function()
+            vim.g.expand_region_text_objects = {
+                ['iw'] = 0,
+                ['iW'] = 0,
+                ['i"'] = 0,
+                ['a"'] = 0,
+                ["i'"] = 0,
+                ["a'"] = 0,
+                ['i]'] = 0,
+                ['a]'] = 0,
+                ['i)'] = 0,
+                ['a)'] = 0,
+                ['i}'] = 1,
+                ['a}'] = 1,
+                ['il'] = 1,
+            }
+        end
+    },
+
+    -- {
+    --     'gorkunov/smartpairs.vim',
+    --     init = function ()
+    --         vim.g.smartpairs_key = 'v'
+    --         vim.g.smartpairs_nextpairs_key = 'v'
+    --         vim.g.smartpairs_revert_key = '<BS>'
+    --     end
+    -- },
+    {
         "mg979/vim-visual-multi",
         event = 'VeryLazy',
         enabled = true,
