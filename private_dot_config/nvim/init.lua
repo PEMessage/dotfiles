@@ -250,7 +250,7 @@ require("lazy").setup({
         -- active indent guide and indent text objects
         -- indent animation
         "nvim-mini/mini.indentscope",
-        version = false, -- wait till new 0.7.0 release to put it back on semver
+        version = false, -- wait till new 3.7.0 release to put it back on semver
         enabled = true,
         event = { "BufReadPre", "BufNewFile" },
         opts = function()
@@ -267,6 +267,15 @@ require("lazy").setup({
             }
         end,
     },
+    -- {
+    --     'nvim-mini/mini.align',
+    --     lazy = false,
+    --     mappings = {
+    --         start = 'ga',
+    --         start_with_preview = 'gA',
+    --     },
+    --     version = '*'
+    -- },
     {
         'nvim-mini/mini.icons',
         opts = {
@@ -285,7 +294,7 @@ require("lazy").setup({
         --         char = '┆',
         --         filetype_exclude = { "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy", "mason" },
         --     })
-        --     vim.cmd [[highlight IndentBlanklineChar guifg=#455574 gui=nocombine]]
+        --     vim.cmd [[highlight IndentBlanklineChar guifg=#455573 gui=nocombine]]
         -- end
         --
         -- Version 3
@@ -619,6 +628,10 @@ require("lazy").setup({
         init = function()
             vim.cmd [[ command UnSleuth setlocal et sw=4 ts=4 ]]
         end,
+    },
+    {
+        'PEMessage/generate-ninja.vim',
+        ft = 'gn',
     },
     {
         'tpope/vim-rsi',
@@ -1420,12 +1433,18 @@ require("lazy").setup({
         end,
     },
     {
-        "j-hui/fidget.nvim",
+        "j-hui/fidget.nvim", -- LSP Progress message UI
         event = 'VeryLazy',
         opts = {
             -- options
         },
     },
+    -- {
+    --     "soulis-1256/eagle.nvim", -- LSP Mouse Hover
+    --     opts = {
+    --         --override the default values found in config.lua
+    --     }
+    -- },
     -- {
     --     "ray-x/lsp_signature.nvim",
     --     enabled = false,
