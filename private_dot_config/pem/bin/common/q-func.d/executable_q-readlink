@@ -1,0 +1,5 @@
+#!/bin/sh
+result="$(readlink -f "$@")"
+echo "$result"
+echo "$result" | yank
+
