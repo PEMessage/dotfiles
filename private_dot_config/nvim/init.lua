@@ -591,6 +591,7 @@ require("lazy").setup({
     },
     {
         'kevinhwang91/nvim-bqf',
+        dependencies = { 'junegunn/fzf' }, -- for fzf-mode under quickfix using `zf`
         ft = 'qf',
         opts = {
             auto_resize_height = true, -- highly recommended enable
