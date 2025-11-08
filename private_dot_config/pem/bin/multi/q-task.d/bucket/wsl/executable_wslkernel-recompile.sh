@@ -42,11 +42,32 @@ cp Microsoft/config-wsl .config
 # CONFIG_STAGING=y" | tee -a .config
 #
 # WSL Cuttlefish support, thanks to
-#   https://www.zhihu.com/question/307130942/answer/2948560140
-#   https://issuetracker.google.com/issues/329130377
-# Also need --enable_sandbox=false to make it work
+#   Know How:
+#       CONFIG_VHOST_VSOCK is /dev/vhost-vsock
+#       https://github.com/owninnn/my-notes/blob/master/cuttlefish-on-wsl.md know
+#   crosvm error:
+#       https://www.zhihu.com/question/307130942/answer/2948560140
+#       https://issuetracker.google.com/issues/329130377
+#       Also need --enable_sandbox=false to make it work
 # Full Cmd:
 #   HOME=$PWD ./bin/launch_cvd --enable_sandbox=false -webrtc_sig_server_port=8449
+#
+# Cuttlefish GPU explain:
+#   See: https://source.android.com/docs/devices/cuttlefish/gpu?hl=zh-cn
+#   --gpu_mode=gfxstream > --gpu_mode=drm_virgl
+#
+# vulkan not enable(not yet fix):
+#   Thanks: https://forums.developer.nvidia.com/t/vulkan-fails-to-detect-nvidia-gpu-on-wsl2-ubuntu-24-04-dzn-driver-files-missing-tested-on-multiple-systems/342142
+#   Official Blog: https://devblogs.microsoft.com/commandline/d3d12-gpu-video-acceleration-in-the-windows-subsystem-for-linux-now-available/
+#   use `vulkaninfo --summary` see PHYSICAL_DEVICE_TYPE_CPU
+#
+#   update new version of mesa
+#   ```
+#   sudo add-apt-repository ppa:kisak/turtle
+#   sudo apt update
+#   sudo apt upgrade
+#   ```
+#
 ./scripts/config --file .config \
     --enable CONFIG_ANDROID \
     --enable CONFIG_ANDROID_BINDER_IPC \
