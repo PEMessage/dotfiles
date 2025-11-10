@@ -48,15 +48,26 @@ cp Microsoft/config-wsl .config
 #   crosvm error:
 #       https://www.zhihu.com/question/307130942/answer/2948560140
 #       https://issuetracker.google.com/issues/329130377
-#       Also need --enable_sandbox=false to make it work
+#       Also need `--enable_sandbox=false` to make it work
+#
+#   crosvm mount update 2025-11-11:
+#       ```issue
+#       crosvm[1]: libminijail[1]: cannot mount '/usr/lib' as '/var/empty/usr/lib' with flags 0x1001: Invalid argument
+#       crosvm[1]: libminijail[1]: mount_one failed with /dev at '(null)'
+#       ```
+#       Thanks to:
+#           https://stackoverflow.com/a/79248399
+#           https://github.com/5ec1cff/my-notes/blob/master/cuttlefish-on-wsl.md
+#       It seem like create a simple dir called '/var/empty/usr/lib' fix this issue
+#
 # Full Cmd:
-#   HOME=$PWD ./bin/launch_cvd --enable_sandbox=false -webrtc_sig_server_port=8449
+#   HOME=$PWD ./bin/launch_cvd -webrtc_sig_server_port=8449
 #
 # Cuttlefish GPU explain:
 #   See: https://source.android.com/docs/devices/cuttlefish/gpu?hl=zh-cn
 #   --gpu_mode=gfxstream > --gpu_mode=drm_virgl
 #
-# vulkan not enable(not yet fix):
+# Vulkan not enable(not yet fix, and will cause other issue):
 #   Thanks: https://forums.developer.nvidia.com/t/vulkan-fails-to-detect-nvidia-gpu-on-wsl2-ubuntu-24-04-dzn-driver-files-missing-tested-on-multiple-systems/342142
 #   Official Blog: https://devblogs.microsoft.com/commandline/d3d12-gpu-video-acceleration-in-the-windows-subsystem-for-linux-now-available/
 #   use `vulkaninfo --summary` see PHYSICAL_DEVICE_TYPE_CPU
@@ -66,6 +77,11 @@ cp Microsoft/config-wsl .config
 #   sudo add-apt-repository ppa:kisak/turtle
 #   sudo apt update
 #   sudo apt upgrade
+#   ```
+#
+#   But this will cause `emulator` seguement fault, so we need to uninstall it
+#   ```
+#   sudo ppa-purge -d noble ppa:kisak/turtle
 #   ```
 #
 ./scripts/config --file .config \
