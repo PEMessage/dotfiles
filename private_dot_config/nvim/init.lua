@@ -1692,6 +1692,17 @@ require("lazy").setup({
             vim.lsp.config("*", {
                 inlay_hints = { enabled = true },
             })
+
+            -- See: https://github.com/LuaLS/lua-language-server/blob/996e21adedc503e92958105cb8e8959eaa9ab6f9/doc/en-us/config.md#hintenable
+            vim.lsp.config('lua_ls', {
+                settings = {
+                    Lua = {
+                        hint = {
+                            enable = true,
+                        },
+                    }
+                }
+            })
             -- Thanks to:
             -- https://github.com/derekzyl/nvim/blob/6537239beda2b54925bd7640cf384d086c7dc4ea/lua/inlay_hint.lua#L56C1-L67C7
             vim.lsp.config("gopls", {
