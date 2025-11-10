@@ -2523,6 +2523,16 @@ local section = function ()
         function() PE.ToggleOpts("wrap") end,
         { desc = "Toggle Word Wrap" })
 
+    vim.keymap.set('n', '<leader>ro', function()
+        vim.opt.readonly = not vim.opt.readonly
+        vim.opt.modifiable = true
+
+        if vim.opt.readonly then
+            print("Read-only mode enabled")
+        else
+            print("Writeable mode enabled")
+        end
+    end, { silent = true, desc = "Toggle readonly and set modifiable" })
 
     -- Also see @Line-Number
     vim.keymap.set("n", "<leader>nu",
@@ -2640,10 +2650,6 @@ function PE.PrintTbl(tb)
     return RecuPrint(tb)
 end
 
-function PE.CurrentFile()
-    print( vim.api.nvim_buf_get_name(0))
-end
-vim.cmd('command! PFile lua PE.CurrentFile()')
 
 vim.cmd('command! PCD :cd %:p:h')
 
@@ -2657,6 +2663,11 @@ function PE.yank(text)
         vim.fn.chansend(vim.v.stderr, escape)
     end
 end
+function PE.CurrentFile()
+    print(vim.api.nvim_buf_get_name(0))
+    PE.yank(vim.api.nvim_buf_get_name(0))
+end
+vim.cmd('command! PFile lua PE.CurrentFile()')
 
 -- Create a mapping
 vim.api.nvim_set_keymap('', '<Leader>y', 'y:<C-U>lua PE.yank(vim.fn.getreg("@0"))<CR>',
