@@ -40,7 +40,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 -- local LazyUtil = require("lazy.core.util")
 
-vim.keymap.set('i', 'jj', '<C-[>')
+-- vim.keymap.set('i', 'jj', '<C-[>')
 
 
 -- 3. Gernal Setting
@@ -175,6 +175,10 @@ require("lazy").setup({
             wk.add(defaults)
         end,
     },
+    -- {
+    --     "phanen/lazy-help.nvim",
+    --     ft = "lazy"
+    -- },
 
     { 'projekt0n/github-nvim-theme' },
     { 'catppuccin/nvim' },
@@ -979,7 +983,7 @@ require("lazy").setup({
         lazy = false, -- treesitter does NOT support lazy-loading
     },
     {
-        'PEMessage/treesitter-modules.nvim',
+        'MeanderingProgrammer/treesitter-modules.nvim',
         dependencies = { 'nvim-treesitter/nvim-treesitter' },
         lazy = false, -- treesitter does NOT support lazy-loading
         opts = {
