@@ -66,27 +66,11 @@ cp Microsoft/config-wsl .config
 #
 # Cuttlefish GPU explain:
 #   See: https://source.android.com/docs/devices/cuttlefish/gpu?hl=zh-cn
-#   --gpu_mode=gfxstream > --gpu_mode=drm_virgl
+#   --gpu_mode=gfxstream(vulkan) > --gpu_mode=drm_virgl(opnegl)
 #
-# Vulkan not enable(not yet fix, and will cause other issue):
-#   Thanks: https://forums.developer.nvidia.com/t/vulkan-fails-to-detect-nvidia-gpu-on-wsl2-ubuntu-24-04-dzn-driver-files-missing-tested-on-multiple-systems/342142
+# OpenGL hardware accerlate not work:
+#   Thanks to: https://forums.developer.nvidia.com/t/wsl2-ubuntu-24-04-lts-nvidia-gpu-detected-but-wslg-not-working-opengl-llvmpipe/347383
 #   Official Blog: https://devblogs.microsoft.com/commandline/d3d12-gpu-video-acceleration-in-the-windows-subsystem-for-linux-now-available/
-#   use `vulkaninfo --summary` see PHYSICAL_DEVICE_TYPE_CPU
-#
-#   update new version of mesa
-#   ```
-#   sudo add-apt-repository ppa:kisak/turtle
-#   sudo apt update
-#   sudo apt upgrade
-#   ```
-#
-#   But this will cause `emulator` seguement fault, so we need to uninstall it
-#   ```
-#   sudo ppa-purge -d noble ppa:kisak/turtle
-#   ```
-#
-# Update wsl to latest:
-#   https://forums.developer.nvidia.com/t/wsl2-ubuntu-24-04-lts-nvidia-gpu-detected-but-wslg-not-working-opengl-llvmpipe/347383
 #
 #   ```
 #   export MESA_D3D12_DEFAULT_ADAPTER_NAME=NVIDIA
@@ -94,6 +78,32 @@ cp Microsoft/config-wsl .config
 #   export LIBGL_ALWAYS_SOFTWARE=false
 #   ```
 #   `glxgear -info ` workfine
+#
+# Still not work?(OpenGL):
+#   `launch_cvd  -verbosity DEBUG --gpu_mode=drm_virgl` to see full log
+#   `rg 'was requested but the prerequisites'`
+#   https://github.com/google/android-cuttlefish/blob/8ea98b64f51fad897d1a97f9ab5673af8bcdad82/base/cvd/cuttlefish/host/commands/assemble_cvd/graphics_flags.cc#L171
+#   return (sufficient_gles2 || sufficient_gles3) && has_discrete_gpu
+#
+#   we need has_discrete_gpu to enable hardware accerlate
+#
+#   so install latest mesa for dozen(dx12 -> vulkan)
+#
+# Vulkan not enable(not yet fix, and will cause other issue):
+#   Thanks: https://forums.developer.nvidia.com/t/vulkan-fails-to-detect-nvidia-gpu-on-wsl2-ubuntu-24-04-dzn-driver-files-missing-tested-on-multiple-systems/342142
+#   use `vulkaninfo --summary` see PHYSICAL_DEVICE_TYPE_CPU
+#
+#   update new version of mesa
+#   ```
+#   sudo add-apt-repository ppa:kisak/turtle (ubuntu 22.04) or sudo add-apt-repository ppa:kisak/kisak-mesa (ubuntu 24.04)
+#   sudo apt update
+#   sudo apt upgrade
+#   ```
+#
+#   But if will encounter `emulator` seguement fault, so we need to uninstall it
+#   ```
+#   sudo ppa-purge -d noble ppa:kisak/turtle
+#   ```
 #
 ./scripts/config --file .config \
     --enable CONFIG_ANDROID \
