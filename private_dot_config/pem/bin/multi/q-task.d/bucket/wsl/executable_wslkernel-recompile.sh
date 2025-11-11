@@ -15,7 +15,8 @@
 #kernelver="WSL2-Linux-Kernel-4.19.121-microsoft-standard"
 #kernellink="https://github.com/microsoft/WSL2-Linux-Kernel/archive/${kernelver}.tar.gz"
 #kernelver="5.15.79.1"
-kernelver="5.15.167.4"
+
+kernelver="6.6.87.2"
 kernellinkname="linux-msft-wsl-${kernelver}"
 kerneldir="WSL2-Linux-Kernel-linux-msft-wsl-${kernelver}"
 #kernellink="https://github.com/microsoft/WSL2-Linux-Kernel/archive/${kernellinkname}.tar.gz"
@@ -84,6 +85,16 @@ cp Microsoft/config-wsl .config
 #   sudo ppa-purge -d noble ppa:kisak/turtle
 #   ```
 #
+# Update wsl to latest:
+#   https://forums.developer.nvidia.com/t/wsl2-ubuntu-24-04-lts-nvidia-gpu-detected-but-wslg-not-working-opengl-llvmpipe/347383
+#
+#   ```
+#   export MESA_D3D12_DEFAULT_ADAPTER_NAME=NVIDIA
+#   export GALLIUM_DRIVER=d3d12
+#   export LIBGL_ALWAYS_SOFTWARE=false
+#   ```
+#   `glxgear -info ` workfine
+#
 ./scripts/config --file .config \
     --enable CONFIG_ANDROID \
     --enable CONFIG_ANDROID_BINDER_IPC \
@@ -97,6 +108,8 @@ make olddefconfig
 
 # compile
 make -j $(expr $(nproc) - 1)
+make INSTALL_MOD_PATH="$PWD/modules" modules_install
+sudo ./Microsoft/scripts/gen_modules_vhdx.sh "$PWD/modules" $(make -s kernelrelease) modules.vhdx
 # sudo make modules_install
 
 # move new kernel to C drive

@@ -979,7 +979,7 @@ require("lazy").setup({
         lazy = false, -- treesitter does NOT support lazy-loading
     },
     {
-        'MeanderingProgrammer/treesitter-modules.nvim',
+        'PEMessage/treesitter-modules.nvim',
         dependencies = { 'nvim-treesitter/nvim-treesitter' },
         lazy = false, -- treesitter does NOT support lazy-loading
         opts = {
