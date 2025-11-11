@@ -349,7 +349,9 @@ require("lazy").setup({
             -- See: help hl-IblIndent
             -- Default: takes the values from |hl-Whitespace| when not defined ~
             -- So this set must be set before setup()
-            vim.cmd [[highlight IblIndent guifg=#455574 gui=nocombine]]
+            vim.cmd [[
+                highlight IblIndent guifg=#455574 gui=nocombine
+            ]]
             return {
                 debounce = 100,
                 indent = {
@@ -369,6 +371,9 @@ require("lazy").setup({
                         "mason"
                     }
                 },
+                scope = {
+                    enabled = false
+                }
             }
         end
     },
