@@ -855,7 +855,7 @@ require("lazy").setup({
     {
         'kana/vim-gf-diff',
         dependencies = {
-            'kana/vim-gf-user'
+            'PEMessage/vim-gf-user'
         },
         ft = 'diff',
     },

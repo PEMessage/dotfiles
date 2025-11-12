@@ -1211,7 +1211,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         " :h copy-diffs
         " :'<,'>diffget  do(diff obtain)
         " :'<,'>diffput. dp(diff put)
-    Plug 'kana/vim-gf-user'
+    Plug 'PEMessage/vim-gf-user'
     Plug 'kana/vim-gf-diff'
 
     Plug 'HiPhish/info.vim'
