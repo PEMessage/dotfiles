@@ -857,7 +857,7 @@ require("lazy").setup({
         dependencies = {
             'PEMessage/vim-gf-user'
         },
-        ft = 'diff',
+        ft = { 'diff', 'git' }
     },
     {
         "julienvincent/hunk.nvim",
