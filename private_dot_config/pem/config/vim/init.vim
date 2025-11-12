@@ -1211,6 +1211,9 @@ call plug#begin(pe_runtimepath . '/plugged')
         " :h copy-diffs
         " :'<,'>diffget  do(diff obtain)
         " :'<,'>diffput. dp(diff put)
+    Plug 'kana/vim-gf-user'
+    Plug 'kana/vim-gf-diff'
+
     Plug 'HiPhish/info.vim'
     Plug 'cohama/agit.vim' , { 'on': [ 'Agit' ] }
         " J			    <Plug>(agit-scrolldown-stat)
@@ -2772,3 +2775,18 @@ endif
 
     " You can map this to a key, for example:
     " nnoremap <Leader>h :call HighlightCurrentLineTemporarily()<CR>
+
+    function! FilenoDiff()
+        let d = gf#diff#investigate_the_hunk_under_the_cursor()
+        if empty(d)
+            echo "Not in a diff hunk"
+            return
+        endif
+
+        let lineno = gf#diff#calculate_better_lineno('to', d)
+        let path = d.to_path
+
+        call Yank(path . ':' . lineno)
+        echo path . ':' . lineno
+    endfunction
+    autocmd FileType diff command! -buffer Fileno call FilenoDiff()
