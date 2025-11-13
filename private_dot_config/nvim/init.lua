@@ -853,6 +853,13 @@ require("lazy").setup({
         },
     },
     {
+        'kana/vim-gf-diff',
+        dependencies = {
+            'kana/vim-gf-user'
+        },
+        ft = 'diff',
+    },
+    {
         "julienvincent/hunk.nvim",
         opts = {
             -- icons = {
