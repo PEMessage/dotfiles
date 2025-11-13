@@ -33,6 +33,8 @@ tar -xf ${kerneldir}.tar.gz
 cd ${kerneldir}/
 cp Microsoft/config-wsl .config
 
+
+CONFIG=""
 # Add ashmem and binder
 # echo "CONFIG_ANDROID=y
 # CONFIG_ASHMEM=y
@@ -41,6 +43,13 @@ cp Microsoft/config-wsl .config
 # CONFIG_ANDROID_BINDER_DEVICES="binder,hwbinder,vndbinder"
 # CONFIG_ANDROID_BINDER_IPC_SELFTEST=y
 # CONFIG_STAGING=y" | tee -a .config
+CONFIG+=" --enable CONFIG_ANDROID"
+CONFIG+=" --enable CONFIG_ANDROID_BINDER_IPC"
+CONFIG+=" --set-str CONFIG_ANDROID_BINDER_DEVICES \"binder,hwbinder,vndbinder\""
+CONFIG+=" --enable CONFIG_ANDROID_BINDERFS"
+CONFIG+=" --enable CONFIG_STAGING"
+CONFIG+=" --enable CONFIG_ASHMEM"
+
 #
 # WSL Cuttlefish support, thanks to
 #   Know How:
@@ -104,16 +113,22 @@ cp Microsoft/config-wsl .config
 #   ```
 #   sudo ppa-purge -d noble ppa:kisak/turtle
 #   ```
+CONFIG+=" --enable CONFIG_KVM_GUEST"
+CONFIG+=" --enable CONFIG_VHOST_VSOCK"
+
+
 #
-./scripts/config --file .config \
-    --enable CONFIG_ANDROID \
-    --enable CONFIG_ANDROID_BINDER_IPC \
-    --set-str CONFIG_ANDROID_BINDER_DEVICES "binder,hwbinder,vndbinder" \
-    --enable CONFIG_ANDROID_BINDERFS \
-    --enable CONFIG_STAGING \
-    --enable CONFIG_ASHMEM \
-    --enable CONFIG_KVM_GUEST \
-    --enable CONFIG_VHOST_VSOCK
+# Add input Relate staff to allow virtual_touchscreen work,
+#
+# Userland interfaces
+CONFIG+=" --enable CONFIG_INPUT_EVDEV"
+CONFIG+=" --enable CONFIG_INPUT_MOUSEDEV"
+# Input Device Drivers
+CONFIG+=" --enable CONFIG_INPUT_KEYBOARD"
+CONFIG+=" --enable CONFIG_INPUT_MOUSE"
+CONFIG+=" --enable CONFIG_INPUT_TOUCHSCREEN"
+
+./scripts/config --file .config $CONFIG
 make olddefconfig
 
 # compile
