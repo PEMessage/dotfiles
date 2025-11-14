@@ -1203,6 +1203,8 @@ call plug#begin(pe_runtimepath . '/plugged')
         nmap [c <Plug>(GitGutterPrevHunk)
         nmap ]c <Plug>(GitGutterNextHunk)
         nmap <leader>u :GitGutterUndoHunk<CR>
+        nnoremap <expr> <leader>a &diff ? ':diffget<CR>' : ':GitGutterStageHunk<CR>'
+
     Plug 'will133/vim-dirdiff' , { 'on': [ 'DirDiff' ] }
         let g:DirDiffWindowSize = 7
     Plug 'samoshkin/vim-mergetool'
@@ -1234,7 +1236,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         " ri			<Plug>(agit-git-rebase-i)
         " di			<Plug>(agit-diff)
         " dl			<Plug>(agit-diff-with-local)
-        nnoremap <leader>ag :Agit<CR>
+        " nnoremap <leader>ag :Agit<CR>
 
 
 
@@ -1494,7 +1496,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         let g:vista#renderer#enable_icon = 0
         let g:vista_echo_cursor_strategy = "scroll"
         " nnoremap <leader>at :TagbarToggle<CR>
-        nnoremap <leader>av :Vista!!<CR>
+        " nnoremap <leader>av :Vista!!<CR>
     Plug 'Shougo/vinarise.vim'
 
     " This will do "imap \ihs so !!! DONT USE IT !!!
@@ -2199,7 +2201,6 @@ endif
         nmap <buffer> <leader>li :LspCallHierarchyIncoming<CR>
         nmap <buffer> <leader>lo :LspCallHierarchyOutgoing<CR>
         nmap <buffer> <M-h> :LspDocumentSwitchSourceHeader<CR>
-        nnoremap <leader>av :Vista vim_lsp<CR>
         nnoremap <buffer> <leader>q :LspCodeAction --ui=float<CR>
         " nnoremap <buffer> <expr><c-f> lsp#scroll(+4)
         " nnoremap <buffer> <expr><c-d> lsp#scroll(-4)

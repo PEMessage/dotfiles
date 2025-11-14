@@ -20,7 +20,7 @@ elif [ -f "$first_args" ] ; then
     head10="$(head -n10 "$first_args" | grep '//.*q-gcc:' | cut -d : -f 2-)"
     source_file="$first_args"
     if [ -n "$head10" ] ; then
-        $0 INTERNAL_CALL $source_file $head10 "$@"
+        eval $0 INTERNAL_CALL $source_file $head10 "$@"
         exit $?
     fi
 else

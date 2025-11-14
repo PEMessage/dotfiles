@@ -1025,6 +1025,7 @@ require("lazy").setup({
                 'c',
                 'cpp',
                 'make',
+                'cmake',
                 -- from lspsage:
                 -- You need to install the Treesitter markdown and markdown_inline parser.
                 -- If you are not sure if you have them, run :checkhealth
