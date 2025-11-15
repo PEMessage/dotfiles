@@ -1019,13 +1019,16 @@ require("lazy").setup({
             ensure_installed = {
                 'json',
                 'xml',
+                'toml',
                 'css',
+                'html',
                 'vim',
                 'lua',
                 'c',
                 'cpp',
                 'make',
                 'cmake',
+                'gn',
                 'bash',
                 -- from lspsage:
                 -- You need to install the Treesitter markdown and markdown_inline parser.
