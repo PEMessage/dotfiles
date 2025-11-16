@@ -832,7 +832,7 @@ require("lazy").setup({
         },
         keys = {
             {
-                '<leader>`1', '<cmd>Gitsigns toggle_current_line_blame<cr>', mode = 'n',
+                '<leader>gb', '<cmd>Gitsigns toggle_current_line_blame<cr>', mode = 'n',
                 desc = 'Toggle line blame', silent = true
             },
             {
@@ -844,12 +844,13 @@ require("lazy").setup({
                 desc = 'Next git changed line', silent = true
             },
             {
-                '<leader>u', '<cmd>Gitsigns reset_hunk<cr>', mode = 'n',
+                --- @note if we want pass range to cmd, we must use : instead of <cmd>
+                '<leader>u', ':Gitsigns reset_hunk<cr>', mode = {'n', 'v'},
                 desc = 'Reset git hunk', silent = true
             },
             {
-                '<leader>a', '<cmd>Gitsigns stage_hunk<cr>', mode = 'n',
-                desc = 'Add(Stage) git hunk', silent = true
+                '<leader>a', ':Gitsigns stage_hunk<cr>', mode = {'n', 'v'},
+                desc = 'Add(Stage) or Toggle git hunk', silent = true
             },
         },
     },
