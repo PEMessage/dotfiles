@@ -599,7 +599,7 @@ require("lazy").setup({
         opts = {}
     },
     {
-        'PEMessage/nvim-bqf',
+        'kevinhwang91/nvim-bqf',
         enabled = true,
         dependencies = { 'junegunn/fzf' }, -- for fzf-mode under quickfix using `zf`
         ft = 'qf',
