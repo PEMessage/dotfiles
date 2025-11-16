@@ -2178,6 +2178,18 @@ require("lazy").setup({
         },
     },
     {
+        "danymat/neogen",
+        dependencies = {
+            'hrsh7th/vim-vsnip',
+            -- 'saadparwaiz1/cmp_luasnip',
+        },
+        opts = {
+            snippet_engine = "vsnip"
+        },
+        -- Uncomment next line if you want to follow only stable versions
+        -- version = "*"
+    },
+    {
 
         'nvimdev/lspsaga.nvim',
         -- Note: this also have barbecue.nvim feature something like
