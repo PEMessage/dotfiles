@@ -828,7 +828,9 @@ require("lazy").setup({
                 ignore_whitespace = false,
                 virt_text_priority = 100,
             },
-
+            diff_opts = {
+                ignore_whitespace = false,
+            },
         },
         keys = {
             {
