@@ -1554,9 +1554,17 @@ require("lazy").setup({
     {
         "j-hui/fidget.nvim", -- LSP Progress message UI
         event = 'VeryLazy',
-        opts = {
-            -- options
-        },
+        cmds =  { 'NotifyHistory' },
+        opts = function ()
+            vim.api.nvim_create_user_command('NotifyHistory',
+                'lua require("fidget.notification").show_history()'
+                ,{})
+            return {
+                notification = {
+                    override_vim_notify = true,
+                }
+            }
+        end
     },
     -- {
     --     "soulis-1256/eagle.nvim", -- LSP Mouse Hover
@@ -2631,6 +2639,26 @@ local section = function ()
 
     vim.api.nvim_create_user_command('PEMouseON', function() vim.o.mouse = 'a' end, {})
     vim.api.nvim_create_user_command('PEMouseOFF', function() vim.o.mouse = '' end, {})
+
+    vim.api.nvim_create_user_command('ToggleWhitespace', function()
+        local current_diffopt = vim.o.diffopt
+        local has_iwhite = string.find(current_diffopt, 'iwhite') ~= nil
+
+        if has_iwhite then
+            -- Remove iwhite from diffopt
+            vim.o.diffopt = current_diffopt:gsub(',?iwhite', '')
+            vim.notify("Whitespace ignoring disabled")
+        else
+            -- Add iwhite to diffopt
+            if current_diffopt == '' then
+                vim.o.diffopt = 'iwhite'
+            else
+                vim.o.diffopt = current_diffopt .. ',iwhite'
+            end
+            vim.notify("Whitespace ignoring enabled")
+        end
+    end, {})
+    vim.keymap.set('n', '<leader>tw', '<cmd>ToggleWhitespace<CR>')
 end ; section()
 
 -- 7. Function Zone
