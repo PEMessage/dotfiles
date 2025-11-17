@@ -436,19 +436,33 @@ require("lazy").setup({
         keys = {
         }
     },
+    -- {
+    --     'yamatsum/nvim-cursorline',
+    --     enabled = false,
+    --     opts = {
+    --         cursorline = {
+    --             enable = true,
+    --             timeout = 1000,
+    --             number = false,
+    --         },
+    --         cursorword = {
+    --             enable = false,
+    --             -- min_length = 3,
+    --             -- hl = { underline = true },
+    --         }
+    --     }
+    -- },
     {
-        'yamatsum/nvim-cursorline',
+        'nvim-mini/mini.cursorword',
         opts = {
-            cursorline = {
-                enable = true,
-                timeout = 1000,
-                number = false,
-            },
-            cursorword = {
-                enable = true,
-                min_length = 3,
-                hl = { underline = true },
-            }
+            delay = 300,
+        },
+        version = false
+    },
+    {
+        "delphinus/auto-cursorline.nvim",
+        opts = {
+             wait_ms = 1000,
         }
     },
     {
