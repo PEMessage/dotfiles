@@ -86,6 +86,7 @@ local section = function ()
         menu PopUp.Go\ to\ Define <c-]>
         menu PopUp.Back\  <c-t>
     ]]
+    vim.cmd [[ set cinkeys-=0# ]]
     -- -------------------------------------------
     -- 3.5 Windows Setting
     -- -------------------------------------------
@@ -627,6 +628,13 @@ require("lazy").setup({
         },
     },
     {
+        'stevearc/quicker.nvim',
+        ft = "qf",
+        ---@module "quicker"
+        ---@type quicker.SetupOptions
+        opts = {},
+    },
+    {
         'kylechui/nvim-surround',
         event = "VeryLazy",
         opts = {},
@@ -645,7 +653,7 @@ require("lazy").setup({
     {
         'folke/flash.nvim',
         event = "VeryLazy",
-        enabled = true,
+        enabled = false,
         opts = function ()
             vim.cmd [[ highlight! link FlashMatch IncSearch ]]
             return {
@@ -689,7 +697,7 @@ require("lazy").setup({
         event = 'CmdlineEnter'
     },
     {
-        'tpope/vim-sleuth',
+        'tpope/vim-sleuth', -- Maybe nmac427/guess-indent.nvim ?
         cmd = {'Sleuth'},
         lazy = true,
         init = function()
@@ -876,6 +884,11 @@ require("lazy").setup({
             'PEMessage/vim-gf-user'
         },
         ft = { 'diff', 'git' }
+    },
+    {
+        'trevorhauter/gitportal.nvim',
+        enabled = false,
+        opts = {}
     },
     {
         "julienvincent/hunk.nvim",
@@ -2496,18 +2509,19 @@ local section = function ()
     vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition, { desc = 'Go to Declaration' })
     vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, { desc = 'Go to Declaration' })
     -- Format entire document (Normal mode)
-    vim.keymap.set('n', '<leader>F', vim.lsp.buf.format, { desc = 'Format entire document' })
+    -- Recommand using `gq` (vim native) to call formatexpr or formatprg
+    vim.keymap.set({'n', 'v'}, '<leader>f', vim.lsp.buf.format, { desc = 'Format entire document' })
     -- Format selected range (Visual mode)
-    vim.keymap.set('v', '<leader>F', function()
-        local start_row = vim.api.nvim_buf_get_mark(0, '<')[1]
-        local end_row = vim.api.nvim_buf_get_mark(0, '>')[1]
-        vim.lsp.buf.format({
-            range = {
-                ['start'] = { start_row, 0 },
-                ['end'] = { end_row, 0 },
-            },
-        })
-    end, { desc = 'Format selected range' })
+    -- vim.keymap.set('v', '<leader>F', function()
+    --     local start_row = vim.api.nvim_buf_get_mark(0, '<')[1]
+    --     local end_row = vim.api.nvim_buf_get_mark(0, '>')[1]
+    --     vim.lsp.buf.format({
+    --         range = {
+    --             ['start'] = { start_row, 0 },
+    --             ['end'] = { end_row, 0 },
+    --         },
+    --     })
+    -- end, { desc = 'Format selected range' })
 
 
     vim.keymap.set('x', '&', function()
