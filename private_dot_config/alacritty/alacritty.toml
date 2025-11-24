@@ -74,3 +74,14 @@ draw_bold_text_with_bright_colors = true
     magenta = '#b4009e'
     cyan    = '#61d6d6'
     white   = '#f2f2f2'
+
+[font]
+# apt install fonts-cascadia-code
+normal = { family = "Cascadia Mono PL", style = "Regular" }
+
+# NOTICE: windows terminal do not use Bold for `boldtext` they use bright color!
+# bold = { family = "Cascadia Mono PL", style = "SemiBold" }
+bold = { family = "Cascadia Mono PL", style = "Regular" }
+
+italic = { family = "Cascadia Mono PL", style = "Italic" }
+bold_italic = { family = "Cascadia Mono PL", style = "Bold Italic" }
