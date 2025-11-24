@@ -1,11 +1,76 @@
+# Thanks to:
+# 你的 Alacritty 的配置是怎么样的？ - 京山游侠的回答 - 知乎
+# https://www.zhihu.com/question/1941562847399223669/answer/1941746072646026455
+[window]
+decorations_theme_variant = "Dark"
+dynamic_title = true
+blur = true
+padding = { x = 1, y = 1 }
+
+[scrolling]
+history = 10000
+multiplier = 10
+
+
 [mouse]
 bindings = [
-  { mouse = "Right", mods = "Shift", action = "Paste" },
+    { mouse = "Right", mods = "Shift", action = "Paste" },
+]
+
+# Thanks to: https://github.com/qwjyh/dotfiles/blob/d845ff73756260c17ee933bab65cfc72c52892dc/dotfiles/alacritty.yml#L115
+[keyboard]
+bindings = [
+    { key = "Key0", mods = "Control", action = "ResetFontSize" },
+    { key = "Semicolon", mods = "Control", action = "IncreaseFontSize" },
+    { key = "Minus", mods = "Control", action = "DecreaseFontSize" },
 ]
 
 [selection]
 # When set to `true`, selected text will be copied to the primary clipboard.
 save_to_clipboard = true
 
+[hints]
+
+    [[hints.enabled]]
+    command = "xdg-open"
+    post_processing = true
+    regex = "(mailto:|gemini:|gopher:|https:|http:|news:|file:|git:|ssh:|ftp:)[^\u0000-\u001F\u007F-\u009F<>\"\\s{-}\\^⟨⟩`]+"
+
+    [hints.enabled.mouse]
+    enabled = true
+    mods = "Control"
+
+
+
 [env]
+# Thanks to: https://gist.github.com/andersevenrud/015e61af2fd264371032763d4ed965b6
 TERM = "xterm-256color"
+
+# https://raw.githubusercontent.com/alacritty/alacritty-theme/refs/heads/master/themes/campbell.toml
+# Campbell (Windows 10 default)
+[colors]
+draw_bold_text_with_bright_colors = true
+
+    [colors.primary]
+    background = '#0c0c0c'
+    foreground = '#cccccc'
+
+    [colors.normal]
+    black   = '#0c0c0c'
+    red     = '#c50f1f'
+    green   = '#13a10e'
+    yellow  = '#c19c00'
+    blue    = '#0037da'
+    magenta = '#881798'
+    cyan    = '#3a96dd'
+    white   = '#cccccc'
+
+    [colors.bright]
+    black   = '#767676'
+    red     = '#e74856'
+    green   = '#16c60c'
+    yellow  = '#f9f1a5'
+    blue    = '#3b78ff'
+    magenta = '#b4009e'
+    cyan    = '#61d6d6'
+    white   = '#f2f2f2'
