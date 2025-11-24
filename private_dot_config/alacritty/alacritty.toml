@@ -85,3 +85,5 @@ bold = { family = "Cascadia Mono PL", style = "Regular" }
 
 italic = { family = "Cascadia Mono PL", style = "Italic" }
 bold_italic = { family = "Cascadia Mono PL", style = "Bold Italic" }
+
+builtin_box_drawing = false

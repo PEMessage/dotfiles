@@ -507,6 +507,7 @@ require("lazy").setup({
     },
     {
         'MeanderingProgrammer/render-markdown.nvim',
+        enabled = false,
         -- if you use standalone mini plugins
         dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' },
         opts = {},
