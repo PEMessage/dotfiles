@@ -2564,7 +2564,8 @@ local section = function ()
                 { silent = true, noremap = true, buffer = bufnr, desc = 'Range Code Action' }
             )
 
-            vim.keymap.set("n", "gd", vim.lsp.buf.definition,
+            vim.keymap.set("n", "gd", '<c-]>',
+                -- vim.lsp.buf.definition will cause error when meet swapfile
                 { silent = true, noremap = true, buffer = bufnr, desc = 'Goto Definition' }
             )
             vim.keymap.set("n", "gr", vim.lsp.buf.references,
