@@ -233,6 +233,11 @@ require("lazy").setup({
                 ['@comment'] = {fg = '$pe_gray'},
                 ['@lsp.type.comment'] = {fg = '$pe_gray'},
                 -- DiffAdd = {bg = '#8bcd5b', fg = '#1a212e'},
+
+                -- Telescope
+                TelescopePromptBorder = {fg = '$blue'},
+                TelescopeResultsBorder = {fg = '$grey'},
+                TelescopePreviewBorder = {fg = '$grey'},
             },
 
             code_style = {
