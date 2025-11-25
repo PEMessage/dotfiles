@@ -113,8 +113,13 @@ let g:startify_custom_header = [
     set updatetime=700
     set linebreak
     set wildmenu
-    " set wildmode=longest,longest:full " bash like
-    set wildmode=noselect:lastused,full
+
+    if has('patch-9.1.1771')
+        set wildmode=noselect:lastused,full
+    else
+        set wildmode=longest,longest:full " bash like
+    endif
+
 
     " See: https://github.com/vim/vim/commit/3908ef5017a6b4425727013588f72cc7343199b9
     if has('patch-8.2.4325')
@@ -175,15 +180,18 @@ let g:startify_custom_header = [
         vnoremap RightMouse "+y
     endif
 
+    set diffopt+=iwhite
     if has('patch-8.1.0360')
         set diffopt+=internal,algorithm:patience,iwhite
+    endif
+    if has('patch-9.1.1243')
+        set diffopt+=linematch:60
     endif
 
     " if has('patch-8.1.1270')
     "     set shortmess-=S
     " endif
 
-    set diffopt+=iwhite,linematch:60
     " zf to fold, zo to open, zd to delete
     set foldmethod=manual
 
