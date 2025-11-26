@@ -1,0 +1,8 @@
+right-click-action = copy-or-paste
+
+font-family = Cascadia Mono PL
+
+bold-color = bright
+font-style-bold = false
+
+# vim: set ft= ghostty
