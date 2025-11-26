@@ -1,5 +1,6 @@
 right-click-action = copy-or-paste
 app-notifications = no-clipboard-copy
+mouse-scroll-multiplier = 1
 
 font-family = Cascadia Mono PL
 
