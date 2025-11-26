@@ -16,8 +16,8 @@
     set -as terminal-overrides ",xterm*:Tc"
 
     # Thanks to: https://github.com/vercel/hyper/issues/3338#issuecomment-469089888
-    bind-key -T copy-mode-vi WheelUpPane send -N1 -X scroll-up
-    bind-key -T copy-mode-vi WheelDownPane send -N1 -X scroll-down
+    bind-key -T copy-mode-vi WheelUpPane send -N3 -X scroll-up
+    bind-key -T copy-mode-vi WheelDownPane send -N3 -X scroll-down
 
 
     # See: https://github.com/tmux/tmux/wiki/FAQ#how-do-i-use-a-256-colour-terminal
