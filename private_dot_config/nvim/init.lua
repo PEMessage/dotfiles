@@ -715,6 +715,9 @@ require("lazy").setup({
         ft = 'gn',
     },
     {
+        'PEMessage/ghostty.vim',
+    },
+    {
         'tpope/vim-rsi',
         event = { 'InsertEnter', 'CmdLineEnter' },
     },
