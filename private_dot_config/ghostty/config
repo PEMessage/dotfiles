@@ -1,12 +1,20 @@
+# Mouse
 right-click-action = copy-or-paste
 app-notifications = no-clipboard-copy
 mouse-scroll-multiplier = 1
 
+# Fonts
 font-family = Cascadia Mono PL
-
 bold-color = bright
 font-style-bold = false
 
+# Style
+# https://www.jonashietala.se/blog/2025/01/06/first_impressions_of_ghostty/
+cursor-invert-fg-bg = true
+
+
+
+# Color scheme
 # See: https://www.ditig.com/256-colors-cheat-sheet
 palette = 0=#0c0c0c
 palette = 1=#c50f1f
