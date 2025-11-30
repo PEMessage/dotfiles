@@ -2680,6 +2680,7 @@ local section = function ()
                 vim.o.diffopt = current_diffopt .. ',iwhite'
             end
             vim.notify("Whitespace ignoring enabled")
+            vim.cmd [[ edit % ]]
         end
     end, {})
     vim.keymap.set('n', '<leader>tw', '<cmd>ToggleWhitespace<CR>')
