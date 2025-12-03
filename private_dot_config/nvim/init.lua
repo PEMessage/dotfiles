@@ -1833,6 +1833,30 @@ require("lazy").setup({
                     }
                 }
             })
+            vim.lsp.config("ts_ls", {
+                on_attach = function(client, bufnr)
+                    -- disable for android.bp, only borrow synatx of javascript
+                    local filename = vim.api.nvim_buf_get_name(bufnr)
+                    if filename:match('%.bp$') then
+                        client.stop()
+                        return false
+                    end
+
+                    -- Copy from nvim-lspconfig/lsp/ts_ls.lua
+                    vim.api.nvim_buf_create_user_command(bufnr, 'LspTypescriptSourceAction', function()
+                        local source_actions = vim.tbl_filter(function(action)
+                            return vim.startswith(action, 'source.')
+                        end, client.server_capabilities.codeActionProvider.codeActionKinds)
+
+                        vim.lsp.buf.code_action({
+                            context = {
+                                only = source_actions,
+                                diagnostics = {},
+                            },
+                        })
+                    end, {})
+                end,
+            })
             require("mason-lspconfig").setup(opts)
         end,
 
