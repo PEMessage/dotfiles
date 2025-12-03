@@ -711,6 +711,9 @@ require("lazy").setup({
         end,
     },
     {
+        'rubberduck203/aosp-vim',
+    },
+    {
         'PEMessage/generate-ninja.vim',
         ft = 'gn',
     },
@@ -2664,7 +2667,7 @@ local section = function ()
     vim.api.nvim_create_user_command('PEMouseON', function() vim.o.mouse = 'a' end, {})
     vim.api.nvim_create_user_command('PEMouseOFF', function() vim.o.mouse = '' end, {})
 
-    vim.api.nvim_create_user_command('ToggleWhitespace', function()
+    vim.api.nvim_create_user_command('IgnoreWhitespaceToggle', function()
         local current_diffopt = vim.o.diffopt
         local has_iwhite = string.find(current_diffopt, 'iwhite') ~= nil
 
@@ -2683,7 +2686,7 @@ local section = function ()
             vim.cmd [[ edit % ]]
         end
     end, {})
-    vim.keymap.set('n', '<leader>tw', '<cmd>ToggleWhitespace<CR>')
+    vim.keymap.set('n', '<leader>tw', '<cmd>IgnoreWhitespaceToggle<CR>')
 end ; section()
 
 -- 7. Function Zone
