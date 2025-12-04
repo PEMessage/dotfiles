@@ -1,8 +1,21 @@
 #!/bin/bash
 
+# Check if stdout is a terminal
+if [ -t 1 ]; then
+    # Output is to a terminal - enable colors
+    RED=$'\e[091m'
+    GREEN=$'\e[092m'
+    STOP=$'\e[0m'
+else
+    # Output is piped/redirected - disable colors
+    RED=''
+    GREEN=''
+    STOP=''
+fi
+
 
 runcmd() {
-    echo "Runing: $*"
+    echo "${GREEN}Runing${STOP}: $*"
     "$@"
 }
 
@@ -39,6 +52,10 @@ push_build_to_device() {
         # For direct execution:
         runcmd rsync "$rsync_base/$file" "$local_base/$file"
         runcmd $ADB push "$local_base/$wfile" "/$file"
+        echo
+        if [ ! "$?" -eq 0 ] ; then
+            echo "${RED}Error!${STOP}"
+        fi
     done
 }
 
