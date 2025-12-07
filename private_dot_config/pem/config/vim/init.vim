@@ -913,7 +913,9 @@ call plug#begin(pe_runtimepath . '/plugged')
         xmap <Leader>m <Plug>MarkSet
         nmap <Leader>m <Plug>MarkSet
 
-    Plug 'axelf4/vim-strip-trailing-whitespace'
+    " NOTICE: THIS will casue termdebug report error
+    " TODO: fix it
+    " Plug 'axelf4/vim-strip-trailing-whitespace'
 
 
 " -------------------------------------------

@@ -45,7 +45,7 @@ CONFIG=""
 # CONFIG_STAGING=y" | tee -a .config
 CONFIG+=" --enable CONFIG_ANDROID"
 CONFIG+=" --enable CONFIG_ANDROID_BINDER_IPC"
-CONFIG+=" --set-str CONFIG_ANDROID_BINDER_DEVICES \"binder,hwbinder,vndbinder\""
+CONFIG+=" --set-str CONFIG_ANDROID_BINDER_DEVICES binder,hwbinder,vndbinder"
 CONFIG+=" --enable CONFIG_ANDROID_BINDERFS"
 CONFIG+=" --enable CONFIG_STAGING"
 CONFIG+=" --enable CONFIG_ASHMEM"
@@ -129,6 +129,8 @@ CONFIG+=" --enable CONFIG_INPUT_MOUSE"
 CONFIG+=" --enable CONFIG_INPUT_TOUCHSCREEN"
 
 ./scripts/config --file .config $CONFIG
+
+
 make olddefconfig
 
 # compile
