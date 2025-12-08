@@ -1924,8 +1924,9 @@ require("lazy").setup({
             local mason_root = require('mason.settings').current.install_root_dir
             local root_markers = {'javaroot', '.repo', 'gradlew', 'settings.gradle.kts'}
             local root_dir = require('jdtls.setup').find_root(root_markers)
+            local cache_dirname = 'common'
             if root_dir then
-                root_dir = root_dir:gsub('/', '_'):gsub('\\', '_')
+                cache_dirname = root_dir:gsub('/', '_'):gsub('\\', '_')
             end
             local executable = 'jdtls'
 
@@ -1935,7 +1936,7 @@ require("lazy").setup({
 
             vim.api.nvim_create_user_command('JdtWorkspaceDir',
                 function()
-                    vim.print(cache_dir .. '/workspace/' .. root_dir)
+                    vim.print(cache_dir .. '/workspace/' .. cache_dirname)
                 end,
                 {
                     desc = 'Print the workspace directory path'
@@ -1952,12 +1953,12 @@ require("lazy").setup({
                     '-configuration',
                     cache_dir .. '/config',
                     '-data',
-                    cache_dir .. '/workspace/' .. root_dir
+                    cache_dir .. '/workspace/' .. cache_dirname
                     -- cache_dir .. '/workspace/' .. vim.fn.fnamemodify(root_dir, ":p:h:t"),
                 },
                 -- See: https://github.com/mfussenegger/nvim-jdtls?tab=readme-ov-file#configuration-verbose
                 -- See: https://github.com/eclipse-jdtls/eclipse.jdt.ls/wiki/Language-Server-Settings-&-Capabilities
-                root_dir = require("jdtls.setup").find_root(root_markers),
+                root_dir = root_dir,
                 init_options = {
                     bundles = {
                         vim.fn.glob(
@@ -2645,15 +2646,19 @@ local section = function ()
         { desc = "Toggle Word Wrap" })
 
     vim.keymap.set('n', '<leader>ro', function()
-        vim.opt.readonly = not vim.opt.readonly
         vim.opt.modifiable = true
+        vim.opt.buftype = ''
 
-        if vim.opt.readonly then
+        -- Toggle readonly using vim.o (gets/sets the actual boolean value)
+        vim.o.readonly = not vim.o.readonly
+
+        if vim.o.readonly then
             print("Read-only mode enabled")
         else
-            print("Writeable mode enabled")
+            print("Read-only mode disabled")
         end
     end, { silent = true, desc = "Toggle readonly and set modifiable" })
+
 
     -- Also see @Line-Number
     vim.keymap.set("n", "<leader>nu",
