@@ -67,12 +67,14 @@ git_config_global alias.showtool \
 git_config_global alias.addnw \
    '!sh -c '"'"'git diff -U0 -w --no-color --src-prefix=a/ --dst-prefix=b/ "$@" | git apply --cached --ignore-whitespace --unidiff-zero -'"'"
 
-# state of skip
-git_config_global alias.sk '!f() { [ "$#" != 0 ] && cd "${GIT_PREFIX:-.}" ;  unset GIT_DIR ; unset GIT_PREFIX ; git ls-files -t "$@" | grep ^S --color=always; }; f'
-# if GIT_DIR set, git ls-files will force to use git root dir as relative path, so manually unset it
-git_config_global alias.lsk '!f() { cd "${GIT_PREFIX:-.}" ; unset GIT_DIR ; unset GIT_PREFIX ; git ls-files -t "$@" | grep ^S --color=always; }; f'
 git_config_global alias.skip 'update-index --skip-worktree'
 git_config_global alias.noskip 'update-index --no-skip-worktree'
+
+git_config_global alias.diffskip 'temp-unskip git diff'
+# state of skip
+git_config_global alias.sk 'temp-unskip git st'
+# if GIT_DIR set, git ls-files will force to use git root dir as relative path, so manually unset it
+git_config_global alias.listskip '!f() { [ "$#" != 0 ] && cd "${GIT_PREFIX:-.}" ;  unset GIT_DIR ; unset GIT_PREFIX ; git ls-files -t "$@" | grep ^S --color=always; }; f'
 
 # git config --global alias.diffskip '!f() { \
 #     files=$(git ls-files -v | grep ^S | cut -c3-); \
