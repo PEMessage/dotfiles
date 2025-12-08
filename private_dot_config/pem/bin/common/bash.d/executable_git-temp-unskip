@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# git-skipdiff - Show diffs for files marked as skip-worktree
+# git-skip-cmd - temp run a git cmd for files marked as skip-worktree
 #
-# Usage: git skipdiff [git-diff-options] -- [git-ls-files-options]
+# Usage: git-skip-cmd [CMD] [ARG] -- FILES OR DIR
 #
 # Temporarily unskips files marked with skip-worktree, shows their diffs,
 # then reskips them. This allows you to see changes in files you normally
@@ -19,33 +19,33 @@ is_git_repo() {
 is_git_repo
 
 main() {
-    local root="$(git rev-parse --show-toplevel)"
     # Split arguments: everything before -- goes to git diff, after -- goes to git ls-files
-    local diff_args=()
-    local ls_files_args=()
+    local before_double_dash=()
+    local after_double_dash=()
     local found_dash=false
 
     for arg in "$@"; do
         if [ "$arg" = "--" ]; then
             found_dash=true
         elif [ "$found_dash" = true ]; then
-            ls_files_args+=("$arg")
+            after_double_dash+=("$arg")
         else
-            diff_args+=("$arg")
+            before_double_dash+=("$arg")
         fi
     done
 
-    if [ ${#ls_files_args[@]} -gt 0 ]; then
-        ls_files_args=(-- "${ls_files_args[@]}")
+    if [ ${#after_double_dash[@]} -gt 0 ]; then
+        after_double_dash=(-- "${after_double_dash[@]}")
     else
         # enforce ls-files using root dir, similiar to git status behave
-        export GIT_DIR="$root"
+        local root="$(git rev-parse --show-toplevel)"
+        cd "$root"
     fi
 
 
     # Get skipped files, passing ls-files arguments if any
     local files
-    files=$(git ls-files -v "${ls_files_args[@]}" | grep ^S | cut -c3-)
+    files=$(git ls-files -v "${after_double_dash[@]}" | grep ^S | cut -c3-)
 
     if [ -z "$files" ]; then
         echo "No skipped files."
@@ -54,7 +54,7 @@ main() {
 
     # Temporarily unskip files, run diff, then reskip
     echo "$files" | xargs git update-index --no-skip-worktree
-    git diff "${diff_args[@]}" -- $files
+    "${before_double_dash[@]}" -- $files
     echo "$files" | xargs git update-index --skip-worktree
 }
 
