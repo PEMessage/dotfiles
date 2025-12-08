@@ -67,9 +67,19 @@ git_config_global alias.showtool \
 git_config_global alias.addnw \
    '!sh -c '"'"'git diff -U0 -w --no-color --src-prefix=a/ --dst-prefix=b/ "$@" | git apply --cached --ignore-whitespace --unidiff-zero -'"'"
 
-git_config_global alias.lss '!git ls-files -v | grep ^S --color=always'
+# if GIT_DIR set, git ls-files will force to use git root dir as relative path, so manually unset it
+git_config_global alias.lsk '!f() { cd "${GIT_PREFIX:-.}" ; unset GIT_DIR ; unset GIT_PREFIX ; git ls-files -t "$@" | grep ^S --color=always; }; f'
 git_config_global alias.skip 'update-index --skip-worktree'
 git_config_global alias.noskip 'update-index --no-skip-worktree'
+
+# git config --global alias.diffskip '!f() { \
+#     files=$(git ls-files -v | grep ^S | cut -c3-); \
+#     [ -z "$files" ] && echo "No skipped files." && exit 0; \
+#     echo "$files" | xargs git update-index --no-skip-worktree; \
+#     git diff "$@" -- $files; \
+#     echo "$files" | xargs git update-index --skip-worktree; \
+# }; f'
+
 
 # From: https://stackoverflow.com/questions/43762338/how-to-remove-file-from-git-history
 git_config_global alias.remove-file-from-branch-history '!sh -c '"'"'git filter-branch -f --index-filter "git rm -rf  --cached --ignore-unmatch $1" $2 '"'"
