@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# git-skipdiff - Show diffs for files marked as skip-worktree
+#
+# Usage: git skipdiff [git-diff-options] -- [git-ls-files-options]
+#
+# Temporarily unskips files marked with skip-worktree, shows their diffs,
+# then reskips them. This allows you to see changes in files you normally
+# want git to ignore (like local configuration files).
+
+is_git_repo() {
+  git rev-parse --show-toplevel > /dev/null 2>&1
+  result=$?
+  if test $result != 0; then
+    >&2 echo 'Not a git repo!'
+    exit $result
+  fi
+}
+is_git_repo
+
+main() {
+    local root="$(git rev-parse --show-toplevel)"
+    # Split arguments: everything before -- goes to git diff, after -- goes to git ls-files
+    local diff_args=()
+    local ls_files_args=()
+    local found_dash=false
+
+    for arg in "$@"; do
+        if [ "$arg" = "--" ]; then
+            found_dash=true
+        elif [ "$found_dash" = true ]; then
+            ls_files_args+=("$arg")
+        else
+            diff_args+=("$arg")
+        fi
+    done
+
+    if [ ${#ls_files_args[@]} -gt 0 ]; then
+        ls_files_args=(-- "${ls_files_args[@]}")
+    else
+        # enforce ls-files using root dir, similiar to git status behave
+        export GIT_DIR="$root"
+    fi
+
+
+    # Get skipped files, passing ls-files arguments if any
+    local files
+    files=$(git ls-files -v "${ls_files_args[@]}" | grep ^S | cut -c3-)
+
+    if [ -z "$files" ]; then
+        echo "No skipped files."
+        exit 0
+    fi
+
+    # Temporarily unskip files, run diff, then reskip
+    echo "$files" | xargs git update-index --no-skip-worktree
+    git diff "${diff_args[@]}" -- $files
+    echo "$files" | xargs git update-index --skip-worktree
+}
+
+# Only run main if script is executed directly (not sourced)
+if [[ "${BASH_SOURCE[0]}" = "${0}" ]]; then
+    main "$@"
+fi

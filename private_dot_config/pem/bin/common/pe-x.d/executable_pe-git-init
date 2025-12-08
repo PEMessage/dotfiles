@@ -91,3 +91,6 @@ git_config_global alias.reproduced-online-stat 'log --graph --stat --format="%C(
 git_config_global alias.reset-author \
     "-c rebase.instructionFormat='%s%nexec GIT_COMMITTER_DATE=\"%cD\" GIT_AUTHOR_DATE=\"%aD\" git commit --amend --no-edit --reset-author' rebase -f"
 
+
+# From https://github.com/unixorn/git-extra-commands
+git_config_global alias.root-commit 'log --all --oneline --decorate --max-parents=0'
