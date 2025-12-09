@@ -864,6 +864,7 @@ require("lazy").setup({
             },
             diff_opts = {
                 ignore_whitespace = false,
+                ignore_whitespace_change = false,
             },
         },
         keys = {
