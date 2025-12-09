@@ -1680,6 +1680,11 @@ require("lazy").setup({
                 end
             end
 
+            vim.api.nvim_create_user_command( 'MasonWhichTreeSitterCli',
+                function() vim.print(tree_sitter) end,
+                { desc = 'Print which tree-sitter-cli' }
+            )
+
             return {
                 ensure_installed = {
                     tree_sitter,
