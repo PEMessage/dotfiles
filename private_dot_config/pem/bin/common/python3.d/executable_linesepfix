@@ -177,18 +177,31 @@ def main():
               file=sys.stderr)
         print("Please install them for full functionality", file=sys.stderr)
 
-    # Process each file
     for file_pattern in args.files:
-        for file_path in Path('.').glob(file_pattern):
-            if file_path.is_file():
-                process_file(
-                    str(file_path),
-                    threshold=args.threshold,
-                    backup=args.backup,
-                    verbose=args.verbose,
-                    force=args.force,
-                    debug=args.debug
-                )
+    # Convert to Path object
+        pattern_path = Path(file_pattern)
+
+        if pattern_path.is_file():
+            process_file(
+                str(pattern_path),
+                threshold=args.threshold,
+                backup=args.backup,
+                verbose=args.verbose,
+                force=args.force,
+                debug=args.debug
+            )
+        else:
+            # Pattern is relative to current directory (like *.txt)
+            for file_path in Path('.').glob(file_pattern):
+                if file_path.is_file():
+                    process_file(
+                        str(file_path),
+                        threshold=args.threshold,
+                        backup=args.backup,
+                        verbose=args.verbose,
+                        force=args.force,
+                        debug=args.debug
+                    )
 
 
 if __name__ == '__main__':
