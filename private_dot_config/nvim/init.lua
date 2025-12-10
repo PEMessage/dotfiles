@@ -583,6 +583,7 @@ require("lazy").setup({
     {
         "Zeioth/compiler.nvim",
         dependencies = { "stevearc/overseer.nvim", "nvim-telescope/telescope.nvim" },
+        cmd = { "CompilerOpen", "CompilerToggleResults", "CompilerRedo" },
         -- cmd = {
         --     'CompilerOpen', 'CompilerRedo', 'CompilerStop'
         -- },
@@ -604,7 +605,6 @@ require("lazy").setup({
     { -- The task runner we use
         "stevearc/overseer.nvim",
         commit = "6271cab7ccc4ca840faa93f54440ffae3a3918bd",
-        cmd = { "CompilerOpen", "CompilerToggleResults", "CompilerRedo" },
         opts = {
             task_list = {
                 direction = "bottom",
@@ -1529,7 +1529,20 @@ require("lazy").setup({
 
                     ['<C-e>'] = cmp.mapping.abort(),
                     ['<C-y>'] = cmp.mapping.complete(),
-                    ['<CR>'] = cmp.mapping.confirm({ select = true }),
+                    ['<CR>'] = cmp.mapping(function(fallback)
+                        -- Thanks to github issue
+                        -- workaround for https://github.com/hrsh7th/cmp-nvim-lsp-signature-help/issues/13
+                        local entry = cmp.get_selected_entry()
+                        -- If no entry is selected OR if it's from signature help, fallback
+                        if not entry or (entry.source and entry.source.name == 'nvim_lsp_signature_help') then
+                            fallback()
+                        else
+                            cmp.mapping.confirm {
+                                -- do not auto select first item
+                                select = false,
+                            }(fallback)
+                        end
+                    end),
                     -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
                     ['<S-CR>'] = cmp.mapping.confirm({
                         behavior = cmp.ConfirmBehavior.Replace,
@@ -1577,6 +1590,26 @@ require("lazy").setup({
             }
         end,
     },
+    -- {
+    --     'ray-x/lsp_signature.nvim',
+    --     event = "InsertEnter",
+    --     opts = {
+    --         bind = true,
+    --         floating_window = false,
+    --         hint_inline = function() return true end,
+    --         hi_parameter = "LspInlayHint",
+    --         hint_prefix = '',
+    --     },
+    --     config = function(_, opts)
+    --         vim.keymap.set(
+    --             { 'i', 'n' }, '<C-k>', function()
+    --                 require('lsp_signature').toggle_float_win()
+    --             end, { silent = true, noremap = true, desc = 'toggle signature' }
+    --         )
+    --
+    --         require'lsp_signature'.setup(opts)
+    --     end,
+    -- },
     {
         "j-hui/fidget.nvim", -- LSP Progress message UI
         event = 'VeryLazy',
@@ -1784,9 +1817,12 @@ require("lazy").setup({
             -- Thanks to:
             -- https://github.com/derekzyl/nvim/blob/6537239beda2b54925bd7640cf384d086c7dc4ea/lua/inlay_hint.lua#L56C1-L67C7
             vim.lsp.config("gopls", {
-                settings = {
-                    gopls = {
-                        hints = {
+                on_attach = function(client, _)
+                    -- Check if inlay hints are supported
+                    if client.server_capabilities.inlayHintProvider then
+                        client.config.settings = client.config.settings or {}
+                        client.config.settings.gopls = client.config.settings.gopls or {}
+                        client.config.settings.gopls.hints = {
                             assignVariableTypes = true,
                             compositeLiteralFields = true,
                             compositeLiteralTypes = true,
@@ -1794,10 +1830,16 @@ require("lazy").setup({
                             functionTypeParameters = true,
                             parameterNames = true,
                             rangeVariableTypes = true,
-                        },
-                    },
-                },
+                        }
+                    else
+                        vim.notify("gopls doesn't support inlay hints (maybe older version)")
+                    end
+                end,
             })
+            -- enable gopls automatically even if not install from mason
+            -- if we type this manually, we might need a `edit %` to make lsp work
+            vim.lsp.enable('gopls')
+
             vim.lsp.config("kotlin_lsp", {
                 inlay_hints = { enabled = true },
                 root_markers = {
