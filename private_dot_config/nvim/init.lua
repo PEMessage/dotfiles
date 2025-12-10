@@ -1135,36 +1135,24 @@ require("lazy").setup({
         'ckolkey/ts-node-action',
         opts = function()
             local actions = require("ts-node-action.actions")
+            local helpers = require("ts-node-action.helpers")
 
-            local c_cpp_padding = {
-                [","] = "%s ",
-                ["{"] = "%s ",
-                ["}"] = " %s",
-                ["("] = "%s",
-                [")"] = "%s",
-                ["["] = "%s",
-                ["]"] = "%s",
-            }
+            -- local c_cpp_padding = {
+            --     [","] = "%s ",
+            --     ["{"] = "%s ",
+            --     ["}"] = " %s",
+            --     ["("] = "%s",
+            --     [")"] = "%s",
+            --     ["["] = "%s",
+            --     ["]"] = "%s",
+            -- }
 
             return {
-                c = {
-                    ["compound_statement"] = actions.toggle_multiline(c_cpp_padding),
-                    ["parameter_list"] = actions.toggle_multiline(c_cpp_padding),
-                    ["argument_list"] = actions.toggle_multiline(c_cpp_padding),
-                    ["initializer_list"] = actions.toggle_multiline(c_cpp_padding),
-                    ["subscript_expression"] = actions.toggle_multiline(c_cpp_padding),
-                    ["declaration_list"] = actions.toggle_multiline(c_cpp_padding),
+                ['*'] = {
+                    ['identifier'] = function() end,
+                    ['arguments'] = actions.toggle_multiline(),
+                    ['argument_list'] = actions.toggle_multiline(),
                 },
-                cpp = {
-                    ["compound_statement"] = actions.toggle_multiline(c_cpp_padding),
-                    ["parameter_list"] = actions.toggle_multiline(c_cpp_padding),
-                    ["argument_list"] = actions.toggle_multiline(c_cpp_padding),
-                    ["initializer_list"] = actions.toggle_multiline(c_cpp_padding),
-                    ["subscript_argument_list"] = actions.toggle_multiline(c_cpp_padding),
-                    ["template_argument_list"] = actions.toggle_multiline(c_cpp_padding),
-                    ["base_class_list"] = actions.toggle_multiline(c_cpp_padding),
-                    ["declaration_list"] = actions.toggle_multiline(c_cpp_padding),
-                }
             }
         end,
         keys = {
