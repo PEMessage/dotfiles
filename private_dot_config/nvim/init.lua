@@ -735,6 +735,15 @@ require("lazy").setup({
         'tpope/vim-fugitive',
     },
     {
+        'justinmk/vim-dirvish',
+    },
+    {
+        'tpope/vim-eunuch',
+    },
+    {
+        'tpope/vim-unimpaired',
+    },
+    {
         'axelf4/vim-strip-trailing-whitespace',
         event = {'InsertEnter', 'BufEnter'}
     },
