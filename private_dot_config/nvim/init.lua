@@ -2856,6 +2856,33 @@ end
 vim.keymap.set('n', '<leader>cc', PE.ToggleQuickfix, { desc = 'Toggle quickfix window' })
 vim.keymap.set('n', '<m-s-t>', PE.ToggleQuickfix, { desc = 'Toggle quickfix window' })
 
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "qf",
+    callback = function()
+        vim.keymap.set(
+            "n", "<C-o>",
+            function()
+                local items, idx = unpack(vim.fn.getjumplist())
+
+                if idx == 0 then
+                    vim.notify("No previous jump position", vim.log.levels.WARN)
+                    return
+                end
+
+                local prev_item = items[idx]
+
+                if prev_item.bufnr ~= vim.api.nvim_get_current_buf() then
+                    vim.notify("Jump blocked: Target is outside Quickfix", vim.log.levels.INFO)
+                    return
+                end
+
+                vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-o>", true, false, true), "n", false)
+            end,
+            { buffer = true, silent = true, desc = "Jump back only within Quickfix" }
+        )
+    end,
+})
+
 -- 7.1 Vim Function Zone(I just tired)
 -- ===========================================
 vim.cmd [[
