@@ -1326,6 +1326,7 @@ require("lazy").setup({
         dependencies = { 'nvim-lua/plenary.nvim' },
         cmd = "Telescope",
         -- See : help LazyKeysSpec
+        ---@type LazyKeysSpec
         keys = {
             {
                 "<C-p>",
@@ -1395,102 +1396,56 @@ require("lazy").setup({
             { "<leader>tg", "<cmd>Telescope live_grep<cr>", desc = "Telescope Live Grep" },
             { "<leader>tt", "<cmd>Telescope<cr>", desc = "Telescope All" },
         },
-        opts = {
-            defaults = {
+        opts = function()
+            local actions = require('telescope.actions')
+            local action_set = require('telescope.actions.set')
 
-                mappings = {
-                    i = {
-                        ["<c-t>"] = function(...)
-                            return require("trouble.providers.telescope").open_with_trouble(...)
-                        end,
-                        ["<a-t>"] = function(...)
-                            return require("trouble.providers.telescope").open_selected_with_trouble(...)
-                        end,
-                        --
-                        -- Scoll Down result
-                        --
-                        ["<C-j>"] = function(...)
-                            return require("telescope.actions").move_selection_next(...)
-                        end,
-                        ["<C-k>"] = function(...)
-                            return require("telescope.actions").move_selection_previous(...)
-                        end,
-                        ["<C-d>"] = function(...)
-                            local action_set = require("telescope.actions.set")
-                            action_set.shift_selection(..., 3)
-                        end,
-                        ["<C-u>"] = function(...)
-                            local action_set = require("telescope.actions.set")
-                            action_set.shift_selection(..., -3)
-                        end,
-                        ["<C-l>"] = function(...)
-                            return require("telescope.actions").select_default(...)
-                        end,
-
-                        --
-                        -- History like command mode
-                        --
-                        ["<C-Down>"] = function(...)
-                            return require("telescope.actions").cycle_history_next(...)
-                        end,
-                        ["<C-Up>"] = function(...)
-                            return require("telescope.actions").cycle_history_prev(...)
-                        end,
-                        ["<C-f>"] = function(...)
-                            return require("telescope.actions").preview_scrolling_down(...)
-                        end,
-                        ["<C-b>"] = function(...)
-                            return require("telescope.actions").preview_scrolling_up(...)
-                        end,
-                    },
-                    n = {
-                        ["<C-j>"] = function(...)
-                            return require("telescope.actions").move_selection_next(...)
-                        end,
-                        ["<C-k>"] = function(...)
-                            return require("telescope.actions").move_selection_previous(...)
-                        end,
-                        ["<C-d>"] = function(...)
-                            local action_set = require("telescope.actions.set")
-                            action_set.shift_selection(..., 3)
-                        end,
-                        ["<C-u>"] = function(...)
-                            local action_set = require("telescope.actions.set")
-                            action_set.shift_selection(..., -3)
-                        end,
-                        ["q"] = function(...)
-                            return require("telescope.actions").close(...)
-                        end,
-                        ["<C-C>"] = function(...)
-                            return require("telescope.actions").close(...)
-                        end,
-                        ["<ESC>"] = function(...)
-                            return require("telescope.actions").close(...)
-                        end,
+            return {
+                defaults = {
+                    mappings = {
+                        i = {
+                            ['<C-j>'] = actions.move_selection_next,
+                            ['<C-k>'] = actions.move_selection_previous,
+                            ['<C-d>'] = function(...)
+                                action_set.shift_selection(..., 3)
+                            end,
+                            ['<C-u>'] = function(...)
+                                action_set.shift_selection(..., -3)
+                            end,
+                            ['<C-l>'] = actions.select_default,
+                            ['<C-Down>'] = actions.cycle_history_next,
+                            ['<C-Up>'] = actions.cycle_history_prev,
+                            ['<C-f>'] = actions.preview_scrolling_down,
+                            ['<C-b>'] = actions.preview_scrolling_up,
+                        },
+                        n = {
+                            ['<C-j>'] = actions.move_selection_next,
+                            ['<C-k>'] = actions.move_selection_previous,
+                            ['<C-d>'] = function(...)
+                                action_set.shift_selection(..., 3)
+                            end,
+                            ['<C-u>'] = function(...)
+                                action_set.shift_selection(..., -3)
+                            end,
+                            ['q'] = actions.close,
+                            ['<C-c>'] = actions.close,
+                            ['<Esc>'] = actions.close,
+                        },
                     },
                 },
-            },
-            pickers = {
-                colorscheme = {
-                    enable_preview = true
+                pickers = {
+                    colorscheme = {
+                        enable_preview = true
+                    },
                 },
-                -- buffers = {
-                --     mappings = {
-                --         i = {
-                --             ["<C-p>"] = function(...)
-                --                 return require("telescope.actions").close(...)
-                --             end,
-                --         },
-                --     },
-                -- },
-            },
-            init = function()
-                local wk = require('which-key')
-                wk.add({
-                    { "<leader>n", group = "LineNumber Options" },
-                })
-            end,
-        },
+                init = function()
+                    local wk = require('which-key')
+                    wk.add({
+                        { "<leader>n", group = "LineNumber Options" },
+                    })
+                end,
+            }
+        end,
     },
 
     -- -------------------------------------------
