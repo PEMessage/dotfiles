@@ -725,6 +725,9 @@ require("lazy").setup({
         event = { 'InsertEnter', 'CmdLineEnter' },
     },
     {
+        'tpope/vim-fugitive',
+    },
+    {
         'axelf4/vim-strip-trailing-whitespace',
         event = {'InsertEnter', 'BufEnter'}
     },
