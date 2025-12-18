@@ -1135,7 +1135,7 @@ require("lazy").setup({
         'ckolkey/ts-node-action',
         opts = function()
             local actions = require("ts-node-action.actions")
-            local helpers = require("ts-node-action.helpers")
+            -- local helpers = require("ts-node-action.helpers")
 
             -- local c_cpp_padding = {
             --     [","] = "%s ",
@@ -1326,76 +1326,63 @@ require("lazy").setup({
         dependencies = { 'nvim-lua/plenary.nvim' },
         cmd = "Telescope",
         -- See : help LazyKeysSpec
-        ---@type LazyKeysSpec
-        keys = {
-            {
-                "<C-p>",
-                function()
-                    require('telescope.builtin').buffers(
-                        require('telescope.themes').get_dropdown{
-                            -- previewer = false,
-                            -- Thanks to: https://github.com/nvim-telescope/telescope.nvim/issues/791#issuecomment-882101144
-                            -- sort_lastused = true,
-                            sort_mru = true,
-                            ignore_current_buffer = true,
-                            path_display = {
-                                shorten = { len = 2, exclude = {1, 2, -3, -2, -1} }
-                            },
-                            layout_config = {
-                                width = 0.8,
-                            },
-                            attach_mappings = function (_,map)
-                                map( {'i','n'}, '<C-p>',
-                                    function(...)
-                                        return require("telescope.actions").close(...)
-                                    end
-                                )
-                                return true
-                            end,
-                        }
-                    )
-                end,
-                desc = "Buffers"
-            },{
-                "<C-r>",
-                function()
-                    require('telescope.builtin').oldfiles(
-                        require('telescope.themes').get_dropdown({
-                            previewer = false,
-                            layout_config = {
-                                width = 0.8,
-                            },
-                            attach_mappings = function (_,map)
-                                map( {'i','n'}, '<C-r>',
-                                    function(...)
-                                        return require("telescope.actions").close(...)
-                                    end
-                                )
-                                return true
-                            end,
-                        })
-                    )
-                end,
-                desc = "MRU"
-            }, {
-                "<C-e>",
-                function()
-                    require('telescope.builtin').find_files({
-                        previewer = false,
-                        path_display = {
-                            shorten = { len = 3, exclude = {1, 2, -3, -2, -1} }
-                        }
-                    })
-                end,
-                desc = "Telescope Find Files"
-            },
-            { "<leader>tm", "<cmd>Telescope man_pages<cr>", desc = "Telescope Man Pages" },
-            { "<leader>td", "<cmd>Telescope lsp_definitions<cr>", desc = "Telescope LSP Define" },
-            { "<leader>th", "<cmd>Telescope help_tags<cr>", desc = "Telescope Help Pages" },
-            { "<leader>tf", "<cmd>Telescope find_files<cr>", desc = "Telescope Find Files" },
-            { "<leader>tg", "<cmd>Telescope live_grep<cr>", desc = "Telescope Live Grep" },
-            { "<leader>tt", "<cmd>Telescope<cr>", desc = "Telescope All" },
-        },
+        keys = function(_, _)
+            -- Helper function to create telescope dropdown config
+            local function create_dropdown_config(opts)
+                local defaults = {
+                    layout_config = { width = 0.8 },
+                    attach_mappings = function(_, map)
+                        map({ 'i', 'n' }, '<C-p>', function(...)
+                            return require("telescope.actions").close(...)
+                        end)
+                        return true
+                    end
+                }
+                return require('telescope.themes').get_dropdown(vim.tbl_extend("force", defaults, opts or {}))
+            end
+
+            -- Helper function to create buffer picker
+            local function buffers_picker()
+                require('telescope.builtin').buffers(create_dropdown_config({
+                    sort_mru = true,
+                    ignore_current_buffer = true,
+                    path_display = { shorten = { len = 2, exclude = { 1, 2, -3, -2, -1 } } }
+                }))
+            end
+
+            -- Helper function to create oldfiles picker
+            local function oldfiles_picker()
+                require('telescope.builtin').oldfiles(create_dropdown_config({
+                    previewer = false,
+                    attach_mappings = function(_, map)
+                        map({ 'i', 'n' }, '<C-r>', function(...)
+                            return require("telescope.actions").close(...)
+                        end)
+                        return true
+                    end
+                }))
+            end
+
+            -- Helper function to create find_files picker
+            local function find_files_picker()
+                require('telescope.builtin').find_files({
+                    previewer = false,
+                    path_display = { shorten = { len = 3, exclude = { 1, 2, -3, -2, -1 } } }
+                })
+            end
+
+            return {
+                {"<C-p>", buffers_picker, "Buffers" },
+                {"<C-r>", oldfiles_picker, "MRU" },
+                {"<C-e>", find_files_picker, "Telescope Find Files" },
+                {"<leader>tm", "<cmd>Telescope man_pages<cr>", "Telescope Man Pages" },
+                {"<leader>td", "<cmd>Telescope lsp_definitions<cr>", "Telescope LSP Define" },
+                {"<leader>th", "<cmd>Telescope help_tags<cr>", "Telescope Help Pages" },
+                {"<leader>tf", "<cmd>Telescope find_files<cr>", "Telescope Find Files" },
+                {"<leader>tg", "<cmd>Telescope live_grep<cr>", "Telescope Live Grep" },
+                {"<leader>tt", "<cmd>Telescope<cr>", "Telescope All" },
+            }
+        end,
         opts = function()
             local actions = require('telescope.actions')
             local action_set = require('telescope.actions.set')
