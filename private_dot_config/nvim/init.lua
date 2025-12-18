@@ -2736,6 +2736,14 @@ local section = function ()
         end
     end, {})
     vim.keymap.set('n', '<leader>tw', '<cmd>IgnoreWhitespaceToggle<CR>')
+
+    function PE.ToggleInlayHint()
+        vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+        vim.notify("Now inlayhint is " ..  tostring(vim.lsp.inlay_hint.is_enabled()))
+    end
+
+    vim.api.nvim_create_user_command('InlayHintToggle', PE.ToggleInlayHint, {});
+    vim.api.nvim_create_user_command('ToggleInlayHint', PE.ToggleInlayHint, {});
 end ; section()
 
 -- 7. Function Zone
