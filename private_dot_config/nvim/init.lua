@@ -1588,6 +1588,9 @@ require("lazy").setup({
                 'lua require("fidget.notification").show_history()'
                 ,{})
             return {
+                progress = {
+                    display = { done_icon = "OK" }
+                },
                 notification = {
                     override_vim_notify = true,
                 }
