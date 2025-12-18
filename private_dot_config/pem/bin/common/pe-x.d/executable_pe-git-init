@@ -62,6 +62,17 @@ git_config_global alias.ftag  \
 git_config_global alias.showtool \
     '!showci () { rev=${1:-HEAD}; git difftool $rev~1 $rev; }; showci $1'
 
+# Thanks to: https://stackoverflow.com/questions/6759791/how-do-i-move-forward-and-backward-between-commits-in-git
+git_config_global alias.ck-step \
+    '!f() { \
+        if [ "$2" = n ] ; then \
+            git checkout $(git rev-list --topo-order HEAD.."$1" | tail -1); \
+        else \
+            git checkout HEAD^
+        fi \
+      }; f'
+
+
 
 # From: https://stackoverflow.com/questions/3515597/add-only-non-whitespace-changes
 git_config_global alias.addnw \
