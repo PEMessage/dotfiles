@@ -1333,7 +1333,10 @@ require("lazy").setup({
                     require('telescope.builtin').buffers(
                         require('telescope.themes').get_dropdown{
                             -- previewer = false,
-                            sort_lastused = true,
+                            -- Thanks to: https://github.com/nvim-telescope/telescope.nvim/issues/791#issuecomment-882101144
+                            -- sort_lastused = true,
+                            sort_mru = true,
+                            ignore_current_buffer = true,
                             path_display = {
                                 shorten = { len = 2, exclude = {1, 2, -3, -2, -1} }
                             },
@@ -1358,6 +1361,9 @@ require("lazy").setup({
                     require('telescope.builtin').oldfiles(
                         require('telescope.themes').get_dropdown({
                             previewer = false,
+                            layout_config = {
+                                width = 0.8,
+                            },
                             attach_mappings = function (_,map)
                                 map( {'i','n'}, '<C-r>',
                                     function(...)
