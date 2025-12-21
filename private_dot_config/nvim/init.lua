@@ -703,6 +703,13 @@ require("lazy").setup({
         event = 'CmdlineEnter'
     },
     {
+        'PEMessage/parent_dir_tui.vim',
+        keys = {
+            {'<m-left>', '<cmd>ParentDirTuiLeft<CR>'},
+            {'<m-right>', '<cmd>ParentDirTuiRight<CR>'},
+        }
+    },
+    {
         'tpope/vim-sleuth', -- Maybe nmac427/guess-indent.nvim ?
         cmd = {'Sleuth'},
         lazy = true,
