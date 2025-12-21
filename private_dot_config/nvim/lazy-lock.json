@@ -78,6 +78,7 @@
   "vim-easy-align": { "branch": "master", "commit": "9815a55dbcd817784458df7a18acacc6f82b1241" },
   "vim-expand-region": { "branch": "master", "commit": "966513543de0ddc2d673b5528a056269e7917276" },
   "vim-fetch": { "branch": "master", "commit": "f25458bb4b4ba5efd323b76756df0c2ab82e7ed0" },
+  "vim-fugitive": { "branch": "master", "commit": "61b51c09b7c9ce04e821f6cf76ea4f6f903e3cf4" },
   "vim-gf-diff": { "branch": "master", "commit": "bb843806547090cc6a59d32a82deeeec2695ae22" },
   "vim-gf-user": { "branch": "master", "commit": "1b29f2c68cfecc0ef007de871f0b7cbd7c2e784e" },
   "vim-quickrun": { "branch": "master", "commit": "77b4d6ea9972a206f02c736882c2398c36d2983c" },
