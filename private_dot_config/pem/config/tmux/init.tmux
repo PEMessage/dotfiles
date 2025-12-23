@@ -60,6 +60,13 @@
         set-window-option synchronize-panes\; \
         display-message "synchronize-panes is now #{?pane_synchronized,on,off}"
 
+    bind j \
+        send-keys -R\; \
+        display-message "Clear!"
+    bind ` \
+        send-keys -R\; \
+        clear-history\; \
+        display-message "Clear All!"
 
     # copy mode 
     # ----------------------------
