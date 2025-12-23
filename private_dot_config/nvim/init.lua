@@ -2763,6 +2763,8 @@ local section = function ()
 
     vim.api.nvim_create_user_command('InlayHintToggle', PE.ToggleInlayHint, {});
     vim.api.nvim_create_user_command('ToggleInlayHint', PE.ToggleInlayHint, {});
+
+    vim.keymap.set('n', '<leader>q', [[:vimgrep /<C-r>// %]], { desc = "vimgrep @/" })
 end ; section()
 
 -- 7. Function Zone
