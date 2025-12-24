@@ -1744,53 +1744,13 @@ require("lazy").setup({
                 "ts_ls",
                 -- "kotlin_lsp", -- See: https://github.com/desugar-64/kotlin-lsp-workspace-generator for android
                 -- "jdtls" -- leave it to nvim-jdtls
+                -- "java_language_server",
             }
         },
         config = function(_,opts)
-            -- vim.lsp.config('lua_ls', {
-            --     on_init = function(client)
-            --         if client.workspace_folders then
-            --             local path = client.workspace_folders[1].name
-            --             ---@diagnostic disable-next-line: undefined-field
-            --             if path ~= vim.fn.stdpath('config') and (vim.uv.fs_stat(path..'/.luarc.json') or vim.uv.fs_stat(path..'/.luarc.jsonc')) then
-            --                 return
-            --             end
-            --         end
-            --
-            --         client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
-            --             runtime = {
-            --                 -- Tell the language server which version of Lua you're using
-            --                 -- (most likely LuaJIT in the case of Neovim)
-            --                 version = 'LuaJIT'
-            --             },
-            --             -- Make the server aware of Neovim runtime files
-            --             workspace = {
-            --                 checkThirdParty = false,
-            --                 library = {
-            --                     vim.env.VIMRUNTIME
-            --                     -- Depending on the usage, you might want to add additional paths here.
-            --                     -- "${3rd}/luv/library"
-            --                     -- "${3rd}/busted/library",
-            --                 }
-            --                 -- or pull in all of 'runtimepath'.
-            --                 -- NOTE: this is a lot slower and will cause issues when working on your own configuration
-            --                 -- (see https://github.com/neovim/nvim-lspconfig/issues/3189)
-            --                 -- library = vim.api.nvim_get_runtime_file("", true)
-            --             }
-            --         })
-            --     end,
-            --     settings = {
-            --         Lua = {
-            --             diagnostics = {
-            --                 neededFileStatus = {
-            --                     ['codestyle-check'] = 'None!',
-            --                     ["unused-local"] = 'None!',
-            --                     ["empty-block"] = "None!",
-            --                 }
-            --             }
-            --         }
-            --     }
-            -- })
+            require("mason-lspconfig").setup(opts)
+
+            -- lspconfig
             vim.lsp.config("*", {
                 inlay_hints = { enabled = true },
             })
@@ -1896,9 +1856,49 @@ require("lazy").setup({
                     end, {})
                 end,
             })
-            require("mason-lspconfig").setup(opts)
-        end,
 
+            vim.lsp.config('java_language_server', {
+                -- borrow root marker from jdtls
+                root_markers = vim.lsp.config["jdtls"].root_markers,
+                -- Dynamic settings handler
+                on_attach = function(client)
+                    local root = client.workspace_folders and client.workspace_folders[1].name
+                    if not root then return end
+
+                    local settings_file = root .. '/java_language_server.json'
+                    vim.notify("Found settings " .. settings_file)
+                    local f = io.open(settings_file, "r")
+
+                    if f then
+                        local content = f:read("*all")
+                        f:close()
+
+                        local ok, decoded = pcall(vim.fn.json_decode, content)
+                        if ok and decoded then
+                            -- Extend the client settings with the JSON content
+                            vim.notify("Parse success")
+                            client.config.settings = vim.tbl_deep_extend("force", client.config.settings or {}, decoded)
+                            client.notify("workspace/didChangeConfiguration", { settings = client.config.settings })
+                        end
+                    end
+                end,
+                -- settings = {
+                --     java = {
+                --         classPath = {
+                --             "/opt/android-sdk/platforms/android-33/android.jar"
+                --         }
+                --     }
+                -- },
+                handlers = {
+                    ['client/registerCapability'] = function(_, _, _, _)
+                        return {
+                            result = nil;
+                            error = nil;
+                        }
+                    end
+                }
+            })
+        end,
     },
     {
         'p00f/clangd_extensions.nvim',
@@ -1910,6 +1910,7 @@ require("lazy").setup({
     },
     {
         'mfussenegger/nvim-jdtls',
+        enabled = true,
         version = false, -- set this if you want to always pull the latest change
         ft = { "java" }, -- THIS IS KEY, if not this, everything will broken
         -- UPDATE: this will cause jump to class not work as expect, but other function will do work
