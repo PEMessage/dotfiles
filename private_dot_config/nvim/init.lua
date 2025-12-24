@@ -2764,7 +2764,15 @@ local section = function ()
     vim.api.nvim_create_user_command('InlayHintToggle', PE.ToggleInlayHint, {});
     vim.api.nvim_create_user_command('ToggleInlayHint', PE.ToggleInlayHint, {});
 
-    vim.keymap.set('n', '<leader>q', [[:vimgrep /<C-r>// %]], { desc = "vimgrep @/" })
+    -- vim.keymap.set('n', '<leader>q', [[:vimgrep /<C-r>// %<CR>]], { desc = "vimgrep @/" })
+    vim.keymap.set('n', '<leader>q', function()
+        local search_term = vim.fn.getreg('/')
+        local cmd = string.format("vimgrep /%s/j %%", search_term)
+        vim.fn.histadd("cmd", cmd)
+        vim.cmd(cmd)
+        vim.cmd("copen")
+    end, { desc = "vimgrep @/ (no jump, add to history)" })
+
 end ; section()
 
 -- 7. Function Zone
