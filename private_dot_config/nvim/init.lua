@@ -21,6 +21,9 @@ PE.logo = {
 -- 2. LazyNvim Auto Install
 -- ===========================================
 
+-- Debug Lsp
+-- vim.lsp.set_log_level(vim.log.levels.DEBUG)
+-- vim.lsp.log.set_format_func(vim.inspect)
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 ---@diagnostic disable-next-line: undefined-field
@@ -1860,6 +1863,23 @@ require("lazy").setup({
             vim.lsp.config('java_language_server', {
                 -- borrow root marker from jdtls
                 root_markers = vim.lsp.config["jdtls"].root_markers,
+                trace = "verbose",
+                -- capabilities = {
+                --     workspace = {
+                --         workspaceEdit = {
+                --             documentChanges = true,
+                --         },
+                --     },
+                --     textDocument = {
+                --         definition = {
+                --             dynamicRegistration = true,
+                --             linkSupport = true
+                --         }
+                --     },
+                --     documentLink = {
+                --         dynamicRegistration = true,
+                --     },
+                -- },
                 -- Dynamic settings handler
                 on_attach = function(client)
                     local root = client.workspace_folders and client.workspace_folders[1].name
@@ -1879,23 +1899,45 @@ require("lazy").setup({
                             vim.notify("Parse success")
                             client.config.settings = vim.tbl_deep_extend("force", client.config.settings or {}, decoded)
                             client.notify("workspace/didChangeConfiguration", { settings = client.config.settings })
+                        else
+                            vim.notify("Parse fail")
                         end
                     end
                 end,
-                -- settings = {
-                --     java = {
-                --         classPath = {
-                --             "/opt/android-sdk/platforms/android-33/android.jar"
-                --         }
-                --     }
-                -- },
                 handlers = {
-                    ['client/registerCapability'] = function(_, _, _, _)
-                        return {
-                            result = nil;
-                            error = nil;
+                    ['client/registerCapability'] = function(e, r, ct, cf)
+                        -- Thanks to
+                        -- https://github.com/cdnspix/dotfiles/blob/3bfcfcd446f571fa0bb717f87749b7225c9d4d4f/private_dot_config/nvim/lsp/java_language_server.lua#L7
+                        local registration = {
+                            registrations = { r },
                         }
-                    end
+                        return vim.lsp.handlers['client/registerCapability'](e, registration, ct, cf)
+                    end,
+                    -- ["textDocument/definition"] = function(err, result, ctx, config)
+                    --     local original_handler = vim.lsp.handlers["textDocument/definition"]
+                    --     if not result or vim.tbl_isempty(result) then
+                    --         original_handler(err, result, ctx, config)
+                    --         return
+                    --     end
+                    --
+                    --     local locations = vim.islist(result) and result or { result }
+                    --     vim.print(locations)
+                    --
+                    --     for _, location in ipairs(locations) do
+                    --         local uri = location.uri or location.targetUri
+                    --         if uri:match("^jar:file:") then
+                    --             local zip_path, internal_path = uri:match("jar:file://(.+)!/(.+)")
+                    --
+                    --             if zip_path and internal_path then
+                    --                 local bufnr_name = "zipfile://" .. zip_path .. "::" .. internal_path
+                    --
+                    --                 if location.uri then location.uri = bufnr_name end
+                    --                 if location.targetUri then location.targetUri = bufnr_name end
+                    --             end
+                    --         end
+                    --     end
+                    --     original_handler(err, result, ctx, config)
+                    -- end
                 }
             })
         end,
