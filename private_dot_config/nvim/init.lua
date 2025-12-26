@@ -1277,10 +1277,13 @@ require("lazy").setup({
     -- 5.5 Telescope Setting
     -- -------------------------------------------
     {
-        'nvim-telescope/telescope-fzf-native.nvim',
-        dependencies = { 'nvim-telescope/telescope.nvim' },
+        "nvim-telescope/telescope-fzf-native.nvim",
+        dependencies = { 'nvim-telescope/telescope.nvim', 'j-hui/fidget.nvim' },
         event = 'VimEnter',
         build = 'make',
+        cond = function()
+            return vim.fn.executable("make") == 1 or vim.fn.executable("cmake") == 1
+        end,
         opts = {
             -- Also See: https://github.com/debugloop/telescope-undo.nvim
             -- don't use `defaults = { }` here, do this in the main telescope spec
@@ -1294,11 +1297,33 @@ require("lazy").setup({
                 }
             },
         },
-        config = function(_, opts)
+        -- Thanks to:
+        -- https://github.com/Jaetan/dotfiles/blob/78ae9683123d8f234c3ed4c77e3ca4f561ef1695/.config/nvim/lua/plugins/telescope_extras.lua#L7
+        config = function(plugin, opts)
             local telescope = require("telescope")
             telescope.setup(opts)
-            telescope.load_extension("fzf")
-        end
+            local ok, _ = pcall(telescope.load_extension, "fzf")
+
+            if not ok then
+
+                local retry = function(_)
+                    if vim.fn.executable("cmake") == 1 then
+                        return "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release --target install"
+                    end
+                    if vim.fn.executable("make") == 1 then
+                        return "make"
+                    end
+                end
+                vim.print(plugin.build)
+
+                plugin.build = retry()
+                vim.notify("Failed to load telescope-fzf extension")
+                require("lazy").build({
+                    plugins = { plugin },
+                    show = true -- Set to false if you want it to happen silently in the background
+                })
+            end
+        end,
     },
     {
         "jmacadie/telescope-hierarchy.nvim",
