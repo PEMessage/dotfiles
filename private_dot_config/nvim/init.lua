@@ -2925,7 +2925,11 @@ end
 
 vim.cmd('command! PCD :cd %:p:h')
 
-function PE.yank(text)
+local function yank_windows(text)
+    vim.fn.setreg("*", text)
+end
+
+local function yank_unix(text)
     local escape = vim.fn.system("yank", text)
 
     if vim.v.shell_error ~= 0 then
@@ -2935,6 +2939,9 @@ function PE.yank(text)
         vim.fn.chansend(vim.v.stderr, escape)
     end
 end
+
+PE.yank = vim.fn.has("win32") == 1 and yank_windows or yank_unix
+
 function PE.CurrentFile()
     print(vim.api.nvim_buf_get_name(0))
     PE.yank(vim.api.nvim_buf_get_name(0))
