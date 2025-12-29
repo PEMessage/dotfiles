@@ -584,6 +584,22 @@ require("lazy").setup({
     --     end
     -- },
     {
+        "ii14/neorepl.nvim",
+        cmd = 'Repl',
+        lazy = true,
+        dependencies = {
+            "hrsh7th/nvim-cmp",
+            -- "nvim-treesitter/nvim-treesitter",
+        },
+        config = function(_, opts)
+            require('cmp').setup.filetype('neorepl', {
+                enabled = false
+            })
+            -- Seem not work
+            -- vim.treesitter.language.register("lua", "neorepl")
+        end,
+    },
+    {
         "Zeioth/compiler.nvim",
         dependencies = { "stevearc/overseer.nvim", "nvim-telescope/telescope.nvim" },
         cmd = { "CompilerOpen", "CompilerToggleResults", "CompilerRedo" },
