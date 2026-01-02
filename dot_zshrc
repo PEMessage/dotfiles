@@ -81,8 +81,13 @@
     # zstyle ':autocomplete:*' min-input 2
 
     # 设置默认命令行提示符
+    # -U: Disables alias expansion when loading the function
+    # -z: Forces the function to be loaded in zsh syntax, not ksh or sh
     autoload -Uz color && colors
     autoload -Uz compinit && compinit
+    # use `zmv -n` to dry run
+    autoload -Uz zmv
+
     export PS1
     PS1="["
     PS1+="%{$fg_bold[blue]%}%n@%m%{$reset_color%}"
