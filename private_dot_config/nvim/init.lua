@@ -25,6 +25,12 @@ PE.logo = {
 -- vim.lsp.set_log_level(vim.log.levels.DEBUG)
 -- vim.lsp.log.set_format_func(vim.inspect)
 
+-- Debug define
+-- vim.g.editorconfig = false
+-- vim.cmd('filetype off')
+-- vim.cmd('syntax off')
+
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 ---@diagnostic disable-next-line: undefined-field
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -1172,8 +1178,30 @@ require("lazy").setup({
         }
     },
     {
-        'HiPhish/rainbow-delimiters.nvim'
+        'HiPhish/rainbow-delimiters.nvim',
+        init = function()
+            -- NOTICE: we should disable this for large file, it will highlight entire file
+            --         or maybe take a look of 'saghen/blink.pairs' ?
+            -- ALSO SEE:
+            --  https://github.com/HiPhish/rainbow-delimiters.nvim/issues/184#issuecomment-3085700893
+            local large_file_handle = function (bufnr)
+                local line_count = vim.api.nvim_buf_line_count(bufnr)
+                if line_count > 5000 then
+                    return nil
+                end
+                return 'rainbow-delimiters.strategy.global'
+            end
+
+            vim.g.rainbow_delimiters = {
+                [''] = 'rainbow-delimiters.strategy.global',
+                strategy = {
+                    cpp = large_file_handle,
+                },
+            }
+        end,
+        enabled = true,
     },
+
     {
         'ckolkey/ts-node-action',
         opts = function()
