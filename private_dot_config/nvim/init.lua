@@ -700,8 +700,7 @@ require("lazy").setup({
             { "s", mode = { "n", "x", "o" }, function() require("flash").jump({
                 jump = { autoexit = false }
             }) end, desc = "Flash" },
-            -- { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
-            -- { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+            { "r", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
             -- { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
         },
 
@@ -1791,10 +1790,12 @@ require("lazy").setup({
                 "gopls",
                 "bashls",
                 "kotlin_language_server",
-                "ts_ls",
+                -- "ts_ls",
+                "tsgo",
                 -- "kotlin_lsp", -- See: https://github.com/desugar-64/kotlin-lsp-workspace-generator for android
                 -- "jdtls" -- leave it to nvim-jdtls
                 -- "java_language_server",
+                "glsl_analyzer",
             }
         },
         config = function(_,opts)
@@ -1845,6 +1846,14 @@ require("lazy").setup({
                 inlay_hints = { enabled = true },
                 root_markers = {
                     'workspace.json', -- Used to integrate your own build system
+                    'settings.gradle.kts'
+                }
+            })
+
+            vim.lsp.config("kotlin_language_server", {
+                inlay_hints = { enabled = true },
+                root_markers = {
+                    'settings.gradle.kts'
                 }
             })
             vim.lsp.config("pylsp", {
@@ -1882,6 +1891,7 @@ require("lazy").setup({
                     }
                 }
             })
+
             vim.lsp.config("ts_ls", {
                 on_attach = function(client, bufnr)
                     -- disable for android.bp, only borrow synatx of javascript
@@ -1905,6 +1915,20 @@ require("lazy").setup({
                         })
                     end, {})
                 end,
+            })
+            vim.lsp.config("tsgo", {
+                settings = {
+                    typescript = {
+                        inlayHints = {
+                            parameterNames = { enabled = "literals" },
+                            parameterTypes = { enabled = true },
+                            variableTypes = { enabled = true },
+                            propertyDeclarationTypes = { enabled = true },
+                            functionLikeReturnTypes = { enabled = true },
+                            enumMemberValues = { enabled = true },
+                        },
+                    },
+                },
             })
 
             vim.lsp.config('java_language_server', {
