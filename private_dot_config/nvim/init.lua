@@ -1365,7 +1365,9 @@ require("lazy").setup({
 
                 local retry = function(_)
                     if vim.fn.executable("cmake") == 1 then
-                        return "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release --target install"
+                        -- Cmake 4.0 need CMAKE_POLICY_VERSION_MINIMUM
+                        return "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5" ..
+                            "&& cmake --build build --config Release --target install"
                     end
                     if vim.fn.executable("make") == 1 then
                         return "make"
