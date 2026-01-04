@@ -1443,12 +1443,13 @@ require("lazy").setup({
         -- See : help LazyKeysSpec
         keys = function(_, _)
             -- Helper function to create telescope dropdown config
+            local actions = require("telescope.actions")
             local function create_dropdown_config(opts)
                 local defaults = {
                     layout_config = { width = 0.8 },
                     attach_mappings = function(_, map)
                         map({ 'i', 'n' }, '<C-p>', function(...)
-                            return require("telescope.actions").close(...)
+                            return actions.close(...)
                         end)
                         return true
                     end
@@ -1471,7 +1472,7 @@ require("lazy").setup({
                     previewer = false,
                     attach_mappings = function(_, map)
                         map({ 'i', 'n' }, '<C-r>', function(...)
-                            return require("telescope.actions").close(...)
+                            return actions.close(...)
                         end)
                         return true
                     end
@@ -1486,10 +1487,21 @@ require("lazy").setup({
                 })
             end
 
+            local function cmd_history()
+                require('telescope.builtin').command_history({
+                    default_text = vim.fn.getcmdline(),
+                    attach_mappings = function(_, map)
+                        map({ "i", "n" }, "<enter>", actions.edit_command_line)
+                        return true
+                    end,
+                })
+            end
+
             return {
                 {"<C-p>", buffers_picker, "Buffers" },
                 {"<C-r>", oldfiles_picker, "MRU" },
-                {"<C-e>", find_files_picker, "Telescope Find Files" },
+                {"<C-e>", find_files_picker, "Find Files" },
+                {"<C-q>", cmd_history,  "Commands History", mode = {"c", "n"}},
                 {"<leader>tm", "<cmd>Telescope man_pages<cr>", "Telescope Man Pages" },
                 {"<leader>td", "<cmd>Telescope lsp_definitions<cr>", "Telescope LSP Define" },
                 {"<leader>th", "<cmd>Telescope help_tags<cr>", "Telescope Help Pages" },
