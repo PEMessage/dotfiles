@@ -429,6 +429,7 @@ require("lazy").setup({
         priority = 1000,
         lazy = false,
         ---@diagnostic disable-next-line: undefined-doc-name
+        ---@module snacks
         ---@type snacks.Config
         opts = {
             -- your configuration comes here
@@ -706,7 +707,7 @@ require("lazy").setup({
             { "s", mode = { "n", "x", "o" }, function() require("flash").jump({
                 jump = { autoexit = false }
             }) end, desc = "Flash" },
-            { "r", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+            { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
             -- { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
         },
 
@@ -896,7 +897,14 @@ require("lazy").setup({
     --         -- )
     --     end,
     -- },
-    { 'junegunn/vim-easy-align', event = 'VeryLazy' },
+    {
+        'junegunn/vim-easy-align',
+        event = 'VeryLazy',
+        keys = {
+            { "ga", "<Plug>(EasyAlign)", mode = { "x" }, desc = "EasyAlign (visual mode)" },
+        }
+
+    },
     { 'tpope/vim-repeat', event = 'VeryLazy' },
 
     {
@@ -1761,6 +1769,8 @@ require("lazy").setup({
     },
     {
         'WhoIsSethDaniel/mason-tool-installer.nvim',
+        -- See: https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim/issues/39
+        -- This plugin not support lazyload, but we manually call
         event = 'VeryLazy',
         dependencies = {
             'williamboman/mason.nvim',
@@ -1792,6 +1802,13 @@ require("lazy").setup({
                 },
             }
         end,
+        config =  function (_, opts)
+            require('mason-tool-installer').setup(opts)
+            -- If not lazyload, this run_on_start will be called in VimEnter
+            -- See: mason-tool-installer.nvim/plugin/mason-tool-installer.lua
+            -- Since we lazyload it(will not receives VimEnter event), do it manually
+            require('mason-tool-installer').run_on_start()
+        end
     },
     {
         'williamboman/mason-lspconfig.nvim',
