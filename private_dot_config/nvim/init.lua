@@ -512,7 +512,7 @@ require("lazy").setup({
                     local expand_or_jumpable_ok, expand_or_jumpable = pcall(luasnip.expand_or_jumpable)
                     local in_snippet_ok, in_snippet = pcall(luasnip.in_snippet)
 
-                    if (expand_or_jumpable_ok and expand_or_jumpable) or (in_snippet_ok and in_snippet) then
+                    if (expand_or_jumpable_ok and expand_or_jumpable) and (in_snippet_ok and in_snippet) then
                         return '[Snippet]'
                     end
 
@@ -1755,8 +1755,8 @@ require("lazy").setup({
                 end,
                 snippet = {
                     expand = function(args)
-                        vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
-                        -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+                        -- vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+                        require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
                         -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
                         -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
                     end,
@@ -2651,11 +2651,12 @@ require("lazy").setup({
     {
         "danymat/neogen",
         dependencies = {
-            'hrsh7th/vim-vsnip',
-            -- 'saadparwaiz1/cmp_luasnip',
+            -- 'hrsh7th/vim-vsnip',
+            'L3MON4D3/LuaSnip',
         },
         opts = {
-            snippet_engine = "vsnip"
+            -- snippet_engine = "vsnip"
+            snippet_engine = "luasnip"
         },
         -- Uncomment next line if you want to follow only stable versions
         -- version = "*"
