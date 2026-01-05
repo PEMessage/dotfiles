@@ -486,24 +486,79 @@ require("lazy").setup({
         enabled = true,
         dependencies = {
             -- 'nvim-tree/nvim-web-devicons',
+            'L3MON4D3/LuaSnip',
+            -- 'hrsh7th/vim-vsnip',
             -- opt = true
         },
-        opts = {
-            options = {
-                theme = 'auto',
-                icons_enabled = false,
-                component_separators = { left = '|', right = '|' },
-                section_separators = { left = '', right = '' },
-            },
-            sections = {
-                lualine_a = {'mode'},
-                lualine_b = {'branch', 'diff', 'diagnostics'},
-                lualine_c = {'filename','searchcount'},
-                lualine_x = {'encoding', 'fileformat', 'filetype'},
-                lualine_y = {'progress'},
-                lualine_z = {'location'}
-            },
-        }
+        opts = function ()
+            local luasnip_status = {
+                function ()
+                    local ok, luasnip = pcall(require, 'luasnip')
+                    if not ok then
+                        return ''  -- Luasnip not installed/loaded
+                    end
+
+                    local session = luasnip.session
+                    if type(session) ~= 'table' or type(session.current_nodes) ~= 'table' then
+                        return ''
+                    end
+
+                    local node = session.current_nodes[vim.api.nvim_get_current_buf()]
+                    if not node then
+                        return ''
+
+                    end
+
+                    local expand_or_jumpable_ok, expand_or_jumpable = pcall(luasnip.expand_or_jumpable)
+                    local in_snippet_ok, in_snippet = pcall(luasnip.in_snippet)
+
+                    if (expand_or_jumpable_ok and expand_or_jumpable) or (in_snippet_ok and in_snippet) then
+                        return '[Snippet]'
+                    end
+
+                    return ''
+                end,
+                color = { fg = '#98c379' }
+            }
+            -- local vsnip_status = {
+            --     function()
+            --         if vim.fn.exists('*vsnip#jumpable') == 0 then
+            --             return ''
+            --         end
+            --         local in_snippet = vim.fn['vsnip#jumpable'](1) == 1 or vim.fn['vsnip#jumpable'](-1) == 1
+            --
+            --         if in_snippet then
+            --             return '[Snippet]'
+            --         else
+            --             return ''
+            --         end
+            --     end,
+            --     color = { fg = '#98c379' }
+            -- }
+
+
+            return {
+                options = {
+                    theme = 'auto',
+                    icons_enabled = false,
+                    component_separators = { left = '|', right = '|' },
+                    section_separators = { left = '', right = '' },
+                },
+                sections = {
+                    lualine_a = {'mode'},
+                    lualine_b = {'branch', 'diff', 'diagnostics'},
+                    lualine_c = {
+                        'filename',
+                        -- vsnip_status,
+                        luasnip_status,
+                        'searchcount'
+                    },
+                    lualine_x = {'encoding', 'fileformat', 'filetype'},
+                    lualine_y = {'progress'},
+                    lualine_z = {'location'}
+                },
+            }
+        end
     },
     {
         'akinsho/toggleterm.nvim',
@@ -956,6 +1011,11 @@ require("lazy").setup({
                 desc = 'Add(Stage) or Toggle git hunk', silent = true
             },
         },
+    },
+    {
+        "chentoast/marks.nvim",
+        event = "VeryLazy",
+        opts = {},
     },
     {
         'kana/vim-gf-diff',
@@ -1565,20 +1625,99 @@ require("lazy").setup({
     -- -------------------------------------------
     -- 5.7 nvim-cmp plug
     -- -------------------------------------------
+    -- {
+    --     'saghen/blink.cmp',
+    --     enabled = false,
+    --     dependencies = { 'rafamadriz/friendly-snippets' },
+    --     version = '1.*',
+    --
+    --     ---@module 'blink.cmp'
+    --     ---@type blink.cmp.Config
+    --     opts = {
+    --         -- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)
+    --         -- 'super-tab' for mappings similar to vscode (tab to accept)
+    --         -- 'enter' for enter to accept
+    --         -- 'none' for no mappings
+    --         --
+    --         -- All presets have the following mappings:
+    --         -- C-space: Open menu or open docs if already open
+    --         -- C-n/C-p or Up/Down: Select next/previous item
+    --         -- C-e: Hide menu
+    --         -- C-k: Toggle signature help (if signature.enabled = true)
+    --         keymap = {
+    --             preset = 'enter',
+    --             ['<Tab>'] = {
+    --                 'select_next',
+    --                 'snippet_forward',
+    --                 'fallback'
+    --             },
+    --             ['<S-Tab>'] = {
+    --                 'select_prev',
+    --                 'snippet_backward',
+    --                 'fallback'
+    --             },
+    --             ['<CR>'] = {
+    --                 'accept',
+    --                 'fallback'
+    --             },
+    --         },
+    --
+    --         appearance = {
+    --             nerd_font_variant = ''
+    --         },
+    --
+    --         -- (Default) Only show the documentation popup when manually triggered
+    --         completion = {
+    --             documentation = {
+    --                 auto_show = false
+    --             },
+    --             list = {
+    --                 selection = {
+    --                     -- preselect = function(ctx) return not require('blink.cmp').snippet_active({ direction = 1 }) end
+    --                     preselect = false,
+    --                 }
+    --             }
+    --         },
+    --         sources = {
+    --             default = { 'lsp', 'path', 'snippets', 'buffer' },
+    --         },
+    --         fuzzy = { implementation = "prefer_rust_with_warning" }
+    --     },
+    --     opts_extend = { "sources.default" }
+    -- },
+    {
+        'L3MON4D3/LuaSnip',
+        dependencies = {
+            -- 'rafamadriz/friendly-snippets',
+            'honza/vim-snippets',
+        },
+        config = function(_, opts)
+            require('luasnip').setup(opts)
+            -- require("luasnip.loaders.from_vscode").lazy_load()
+            require("luasnip.loaders.from_snipmate").lazy_load()
+        end
+
+    },
     {
         "hrsh7th/nvim-cmp",
         version = false, -- last release is way too old
-        event = "InsertEnter",
+        enabled = true,
+        event = { 'InsertEnter', 'CmdLineEnter' },
         dependencies = {
             'hrsh7th/cmp-nvim-lsp-signature-help',
             'hrsh7th/cmp-nvim-lsp',
             'hrsh7th/cmp-buffer',
             'hrsh7th/cmp-path',
             'hrsh7th/cmp-cmdline',
-            'rafamadriz/friendly-snippets',
-            'hrsh7th/cmp-vsnip',
-            'hrsh7th/vim-vsnip',
-            -- 'saadparwaiz1/cmp_luasnip',
+
+            -- vsnip config:
+            -- 'rafamadriz/friendly-snippets',
+            -- 'hrsh7th/cmp-vsnip',
+            -- 'hrsh7th/vim-vsnip',
+
+            -- luasnip config:
+            'L3MON4D3/LuaSnip',
+            'saadparwaiz1/cmp_luasnip',
         },
         init = function ()
             vim.keymap.set('i','<C-l>','<Plug>(vsnip-expand-or-jump)')
@@ -1597,12 +1736,23 @@ require("lazy").setup({
                 vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(key, true, true, true), mode, true)
             end
 
+            local snip_status_ok, luasnip = pcall(require, "luasnip")
+
             return {
                 -- view = {
                 --     entries = {
                 --         {name = 'native'}
                 --     }
                 -- },
+                enabled = function()
+                    local disabled = false
+
+                    -- Thanks to: https://github.com/hrsh7th/nvim-cmp/wiki/Advanced-techniques#disabling-completion-in-certain-contexts-such-as-comments
+                    -- Check if vim-visual-multi is active
+                    -- VM plugin typically sets these global variables when active
+                    disabled = disabled or (vim.g.VM_Extension ~= nil and vim.b.VM_Selection ~= nil)
+                    return not disabled
+                end,
                 snippet = {
                     expand = function(args)
                         vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
@@ -1626,6 +1776,7 @@ require("lazy").setup({
                     ['<C-e>'] = cmp.mapping.abort(),
                     ['<C-y>'] = cmp.mapping.complete(),
                     ['<CR>'] = cmp.mapping(function(fallback)
+                        -- Thanks to: https://github.com/musabadru/astronvim/blob/dc6e52dc57e903a5a1a0c3f7b6e5bdc811663744/cmp.lua#L7
                         -- Thanks to github issue
                         -- workaround for https://github.com/hrsh7th/cmp-nvim-lsp-signature-help/issues/13
                         local entry = cmp.get_selected_entry()
@@ -1651,8 +1802,11 @@ require("lazy").setup({
                     ["<Tab>"] = cmp.mapping(function(fallback)
                         if cmp.visible() then
                             cmp.select_next_item()
-                        elseif vim.fn["vsnip#available"](1) == 1 then
-                            feedkey("<Plug>(vsnip-expand-or-jump)", "")
+
+                        elseif luasnip.expand_or_jumpable() then
+                            luasnip.expand_or_jump()
+                        -- elseif vim.fn["vsnip#available"](1) == 1 then
+                        --     feedkey("<Plug>(vsnip-expand-or-jump)", "")
                         elseif has_words_before() then
                             cmp.complete()
                         else
@@ -1663,8 +1817,10 @@ require("lazy").setup({
                     ["<S-Tab>"] = cmp.mapping(function()
                         if cmp.visible() then
                             cmp.select_prev_item()
-                        elseif vim.fn["vsnip#jumpable"](-1) == 1 then
-                            feedkey("<Plug>(vsnip-jump-prev)", "")
+                        elseif luasnip.jumpable(-1) then
+                            luasnip.jump(-1)
+                        -- elseif vim.fn["vsnip#jumpable"](-1) == 1 then
+                        --     feedkey("<Plug>(vsnip-jump-prev)", "")
                         end
                     end, { "i", "s" }),
                 }),
@@ -1674,7 +1830,8 @@ require("lazy").setup({
                     { name = 'path' },
                     { name = 'nvim_lsp_signature_help' },
                     { name = 'nvim_lsp' },
-                    { name = 'vsnip'}
+                     { name = 'luasnip' },
+                    -- { name = 'vsnip'}
                 }),
                 formatting = {
                     format = function(_, vim_item)
@@ -1682,8 +1839,26 @@ require("lazy").setup({
                         return vim_item
                     end
                 },
+                -- experimental = {
+                --     ghost_text = true,
+                -- },
 
             }
+        end,
+        config = function(_, opts)
+            local cmp = require('cmp')
+            cmp.setup(opts)
+
+            cmp.setup.cmdline(':', {
+                mapping = cmp.mapping.preset.cmdline(),
+                sources = cmp.config.sources(
+                    { { name = 'path' } },
+                    { { name = 'cmdline' } }
+                ),
+                matching = { disallow_symbol_nonprefix_matching = false }
+            })
+
+
         end,
     },
     -- {
@@ -2608,42 +2783,42 @@ require("lazy").setup({
     -- -------------------------------------------
     -- 5.10 AI
     -- -------------------------------------------
-    {
-        "yetone/avante.nvim",
-        event = "VeryLazy",
-        lazy = false,
-        enabled = false,
-        version = false, -- set this if you want to always pull the latest change
-        opts = {
-            provider = "ollama",
-            vendors = {
-                ollama = {
-                    __inherited_from = "openai",
-                    api_key_name = "",
-                    -- endpoint = "http://80/v1",
-                    model = "qwen2.5-coder",
-                },
-            },
-        },
-        -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
-        build = "make",
-        -- build = "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false" -- for windows
-        dependencies = {
-            "stevearc/dressing.nvim",
-            "nvim-lua/plenary.nvim",
-            "MunifTanjim/nui.nvim",
-            --- The below dependencies are optional,
-            "hrsh7th/nvim-cmp", -- autocompletion for avante commands and mentions
-            {
-                -- Make sure to set this up properly if you have lazy=true
-                'MeanderingProgrammer/render-markdown.nvim',
-                opts = {
-                    file_types = { "markdown", "Avante" },
-                },
-                ft = { "markdown", "Avante" },
-            },
-        },
-    },
+    -- {
+    --     "yetone/avante.nvim",
+    --     event = "VeryLazy",
+    --     lazy = false,
+    --     enabled = false,
+    --     version = false, -- set this if you want to always pull the latest change
+    --     opts = {
+    --         provider = "ollama",
+    --         vendors = {
+    --             ollama = {
+    --                 __inherited_from = "openai",
+    --                 api_key_name = "",
+    --                 -- endpoint = "http://80/v1",
+    --                 model = "qwen2.5-coder",
+    --             },
+    --         },
+    --     },
+    --     -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
+    --     build = "make",
+    --     -- build = "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false" -- for windows
+    --     dependencies = {
+    --         "stevearc/dressing.nvim",
+    --         "nvim-lua/plenary.nvim",
+    --         "MunifTanjim/nui.nvim",
+    --         --- The below dependencies are optional,
+    --         "hrsh7th/nvim-cmp", -- autocompletion for avante commands and mentions
+    --         {
+    --             -- Make sure to set this up properly if you have lazy=true
+    --             'MeanderingProgrammer/render-markdown.nvim',
+    --             opts = {
+    --                 file_types = { "markdown", "Avante" },
+    --             },
+    --             ft = { "markdown", "Avante" },
+    --         },
+    --     },
+    -- },
 
 
     -- -------------------------------------------
