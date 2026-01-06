@@ -247,6 +247,9 @@ require("lazy").setup({
                 TelescopePromptBorder = {fg = '$blue'},
                 TelescopeResultsBorder = {fg = '$grey'},
                 TelescopePreviewBorder = {fg = '$grey'},
+
+                -- visual-whitespace
+                VisualNonText = {fg = '$grey', bg = '$bg3'}
             },
 
             code_style = {
@@ -342,6 +345,24 @@ require("lazy").setup({
         opts = {
             style = 'ascii',
         }
+    },
+    {
+        'mcauley-penney/visual-whitespace.nvim',
+        enabled = true,
+        event = "ModeChanged *:[vV\22]", -- optionally, lazy load on entering visual mode
+        opts = function ()
+
+            return {
+                match_types = {
+                    space = false,
+                    tab = true,
+                    nbsp = true,
+                    lead = false,
+                    trail = false,
+                },
+            }
+        end
+
     },
     {
         "lukas-reineke/indent-blankline.nvim",
@@ -486,7 +507,7 @@ require("lazy").setup({
         enabled = true,
         dependencies = {
             -- 'nvim-tree/nvim-web-devicons',
-            'L3MON4D3/LuaSnip',
+            -- 'L3MON4D3/LuaSnip',
             -- 'hrsh7th/vim-vsnip',
             -- opt = true
         },
@@ -535,7 +556,6 @@ require("lazy").setup({
             --     end,
             --     color = { fg = '#98c379' }
             -- }
-
 
             return {
                 options = {
@@ -1699,6 +1719,8 @@ require("lazy").setup({
 
     },
     {
+    },
+    {
         "hrsh7th/nvim-cmp",
         version = false, -- last release is way too old
         enabled = true,
@@ -1709,6 +1731,9 @@ require("lazy").setup({
             'hrsh7th/cmp-buffer',
             'hrsh7th/cmp-path',
             'hrsh7th/cmp-cmdline',
+            'hrsh7th/cmp-nvim-lsp-document-symbol',
+
+            'petertriho/cmp-git',
 
             -- vsnip config:
             -- 'rafamadriz/friendly-snippets',
@@ -1718,6 +1743,7 @@ require("lazy").setup({
             -- luasnip config:
             'L3MON4D3/LuaSnip',
             'saadparwaiz1/cmp_luasnip',
+            'doxnit/cmp-luasnip-choice',
         },
         init = function ()
             vim.keymap.set('i','<C-l>','<Plug>(vsnip-expand-or-jump)')
@@ -1751,6 +1777,7 @@ require("lazy").setup({
                     -- Check if vim-visual-multi is active
                     -- VM plugin typically sets these global variables when active
                     disabled = disabled or (vim.g.VM_Extension ~= nil and vim.b.VM_Selection ~= nil)
+                    disabled = disabled or vim.bo.filetype == 'TelescopePrompt'
                     return not disabled
                 end,
                 snippet = {
@@ -1767,6 +1794,7 @@ require("lazy").setup({
                 mapping = cmp.mapping.preset.insert({
                     ['<C-d>'] = cmp.mapping.scroll_docs(-4),
                     ['<C-u>'] = cmp.mapping.scroll_docs(4),
+                    ['<C-k>'] = cmp.mapping.close_docs(),
 
                     ['<C-n>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
                     ['<C-p>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
@@ -1830,7 +1858,8 @@ require("lazy").setup({
                     { name = 'path' },
                     { name = 'nvim_lsp_signature_help' },
                     { name = 'nvim_lsp' },
-                     { name = 'luasnip' },
+                    { name = 'luasnip' },
+                    { name = 'luasnip_choice' },
                     -- { name = 'vsnip'}
                 }),
                 formatting = {
@@ -1857,7 +1886,13 @@ require("lazy").setup({
                 ),
                 matching = { disallow_symbol_nonprefix_matching = false }
             })
-
+            cmp.setup.filetype('gitcommit', {
+                sources = cmp.config.sources(
+                    { { name = 'git' },  },
+                    { { name = 'buffer' },  }
+                )
+            })
+            require("cmp_git").setup()
 
         end,
     },
@@ -3303,3 +3338,5 @@ vim.cmd [[
 
 vim.cmd [[ command! -nargs=+ -complete=command Redir let s:reg = @@ | redir @"> | silent execute <q-args> | redir END | new | pu | 1,2d_ | let @@ = s:reg ]]
 
+-- workaround that if we <leader>rce type too fast
+-- vim: ft=lua
