@@ -683,6 +683,7 @@ require("lazy").setup({
     },
     {
         "Zeioth/compiler.nvim",
+        enabled = false,
         dependencies = { "stevearc/overseer.nvim", "nvim-telescope/telescope.nvim" },
         cmd = { "CompilerOpen", "CompilerToggleResults", "CompilerRedo" },
         -- cmd = {
@@ -705,6 +706,7 @@ require("lazy").setup({
     },
     { -- The task runner we use
         "stevearc/overseer.nvim",
+        enabled = false,
         commit = "6271cab7ccc4ca840faa93f54440ffae3a3918bd",
         opts = {
             task_list = {
@@ -1863,6 +1865,7 @@ require("lazy").setup({
                     -- { name = 'vsnip'}
                 }),
                 formatting = {
+                    -- Thanks to: https://github.com/hrsh7th/nvim-cmp/issues/88#issuecomment-906585635
                     format = function(_, vim_item)
                         vim_item.abbr = string.sub(vim_item.abbr, 1, 20)
                         return vim_item
@@ -1884,7 +1887,15 @@ require("lazy").setup({
                     { { name = 'path' } },
                     { { name = 'cmdline' } }
                 ),
-                matching = { disallow_symbol_nonprefix_matching = false }
+                formatting = {
+                    fields = { 'abbr', 'menu', 'kind' }, -- Remove 'kind' from fields
+                    format = function(entry, vim_item)
+                        if entry.source.name == 'cmdline' then
+                            vim_item.kind = ''
+                        end
+                        return vim_item
+                    end
+                },
             })
             cmp.setup.filetype('gitcommit', {
                 sources = cmp.config.sources(
@@ -1892,8 +1903,7 @@ require("lazy").setup({
                     { { name = 'buffer' },  }
                 )
             })
-            require("cmp_git").setup()
-
+            require("cmp_git").setup({})
         end,
     },
     -- {
@@ -1919,7 +1929,7 @@ require("lazy").setup({
     {
         "j-hui/fidget.nvim", -- LSP Progress message UI
         event = 'VeryLazy',
-        cmds =  { 'NotifyHistory' },
+        cmd =  { 'NotifyHistory' },
         opts = function ()
             vim.api.nvim_create_user_command('NotifyHistory',
                 'lua require("fidget.notification").show_history()'
@@ -2685,6 +2695,9 @@ require("lazy").setup({
     },
     {
         "danymat/neogen",
+        cmd = {
+            "Neogen"
+        },
         dependencies = {
             -- 'hrsh7th/vim-vsnip',
             'L3MON4D3/LuaSnip',
@@ -2705,8 +2718,7 @@ require("lazy").setup({
             'nvim-treesitter/nvim-treesitter', -- optional
             -- 'nvim-tree/nvim-web-devicons'     -- optional
         },
-        enabled = true,
-        event = "LspAttach",
+        enabled = false,
         opts = {
             ui = {
                 code_action = '*',
