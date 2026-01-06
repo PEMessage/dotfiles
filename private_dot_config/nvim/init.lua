@@ -850,12 +850,20 @@ require("lazy").setup({
     },
     {
         'tpope/vim-fugitive',
+        event = 'VeryLazy',
     },
     {
         'justinmk/vim-dirvish',
     },
     {
         'tpope/vim-eunuch',
+        event = 'VeryLazy',
+        config = function(_, _)
+            vim.cmd [[
+            delcommand Unlink
+            delcommand Remove
+            ]]
+        end,
     },
     {
         'tpope/vim-unimpaired',
@@ -1712,15 +1720,12 @@ require("lazy").setup({
         dependencies = {
             -- 'rafamadriz/friendly-snippets',
             'honza/vim-snippets',
+            -- "mireq/luasnip-snippets",
         },
         config = function(_, opts)
             require('luasnip').setup(opts)
-            -- require("luasnip.loaders.from_vscode").lazy_load()
             require("luasnip.loaders.from_snipmate").lazy_load()
         end
-
-    },
-    {
     },
     {
         "hrsh7th/nvim-cmp",
@@ -1730,6 +1735,7 @@ require("lazy").setup({
         dependencies = {
             'hrsh7th/cmp-nvim-lsp-signature-help',
             'hrsh7th/cmp-nvim-lsp',
+            'andersevenrud/cmp-tmux',
             'hrsh7th/cmp-buffer',
             'hrsh7th/cmp-path',
             'hrsh7th/cmp-cmdline',
@@ -1858,6 +1864,7 @@ require("lazy").setup({
                 sources = cmp.config.sources({
                     { name = 'lazydev' },
                     { name = 'buffer' },
+                    { name = 'tmux' },
                     { name = 'path' },
                     { name = 'nvim_lsp_signature_help' },
                     { name = 'nvim_lsp' },
@@ -1866,8 +1873,13 @@ require("lazy").setup({
                     -- { name = 'vsnip'}
                 }),
                 formatting = {
-                    -- Thanks to: https://github.com/hrsh7th/nvim-cmp/issues/88#issuecomment-906585635
-                    format = function(_, vim_item)
+                    format = function(entry, vim_item)
+                        if entry.source.name == 'tmux' then
+                            vim_item.kind = 'tmux'
+                            vim_item.menu = nil
+                            vim_item.kind_hl_group = 'Special'
+                        end
+                        -- Thanks to: https://github.com/hrsh7th/nvim-cmp/issues/88#issuecomment-906585635
                         vim_item.abbr = string.sub(vim_item.abbr, 1, 20)
                         return vim_item
                     end
@@ -1909,6 +1921,7 @@ require("lazy").setup({
                     {
                         name = 'cmdline_history',
                         max_item_count = 10,
+                        keyword_length = 4
                     }
                 },
                 formatting = {
@@ -1919,6 +1932,7 @@ require("lazy").setup({
                         end
                         if entry.source.name == 'cmdline_history' then
                             vim_item.kind = 'Hist'
+                            vim_item.kind_hl_group = 'Special'
                             entry.completion_item.documentation = vim_item.abbr
                             vim_item.abbr = string.sub(vim_item.abbr, 1, 20)
                         end
