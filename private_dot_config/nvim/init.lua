@@ -1733,6 +1733,7 @@ require("lazy").setup({
             'hrsh7th/cmp-buffer',
             'hrsh7th/cmp-path',
             'hrsh7th/cmp-cmdline',
+            'dmitmel/cmp-cmdline-history',
             'hrsh7th/cmp-nvim-lsp-document-symbol',
 
             'petertriho/cmp-git',
@@ -1877,22 +1878,78 @@ require("lazy").setup({
 
             }
         end,
+
+
         config = function(_, opts)
             local cmp = require('cmp')
             cmp.setup(opts)
 
+            local default_config = require('cmp.config.default')()
+            local comparators = default_config.sorting.comparators
+            local function button_down_cmdline_history(entry1, entry2)
+                local source1 = entry1.source.name
+                local source2 = entry2.source.name
+
+                if source1 == 'cmdline_history' and source2 ~= 'cmdline_history' then
+                    return false
+                end
+                if source1 ~= 'cmdline_history' and source2 == 'cmdline_history' then
+                    return true
+                end
+
+                return nil
+            end
+            -- should after compare.exact/compare.offset
+            table.insert(comparators, 1, button_down_cmdline_history)
+
             cmp.setup.cmdline(':', {
                 mapping = cmp.mapping.preset.cmdline(),
-                sources = cmp.config.sources(
-                    { { name = 'path' } },
-                    { { name = 'cmdline' } }
-                ),
+                sources = {
+                    { name = 'cmdline' },
+                    {
+                        name = 'cmdline_history',
+                        max_item_count = 10,
+                    }
+                },
                 formatting = {
                     fields = { 'abbr', 'menu', 'kind' }, -- Remove 'kind' from fields
                     format = function(entry, vim_item)
                         if entry.source.name == 'cmdline' then
-                            vim_item.kind = ''
+                            vim_item.kind = 'Cmd'
                         end
+                        if entry.source.name == 'cmdline_history' then
+                            vim_item.kind = 'Hist'
+                            entry.completion_item.documentation = vim_item.abbr
+                            vim_item.abbr = string.sub(vim_item.abbr, 1, 20)
+                        end
+                        return vim_item
+                    end
+                },
+                -- Ensure that cmdline source always show first
+                sorting = {
+                    priority_weight = 2,
+                    comparators = comparators
+                },
+                matching = { disallow_symbol_nonprefix_matching = false }
+            })
+
+            cmp.setup.cmdline({'/', '?'}, {
+                mapping = cmp.mapping.preset.cmdline(),
+                sources = {
+                    -- { name = 'buffer' },
+                    { name = 'cmdline_history' },
+                },
+                completion = {
+                    autocomplete = false,  -- 禁用自动弹出
+                },
+                formatting = {
+                    fields = { 'abbr', 'menu', 'kind' }, -- Remove 'kind' from fields
+                    format = function(entry, vim_item)
+                        if entry.source.name == 'cmdline_history' then
+                            vim_item.kind = 'Hist'
+                            vim_item.kind_hl_group = 'Special'
+                        end
+                        vim_item.abbr = string.sub(vim_item.abbr, 1, 20)
                         return vim_item
                     end
                 },
@@ -1901,7 +1958,7 @@ require("lazy").setup({
                 sources = cmp.config.sources(
                     { { name = 'git' },  },
                     { { name = 'buffer' },  }
-                )
+                ),
             })
             require("cmp_git").setup({})
         end,
