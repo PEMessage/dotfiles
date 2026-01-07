@@ -500,7 +500,7 @@ require("lazy").setup({
         "delphinus/auto-cursorline.nvim",
         opts = {
              wait_ms = 1000,
-        }
+        },
     },
     {
         'nvim-lualine/lualine.nvim',
@@ -1595,9 +1595,25 @@ require("lazy").setup({
                 end
                 builtin.command_history({
                     default_text = default_text,
+                    -- ctrlp like style
+                    layout_strategy = "bottom_pane",
+                    layout_config = {
+                        height = 15,
+                        mirror = false,
+                        prompt_position = "bottom",
+                    },
+                    -- borderchars = false,
+                    prompt_title = "",
+                    results_title = "",
+                    preview_title = "",
+
                     attach_mappings = function(prompt_bufnr, map)
+                        vim.api.nvim_buf_set_option(prompt_bufnr, "cursorline", false)
+                        vim.api.nvim_buf_set_var(prompt_bufnr, 'auto_cursorline_disabled', 1)
+
                         local picker = action_state.get_current_picker(prompt_bufnr)
                         local initial_text = picker and picker.default_text or ''
+
                         map({ "i", "n" }, "<enter>", actions.edit_command_line)
                         map({ "i", "n" }, "<C-c>",
                             function(...)
