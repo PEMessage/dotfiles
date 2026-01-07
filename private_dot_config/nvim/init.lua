@@ -309,6 +309,18 @@ require("lazy").setup({
 
         }
     },
+    {
+        "nvim-mini/mini.move",
+        opts = {
+            mappings = {
+                left = '<M-h>',
+                right = '<M-l>',
+                down = '<M-j>',
+                up = '<M-k>',
+            },
+        }
+
+    },
     -- -------------------------------------------
     -- 5.1 Style Plugin
     -- -------------------------------------------
@@ -3098,8 +3110,11 @@ local section = function ()
     vim.keymap.set("n", "<M-k>", "<cmd>m .-2<cr>==", { desc = "Move up" })
     vim.keymap.set("i", "<M-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move down" })
     vim.keymap.set("i", "<M-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move up" })
-    vim.keymap.set("v", "<M-j>", ":m '>+1<cr>gv=gv", { desc = "Move down" })
-    vim.keymap.set("v", "<M-k>", ":m '<-2<cr>gv=gv", { desc = "Move up" })
+
+    -- let mini.move handle it, which support
+    -- charwise with v, linewise with V, and blockwise with CTRL-V
+    -- vim.keymap.set("v", "<M-j>", ":m '>+1<cr>gv=gv", { desc = "Move down" })
+    -- vim.keymap.set("v", "<M-k>", ":m '<-2<cr>gv=gv", { desc = "Move up" })
 
     vim.keymap.set('x', 'p', 'P', { noremap = true })
     vim.keymap.set('x', 'P', 'p', { noremap = true })
