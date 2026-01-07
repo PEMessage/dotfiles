@@ -1535,15 +1535,17 @@ require("lazy").setup({
             -- Helper function to create telescope dropdown config
             local actions = require("telescope.actions")
             local action_state = require("telescope.actions.state")
+
+            local function disable_cursorline(prompt_bufnr, _)
+                vim.api.nvim_buf_set_option(prompt_bufnr, "cursorline", false)
+                vim.api.nvim_buf_set_var(prompt_bufnr, 'auto_cursorline_disabled', 1)
+                return true
+            end
+
             local function create_dropdown_config(opts)
                 local defaults = {
                     layout_config = { width = 0.8 },
-                    attach_mappings = function(_, map)
-                        map({ 'i', 'n' }, '<C-p>', function(...)
-                            return actions.close(...)
-                        end)
-                        return true
-                    end
+                    attach_mappings = disable_cursorline,
                 }
                 return require('telescope.themes').get_dropdown(vim.tbl_extend("force", defaults, opts or {}))
             end
@@ -1551,11 +1553,19 @@ require("lazy").setup({
             -- Helper function to create buffer picker
             local builtin = require('telescope.builtin')
 
+
             local function buffers_picker()
                 builtin.buffers(create_dropdown_config({
                     sort_mru = true,
                     ignore_current_buffer = true,
-                    path_display = { shorten = { len = 2, exclude = { 1, 2, -3, -2, -1 } } }
+                    path_display = { shorten = { len = 2, exclude = { 1, 2, -3, -2, -1 } } },
+                    attach_mappings = function(prompt_bufnr, map)
+                        disable_cursorline(prompt_bufnr, map)
+                        map({ 'i', 'n' }, '<C-p>', function(...)
+                            return actions.close(...)
+                        end)
+                        return true
+                    end
                 }))
             end
 
@@ -1563,7 +1573,8 @@ require("lazy").setup({
             local function oldfiles_picker()
                 builtin.oldfiles(create_dropdown_config({
                     previewer = false,
-                    attach_mappings = function(_, map)
+                    attach_mappings = function(prompt_bufnr, map)
+                        disable_cursorline(prompt_bufnr, map)
                         map({ 'i', 'n' }, '<C-r>', function(...)
                             return actions.close(...)
                         end)
@@ -1576,7 +1587,8 @@ require("lazy").setup({
             local function find_files_picker()
                 builtin.find_files({
                     previewer = false,
-                    path_display = { shorten = { len = 3, exclude = { 1, 2, -3, -2, -1 } } }
+                    path_display = { shorten = { len = 3, exclude = { 1, 2, -3, -2, -1 } } },
+                    attach_mappings = disable_cursorline,
                 })
             end
 
@@ -1608,8 +1620,7 @@ require("lazy").setup({
                     preview_title = "",
 
                     attach_mappings = function(prompt_bufnr, map)
-                        vim.api.nvim_buf_set_option(prompt_bufnr, "cursorline", false)
-                        vim.api.nvim_buf_set_var(prompt_bufnr, 'auto_cursorline_disabled', 1)
+                        disable_cursorline(prompt_bufnr, map)
 
                         local picker = action_state.get_current_picker(prompt_bufnr)
                         local initial_text = picker and picker.default_text or ''
@@ -1647,6 +1658,7 @@ require("lazy").setup({
 
             return {
                 defaults = {
+                    borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
                     mappings = {
                         i = {
                             ['<C-j>'] = actions.move_selection_next,
