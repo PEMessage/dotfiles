@@ -1534,6 +1534,7 @@ require("lazy").setup({
         keys = function(_, _)
             -- Helper function to create telescope dropdown config
             local actions = require("telescope.actions")
+            local action_state = require("telescope.actions.state")
             local function create_dropdown_config(opts)
                 local defaults = {
                     layout_config = { width = 0.8 },
@@ -1578,10 +1579,26 @@ require("lazy").setup({
             end
 
             local function cmd_history()
+                local default_text = vim.fn.getcmdline()
+                -- vim.api.nvim_feedkeys(
+                --     vim.api.nvim_replace_termcodes("<C-\\><C-N>", true, true, true),
+                --     "n",
+                --     true
+                -- )
                 require('telescope.builtin').command_history({
-                    default_text = vim.fn.getcmdline(),
-                    attach_mappings = function(_, map)
+                    default_text = default_text,
+                    attach_mappings = function(prompt_bufnr, map)
+                        local picker = action_state.get_current_picker(prompt_bufnr)
+                        local default_text = picker and picker.default_text or ''
                         map({ "i", "n" }, "<enter>", actions.edit_command_line)
+                        map({ "i", "n" }, "<C-c>",
+                            function(...)
+                                actions.close(...)
+                                if default_text ~= '' then
+                                    vim.api.nvim_feedkeys(":" .. default_text, "n", true)
+                                end
+                            end
+                        )
                         return true
                     end,
                 })
@@ -1591,7 +1608,7 @@ require("lazy").setup({
                 {"<C-p>", buffers_picker, "Buffers" },
                 {"<C-r>", oldfiles_picker, "MRU" },
                 {"<C-e>", find_files_picker, "Find Files" },
-                {"<C-q>", cmd_history,  "Commands History", mode = {"c", "n"}},
+                {"<C-q>", cmd_history,  "Commands History", mode = {"c", "n"}, silent = true},
                 {"<leader>tm", "<cmd>Telescope man_pages<cr>", "Telescope Man Pages" },
                 {"<leader>td", "<cmd>Telescope lsp_definitions<cr>", "Telescope LSP Define" },
                 {"<leader>th", "<cmd>Telescope help_tags<cr>", "Telescope Help Pages" },
