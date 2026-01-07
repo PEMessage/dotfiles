@@ -673,7 +673,7 @@ require("lazy").setup({
             "hrsh7th/nvim-cmp",
             -- "nvim-treesitter/nvim-treesitter",
         },
-        config = function(_, opts)
+        config = function(_, _)
             require('cmp').setup.filetype('neorepl', {
                 enabled = false
             })
@@ -1549,8 +1549,10 @@ require("lazy").setup({
             end
 
             -- Helper function to create buffer picker
+            local builtin = require('telescope.builtin')
+
             local function buffers_picker()
-                require('telescope.builtin').buffers(create_dropdown_config({
+                builtin.buffers(create_dropdown_config({
                     sort_mru = true,
                     ignore_current_buffer = true,
                     path_display = { shorten = { len = 2, exclude = { 1, 2, -3, -2, -1 } } }
@@ -1559,7 +1561,7 @@ require("lazy").setup({
 
             -- Helper function to create oldfiles picker
             local function oldfiles_picker()
-                require('telescope.builtin').oldfiles(create_dropdown_config({
+                builtin.oldfiles(create_dropdown_config({
                     previewer = false,
                     attach_mappings = function(_, map)
                         map({ 'i', 'n' }, '<C-r>', function(...)
@@ -1572,30 +1574,36 @@ require("lazy").setup({
 
             -- Helper function to create find_files picker
             local function find_files_picker()
-                require('telescope.builtin').find_files({
+                builtin.find_files({
                     previewer = false,
                     path_display = { shorten = { len = 3, exclude = { 1, 2, -3, -2, -1 } } }
                 })
             end
 
             local function cmd_history()
-                local default_text = vim.fn.getcmdline()
-                -- vim.api.nvim_feedkeys(
-                --     vim.api.nvim_replace_termcodes("<C-\\><C-N>", true, true, true),
-                --     "n",
-                --     true
-                -- )
-                require('telescope.builtin').command_history({
+                local default_text = ''
+                local mode = vim.fn.mode()
+                if mode == "c" then
+                    if vim.fn.getcmdtype() ~= ":" then
+                        return
+                    end
+                    default_text = vim.fn.getcmdline()
+                    -- clean it, so that
+                    -- 1. it will not being add to cmdline_history
+                    -- 2. will not trigger a 'E492: Not an editor command' why???
+                    vim.fn.setcmdline('')
+                end
+                builtin.command_history({
                     default_text = default_text,
                     attach_mappings = function(prompt_bufnr, map)
                         local picker = action_state.get_current_picker(prompt_bufnr)
-                        local default_text = picker and picker.default_text or ''
+                        local initial_text = picker and picker.default_text or ''
                         map({ "i", "n" }, "<enter>", actions.edit_command_line)
                         map({ "i", "n" }, "<C-c>",
                             function(...)
                                 actions.close(...)
-                                if default_text ~= '' then
-                                    vim.api.nvim_feedkeys(":" .. default_text, "n", true)
+                                if initial_text ~= '' then
+                                    vim.api.nvim_feedkeys(":" .. initial_text, "n", true)
                                 end
                             end
                         )
@@ -1608,7 +1616,7 @@ require("lazy").setup({
                 {"<C-p>", buffers_picker, "Buffers" },
                 {"<C-r>", oldfiles_picker, "MRU" },
                 {"<C-e>", find_files_picker, "Find Files" },
-                {"<C-q>", cmd_history,  "Commands History", mode = {"c", "n"}, silent = true},
+                {"<C-q>", cmd_history,  "Commands History", mode = {"c", "n"}, noremap = true},
                 {"<leader>tm", "<cmd>Telescope man_pages<cr>", "Telescope Man Pages" },
                 {"<leader>td", "<cmd>Telescope lsp_definitions<cr>", "Telescope LSP Define" },
                 {"<leader>th", "<cmd>Telescope help_tags<cr>", "Telescope Help Pages" },
@@ -1961,6 +1969,7 @@ require("lazy").setup({
                     priority_weight = 2,
                     comparators = comparators
                 },
+                ---@diagnostic disable-next-line: missing-fields
                 matching = { disallow_symbol_nonprefix_matching = false }
             })
 
@@ -1991,6 +2000,7 @@ require("lazy").setup({
                     { { name = 'buffer' },  }
                 ),
             })
+            ---@diagnostic disable-next-line: missing-fields
             require("cmp_git").setup({})
         end,
     },
@@ -3063,6 +3073,9 @@ local section = function ()
 
     vim.keymap.set('x', 'p', 'P', { noremap = true })
     vim.keymap.set('x', 'P', 'p', { noremap = true })
+
+    -- When exit cmdline, clean input so that will not go into cmdwin(<c-f> or q:c)
+    vim.keymap.set('c', '<C-c>', [[getcmdtype() == ':' ? '<C-u><C-c>' : '<C-c>']], { noremap = true, expr = true })
 
     -- Jump Section
     vim.keymap.set(
