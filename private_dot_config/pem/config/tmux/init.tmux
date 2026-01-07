@@ -102,6 +102,9 @@
     bind -n C-M-b choose-buffer # yank ring
     bind -n C-M-z resize-pane -Z # yank ring
 
+    bind-key v select-layout even-horizontal
+    bind-key h select-layout even-vertical
+
     # vi copy mode
     # ----------------------------
     # setw -g mode-keys vi 

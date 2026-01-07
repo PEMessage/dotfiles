@@ -104,6 +104,8 @@ local section = function ()
     vim.o.splitright  = true -- Put new windows right of current
     vim.o.pumheight = 10
 
+    vim.o.jumpoptions = "stack"
+
     -- vim.api.nvim_create_autocmd( { 'FileType' },{
     --     pattern       = { 'help','man' },
     --     command       = 'wincmd L'
