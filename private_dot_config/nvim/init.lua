@@ -1558,7 +1558,14 @@ require("lazy").setup({
 
             local function create_dropdown_config(opts)
                 local defaults = {
-                    layout_config = { width = 0.8 },
+                    layout_config = {
+                        width = 0.8,
+                    },
+                    borderchars = {
+                        prompt = { "─", "│", "-", "│", "┌", "┐", "│", "│" },
+                        results = { "─", "│", "─", "│", "├", "┤", "┘", "└" },
+                        preview = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
+                    },
                     attach_mappings = disable_cursorline,
                 }
                 return require('telescope.themes').get_dropdown(vim.tbl_extend("force", defaults, opts or {}))
@@ -1619,13 +1626,13 @@ require("lazy").setup({
                     -- 2. will not trigger a 'E492: Not an editor command' why???
                     vim.fn.setcmdline('')
                 end
-                builtin.command_history({
+                builtin.command_history(require("telescope.themes").get_ivy ({
                     default_text = default_text,
                     -- ctrlp like style
-                    layout_strategy = "bottom_pane",
+                    sorting_strategy = "descending",
                     layout_config = {
                         height = 15,
-                        mirror = false,
+                        mirror = true,
                         prompt_position = "bottom",
                     },
                     -- borderchars = false,
@@ -1639,18 +1646,19 @@ require("lazy").setup({
                         local picker = action_state.get_current_picker(prompt_bufnr)
                         local initial_text = picker and picker.default_text or ''
 
-                        map({ "i", "n" }, "<enter>", actions.edit_command_line)
-                        map({ "i", "n" }, "<C-c>",
-                            function(...)
-                                actions.close(...)
-                                if initial_text ~= '' then
-                                    vim.api.nvim_feedkeys(":" .. initial_text, "n", true)
-                                end
+                        local function close(...)
+                            actions.close(...)
+                            if initial_text ~= '' then
+                                vim.api.nvim_feedkeys(":" .. initial_text, "n", true)
                             end
-                        )
+                        end
+
+                        map({ "i", "n" }, "<enter>", actions.edit_command_line)
+                        map({ "i", "n" }, "<C-c>", close)
+                        map({ "i", "n" }, "<C-q>", close)
                         return true
                     end,
-                })
+                }))
             end
 
             return {
@@ -1672,6 +1680,7 @@ require("lazy").setup({
 
             return {
                 defaults = {
+                    -- layout_strategy = "center",
                     borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
                     mappings = {
                         i = {
