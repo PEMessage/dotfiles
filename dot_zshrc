@@ -128,6 +128,10 @@
     zinit ice as"completion"
     zinit snippet https://github.com/docker/cli/blob/master/contrib/completion/zsh/_docker
 
+    zinit ice as"completion"
+    zinit snippet https://github.com/sainnhe/zsh-completions/blob/master/src/custom/_fzf
+    zinit ice as"completion"
+    zinit snippet https://github.com/gradle/gradle-completion/blob/master/_gradle
 
     # https://unix.stackexchange.com/a/157773
     setopt AUTO_PUSHD                  # pushes the old directory onto the stack
