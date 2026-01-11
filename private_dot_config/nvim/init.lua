@@ -290,14 +290,6 @@ require("lazy").setup({
             default_quickfix_mappings = false,
 
             mappings = {
-                trigger = {
-                    n = {
-                        ["<c-k>"] = "open_cword",      -- Open UI - search pattern = <cword>
-                    },
-                    x = {
-                        ["<c-k>"] = "open_visual", -- Open UI - search pattern = current visual selection
-                    },
-                },
                 ui = {
                     -- Normal mode maps
                     n = {
@@ -305,9 +297,11 @@ require("lazy").setup({
                     },
                 },
             }
-
-
-        }
+        },
+        keys = {
+            {'<m-/>', mode = {'n'}, '<cmd>lua require("rgflow").open_cword()<CR>' },
+            {'<m-/>', mode = {'v'}, '<cmd>lua require("rgflow").open_visual()<CR>' },
+        },
     },
     {
         "nvim-mini/mini.move",
@@ -790,6 +784,9 @@ require("lazy").setup({
                     search = {
                         enabled = false,
                     },
+                    char = {
+                        enabled = false,
+                    }
                 },
             }
         end,
@@ -1083,12 +1080,12 @@ require("lazy").setup({
                 desc = 'Toggle line blame', silent = true
             },
             {
-                '[c', '<cmd>Gitsigns prev_hunk<cr>', mode = 'n',
-                desc = 'Previous git changed line', silent = true
+                '[c', "&diff ? '[c' : ':Gitsigns prev_hunk<CR>'", mode = 'n',
+                desc = 'Previous git changed line', silent = true, expr = true
             },
             {
-                ']c', '<cmd>Gitsigns next_hunk<cr>', mode = 'n',
-                desc = 'Next git changed line', silent = true
+                ']c', "&diff ? ']c' : ':Gitsigns next_hunk<CR>'", mode = 'n',
+                desc = 'Next git changed line', silent = true, expr = true
             },
             {
                 --- @note if we want pass range to cmd, we must use : instead of <cmd>
@@ -3198,8 +3195,9 @@ local section = function ()
         { desc = "Go to Previous Paste", noremap = true }
     )
 
-    vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1, float = true }) end, { desc = 'Go to previous diagnostic' })
-    vim.keymap.set('n', ']d', function() vim.diagnostic.jump({ count =  1, float = true }) end, { desc = 'Go to next diagnostic' })
+    vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1, float = true }) end, { noremap = true, desc = 'Go to previous diagnostic' })
+    vim.keymap.set('n', ']d', function() vim.diagnostic.jump({ count =  1, float = true }) end, { noremap = true, desc = 'Go to next diagnostic' })
+
 
     -- Lsp
     vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition, { desc = 'Go to Declaration' })
