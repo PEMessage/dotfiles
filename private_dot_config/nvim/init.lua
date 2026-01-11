@@ -960,13 +960,13 @@ require("lazy").setup({
     },
     {
         "jake-stewart/multicursor.nvim",
-        enable = false,
+        enabled = false,
         config = function()
             local mc = require("multicursor-nvim")
             mc.setup()
 
             local set = vim.keymap.set
-            set({"n", "x"}, "<c-up>", function() mc.lineAddCurs123or(-1) end)
+            set({"n", "x"}, "<c-up>", function() mc.lineAddCursor(-1) end)
             set({"n", "x"}, "<c-down>", function() mc.lineAddCursor(1) end)
             set({"n", "x"}, "<m-up>", function() mc.lineSkipCursor(-1) end)
             set({"n", "x"}, "<m-down>", function() mc.lineSkipCursor(1) end)
