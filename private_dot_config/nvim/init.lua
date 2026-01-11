@@ -1490,6 +1490,7 @@ require("lazy").setup({
 
     -- -------------------------------------------
     -- 5.5 Telescope Setting
+
     -- -------------------------------------------
     {
         "nvim-telescope/telescope-fzf-native.nvim",
@@ -1658,6 +1659,15 @@ require("lazy").setup({
                 })
             end
 
+            local function modify_sorter_scoring(sorter)
+                local original_scoring_fn = sorter.scoring_function
+                sorter.scoring_function = function(...)
+                    local score = original_scoring_fn(...)
+                    return score < 0 and score or 1
+                end
+                return sorter
+            end
+
             local function cmd_history()
                 local default_text = ''
                 local mode = vim.fn.mode()
@@ -1671,6 +1681,7 @@ require("lazy").setup({
                     -- 2. will not trigger a 'E492: Not an editor command' why???
                     vim.fn.setcmdline('')
                 end
+
                 builtin.command_history({
                     default_text = default_text,
                     -- ctrlp like style
@@ -1685,7 +1696,10 @@ require("lazy").setup({
                     prompt_title = "",
                     results_title = "",
                     preview_title = "",
-
+                    -- sorter
+                    sorter = modify_sorter_scoring(
+                        require('telescope.config').values.generic_sorter()
+                    ),
                     attach_mappings = function(prompt_bufnr, map)
                         disable_cursorline(prompt_bufnr, map)
 
