@@ -1671,9 +1671,10 @@ require("lazy").setup({
                     -- 2. will not trigger a 'E492: Not an editor command' why???
                     vim.fn.setcmdline('')
                 end
-                builtin.command_history(require("telescope.themes").get_ivy ({
+                builtin.command_history({
                     default_text = default_text,
                     -- ctrlp like style
+                    layout_strategy = "bottom_pane",
                     sorting_strategy = "descending",
                     layout_config = {
                         height = 15,
@@ -1703,7 +1704,7 @@ require("lazy").setup({
                         map({ "i", "n" }, "<C-q>", close)
                         return true
                     end,
-                }))
+                })
             end
 
             return {
