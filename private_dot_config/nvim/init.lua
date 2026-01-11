@@ -959,6 +959,51 @@ require("lazy").setup({
         end,
     },
     {
+        "jake-stewart/multicursor.nvim",
+        enable = false,
+        config = function()
+            local mc = require("multicursor-nvim")
+            mc.setup()
+
+            local set = vim.keymap.set
+            set({"n", "x"}, "<c-up>", function() mc.lineAddCurs123or(-1) end)
+            set({"n", "x"}, "<c-down>", function() mc.lineAddCursor(1) end)
+            set({"n", "x"}, "<m-up>", function() mc.lineSkipCursor(-1) end)
+            set({"n", "x"}, "<m-down>", function() mc.lineSkipCursor(1) end)
+
+
+            set("n", "<c-leftmouse>", mc.handleMouse)
+            set("n", "<c-leftdrag>", mc.handleMouseDrag)
+            set("n", "<c-leftrelease>", mc.handleMouseRelease)
+
+            mc.addKeymapLayer(function(layerSet)
+
+                -- Select a different cursor as the main one.
+                layerSet({"n", "x"}, "<m-h>", mc.prevCursor)
+                layerSet({"n", "x"}, "<m-l>", mc.nextCursor)
+
+                local function exit()
+                    if not mc.cursorsEnabled() then
+                        mc.enableCursors()
+                    else
+                        mc.clearCursors()
+                    end
+                end
+                layerSet("n", "<esc>", exit)
+                layerSet("n", "<c-c>", exit)
+            end)
+
+            local hl = vim.api.nvim_set_hl
+            hl(0, "MultiCursorCursor", { reverse = true })
+            hl(0, "MultiCursorVisual", { link = "Visual" })
+            hl(0, "MultiCursorSign", { link = "SignColumn"})
+            hl(0, "MultiCursorMatchPreview", { link = "Search" })
+            hl(0, "MultiCursorDisabledCursor", { reverse = true })
+            hl(0, "MultiCursorDisabledVisual", { link = "Visual" })
+            hl(0, "MultiCursorDisabledSign", { link = "SignColumn"})
+        end
+    },
+    {
         'PEMessage/vim-text-process',
         event = { 'InsertEnter', 'CmdLineEnter' },
         config = function ()
@@ -1939,11 +1984,11 @@ require("lazy").setup({
                 }),
                 sources = cmp.config.sources({
                     { name = 'lazydev' },
+                    { name = 'nvim_lsp_signature_help' },
+                    { name = 'nvim_lsp' },
                     { name = 'buffer' },
                     { name = 'tmux' },
                     { name = 'path' },
-                    { name = 'nvim_lsp_signature_help' },
-                    { name = 'nvim_lsp' },
                     { name = 'luasnip' },
                     { name = 'luasnip_choice' },
                     -- { name = 'vsnip'}
