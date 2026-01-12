@@ -3,6 +3,7 @@
 
     Remove-Item alias:curl
     Set-Alias -Name l -Value ls
+    Set-Alias -Name nvi -Value nvim
     Function Invoke-ScoopRsync {
         & rsync.exe `
             -e "$HOME\scoop\apps\cwrsync\current\bin\ssh.exe -i $HOME\.ssh\id_rsa -o UserKnownHostsFile=$HOME\.ssh\known_hosts" `
