@@ -6,7 +6,7 @@
     Function Invoke-ScoopRsync {
         & rsync.exe `
             -e "$HOME\scoop\apps\cwrsync\current\bin\ssh.exe -i $HOME\.ssh\id_rsa -o UserKnownHostsFile=$HOME\.ssh\known_hosts" `
-            --checksum `
+            --ignore-times `
             --progress  $args
         return $?
     }
