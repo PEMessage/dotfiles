@@ -83,7 +83,8 @@
         Darwin*)         PEM_OS="mac";;
         CYGWIN*)         PEM_OS="cygwin";;
         MINGW*)          PEM_OS="windows";;
-        *Msys)           PEM_OS="windows";;
+        *Msys)           PEM_OS="windows"
+                         PEM_OS_VARIANT="msys";;
         *)               PEM_OS="unknow"
     esac
 
@@ -96,7 +97,8 @@
         *)          PEM_ARCH="unknow"
     esac
 
-    PEM_INIT_SCRIPT="$(readlink -f ${BASH_SOURCE[0]-$0})"
+    # readlink is not builtin cmd, only use it if we need
+    # PEM_INIT_SCRIPT="$(readlink -f ${BASH_SOURCE[0]-$0})"
     export PEM_HOME="${XDG_CONFIG_HOME:-${HOME}/.config}/pem"
     export PEM_DATA_HOME="${XDG_CONFIG_HOME:-${HOME}/.local/share}/pem"
     export PEM_CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}/pem"
@@ -129,6 +131,10 @@
     alias l="ls --color=auto --time-style=long-iso -h"
     alias ll='ls --color=auto --time-style=long-iso -h -l -a'
 
+    if [ "$PEM_OS_VARIANT" == "msys" ] ; then
+        alias chezmoi='chezmoi -S "$(cygpath -w "${XDG_CONFIG_HOME:-${HOME}/.local/share}/chezmoi")"'
+    fi
+
 # -----------------------------------------
 # configuration
 # -----------------------------------------
@@ -150,7 +156,7 @@
         [ -d "$x" ] || {
            mkdir -p "$x/bin/misc.d"
            mkdir -p "$x/shell"
-           echo "# this script auto source by $PEM_INIT_SCRIPT" > \
+           echo "# this script auto source by initscript" > \
                "$x/shell/autorun.sh"
            mkdir -p "$x/etc"
         }
