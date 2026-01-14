@@ -299,8 +299,10 @@ require("lazy").setup({
             }
         },
         keys = {
-            {'<m-/>', mode = {'n'}, '<cmd>lua require("rgflow").open_cword()<CR>' },
-            {'<m-/>', mode = {'v'}, '<cmd>lua require("rgflow").open_visual()<CR>' },
+            -- For some reason, vim registers <C-/> as <C-_>
+            -- See https://stackoverflow.com/questions/9051837/how-to-map-c-to-toggle-comments-in-vim
+            {'<c-_>', mode = {'n'}, '<cmd>lua require("rgflow").open_cword()<CR>' },
+            {'<c-_>', mode = {'v'}, '<cmd>lua require("rgflow").open_visual()<CR>' },
         },
     },
     {
