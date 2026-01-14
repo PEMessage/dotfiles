@@ -36,5 +36,10 @@ Set-GitConfigGlobal alias.fw 'merge --ff-only'
 Set-GitConfigGlobal alias.re 'remote -v'
 Set-GitConfigGlobal alias.top 'rev-parse --show-toplevel'
 Set-GitConfigGlobal alias.st 'status --short --branch'
+Set-GitConfigGlobal alias.lst 'status --short --branch -- .'
 Set-GitConfigGlobal alias.lg 'log --oneline --graph'
+Set-GitConfigGlobal alias.dis "diff --staged"
+Set-GitConfigGlobal alias.dfs "diff --staged"
+Set-GitConfigGlobal alias.root-commit "log --all --oneline --decorate --max-parents=0"
+
 
