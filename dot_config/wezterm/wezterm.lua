@@ -36,6 +36,14 @@ local config = {
     },
     color_scheme = 'Campbell (Gogh)',
 
+    keys = {
+        {
+            key = 'P',
+            mods = 'SHIFT|CTRL',
+            action = wezterm.action.ActivateCommandPalette,
+        },
+    },
+
     mouse_bindings = {
 
         --  LeftClick Down
