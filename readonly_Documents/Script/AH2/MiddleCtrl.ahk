@@ -1,10 +1,10 @@
 #Requires AutoHotkey v2.0
 
 MagpieMsg := DllCall("RegisterWindowMessage", "Str", "MagpieScalingChanged", "UInt")
-active := false
+
 
 OnMessage(MagpieMsg, MagpieMessageHandler)
-
+ 
 MagpieMessageHandler(wParam, lParam, msg, hwnd) {
     global active
     if (wParam = 1) { ; Scaling started
@@ -15,6 +15,12 @@ MagpieMessageHandler(wParam, lParam, msg, hwnd) {
     }
 }
 
+active := true
 #HotIf WinExist("ahk_exe Magpie.exe") && active  
 MButton::Send "{Ctrl down}"
 MButton up::Send "{Ctrl up}"
+Xbutton1::Send "{Ctrl down}"
+Xbutton1 up::Send "{Ctrl up}"
+#HotIf
+
+#HotIf WinExist("ahk_exe Magpie.exe")
