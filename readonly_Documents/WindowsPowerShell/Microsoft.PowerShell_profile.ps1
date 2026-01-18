@@ -23,6 +23,15 @@
 		Set-PSReadLineOption -PredictionSource History # 设置预测文本来源为历史记录
         Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
 		# Set-PSReadLineKeyHandler -Key "Ctrl+d" -Function MenuComplete # 设置 Ctrl+d 为菜单补全和 Intellisense
+
+        # fix color issue in wezterm
+        # Set-PSReadLineOption -Colors @{ InlinePrediction = 'DarkGreen' }
+        # DarkGray and also with Italics,
+        #   3: This is the standard ANSI code for Italic
+        #   90: This is the code for Bright Black
+        Set-PSReadLineOption -Colors @{
+            InlinePrediction = "$([char]0x1b)[3;90m"
+        }
 	}
 
 
