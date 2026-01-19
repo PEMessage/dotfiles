@@ -3187,8 +3187,14 @@ local section = function ()
     vim.keymap.set("n", "<M-S-P>", "<cmd>bp<CR>", { desc = "Go to right window", remap = true })
 
     -- Switch Tabe using [t or ]t
-    vim.keymap.set("n", "]t", "<cmd>tabn<CR>", { desc = "Go to Next Tab", remap = true })
-    vim.keymap.set("n", "[t", "<cmd>tabp<CR>", { desc = "Go to Previous Tab", remap = true })
+    -- See: https://github.com/neovim/neovim/commit/bb7604eddafb31cd38261a220243762ee013273a
+    -- Also Check: https://github.com/neovim/neovim/blame/master/runtime/doc/vim_diff.txt
+    -- to see update of nvim default-mapping
+    -- become default mapping in 0.11
+    if vim.fn.has('nvim-0.11') == 0 then
+        vim.keymap.set("n", "]t", "<cmd>tabn<CR>", { desc = "Go to Next Tab", remap = true })
+        vim.keymap.set("n", "[t", "<cmd>tabp<CR>", { desc = "Go to Previous Tab", remap = true })
+    end
 
     -- Move Lines
     vim.keymap.set("n", "<M-j>", "<cmd>m .+1<cr>==", { desc = "Move down" })
@@ -3214,8 +3220,17 @@ local section = function ()
         { desc = "Go to Previous Paste", noremap = true }
     )
 
-    vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1, float = true }) end, { noremap = true, desc = 'Go to previous diagnostic' })
-    vim.keymap.set('n', ']d', function() vim.diagnostic.jump({ count =  1, float = true }) end, { noremap = true, desc = 'Go to next diagnostic' })
+    -- Become default keymap in nvim-0.10
+    -- See: https://github.com/neovim/neovim/commit/73034611c25d16df5e87c8afb2d339a03a91bd0d
+    if vim.fn.has('nvim-0.10') == 0 then
+        vim.keymap.set('n', ']d', function()
+            vim.diagnostic.jump({ count = vim.v.count1 })
+        end, { desc = 'Jump to the next diagnostic in the current buffer' })
+
+        vim.keymap.set('n', '[d', function()
+            vim.diagnostic.jump({ count = -vim.v.count1 })
+        end, { desc = 'Jump to the previous diagnostic in the current buffer' })
+    end
 
 
     -- Lsp

@@ -91,6 +91,8 @@
   "vim-fugitive": { "branch": "master", "commit": "61b51c09b7c9ce04e821f6cf76ea4f6f903e3cf4" },
   "vim-gf-diff": { "branch": "master", "commit": "bb843806547090cc6a59d32a82deeeec2695ae22" },
   "vim-gf-user": { "branch": "master", "commit": "1b29f2c68cfecc0ef007de871f0b7cbd7c2e784e" },
+  "vim-ingo-library": { "branch": "master", "commit": "3ea510a25f36df6a0a0eb8f075f3b2daca8adbc0" },
+  "vim-mark": { "branch": "master", "commit": "a613b0676fce72960c06e26f8f8f6454bcef4564" },
   "vim-quickrun": { "branch": "master", "commit": "77b4d6ea9972a206f02c736882c2398c36d2983c" },
   "vim-repeat": { "branch": "master", "commit": "65846025c15494983dafe5e3b46c8f88ab2e9635" },
   "vim-rsi": { "branch": "master", "commit": "45540637ead22f011e8215f1c90142e49d946a54" },
