@@ -1106,6 +1106,23 @@ require("lazy").setup({
         opts = {},
     },
     {
+        'inkarkat/vim-mark',
+        event = 'BufRead',
+        dependencies = 'inkarkat/vim-ingo-library',
+        init = function()
+            vim.g.mw_no_mappings = 1
+            vim.g.mwAutoLoadMarks = 1
+            vim.g.mwMaxMatchPriority = 10
+        end,
+        keys = {
+            { '<Leader>mt', '<Plug>MarkToggle', mode = 'n', desc = 'vim-mark toggle' },
+            { '<Leader>mc', '<Plug>MarkClear', mode = 'n', desc = 'vim-mark clear' },
+            { '<leader>m', '<Plug>MarkSet', mode = 'x', desc = 'Set visual vim-mark' },
+            { 'n', '<Plug>MarkSearchAnyOrDefaultNext', mode = 'n', desc = 'Next mark' },
+            { 'N', '<Plug>MarkSearchAnyOrDefaultPrev', mode = 'n', desc = 'Previous mark' },
+        },
+    },
+    {
         'kana/vim-gf-diff',
         dependencies = {
             'PEMessage/vim-gf-user'
