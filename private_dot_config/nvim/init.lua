@@ -3220,17 +3220,13 @@ local section = function ()
         { desc = "Go to Previous Paste", noremap = true }
     )
 
-    -- Become default keymap in nvim-0.10
-    -- See: https://github.com/neovim/neovim/commit/73034611c25d16df5e87c8afb2d339a03a91bd0d
-    if vim.fn.has('nvim-0.10') == 0 then
-        vim.keymap.set('n', ']d', function()
-            vim.diagnostic.jump({ count = vim.v.count1 })
-        end, { desc = 'Jump to the next diagnostic in the current buffer' })
+    vim.keymap.set('n', ']d', function()
+        vim.diagnostic.jump({ count = vim.v.count1, float = true })
+    end, { desc = 'Jump to the next diagnostic in the current buffer' })
 
-        vim.keymap.set('n', '[d', function()
-            vim.diagnostic.jump({ count = -vim.v.count1 })
-        end, { desc = 'Jump to the previous diagnostic in the current buffer' })
-    end
+    vim.keymap.set('n', '[d', function()
+        vim.diagnostic.jump({ count = -vim.v.count1, float = true })
+    end, { desc = 'Jump to the previous diagnostic in the current buffer' })
 
 
     -- Lsp
