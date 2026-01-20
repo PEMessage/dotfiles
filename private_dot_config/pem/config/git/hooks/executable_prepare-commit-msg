@@ -1,0 +1,29 @@
+#!/bin/sh
+
+COMMIT_MSG_FILE="$1"
+COMMIT_SOURCE="$2"
+SHA1="$3"
+
+# Only append history for new commits (not for merges, cherry-picks, etc.)
+# You can modify this condition based on your needs
+if [ "$COMMIT_SOURCE" = "message" ] ||
+    [ "$COMMIT_SOURCE" = "" ] ||
+    [ "$COMMIT_SOURCE" = "template" ] ||
+    [ "$COMMIT_SOURCE" = "commit" ] ; then
+
+    # Get the last 5 commits from HEAD (you can adjust this number)
+    # Format: hash - author date - subject
+    GIT_LOG=$(git log --oneline -5 HEAD 2>/dev/null)
+
+    if [ -n "$GIT_LOG" ]; then
+        # Append separator and recent history to commit message
+        echo "" >> "$COMMIT_MSG_FILE"
+        echo "# --- Recent Git History (HEAD) ---" >> "$COMMIT_MSG_FILE"
+        echo "$GIT_LOG" | while IFS= read -r line; do
+            echo "# $line" >> "$COMMIT_MSG_FILE"
+        done
+        echo "#" >> "$COMMIT_MSG_FILE"
+    fi
+fi
+
+exit 0

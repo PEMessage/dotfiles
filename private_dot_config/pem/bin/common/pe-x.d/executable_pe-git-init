@@ -20,6 +20,21 @@ git_config_global() {
     fi
     runcmd git config --global "$key" "$value"
 }
+
+git_config_global_if_not_set() {
+    key="$1"
+    value="$2"
+
+    curvalue="$(git config --global --get-all "$key")"
+
+    if [ "$curvalue" = "$value" ] ; then
+        return 0
+    elif [ -z "$curvalue" ] ; then
+        runcmd git config --global "$key" "$value"
+    else
+        echo "[Notice]: skip setting '${key}' since it's already has value..."
+    fi
+}
  
 git_config_global branch.sort -committerdate
 git_config_global column.ui auto
@@ -108,3 +123,8 @@ git_config_global alias.reset-author \
 
 # From https://github.com/unixorn/git-extra-commands
 git_config_global alias.root-commit 'log --all --oneline --decorate --max-parents=0'
+
+# Notice: re-run `git init` to install hook
+if [ -n "$PEM_HOME" ] && [ -d "$PEM_HOME/config/git" ] ; then
+    git_config_global_if_not_set init.templateDir "$PEM_HOME/config/git"
+fi
