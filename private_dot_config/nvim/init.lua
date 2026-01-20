@@ -192,8 +192,8 @@ require("lazy").setup({
     --     ft = "lazy"
     -- },
 
-    { 'projekt0n/github-nvim-theme' },
-    { 'catppuccin/nvim' },
+    -- { 'projekt0n/github-nvim-theme' },
+    -- { 'catppuccin/nvim' },
     -- {
     --     'uloco/bluloco.nvim',
     --     lazy = false,
@@ -223,7 +223,23 @@ require("lazy").setup({
     --     end,
     -- },
     {
+        'wuelnerdotexe/vim-enfocado',
+        enabled = false,
+        lazy = false,
+        priority = 900,
+        config = function ()
+            vim.cmd [[ colorscheme enfocado ]]
+        end
+    },
+    {
+        "uga-rosa/ccc.nvim",
+        lazy = true,
+        opts = {},
+        cmd = { 'CccPick' }
+    },
+    {
         'navarasu/onedark.nvim',
+        enabled = true,
         lazy = false,
         priority = 900,
         opts = {
@@ -231,7 +247,9 @@ require("lazy").setup({
             colors = {
                 pe_gray = "#7c8dab",    -- define a new color
                 pe_blue = "#499cff",    -- define a new color
-                bg0 = "#1f2329",
+                -- bg0 = "#1f2329", -- bg from darker
+                -- bg0 = "#181818", -- bg come from 'wuelnerdotexe/vim-enfocado'
+                bg0 = "#1a1a1a", -- more red and green, less blue compare to above
                 bg1 = "#282c34",
                 bg2 = "#30363f",
                 bg3 = "#323641",
