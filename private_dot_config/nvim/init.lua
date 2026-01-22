@@ -1894,8 +1894,13 @@ require("lazy").setup({
         },
         config = function(_, opts)
             require('luasnip').setup(opts)
-            require("luasnip.loaders.from_snipmate").lazy_load()
-            require("luasnip.loaders.from_vscode").lazy_load()
+            -- #guard in here(cpp)
+            require("luasnip.loaders.from_vscode").lazy_load() -- friendly-snippets
+            require("luasnip.loaders.from_snipmate").lazy_load() -- vim-snippets
+
+            -- Seem has bug??
+            -- inside this will call 'require("luasnip.loaders.from_vscode").lazy_load()' for us
+            -- require('luasnip_snippets.common.snip_utils').setup() -- mireq/luasnip-snippets
         end
     },
     {
