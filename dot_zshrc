@@ -60,6 +60,9 @@
     # Part 1 zsytle
     # man zshcompsys - Search for “Standard Tags”
     # ------------------------------------
+    #
+    # Tips: use <M-a> to select multiple item
+    #
     # zstyle ':completion:*:*:cdr:*:*' menu selection
     zstyle ':completion:*' menu select
     zstyle ':completion:*:*:*:*:descriptions' format '%F{green}-- %d --%f'

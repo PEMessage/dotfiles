@@ -1888,13 +1888,14 @@ require("lazy").setup({
     {
         'L3MON4D3/LuaSnip',
         dependencies = {
-            -- 'rafamadriz/friendly-snippets',
+            'rafamadriz/friendly-snippets',
             'honza/vim-snippets',
             -- "mireq/luasnip-snippets",
         },
         config = function(_, opts)
             require('luasnip').setup(opts)
             require("luasnip.loaders.from_snipmate").lazy_load()
+            require("luasnip.loaders.from_vscode").lazy_load()
         end
     },
     {
