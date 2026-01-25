@@ -85,7 +85,7 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
         New-NetFirewallRule -DisplayName "Allow ${Protocol} Inbound Port ${Port}" -Direction Inbound -Action Allow -Protocol $Protocol -LocalPort $Port
     }
 
-    # 移除 WSL 端口转发以及防火墙入站规则
+    # 移除 WSL 端口转发以及防火墙入站规则 #
     function Remove-WSLPortForwarding ($Port = '23333', $Protocol = 'TCP') {
         netsh interface portproxy delete v4tov4 listenport=$Port
         Remove-NetFirewallRule -DisplayName "Allow ${Protocol} Inbound Port ${Port}"
