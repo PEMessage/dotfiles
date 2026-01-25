@@ -68,44 +68,9 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 # fzf
 # # =========================================
 
-    if ( (Get-Command fzf -ErrorAction SilentlyCon ) -and ( Get-Command awk -ErrorAction SilentlyCont ) ) {
-        # Credit: https://gist.github.com/nv-h/081684cee2505cd336e26c2660fc7541
-        # Credit: https://github.com/kelleyma49/PSFzf
-        function Invoke-FuzzyHistory($Query='') {
-            # Pure powershell implent seen have bug?
-            # $seenCommands = New-Object System.Collections.Generic.HashSet[string]
-            # $excludeCommands = @('ls', 'cd', 'clear', 'pwd')
-            # $command = Get-Content (Get-PSReadlineOption).HistorySavePath |
-            # ForEach-Object { $_.Trim() } |
-            # ForEach-Object {
-            #     if ($seenCommands.Add($_)) {
-            #         $_
-            #     }
-            # } | fzf --tac "--query=${Query}" --color dark --no-sort
-            $command = Get-Content (Get-PSReadlineOption).HistorySavePath |
-                awk '!a[$0]++'   |
-                # awk '!a[$0]++'  |
-                fzf --scheme=history --tac "--query=${Query}" --color dark --height 10%
-
-            if ($command) {
-                return $command
-            }
-        }
-        function Invoke-FzfPsReadlineHandlerHistory {
-            $result = $null
-            $line = $null
-            $cursor = $null
-            [Microsoft.PowerShell.PSConsoleReadline]::GetBufferState([ref]$line, [ref]$cursor)
-
-            $result = Invoke-FuzzyHistory -Query $line
-            echo $result
-
-            if (-not [string]::IsNullOrEmpty($result)) {
-                [Microsoft.PowerShell.PSConsoleReadLine]::Replace(0, $line.Length, $result)
-            }
-        }
-        Set-PSReadLineKeyHandler -Key Ctrl+r { Invoke-FzfPsReadlineHandlerHistory }
-        Set-PSReadLineKeyHandler -Key Ctrl+q -Function ReverseSearchHistory
+    if (Get-Command fzf -ErrorAction SilentlyCon ) {
+        Import-Module PSFzfHistory
+        Set-FzfHistoryKeybind -Chord Ctrl+r
     }
 
 
