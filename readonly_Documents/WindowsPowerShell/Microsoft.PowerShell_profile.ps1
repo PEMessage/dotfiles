@@ -38,7 +38,8 @@
 # # =========================================
 # Env setup
 # # =========================================
-    $env:PATh += ";$HOME\Documents\Script\PS1;"
+    $env:PATh += ";$HOME\Documents\Script\PS1"
+    $env:PATh += ";$HOME\.config\pem\bin;"
     # Get-ChildItem -path "$HOME\Documents\Script\PS1" -Filter *.ps1 |
     # Foreach-Object{
     #     $name = $_.Name
@@ -68,9 +69,22 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 # fzf
 # # =========================================
 
-    if (Get-Command fzf -ErrorAction SilentlyCon ) {
+    $has_fzf = $(Get-Command fzf -ErrorAction SilentlyCon )
+    if ((Get-Command posh-fzf -ErrorAction SilentlyCon) -and ($has_fzf)) {
+        Invoke-Expression (&posh-fzf init | Out-String)
+        Set-PSReadLineKeyHandler -Key 'Ctrl+r' -ScriptBlock {
+            $historyPath = (Get-PSReadLineOption).HistorySavePath
+            $historyCommand = Invoke-PoshFzfStartProcess -FileName "posh-fzf" -Arguments @("history", $historyPath)
+            if ($historyCommand) {
+                [Microsoft.PowerShell.PSConsoleReadLine]::DeleteLine()
+                    Invoke-PoshFzfInsertUtf8 $historyCommand
+            }
+        }
+    } elseif ($has_fzf) {
         Import-Module PSFzfHistory
         Set-FzfHistoryKeybind -Chord Ctrl+r
+    } else {
+        # nothing
     }
 
 
