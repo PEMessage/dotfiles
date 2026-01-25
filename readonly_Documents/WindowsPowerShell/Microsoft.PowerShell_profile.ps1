@@ -64,30 +64,15 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
     # Import-Module PwshComplete
     Import-Module misc
 
-
-
 # # =========================================
-# WSL Relate
+# fzf
 # # =========================================
-    # Wsl port
-    function Add-WSLPortForwarding ($Port = '23333', $Protocol = 'TCP') {
-        $WSLIP = wsl -- hostname -I
-        $WSLIP = $WSLIP.Trim().split()[0]
-        netsh interface portproxy add v4tov4 listenport=$Port connectaddress=$WSLIP connectport=$Port
-        New-NetFirewallRule -DisplayName "Allow ${Protocol} Inbound Port ${Port}" -Direction Inbound -Action Allow -Protocol $Protocol -LocalPort $Port
-    }
-
-    # 移除 WSL 端口转发以及防火墙入站规则
-    function Remove-WSLPortForwarding ($Port = '23333', $Protocol = 'TCP') {
-        netsh interface portproxy delete v4tov4 listenport=$Port
-        Remove-NetFirewallRule -DisplayName "Allow ${Protocol} Inbound Port ${Port}"
-    }
 
     if ( (Get-Command fzf -ErrorAction SilentlyCon ) -and ( Get-Command awk -ErrorAction SilentlyCont ) ) {
         # Credit: https://gist.github.com/nv-h/081684cee2505cd336e26c2660fc7541
         # Credit: https://github.com/kelleyma49/PSFzf
         function Invoke-FuzzyHistory($Query='') {
-            # Pure powershell implent seen have bug? 
+            # Pure powershell implent seen have bug?
             # $seenCommands = New-Object System.Collections.Generic.HashSet[string]
             # $excludeCommands = @('ls', 'cd', 'clear', 'pwd')
             # $command = Get-Content (Get-PSReadlineOption).HistorySavePath |
@@ -121,6 +106,24 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
         }
         Set-PSReadLineKeyHandler -Key Ctrl+r { Invoke-FzfPsReadlineHandlerHistory }
         Set-PSReadLineKeyHandler -Key Ctrl+q -Function ReverseSearchHistory
+    }
+
+
+# # =========================================
+# WSL Relate
+# # =========================================
+    # Wsl port
+    function Add-WSLPortForwarding ($Port = '23333', $Protocol = 'TCP') {
+        $WSLIP = wsl -- hostname -I
+        $WSLIP = $WSLIP.Trim().split()[0]
+        netsh interface portproxy add v4tov4 listenport=$Port connectaddress=$WSLIP connectport=$Port
+        New-NetFirewallRule -DisplayName "Allow ${Protocol} Inbound Port ${Port}" -Direction Inbound -Action Allow -Protocol $Protocol -LocalPort $Port
+    }
+
+    # 移除 WSL 端口转发以及防火墙入站规则
+    function Remove-WSLPortForwarding ($Port = '23333', $Protocol = 'TCP') {
+        netsh interface portproxy delete v4tov4 listenport=$Port
+        Remove-NetFirewallRule -DisplayName "Allow ${Protocol} Inbound Port ${Port}"
     }
 
 
@@ -186,168 +189,3 @@ function Run-As {
 }
 #Alias: My sudo
 Set-Alias -Name msudo -Value Run-As
-
-
-function Invoke-SerialTerminal {
-    param (
-        [string]$Port = ([System.IO.Ports.SerialPort]::GetPortNames() | Select-Object -First 1),
-        [int]$BaudRate = 115200,
-        [System.IO.Ports.Parity]$Parity = "None",
-        [int]$DataBits = 8,
-        [System.IO.Ports.StopBits]$StopBits = "One",
-        [int]$ReadTimeout = 100,
-        [switch]$EchoLocal,
-        [switch]$NoInteractive
-    )
-
-    # Validate COM port exists
-    $availablePorts = [System.IO.Ports.SerialPort]::GetPortNames()
-    if ($Port -notin $availablePorts) {
-        throw "COM port '$Port' is not available. Available ports: $($availablePorts -join ', ')"
-    }
-
-    try {
-        $serialPort = New-Object System.IO.Ports.SerialPort $Port, $BaudRate, $Parity, $DataBits, $StopBits
-        $serialPort.ReadTimeout = $ReadTimeout
-        $serialPort.Open()
-        
-        if (-not $serialPort.IsOpen) {
-            throw "Failed to open COM port $Port"
-        }
-
-        # Check if input is being piped
-        $isPiped = $MyInvocation.ExpectingInput
-
-        if ($isPiped) {
-            # Binary mode - process piped input
-            $input | ForEach-Object {
-                $bytes = if ($_ -is [byte[]]) { $_ } else { [System.Text.Encoding]::ASCII.GetBytes($_) }
-                $serialPort.Write($bytes, 0, $bytes.Length)
-            }
-        }
-        elseif (-not $NoInteractive) {
-            # Interactive terminal mode
-            Write-Host "Serial Terminal - $Port @ $BaudRate baud (Press ESC to exit)"
-            Write-Host "----------------------------------------"
-
-            # Configure console for immediate key reading
-            Add-Type -TypeDefinition @"
-using System;
-using System.Runtime.InteropServices;
-public static class ConsoleHelper {
-    [DllImport("kernel32.dll", SetLastError = true)]
-    public static extern IntPtr GetStdHandle(int nStdHandle);
-    
-    [DllImport("kernel32.dll")]
-    public static extern bool GetConsoleMode(IntPtr hConsoleHandle, out uint lpMode);
-    
-    [DllImport("kernel32.dll")]
-    public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
-    
-    public const int STD_INPUT_HANDLE = -10;
-    public const uint ENABLE_ECHO_INPUT = 0x0004;
-    public const uint ENABLE_LINE_INPUT = 0x0002;
-}
-"@
-
-            $handle = [ConsoleHelper]::GetStdHandle([ConsoleHelper]::STD_INPUT_HANDLE)
-            $mode = 0
-            [ConsoleHelper]::GetConsoleMode($handle, [ref]$mode) | Out-Null
-            $newMode = $mode -band (-bnot [ConsoleHelper]::ENABLE_LINE_INPUT) -band (-bnot [ConsoleHelper]::ENABLE_ECHO_INPUT)
-            [ConsoleHelper]::SetConsoleMode($handle, $newMode) | Out-Null
-
-            try {
-                while ($serialPort.IsOpen) {
-                    # Read from serial port
-                    try {
-                        $incomingData = $serialPort.ReadExisting()
-                        if ($incomingData.Length -gt 0) {
-                            Write-Host -NoNewline $incomingData
-                        }
-                    }
-                    catch [System.TimeoutException] {
-                        # Expected timeout - continue
-                    }
-                    catch {
-                        Write-Warning "Read error: $_"
-                        break
-                    }
-
-                    # Check for keyboard input
-                    if ([Console]::KeyAvailable) {
-                        $key = [Console]::ReadKey($true)
-                        
-                        # Exit on ESC key
-                        if ($key.Key -eq [ConsoleKey]::Escape) {
-                            break
-                        }
-                        
-                        # Handle Enter key
-                        if ($key.Key -eq [ConsoleKey]::Enter) {
-                            $serialPort.Write("`r`n")
-                            if ($EchoLocal) {
-                                Write-Host "`r`n" -NoNewline
-                            }
-                        }
-                        # Handle backspace
-                        elseif ($key.Key -eq [ConsoleKey]::Backspace) {
-                            $serialPort.Write([char]8)
-                            if ($EchoLocal) {
-                                Write-Host "`b `b" -NoNewline
-                            }
-                        }
-                        # Normal characters
-                        else {
-                            $serialPort.Write($key.KeyChar)
-                            if ($EchoLocal) {
-                                Write-Host $key.KeyChar -NoNewline
-                            }
-                        }
-                    }
-
-                    Start-Sleep -Milliseconds 1
-                }
-            }
-            finally {
-                # Restore console mode
-                [ConsoleHelper]::SetConsoleMode($handle, $mode) | Out-Null
-            }
-        }
-        else {
-            # Non-interactive mode without pipe
-            try {
-                while ($serialPort.IsOpen) {
-                    try {
-                        $incomingData = $serialPort.ReadExisting()
-                        if ($incomingData.Length -gt 0) {
-                            Write-Host -NoNewline $incomingData
-                        }
-                    }
-                    catch [System.TimeoutException] {
-                        # Expected timeout - continue
-                    }
-                    catch {
-                        Write-Warning "Read error: $_"
-                        break
-                    }
-                    Start-Sleep -Milliseconds 1
-                }
-            }
-            catch {
-                Write-Error "Error: $_"
-            }
-        }
-    }
-    catch {
-        Write-Error "Serial port error: $_"
-    }
-    finally {
-        if ($serialPort -and $serialPort.IsOpen) {
-            $serialPort.Close()
-            $serialPort.Dispose()
-        }
-        if (-not $NoInteractive) {
-            Write-Host "`nExiting..."
-        }
-    }
-}
