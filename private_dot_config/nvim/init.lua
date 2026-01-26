@@ -2042,10 +2042,10 @@ require("lazy").setup({
                     { name = 'nvim_lsp_signature_help' },
                     { name = 'nvim_lsp' },
                     { name = 'buffer' },
-                    { name = 'tmux' },
-                    { name = 'path' },
                     { name = 'luasnip' },
                     { name = 'luasnip_choice' },
+                    { name = 'tmux' },
+                    { name = 'path' },
                     -- { name = 'vsnip'}
                 }),
                 formatting = {
