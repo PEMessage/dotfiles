@@ -1,13 +1,26 @@
 
 px() {
-    __px3_smartone -a set "$@"
+    __px3_smartone --autoipport -a set "$@"
 }
 unpx() {
-    __px3_smartone -a unset "$@"
+    __px3_smartone --autoipport -a unset "$@"
+}
+
+px2() {
+    local ip="$1"
+    local port="$2"
+    shift 2
+    __px3_smartone -a set -i "$ip" -p "$port" "$@"
+}
+unpx2() {
+    local ip="$1"
+    local port="$2"
+    shift 2
+    __px3_smartone -a unset -i "$ip" -p "$port" "$@"
 }
 
 __px3_smartone() {
-    local fnd opt narg
+    local fnd opt narg autoipport
     # Credit: https://github.com/rupa/z/blob/master/z.sh
     while [ "$1" ]; do case "$1" in
         --) while [ "$1" ]; do shift; narg="$narg $1";done;;
@@ -27,6 +40,9 @@ __px3_smartone() {
                 -n|--npm)
                     fnd="$fnd -m npm"
                 ;;
+                --autoipport)
+                    autoipport=1
+                ;;
                 *)
                     fnd="$fnd $opt"
                 ;;
@@ -37,35 +53,21 @@ __px3_smartone() {
     eval set -- "$fnd"
 
 
-
-    if [ "$PEM_OS_VARIANT" = wsl2 ] ||
-        uname -a | grep -i wsl2 >/dev/null 2>&1 ; then
-        if [ "$(wslinfo  --networking-mode 2>/dev/null)" = mirrored ] ; then
-            local hostip="localhost"
-        else
-            local hostip="$(ip route show | grep -i default | awk '{ print $3}' | head -n1)"
+    if [ "$autoipport" = 1 ] ; then
+        if [ "$PEM_OS_VARIANT" = wsl2 ]  ||
+            uname -a | grep -i wsl2 >/dev/null 2>&1 ; then
+            if [ "$(wslinfo  --networking-mode 2>/dev/null)" = mirrored ] ; then
+                local hostip="localhost"
+            else
+                local hostip="$(ip route show | grep -i default | awk '{ print $3}' | head -n1)"
+            fi
+            __px3_alltype  -i "$hostip" -p "7890" "$@"
         fi
-        __px3_alltype  -i "$hostip" -p "7890" "$@"
+    else
+        __px3_alltype "$@"
     fi
 
 }
-
-
-
-px2() {
-    local ip="$1"
-    local port="$2"
-    shift 2
-    __px3_alltype -a set -i "$ip" -p "$port" "$@"
-}
-unpx2() {
-    local ip="$1"
-    local port="$2"
-    shift 2
-    __px3_alltype -a unset -i "$ip" -p "$port" "$@"
-}
-
-
 
 __px3_alltype() {
     __px3 -k http_proxy -u "http://" "$@"
