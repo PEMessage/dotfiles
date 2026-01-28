@@ -1022,25 +1022,9 @@ endif
 
 
 " -------------------------------------------
-" 6.3 Style PlugIn
+" 6.3.1 Style PlugIn -- colorscheme
 " -------------------------------------------
-    Plug 'itchyny/lightline.vim'
-    " Plug 'google/vim-searchindex' , Cond( stridx(&shortmess, 'S')  != -1)
-    " let g:searchindex_enabled = stridx(&shortmess, 'S') != -1  || has('patch-8.1.1270') != 1
-    Plug 'google/vim-searchindex'
-    Plug 'embear/vim-localvimrc'
-        let g:localvimrc_sandbox = 0
-        let g:localvimrc_ask = 1
-        let g:localvimrc_persistent = 2 " Store and restore all decisions
-        let g:localvimrc_event  = [ 'VimEnter' ]
-        if has('unix')
-            let g:localvimrc_persistence_file = pe_cachedir . '/localvimrc_persistent'
-        endif
-
-
-    Plug 'edkolev/tmuxline.vim' , { 'on' : [ 'TmuxlineSnapshot', 'Tmuxline' ] }
-
-    " Plug 'romgrk/github-light.vim'
+if PSelect('colorscheme')
     Plug 'joshdick/onedark.vim'
     " let g:onedark_color_overrides = {
     "             \ "QuickFixLine": {"gui": "#2F343F", "cterm": "235", "cterm16": "0" },
@@ -1087,13 +1071,20 @@ endif
             autocmd ColorScheme * highlight QuickFixLineScope gui=underline guifg=#e5c07b guibg=#444959
 
         augroup END
-    endif
 
+    Plug 'itchyny/vim-cursorword'
     Plug 'Yggdroot/indentLine'
         let g:indentLine_fileTypeExclude = ['man']
         " Do not change concealcursor
         let g:indentLine_concealcursor='in'
         let g:indentLine_conceallevel=1
+    endif
+endif
+
+" -------------------------------------------
+" 6.3.2 Style PlugIn -- starify
+" -------------------------------------------
+if PSelect('starify')
     Plug 'mhinz/vim-startify'
         nnoremap <leader>st :tab new<CR>:Startify<CR>
         " Most Recent File MRF
@@ -1104,15 +1095,67 @@ endif
         let g:startify_enable_unsafe = 1
         let g:startify_files_number = 8
         let g:startify_change_to_dir = 0 " do not auto change dir
+endif
+
+" -------------------------------------------
+" 6.3.2 Style PlugIn -- extrastyle
+" -------------------------------------------
+if PSelect('extrastyle')
+    Plug 'itchyny/lightline.vim'
+    " Plug 'google/vim-searchindex' , Cond( stridx(&shortmess, 'S')  != -1)
+    " let g:searchindex_enabled = stridx(&shortmess, 'S') != -1  || has('patch-8.1.1270') != 1
+    Plug 'google/vim-searchindex'
+    Plug 'embear/vim-localvimrc'
+        let g:localvimrc_sandbox = 0
+        let g:localvimrc_ask = 1
+        let g:localvimrc_persistent = 2 " Store and restore all decisions
+        let g:localvimrc_event  = [ 'VimEnter' ]
+        if has('unix')
+            let g:localvimrc_persistence_file = pe_cachedir . '/localvimrc_persistent'
+        endif
+
+    Plug 'edkolev/tmuxline.vim' , { 'on' : [ 'TmuxlineSnapshot', 'Tmuxline' ] }
+
+endif
 
 
-    " Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
-    " Plug 'liuchengxu/vim-which-key'
-        let g:mapleader = "\\"
-        let g:which_key_exit = ["\<Esc>", "\<C-[>", "\<C-c>"]
-        " nnoremap <silent> <leader>      :<c-u>WhichKey '\'<CR>
-    Plug 'itchyny/vim-cursorword'
-    " Plug 'junegunn/rainbow_parentheses.vim'
+" -------------------------------------------
+" 6.3.4 Style PlugIn -- highlight
+" -------------------------------------------
+if PSelect('highlight')
+    " Plug 'ARM9/arm-syntax-vim'
+        " autocmd BufNewFile,BufRead *.s,*.S set filetype=arm " arm = armv6/7
+    Plug 'rubberduck203/aosp-vim'
+        autocmd BufNewFile,BufRead *.bp set filetype=json " arm = armv6/7
+    " Plug 'fedorenchik/fasm.vim' " in Vim9, we have it as builtin
+        autocmd BufNewFile,BufRead *.fasm set filetype=fasm
+        " See quickrun-exec-format
+    " Plug 'sheerun/vim-polyglot'
+    Plug 'mtdl9/vim-log-highlighting'
+    Plug 'udalov/kotlin-vim'
+    if has('patch-8.2.4980')
+        Plug 'bfrg/vim-cmake-help'
+        autocmd FileType cmake nnoremap <buffer> K :CMakeHelpPopup <C-R><C-W><CR>
+    endif
+    " Plug 'gburca/vim-logcat'
+    Plug 'chrisbra/Colorizer' , { 'on': 'ColorToggle' }
+    Plug 'powerman/vim-plugin-AnsiEsc' , { 'on': 'AnsiEsc' }
+        let g:no_cecutil_maps = 1
+
+    " vi 1976
+    " | \      more 1978
+    " |  \     /
+    " |   \   /
+    " |     v
+    " |   less 1983
+    " v
+    " vim 1991
+    " Plug 'rkitover/vimpager'
+    " File Manager
+
+
+    " Plug 'kvngvikram/rightclick-macros'
+    " Plug 'skywind3000/vim-quickui'
     augroup rainbow_auto
         autocmd!
         autocmd FileType make syn clear makeDefine
@@ -1142,39 +1185,14 @@ endif
             "             \ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">")<cr>
             " nnoremap <S-f3> :echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')<cr>
             nnoremap <S-f1> :exec 'syn list '.synIDattr(synID(line('.'), col('.'), 0), 'name')<cr>
-    " Plug 'ARM9/arm-syntax-vim'
-        " autocmd BufNewFile,BufRead *.s,*.S set filetype=arm " arm = armv6/7
-    Plug 'rubberduck203/aosp-vim'
-        autocmd BufNewFile,BufRead *.bp set filetype=json " arm = armv6/7
-    " Plug 'fedorenchik/fasm.vim' " in Vim9, we have it as builtin
-        autocmd BufNewFile,BufRead *.fasm set filetype=fasm
-        " See quickrun-exec-format
-    " Plug 'sheerun/vim-polyglot'
-    Plug 'mtdl9/vim-log-highlighting'
-    Plug 'udalov/kotlin-vim'
-    if has('patch-8.2.4980')
-        Plug 'bfrg/vim-cmake-help'
-        autocmd FileType cmake nnoremap <buffer> K :CMakeHelpPopup <C-R><C-W><CR>
-    endif
-    " Plug 'gburca/vim-logcat'
-    Plug 'chrisbra/Colorizer' , { 'on': 'ColorToggle' }
-    Plug 'powerman/vim-plugin-AnsiEsc' , { 'on': 'AnsiEsc' }
-        let g:no_cecutil_maps = 1
 
-    " vi 1976
-    " | \      more 1978
-    " |  \     /
-    " |   \   /
-    " |     v
-    " |   less 1983
-    " v
-    " vim 1991
-    " Plug 'rkitover/vimpager'
-" File Manager
-
-
-    " Plug 'kvngvikram/rightclick-macros'
-    " Plug 'skywind3000/vim-quickui'
+    " Plug 'liuchengxu/vim-which-key', { 'on': ['WhichKey', 'WhichKey!'] }
+    " Plug 'liuchengxu/vim-which-key'
+        " let g:mapleader = "\\"
+        " let g:which_key_exit = ["\<Esc>", "\<C-[>", "\<C-c>"]
+        " nnoremap <silent> <leader>      :<c-u>WhichKey '\'<CR>
+    " Plug 'junegunn/rainbow_parentheses.vim'
+endif
 
 " -------------------------------------------
 " 6.4 Locale
