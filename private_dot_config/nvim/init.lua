@@ -170,6 +170,12 @@ require("lazy").setup({
                     suggestions = 5, -- how many suggestions should be shown in the list?
                 },
             },
+            spec = {
+                { "<leader>n", group = "Line Nuber" },
+                { "[", group = "prev" },
+                { "]", group = "next" },
+                { "g", group = "goto" },
+            },
             icons = {
                 mappings = false,
                 keys = {
@@ -207,18 +213,13 @@ require("lazy").setup({
             -- or leave it empty to use the default settings
             -- refer to the configuration section below
         },
-        config = function(_, opts)
-            local wk = require("which-key")
-            local defaults = {
-                { "<leader>n", group = "Line Nuber" },
-                { "[", group = "prev" },
-                { "]", group = "next" },
-                { "g", group = "goto" },
-
-            }
-            wk.setup(opts)
-            wk.add(defaults)
-        end,
+        keys = {
+            {
+                "<leader>w",
+                "<cmd>lua require('which-key').show({ preset = 'moderm', keys = '<c-w>', loop = true }) end",
+                desc = "Hydra Mode",
+            },
+        },
     },
     -- {
     --     "phanen/lazy-help.nvim",
@@ -647,10 +648,31 @@ require("lazy").setup({
             open_mapping = [[<M-S-u>]],
             direction = 'float',
             float_opts = {
-                -- border = 'curved',
+                col = function()
+                    return vim.o.columns - math.floor(vim.o.columns * 0.4)
+                end,
+                width = function()
+                    return math.floor(vim.o.columns * 0.4)
+                end,
+                row = function()
+                    return vim.o.lines - math.floor(vim.o.lines * 0.4)
+                end,
+                height = function()
+                    return math.floor(vim.o.lines * 0.4)
+                end,
             }
         }
     },
+    -- {
+    --     'sunjon/Shade.nvim',
+    --     opts = {
+    --         overlay_opacity = 50,
+    --         opacity_step = 1,
+    --         keys = {
+    --             toggle = '<Leader>s',
+    --         }
+    --     }
+    -- },
     {
         'fei6409/log-highlight.nvim',
         ft = 'log',
