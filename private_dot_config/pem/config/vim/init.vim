@@ -19,12 +19,12 @@ let g:startify_custom_header = [
 
 
 
-" 1. Configure List
+" 0. Configure List
 " ===========================================
 
     " Plug-Mirror
-    let s:PE_VimPlugURL = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-    " let s:PE_VimPlugURL = 'https://gitee.com/yaozhijin/vim-plug/raw/master/plug.vim'
+    let s:vim_plug_url = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+    " let s:vim_plug_url = 'https://gitee.com/yaozhijin/vim-plug/raw/master/plug.vim'
 
     " let g:plug_url_format='https://git::@hub.fastgit.xyz/%s.git'
     " let g:plug_url_format='https://ghproxy.com/https://github.com/%s.git'
@@ -43,8 +43,7 @@ let g:startify_custom_header = [
 
 
     " Comment Color
-    let s:PECommentColor = {"gui": "#00af87", "cterm": "246", "cterm16": "7"}
-    " let s:PECompleteSys  = "asyncomplete"
+    let s:pe_commentcolor = {"gui": "#00af87", "cterm": "246", "cterm16": "7"}
     let g:pe_competesys=""
 
     let g:lightline = {
@@ -65,10 +64,31 @@ let g:startify_custom_header = [
                     " \   'searchcount': 'SearchIndex'
 
 
+" 1. Select plug we want
+" ===========================================
+    if exists('$PEM_PLUG_GROUP') && $PEM_SERVER ==# 'lite'
+        let g:pe_plug_group = ['basic', 'colorscheme']
+    elseif exists('$PEM_PLUG_GROUP') && $PEM_SERVER ==# 'none'
+        let g:pe_plug_group = ['basic', 'colorscheme']
+    else
+        let g:pe_plug_group = ['*'] " by default is full
+    endif
+    function! PSelect(group) abort
+        for pattern in g:pe_plug_group
+            if pattern ==# '*' || a:group ==# '*' 
+                return 1
+            endif
+            if a:group ==# pattern
+                return 1
+            endif
+        endfor
+        return 0
+    endfunction
 
 " 2. Auto Install ViM-Plug
 " ===========================================
-"
+
+if PSelect('*') 
     if has('nvim')
         let g:pe_runtimepath = stdpath('data') . '/site'
     else
@@ -76,7 +96,7 @@ let g:startify_custom_header = [
         let g:pe_runtimepath = expand('~/.config/vim')
     endif
     if empty(glob(pe_runtimepath . '/autoload/plug.vim'))
-      silent execute '!curl -fLo '.pe_runtimepath.'/autoload/plug.vim --create-dirs '.s:PE_VimPlugURL
+      silent execute '!curl -fLo '.pe_runtimepath.'/autoload/plug.vim --create-dirs '.s:vim_plug_url
       source $MYVIMRC
     endif
 
@@ -84,6 +104,9 @@ let g:startify_custom_header = [
     if !isdirectory(pe_cachedir)
         call mkdir(pe_cachedir, "p")
     endif
+endif
+
+
 
 " 3. Some General Setting
 " ===========================================
@@ -710,7 +733,11 @@ let g:startify_custom_header = [
 
 " 6. VIM Plug-in Zone (Part1)
 " ===========================================
-call plug#begin(pe_runtimepath . '/plugged')
+" -------------------------------------------
+" 6.0 Start of plug
+" -------------------------------------------
+if PSelect('*')
+    call plug#begin(pe_runtimepath . '/plugged')
     " helper
     function! Cond(cond, ...)
         let opts = get(a:000, 0, {})
@@ -909,8 +936,11 @@ call plug#begin(pe_runtimepath . '/plugged')
     Plug 'inkarkat/vim-mark'
         let g:mw_no_mappings = 1
         let g:mwAutoLoadMarks = 1
+        nmap <Leader>mt <Plug>MarkToggle
         nmap <Leader>M <Plug>MarkToggle
         xmap <Leader>m <Plug>MarkSet
+        nmap n <Plug>MarkSearchAnyOrDefaultNext
+        nmap N <Plug>MarkSearchAnyOrDefaultPrev
         nmap <Leader>m <Plug>MarkSet
 
     " NOTICE: THIS will casue termdebug report error
@@ -1260,7 +1290,7 @@ call plug#begin(pe_runtimepath . '/plugged')
         " nmap <Leader>vo :VimuxOpenRunner<CR>
     Plug 'gioele/vim-autoswap'
         let g:autoswap_detect_tmux = 1
-    Plug 'PEMessage/vim-fifoserver' ,  { 'on': [ 'FIFOStart' ] }
+    " Plug 'PEMessage/vim-fifoserver' ,  { 'on': [ 'FIFOStart' ] }
         " set title titlestring=
         " ALT + =: toggle terminal below.
         " ALT + SHIFT + h: move to the window on the left.
@@ -1976,7 +2006,11 @@ call plug#begin(pe_runtimepath . '/plugged')
     "             \ 'args': ['123']
     "             \ }
     Plug 'PEMessage/jorenar-lsp-calltree'
-call plug#end()
+" -------------------------------------------
+" Start of plug
+" -------------------------------------------
+    call plug#end()
+endif
 
 " 7. VIM Plug-in Zone (Part2)
 " ===========================================
