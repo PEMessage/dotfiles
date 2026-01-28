@@ -3285,6 +3285,23 @@ local section = function ()
         vim.diagnostic.jump({ count = -vim.v.count1, float = true })
     end, { desc = 'Jump to the previous diagnostic in the current buffer' })
 
+    -- terminal
+    vim.keymap.set('t', '<M-q>', '<C-\\><C-n>', { noremap = true, silent = true })
+
+    vim.api.nvim_create_autocmd('TermOpen', {
+        pattern = '*',
+        callback = function()
+            local buf = vim.api.nvim_get_current_buf()
+
+            -- Buffer-local normal mode mapping to re-enter insert mode
+            vim.keymap.set('n', '<M-q>', 'i', {
+                buffer = buf,
+                noremap = true,
+                silent = true
+            })
+        end
+    })
+
 
     -- Lsp
     vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition, { desc = 'Go to Declaration' })
