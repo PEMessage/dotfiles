@@ -66,9 +66,9 @@ let g:startify_custom_header = [
 
 " 1. Select plug we want
 " ===========================================
-    if exists('$PEM_PLUG_GROUP') && $PEM_SERVER ==# 'lite'
-        let g:pe_plug_group = ['basic', 'colorscheme']
-    elseif exists('$PEM_PLUG_GROUP') && $PEM_SERVER ==# 'none'
+    if exists('$PEM_PLUG_GROUP') && $PEM_PLUG_GROUP ==# 'none'
+        let g:pe_plug_group = []
+    elseif exists('$PEM_PLUG_GROUP') && $PEM_PLUG_GROUP ==# 'lite'
         let g:pe_plug_group = ['basic', 'colorscheme']
     else
         let g:pe_plug_group = ['*'] " by default is full
@@ -100,10 +100,11 @@ if PSelect('*')
       source $MYVIMRC
     endif
 
-    let g:pe_cachedir = expand('~/.cache/vim')
-    if !isdirectory(pe_cachedir)
-        call mkdir(pe_cachedir, "p")
-    endif
+endif
+
+let g:pe_cachedir = expand('~/.cache/vim')
+if !isdirectory(pe_cachedir)
+    call mkdir(pe_cachedir, "p")
 endif
 
 
@@ -952,6 +953,7 @@ if PSelect('*')
 " 6.2 Textobj
 " -------------------------------------------
 
+if PSelect('textobj')
     Plug 'kana/vim-submode'
         let g:submode_timeout = 0
         " let g:submode_keep_leaving_key = 0
@@ -1016,6 +1018,7 @@ if PSelect('*')
           " \ 'ab'  :0,
           " \ 'ii'  :0,
           " \ 'ai'  :0,
+endif
 
 
 " -------------------------------------------
@@ -2017,7 +2020,11 @@ endif
 " -------------------------------------------
 " 7.1 Style
 " -------------------------------------------
+if PSelect('colorscheme')
     colorscheme onedark
+else
+    colorscheme desert
+endif
 " -------------------------------------------
 " 7.2 Async complete
 " -------------------------------------------
@@ -2049,6 +2056,7 @@ endif
 " -------------------------------------------
 " 7.3 Expand region
 " -------------------------------------------
+if PSelect('textobj')
     " call expand_region#custom_text_objects()
     " call expand_region#custom_text_objects('java', {
     "             \ 'iF' :0,
@@ -2092,6 +2100,7 @@ endif
     call expand_region#custom_text_objects('java', {
                 \ 'iF' :0,
                 \ })
+endif
 " -------------------------------------------
 " 7.4 Submode Map
 " -------------------------------------------
