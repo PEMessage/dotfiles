@@ -61,7 +61,7 @@
     # man zshcompsys - Search for “Standard Tags”
     # ------------------------------------
     #
-    # Tips: use <M-a> to select multiple item
+
     #
     # zstyle ':completion:*:*:cdr:*:*' menu selection
     zstyle ':completion:*' menu select
@@ -73,8 +73,13 @@
     # bindkey '^[[Z' reverse-menu-complete
     # Or(might crash but better)
     zmodload zsh/complist
+    # '^[[Z' is Shift+Tab
     bindkey -M menuselect '^[[Z' reverse-menu-complete
     # zstyle ':chpwd:*' recent-dirs-max 50
+
+    # Tips: use <M-a> to select multiple item
+    # also map <M-w> to incase conflict with wechat
+    bindkey -M menuselect '^[w' accept-and-hold
 
     # zstyle ':autocomplete:tab:*' insert-unambiguous yes
     # # zstyle ':autocomplete:tab:*' widget-style menu-select
