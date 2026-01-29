@@ -1,4 +1,12 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+#
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "crccheck",
+# ]
+# ///
+
 
 # if not want to install dependenics to system, using following cmd:
 # uvx --with crccheck python `which allcrcr`
@@ -71,3 +79,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# vim: ft=python
