@@ -139,6 +139,8 @@ local section = function ()
     vim.o.showtabline = 2  -- 总是显示标签栏
     vim.o.splitright = true      -- 水平切割窗口时，默认在右边显示新窗口
 
+    vim.o.showmode = false -- other plug will show status in statusline, not message line(mini.align need this)
+
     vim.diagnostic.config({ virtual_text = false })
     vim.g.inlay_hints_visible = true
     vim.lsp.inlay_hint.enable(true)
