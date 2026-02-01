@@ -66,6 +66,8 @@ local section = function ()
     vim.o.mouse        = 'a'
     -- vim.o.diffopt = "linematch:60"
     vim.o.diffopt = vim.o.diffopt .. ",internal,algorithm:patience,iwhite"
+    vim.o.fileencodings = 'ucs-bom,utf-8,gbk,gb18030,big5,euc-jp,default,latin1,utf-16,shift-jis'
+
 
     -- Thanks to:
     -- https://github.com/nvim-mini/MiniMax/blob/44a93eaf2652cb437a27489c9620f4b1b4221141/configs/nvim-0.11/plugin/10_options.lua#L77C40-L77C80
