@@ -32,8 +32,8 @@ __px3_smartone() {
                 -d|--docker)
                     fnd="$fnd -m systemd -E docker.service,system"
                 ;;
-                -p|--podman)
-                    fnd="$fnd -m systemd -E podman.service,user"
+                # -p|--podman)
+                #     fnd="$fnd -m systemd -E podman.service,user"
                 ;;
                 -g|--gradle)
                     echo
