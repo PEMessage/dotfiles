@@ -243,8 +243,8 @@ __px3()
                     do_init() {
                         echo "# mkdir -p \$HOME/.config/systemd/user/$service.d"
                         echo "# px -p > \$HOME/.config/systemd/user/$service.d/override.conf"
-                        echo "# sudo systemctl daemon-reload"
-                        echo "# sudo systemctl restart podman"
+                        echo "# systemctl --user daemon-reload"
+                        echo "# systemctl --user restart $service"
                         echo '[Service]'
                     }
                     do_set_action() {
