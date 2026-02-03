@@ -34,7 +34,7 @@ __px3_smartone() {
                 ;;
                 # -p|--podman)
                 #     fnd="$fnd -m systemd -E podman.service,user"
-                ;;
+                # ;;
                 -g|--gradle)
                     echo
                     echo "# px -g >> gradle.properties"

@@ -7,6 +7,8 @@ alias msudo="sudo env \"PATH=\$PATH\""
 alias vi="vim" # if we dont use package manger vim, we shouldn't use package manger vi
 alias rgv="rg --vimgrep"
 
+alias lazypodman='DOCKER_HOST=unix:///run/user/`id -u`/podman/podman.sock lazydocker'
+
 # -c, --continue [true|false]
 # -s, --split=<N>
 # -x, --max-connection-per-server=<NUM>
