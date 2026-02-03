@@ -19,6 +19,7 @@ unpx2() {
     __px3_smartone -a unset -i "$ip" -p "$port" "$@"
 }
 
+
 __px3_smartone() {
     local fnd opt narg autoipport
     # Credit: https://github.com/rupa/z/blob/master/z.sh
@@ -29,7 +30,10 @@ __px3_smartone() {
             shift
             case $opt in
                 -d|--docker)
-                    fnd="$fnd -m systemd -E docker.service"
+                    fnd="$fnd -m systemd -E docker.service,system"
+                ;;
+                -p|--podman)
+                    fnd="$fnd -m systemd -E podman.service,user"
                 ;;
                 -g|--gradle)
                     echo
@@ -69,12 +73,15 @@ __px3_smartone() {
 
 }
 
+__px3_callcount=0
 __px3_alltype() {
+    __px3_callcount=0
     __px3 -k http_proxy -u "http://" "$@"
     __px3 -k https_proxy -u "http://" "$@"
     # you need a mix-port support
     __px3 -k sock5h_proxy -u "sock5h://" "$@"
 }
+
 __px3()
 {
     local mode="shell"
@@ -204,26 +211,62 @@ __px3()
                 return 1
             fi
 
-            (
-                override_dir="/run/systemd/system/$ext_arg.d"
-                override_file="$override_dir/override.conf"
 
-                # Initialize override file if needed
-                if [[ ! -f "$override_file" ]]; then
-                    sudo mkdir -p "$override_dir"
-                    echo '[Service]' | sudo tee "$override_file" >/dev/null
+            (
+                service="$(echo $ext_arg | cut -d , -f 1)"
+                mode="$(echo $ext_arg | cut -d , -f 2)"
+                SUDO=sudo
+
+
+                if [ "$mode" = system ] ; then
+                    override_dir="/run/systemd/system/$service.d"
+                    override_file="$override_dir/override.conf"
+                    do_init() {
+                        echo "# sudo systemctl daemon-reload"
+                        echo "# sudo systemctl restart $service"
+                        if [[ ! -f "$override_file" ]] ; then
+                            $SUDO mkdir -p "$override_dir"
+                            # Initialize override file if needed
+                            echo '[Service]' | $SUDO tee "$override_file"
+                        fi
+                    }
+
+                    do_set_action() {
+                        echo "$@" | $SUDO tee -a "$override_file"
+                    }
+
+                    do_unset_action() {
+                        echo "$@"
+                        $SUDO "$@"
+                    }
+                else
+                    do_init() {
+                        echo "# mkdir -p \$HOME/.config/systemd/user/$service.d"
+                        echo "# px -p > \$HOME/.config/systemd/user/$service.d/override.conf"
+                        echo "# sudo systemctl daemon-reload"
+                        echo "# sudo systemctl restart podman"
+                        echo '[Service]'
+                    }
+                    do_set_action() {
+                        echo "$@"
+                    }
+                    do_unset_action() {
+                        echo "Unsupport action"
+                    }
                 fi
+
 
                 # Process systemd commands
                 if [[ "$action" == "set" ]]; then
-                    echo "Environment=\"$key=$value\"" | sudo tee -a "$override_file"
-                    echo "Environment=\"$upper_key=$value\"" | sudo tee -a "$override_file"
+                    if [ "$__px3_callcount" = 0 ] ; then
+                        do_init
+                    fi
+                    do_set_action "Environment=\"$key=$value\""
+                    do_set_action "Environment=\"$upper_key=$value\""
                 else
                     # Remove matching environment variables
-                    echo sed -i "/Environment=\"$key=/d" "$override_file"
-                    echo sed -i "/Environment=\"$upper_key=/d" "$override_file"
-                    sudo sed -i "/Environment=\"$key=/d" "$override_file"
-                    sudo sed -i "/Environment=\"$upper_key=/d" "$override_file"
+                    do_unset_action sed -i "/Environment=\"$key=/d" "$override_file"
+                    do_unset_action sed -i "/Environment=\"$upper_key=/d" "$override_file"
                 fi
             )
             ;;
@@ -233,4 +276,5 @@ __px3()
             return 1
             ;;
     esac
+    __px3_callcount=$((__px3_callcount + 1))
 }
