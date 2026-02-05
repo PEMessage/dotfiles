@@ -1960,6 +1960,7 @@ require("lazy").setup({
         config = function(_, opts)
             require('luasnip').setup(opts)
             -- #guard in here(cpp)
+            -- TIPS: using `once~` instead of `guard~`
             require("luasnip.loaders.from_vscode").lazy_load() -- friendly-snippets
             require("luasnip.loaders.from_snipmate").lazy_load() -- vim-snippets
 
