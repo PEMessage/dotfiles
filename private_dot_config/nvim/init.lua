@@ -1851,9 +1851,13 @@ require("lazy").setup({
                             ['<C-u>'] = function(...)
                                 action_set.shift_selection(..., -3)
                             end,
-                            ['<C-l>'] = actions.select_default,
+                            -- ['<C-l>'] = actions.select_default,
+
                             ['<C-Down>'] = actions.cycle_history_next,
                             ['<C-Up>'] = actions.cycle_history_prev,
+                            ['<C-h>'] = actions.cycle_history_prev,
+                            ['<C-l>'] = actions.cycle_history_next,
+
                             ['<C-f>'] = actions.preview_scrolling_down,
                             ['<C-b>'] = actions.preview_scrolling_up,
                         },
