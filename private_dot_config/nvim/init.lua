@@ -1400,6 +1400,7 @@ require("lazy").setup({
                 'bash',
                 'kotlin',
                 'javascript',
+                'zig',
             },
             incremental_selection = {
                 enable = true,
@@ -2403,6 +2404,7 @@ require("lazy").setup({
                 -- "jdtls" -- leave it to nvim-jdtls
                 -- "java_language_server",
                 "glsl_analyzer",
+                "zls",
             }
         },
         config = function(_,opts)
