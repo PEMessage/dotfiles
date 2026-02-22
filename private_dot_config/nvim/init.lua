@@ -1201,8 +1201,8 @@ require("lazy").setup({
             { '<Leader>mt', '<Plug>MarkToggle', mode = 'n', desc = 'vim-mark toggle' },
             { '<Leader>mc', '<Plug>MarkClear', mode = 'n', desc = 'vim-mark clear' },
             { '<leader>m', '<Plug>MarkSet', mode = 'x', desc = 'Set visual vim-mark' },
-            { 'n', '<Plug>MarkSearchAnyOrDefaultNext', mode = 'n', desc = 'Next mark' },
-            { 'N', '<Plug>MarkSearchAnyOrDefaultPrev', mode = 'n', desc = 'Previous mark' },
+            -- { 'n', '<Plug>MarkSearchAnyOrDefaultNext', mode = 'n', desc = 'Next mark' },
+            -- { 'N', '<Plug>MarkSearchAnyOrDefaultPrev', mode = 'n', desc = 'Previous mark' },
         },
     },
     {
