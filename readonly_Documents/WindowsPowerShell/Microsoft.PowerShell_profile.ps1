@@ -168,3 +168,18 @@ function Run-As {
 }
 #Alias: My sudo
 Set-Alias -Name msudo -Value Run-As
+
+
+function SSH-CopyId {
+    param(
+            [Parameter(Mandatory=$true, Position=0)]
+            [string]$Target
+         )
+    type $env:USERPROFILE\.ssh\id_ed25519.pub |  ssh ${Target} "cat >> .ssh/authorized_keys"
+}
+
+
+$scriptPath = "$HOME\perc.ps1"
+if (Test-Path $scriptPath) {
+    . $scriptPath
+}
