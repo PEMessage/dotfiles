@@ -25,7 +25,9 @@ alias q-xxd='xxd -R always'
 # if west build prompt `ModuleNotFoundError: No module named 'elftools'`
 # you should add `--with pyelftools` at CMake config stage.
 # or maybe need to clean build dir and re-run build
-alias q-west='uvx --with jsonschema --with pyelftools west'
+#
+# anytree: for west run -t romplit
+alias q-west='uvx --with jsonschema --with pyelftools --with anytree west'
 
 # alias ttt='command ls -tp | head -n1'
 ttt() {
