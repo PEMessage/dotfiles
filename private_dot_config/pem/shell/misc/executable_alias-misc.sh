@@ -22,6 +22,11 @@ alias q-less='less -R --mouse -X'
 alias q-sudo='sudo -E env "PATH=$PATH"'
 alias q-xxd='xxd -R always'
 
+# if west build prompt `ModuleNotFoundError: No module named 'elftools'`
+# you should add `--with pyelftools` at CMake config stage.
+# or maybe need to clean build dir and re-run build
+alias q-west='uvx --with jsonschema --with pyelftools west'
+
 # alias ttt='command ls -tp | head -n1'
 ttt() {
     if [ -n "$1" ] ; then
