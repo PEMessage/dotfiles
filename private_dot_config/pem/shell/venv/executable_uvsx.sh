@@ -2,7 +2,7 @@
 # Expand from this oneline version
 # Thanks to: https://github.com/astral-sh/uv/issues/6637#issuecomment-2584434822
 # uv venv main.venv && uv export --script main.py | uv pip install -r - -p main.venv && uv run -p main.venv -- python -c "import anyio; print(anyio)"
-uvs() {
+uvsx() {
     local script="$1"
     shift
     script_dir="$(dirname "$script")"
@@ -27,5 +27,5 @@ uvs() {
 uvnvi() {
     local script="$1"
     shift
-    uvs "$script" nvim "$script" "$@"
+    uvsx "$script" nvim "$script" "$@"
 }
