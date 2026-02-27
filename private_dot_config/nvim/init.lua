@@ -1422,6 +1422,10 @@ require("lazy").setup({
             max_lines = 3
         }
     },
+    -- {
+    --     "mizlan/iswap.nvim",
+    --     event = "VeryLazy"
+    -- },
     {
         "Wansmer/sibling-swap.nvim",
         opts = {
@@ -1433,13 +1437,13 @@ require("lazy").setup({
                 "[,",
                 '<cmd>lua require("sibling-swap").swap_with_left()<CR>',
                 mode = "n",
-                desc = "Swap with left sibling"
+                desc = "Swap left sibling(argument)"
             },
             {
                 "],",
                 '<cmd>lua require("sibling-swap").swap_with_right()<CR>',
                 mode = "n",
-                desc = "Swap with right sibling"
+                desc = "Swap with right sibling(argument)"
             }
         }
     },
