@@ -126,11 +126,14 @@
     zle -N edit-command-line
     bindkey "^X^E" edit-command-line
 
+    export STARSHIP_CONFIG=~/.config/starship/starship.toml
     zinit ice as"command" from"gh-r" \
               atclone"./starship init zsh > init.zsh; ./starship completions zsh > _starship" \
               atpull"%atclone" src"init.zsh"
-    export STARSHIP_CONFIG=~/.config/starship/starship.toml
     zinit light starship/starship
+
+    # zinit ice pick"async.zsh" src"pure.zsh" # with zsh-async library that's bundled with it.
+    # zinit light sindresorhus/pure
 
     # Thanks to: https://zenlian.github.io/zsh-zinit/
     zinit ice as"completion"
@@ -144,6 +147,8 @@
     zinit ice as"completion" mv"just.zsh -> _just"
     zinit snippet https://github.com/casey/just/blob/master/completions/just.zsh
 
+    # Thanks to https://zhuanlan.zhihu.com/p/98450570
+    zinit ice lucid wait="0" atload="zpcompinit; zpcdreplay"
     zinit snippet OMZ::plugins/uv/uv.plugin.zsh
 
     # https://unix.stackexchange.com/a/157773
