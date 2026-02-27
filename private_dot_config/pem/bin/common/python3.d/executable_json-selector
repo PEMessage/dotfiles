@@ -3,7 +3,7 @@
 # /// script
 # requires-python = ">=3.12"
 # dependencies = [
-#     "pyfzf",
+#     "iterfzf",
 # ]
 # ///
 
@@ -27,6 +27,7 @@ import argparse
 from typing import List, Tuple, Any, Optional
 
 from pyfzf import FzfPrompt
+from iterfzf import iterfzf
 
 # ------------------------------
 # CLI interface
@@ -60,6 +61,11 @@ def create_parser() -> argparse.ArgumentParser:
         help='Output file'
     )
 
+    parser.add_argument(
+        '-i', '--inplace',
+        action='store_true',
+        help='Modify the input file in-place (conflicts with -o/--output)'
+    )
 
     parser.add_argument(
         '-v', '--verbose',
@@ -88,26 +94,6 @@ class c:
     RESET = '\033[0m'
     UNDERLINE = '\033[4m'
 
-def run_jq(args: List[str], input_data: Optional[str] = None) -> str:
-    """Run jq command and return output"""
-    cmd = ['jq'] + args
-
-    try:
-        if input_data:
-            proc = subprocess.run(cmd, input=input_data,
-                                  capture_output=True, text=True, check=True)
-        else:
-            proc = subprocess.run(
-                cmd, capture_output=True, text=True, check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"\033[91mjq error: {e.stderr}\033[0m", file=sys.stderr)
-        sys.exit(1)
-    except FileNotFoundError:
-        print(
-            "\033[91mError: jq not found. Please install jq first.\033[0m", file=sys.stderr)
-        sys.exit(1)
-
-    return proc.stdout
 
 
 def read_file(filepath: str) -> str:
@@ -134,6 +120,27 @@ def deep_merge(base, updates):
 # ------------------------------
 # JQ helper function
 # ------------------------------
+def run_jq(args: List[str], input_data: Optional[str] = None) -> str:
+    """Run jq command and return output"""
+    cmd = ['jq'] + args
+
+    try:
+        if input_data:
+            proc = subprocess.run(cmd, input=input_data,
+                                  capture_output=True, text=True, check=True)
+        else:
+            proc = subprocess.run(
+                cmd, capture_output=True, text=True, check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"\033[91mjq error: {e.stderr}\033[0m", file=sys.stderr)
+        sys.exit(1)
+    except FileNotFoundError:
+        print(
+            "\033[91mError: jq not found. Please install jq first.\033[0m", file=sys.stderr)
+        sys.exit(1)
+
+    return proc.stdout
+
 def extract_fields(data, jq_expr: str) -> List[Tuple[List[str], Any]]:
     jq_cmd = f'paths as $p | select($p | {jq_expr}) | [$p, getpath($p)]'
 
@@ -165,49 +172,37 @@ def reconstruct_patch(updated_fields: List[Tuple[List[str], Any]]) -> dict:
 # ------------------------------
 # UI Part
 # ------------------------------
-def ask_user(optional_list: List[str], current_value: str) -> Any:
+def ask_user(options: List[str], current_value: str) -> Any:
     # Convert current_value to string for display if needed
     current_str = str(current_value)
 
     # Create choices list
-    if current_str in optional_list:
-        optional_list.remove(current_str)
+    choices = options.copy()  # Create a copy to avoid modifying the original
+    if current_str in choices:
+        choices.remove(current_str)
 
-    # Create display choices
-    display_choices = [f"Keep current: {current_str}"] + optional_list
+    # Create display choices with "Keep current" option
+    display_choices = [f"Keep current: {current_str}"] + choices
 
-    # Add visual separator for context if path provided
+    # Show current value with color
     print(f"Current value: {c.YELLOW}{current_str}{c.RESET}")
 
-    # Initialize fzf
-    fzf = FzfPrompt()
-
-    # Build fzf options
-    fzf_options = [
-        '--height=40%',
-        '--reverse',
-        '--cycle',
-    ]
-
-    selected = fzf.prompt(display_choices, ' '.join(fzf_options))
-
-    if not selected:
+    # Use iterfzf for selection
+    try:
+        selected = iterfzf(display_choices, multi=False, __extra__=['--reverse', '--height=40%'])
+    except KeyboardInterrupt:
         print(f"{c.RED}Exit by user{c.RESET}")
         sys.exit(1)
-
-    selected = selected[0]
 
     if selected == f"Keep current: {current_str}":
         return current_value
 
     return selected
 
-
-
 def ask_all(fields: List[Tuple[List[str], Any]], options: List[str]) -> dict:
     fields_patch = []
 
-    print(f"=== Interactive Field Selection ===")
+    print("=== Interactive Field Selection ===")
     print(f"Found {len(fields)} field(s) to review")
 
     for i, (path, current_value) in enumerate(fields, 1):
@@ -234,9 +229,10 @@ def ask_all(fields: List[Tuple[List[str], Any]], options: List[str]) -> dict:
     return fields_patch
 
 
-
+# ------------------------------
+# main
+# ------------------------------
 def main():
-    """Main entry point"""
     parser = create_parser()
     args = parser.parse_args()
 
@@ -264,10 +260,10 @@ def main():
 
     result_str = json.dumps(deep_merge(data.copy(), patch.copy()))
 
-    if args.output is None:
-        print(result_str)
-    else:
+    if args.output:
         write_file(args.output, result_str)
+    else:
+        print(result_str)
 
 
 
