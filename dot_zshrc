@@ -144,7 +144,7 @@
     zinit ice as"completion" mv"just.zsh -> _just"
     zinit snippet https://github.com/casey/just/blob/master/completions/just.zsh
 
-    zinit snippet OMZ::plugins/fancy-ctrl-z/fancy-ctrl-z.plugin.zsh
+    zinit snippet OMZ::plugins/uv/uv.plugin.zsh
 
     # https://unix.stackexchange.com/a/157773
     setopt AUTO_PUSHD                  # pushes the old directory onto the stack
