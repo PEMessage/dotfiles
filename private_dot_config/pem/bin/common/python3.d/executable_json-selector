@@ -1,0 +1,277 @@
+#!/usr/bin/env -S uv run --script
+#
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "pyfzf",
+# ]
+# ///
+
+"""
+JSON Field Selector - Interactive field selection and modification using jq
+
+Usage:
+    selector.py input.json <jq_expr> [--options LIST...] [--output FILE]
+
+Examples:
+    selector.py data.json '.[0]? // empty' --output modified.json
+    selector.py config.json 'strings' --options "value1" "value2" "value3"
+    selector.py data.json '.[] | select(.type=="user")' --options "admin" "guest" --output result.json
+"""
+
+import json
+import subprocess
+import sys
+import os
+import argparse
+from typing import List, Tuple, Any, Optional
+
+from pyfzf import FzfPrompt
+
+# ------------------------------
+# CLI interface
+# ------------------------------
+def create_parser() -> argparse.ArgumentParser:
+    """Create argument parser"""
+    parser = argparse.ArgumentParser(
+        description='Interactive JSON field selector and modifier using jq',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=__doc__
+    )
+
+    parser.add_argument(
+        'input',
+        help='Input JSON file'
+    )
+
+    parser.add_argument(
+        'jq_expr',
+        help='jq expression to select fields (e.g., ".[]?.name")'
+    )
+
+    parser.add_argument(
+        'options',
+        nargs='+',
+        help='List of predefined options to choose from'
+    )
+
+    parser.add_argument(
+        '-o', '--output',
+        help='Output file'
+    )
+
+
+    parser.add_argument(
+        '-v', '--verbose',
+        action='store_true',
+        help='Show verbose output'
+    )
+
+    return parser
+
+# ------------------------------
+# Helper function
+# ------------------------------
+# Source - https://stackoverflow.com/a/287944
+# Posted by joeld, modified by community. See post 'Timeline' for change history
+# Retrieved 2026-02-28, License - CC BY-SA 4.0
+class c:
+    GRAY = '\033[90m'      # Bright black (dark gray)
+    GREEN = '\033[92m'
+    RED = '\033[91m'
+    BOLD = '\033[1m'
+    YELLOW = '\033[93m'
+
+    PURPLE = '\033[95m'
+    BLUE = '\033[94m'
+    CYAN = '\033[96m'
+    RESET = '\033[0m'
+    UNDERLINE = '\033[4m'
+
+def run_jq(args: List[str], input_data: Optional[str] = None) -> str:
+    """Run jq command and return output"""
+    cmd = ['jq'] + args
+
+    try:
+        if input_data:
+            proc = subprocess.run(cmd, input=input_data,
+                                  capture_output=True, text=True, check=True)
+        else:
+            proc = subprocess.run(
+                cmd, capture_output=True, text=True, check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"\033[91mjq error: {e.stderr}\033[0m", file=sys.stderr)
+        sys.exit(1)
+    except FileNotFoundError:
+        print(
+            "\033[91mError: jq not found. Please install jq first.\033[0m", file=sys.stderr)
+        sys.exit(1)
+
+    return proc.stdout
+
+
+def read_file(filepath: str) -> str:
+    """Read and validate JSON file"""
+    with open(filepath, 'r') as f:
+        data = f.read()
+        return data
+
+def write_file(filepath: str, data) -> None:
+    """Write data to a file"""
+    with open(filepath, 'w') as f:
+        f.write(data)
+
+def deep_merge(base, updates):
+    for key, value in updates.items():
+        if key in base and isinstance(base[key], dict) and isinstance(value, dict):
+            deep_merge(base[key], value)
+        else:
+            base[key] = value
+    return base
+
+
+
+# ------------------------------
+# JQ helper function
+# ------------------------------
+def extract_fields(data, jq_expr: str) -> List[Tuple[List[str], Any]]:
+    jq_cmd = f'paths as $p | select($p | {jq_expr}) | [$p, getpath($p)]'
+
+    output = run_jq(['-c', jq_cmd], json.dumps(data))
+
+    # Parse results
+    results = []
+    for line in output.strip().split('\n'):
+        if line:
+            path, value = json.loads(line)
+            results.append((path, value))
+
+    return results
+
+def reconstruct_patch(updated_fields: List[Tuple[List[str], Any]]) -> dict:
+    if not updated_fields:
+        return {}
+
+    # Create jq input
+    input_data = '\n'.join(json.dumps([path, value])
+                           for path, value in updated_fields)
+
+    # Run jq to reconstruct
+    jq_cmd = 'reduce .[] as $item ({}; setpath($item[0]; $item[1]))'
+    output = run_jq(["-s", jq_cmd], input_data)
+
+    return json.loads(output)
+
+# ------------------------------
+# UI Part
+# ------------------------------
+def ask_user(optional_list: List[str], current_value: str) -> Any:
+    # Convert current_value to string for display if needed
+    current_str = str(current_value)
+
+    # Create choices list
+    if current_str in optional_list:
+        optional_list.remove(current_str)
+
+    # Create display choices
+    display_choices = [f"Keep current: {current_str}"] + optional_list
+
+    # Add visual separator for context if path provided
+    print(f"Current value: {c.YELLOW}{current_str}{c.RESET}")
+
+    # Initialize fzf
+    fzf = FzfPrompt()
+
+    # Build fzf options
+    fzf_options = [
+        '--height=40%',
+        '--reverse',
+        '--cycle',
+    ]
+
+    selected = fzf.prompt(display_choices, ' '.join(fzf_options))
+
+    if not selected:
+        print(f"{c.RED}Exit by user{c.RESET}")
+        sys.exit(1)
+
+    selected = selected[0]
+
+    if selected == f"Keep current: {current_str}":
+        return current_value
+
+    return selected
+
+
+
+def ask_all(fields: List[Tuple[List[str], Any]], options: List[str]) -> dict:
+    fields_patch = []
+
+    print(f"=== Interactive Field Selection ===")
+    print(f"Found {len(fields)} field(s) to review")
+
+    for i, (path, current_value) in enumerate(fields, 1):
+        path_str = '.'.join(str(p) for p in path)
+
+        print(f"{c.GRAY}[{i}/{len(fields)}]{c.RESET}")
+        print(f"{c.BOLD}Field: {path_str} {c.RESET}")
+
+        new_value = ask_user(
+            options.copy(),  # Copy to avoid modifying original
+            current_value,
+        )
+
+        if new_value != current_value:
+            fields_patch.append((path, new_value))
+            print(f"{c.GREEN}✓ Updated{c.RESET}: {json.dumps(new_value)}")
+        else:
+            print(f"{c.GREEN}→ Kept current{c.RESET}")
+
+        # Add separator between fields
+        if i < len(fields):
+            print(c.GRAY + "-" * 50 + c.RESET)
+
+    return fields_patch
+
+
+
+def main():
+    """Main entry point"""
+    parser = create_parser()
+    args = parser.parse_args()
+
+    if args.verbose:
+        print(f"Reading: {args.input}")
+
+    data = json.loads(read_file(args.input))
+
+    if args.verbose:
+        print(f"Processing with jq expression: {args.jq_expr}")
+
+    fields = extract_fields(data, args.jq_expr)
+
+    if not fields:
+        print("No matching fields found")
+        return
+
+    fields_patch = ask_all(fields, args.options)
+
+    patch = reconstruct_patch(fields_patch)
+
+    if not patch:
+        print("No updates to apply")
+        return
+
+    result_str = json.dumps(deep_merge(data.copy(), patch.copy()))
+
+    if args.output is None:
+        print(result_str)
+    else:
+        write_file(args.output, result_str)
+
+
+
+if __name__ == "__main__":
+    main()
+
+# vim: ft=python
