@@ -2396,7 +2396,7 @@ require("lazy").setup({
             automatic_enable = {
                 "lua_ls",
                 "rust_analyzer",
-                "neocmake",
+                -- "neocmake",
                 "clangd",
                 "pylsp",
                 "gopls",
@@ -2879,6 +2879,7 @@ require("lazy").setup({
             dap.configurations.c = { gdb }
             dap.configurations.cpp = { gdb }
 
+
         end
     },
     {
@@ -2922,6 +2923,14 @@ require("lazy").setup({
                 end,
             }
         },
+    },
+    {
+        "gergol/cmake-debugger.nvim",
+        dependencies = {
+            "mfussenegger/nvim-dap",
+        },
+        -- setup using default opts
+        opts = {}
     },
     -- -------------------------------------------
     -- 5.8 Linter
@@ -2971,9 +2980,26 @@ require("lazy").setup({
     {
         "rcarriga/nvim-dap-ui",
         cmd = { 'DapUiToggle' },
+        keys = {
+            { "<leader>da", '<cmd>DapNew<cr>', desc = "Debug: Start/Continue" },
+            {
+                "<leader>du",
+                function() require("dapui").toggle() end,
+                desc = "Toggle DapUi",
+            },
+            {
+                "<Leader>dh",
+                function()
+                    require("dap.ui.widgets").hover()
+                end,
+                desc = "DAP: Hover",
+                mode = { "n", "v" },
+            },
+        },
         dependencies = {
             "mfussenegger/nvim-dap",
-            "nvim-neotest/nvim-nio"
+            "nvim-neotest/nvim-nio",
+            "hrsh7th/nvim-cmp",
         },
         opts = {
             controls = {
@@ -2998,9 +3024,71 @@ require("lazy").setup({
             },
         },
         config = function (_, opts)
-            require("dapui").setup(opts)
+            local dapui = require('dapui')
+            local dap = require('dap')
+            dapui.setup(opts)
             vim.api.nvim_create_user_command('DapUiToggle', function() require('dapui').toggle() end, { nargs = 0 })
+
+            require('cmp').setup.filetype('dap-repl', {
+                enabled = false
+            })
+
+            local debug_mappings = {
+                -- Normal mode mappings
+                ['n'] = {
+                    ['<F5>'] = dap.continue,
+                    ['<F10>'] = dap.step_over,
+                    ['<F11>'] = dap.step_into,
+                    ['<F12>'] = dap.step_out,
+
+                    ['<leader>dl'] = dap.run_last,
+
+                    ['<c-l>'] = dap.step_over,
+                    ['<c-k>'] = dap.step_out,
+                    ['<c-j>'] = dap.step_into,
+
+                    ['[f'] = dap.up,
+                    [']f'] = dap.down,
+
+                    ['<c-x>'] = function() require("dapui").eval() end,
+                },
+                -- Visual mode mappings
+                ['v'] = {
+                    ['<c-x>'] = function() require("dapui").eval() end,
+                }
+            }
+
+            local function set_debug_mappings()
+                local keymap_opts = { noremap = true, silent = true }
+
+                for mode, mappings in pairs(debug_mappings) do
+                    for lhs, rhs in pairs(mappings) do
+                        vim.keymap.set(mode, lhs, rhs, keymap_opts)
+                    end
+                end
+
+                dapui.open()
+            end
+
+            local function clear_debug_mappings()
+                for mode, mappings in pairs(debug_mappings) do
+                    for lhs, _ in pairs(mappings) do
+                        pcall(vim.keymap.del, mode, lhs)
+                    end
+                end
+
+                dapui.close()
+            end
+
+            dap.listeners.after.event_initialized['me'] = set_debug_mappings
+            dap.listeners.after.event_terminated['me'] = clear_debug_mappings
+            -- dap.listeners.after.disconnected['me'] = clear_debug_mappings
+            dap.listeners.after.event_exited['me'] = clear_debug_mappings
         end,
+    },
+    {
+        "theHamsta/nvim-dap-virtual-text",
+        opts = {},
     },
     {
         'Weissle/persistent-breakpoints.nvim',
