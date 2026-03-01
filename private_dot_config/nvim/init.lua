@@ -3096,6 +3096,7 @@ require("lazy").setup({
             "mfussenegger/nvim-dap",
         },
         cmd = { "PBToggleBreakpoint" },
+        event = 'BufReadPost',
         keys = {
             {
                 "<F1>", "<cmd>PBToggleBreakpoint<CR>",
