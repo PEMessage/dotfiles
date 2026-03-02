@@ -2396,7 +2396,7 @@ require("lazy").setup({
             automatic_enable = {
                 "lua_ls",
                 "rust_analyzer",
-                -- "neocmake",
+                "neocmake",
                 "clangd",
                 "pylsp",
                 "gopls",
@@ -2856,7 +2856,7 @@ require("lazy").setup({
             dap.adapters.gdb = {
                 id = 'gdb',
                 type = 'executable',
-                command = 'gdb',
+                command = 'gdb-multiarch',
                 args = { '--quiet', '--interpreter=dap' },
             }
 
@@ -2978,6 +2978,10 @@ require("lazy").setup({
     -- 5.9 DAP & LSP UI
     -- -------------------------------------------
     {
+        "theHamsta/nvim-dap-virtual-text",
+        opts = {}
+    },
+    {
         "rcarriga/nvim-dap-ui",
         cmd = { 'DapUiToggle' },
         keys = {
@@ -2999,7 +3003,9 @@ require("lazy").setup({
         dependencies = {
             "mfussenegger/nvim-dap",
             "nvim-neotest/nvim-nio",
+            --
             "hrsh7th/nvim-cmp",
+            "theHamsta/nvim-dap-virtual-text",
         },
         opts = {
             controls = {
@@ -3028,6 +3034,7 @@ require("lazy").setup({
             local dap = require('dap')
             dapui.setup(opts)
             vim.api.nvim_create_user_command('DapUiToggle', function() require('dapui').toggle() end, { nargs = 0 })
+            vim.cmd [[ highlight link NvimDapVirtualText DiagnosticVirtualTextUnnecessary ]]
 
             require('cmp').setup.filetype('dap-repl', {
                 enabled = false
@@ -3067,6 +3074,7 @@ require("lazy").setup({
                     end
                 end
 
+                vim.cmd [[ DapVirtualTextEnable ]]
                 dapui.open()
             end
 
@@ -3077,6 +3085,7 @@ require("lazy").setup({
                     end
                 end
 
+                vim.cmd [[ DapVirtualTextDisable ]]
                 dapui.close()
             end
 
@@ -3085,10 +3094,6 @@ require("lazy").setup({
             -- dap.listeners.after.disconnected['me'] = clear_debug_mappings
             dap.listeners.after.event_exited['me'] = clear_debug_mappings
         end,
-    },
-    {
-        "theHamsta/nvim-dap-virtual-text",
-        opts = {},
     },
     {
         'Weissle/persistent-breakpoints.nvim',
