@@ -77,12 +77,24 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
     $has_fzf = $(Get-Command fzf -ErrorAction SilentlyCon )
     if ((Get-Command posh-fzf -ErrorAction SilentlyCon) -and ($has_fzf)) {
         Invoke-Expression (&posh-fzf init | Out-String)
+        # Set-PSReadLineKeyHandler -Key 'Ctrl+r' -ScriptBlock {
+        #     $historyPath = (Get-PSReadLineOption).HistorySavePath
+        #     $historyCommand = Invoke-PoshFzfStartProcess -FileName "posh-fzf" -Arguments @("history", $historyPath)
+        #     if ($historyCommand) {
+        #         [Microsoft.PowerShell.PSConsoleReadLine]::DeleteLine()
+        #             Invoke-PoshFzfInsertUtf8 $historyCommand
+        #     }
+        # }
+
         Set-PSReadLineKeyHandler -Key 'Ctrl+r' -ScriptBlock {
-            $historyPath = (Get-PSReadLineOption).HistorySavePath
-            $historyCommand = Invoke-PoshFzfStartProcess -FileName "posh-fzf" -Arguments @("history", $historyPath)
+            $line = $null
+            $cursor = $null
+            [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
+            $historyCommand = Get-Content $(Get-PSReadLineOption).HistorySavePath |
+            Invoke-PoshFzfStartProcess -FileName "fzf" -Arguments @("--scheme", "history", "--height=45%", "--reverse", "-q", "$line") -HeightRowsOrPercent "45%"
             if ($historyCommand) {
                 [Microsoft.PowerShell.PSConsoleReadLine]::DeleteLine()
-                    Invoke-PoshFzfInsertUtf8 $historyCommand
+                Invoke-PoshFzfInsertUtf8 $historyCommand
             }
         }
     } elseif ($has_fzf) {
