@@ -91,7 +91,7 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
             $cursor = $null
             [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
             $historyCommand = Get-Content $(Get-PSReadLineOption).HistorySavePath |
-            Invoke-PoshFzfStartProcess -FileName "fzf" -Arguments @("--scheme", "history", "--height=45%", "--reverse", "-q", "$line") -HeightRowsOrPercent "45%"
+            Invoke-PoshFzfStartProcess -FileName "fzf" -Arguments @("--scheme", "history", "--height=45%", "-q", "$line") -HeightRowsOrPercent "45%"
             if ($historyCommand) {
                 [Microsoft.PowerShell.PSConsoleReadLine]::DeleteLine()
                 Invoke-PoshFzfInsertUtf8 $historyCommand
