@@ -79,7 +79,11 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
         Invoke-Expression (&posh-fzf init | Out-String)
         Set-PSReadLineKeyHandler -Key 'Ctrl+r' -ScriptBlock {
             $historyPath = (Get-PSReadLineOption).HistorySavePath
-            $historyCommand = Invoke-PoshFzfStartProcess -FileName "posh-fzf" -Arguments @("history", $historyPath)
+            $line = $null
+            $cursor = $null
+            [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
+            $historyCommand = Invoke-PoshFzfStartProcess -FileName "posh-fzf" -Arguments `
+            @("history", $historyPath, '--', '--scheme', 'history', '-q', "$line")
             if ($historyCommand) {
                 [Microsoft.PowerShell.PSConsoleReadLine]::DeleteLine()
                     Invoke-PoshFzfInsertUtf8 $historyCommand
