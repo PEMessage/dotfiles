@@ -65,6 +65,7 @@
     #
     # zstyle ':completion:*:*:cdr:*:*' menu selection
     zstyle ':completion:*' menu select
+    zstyle ':completion:*' group-name ''
     zstyle ':completion:*:*:*:*:descriptions' format '%F{green}-- %d --%f'
     zstyle ':completion:*:*:*:*:corrections' format '%F{yellow}!- %d (errors: %e) -!%f'
     command -v dircolors >/dev/null 2>&1  && eval "$(dircolors)"
