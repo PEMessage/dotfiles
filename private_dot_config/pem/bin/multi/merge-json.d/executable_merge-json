@@ -1,0 +1,123 @@
+#!/bin/bash
+
+# set -euo pipefail
+
+LOCAL_SCRIPT_PATH="$(readlink -f "$0")"
+LOCAL_SCRIPT_DIR="$(dirname "$LOCAL_SCRIPT_PATH")"
+
+[ -d "$CONF_JSON_BUCKET_DIR" ] ||
+    CONF_JSON_BUCKET_DIR="$LOCAL_SCRIPT_DIR/preset"
+
+usage() {
+    cat <<EOF
+Usage: $(basename "$0") [OPTION]... [FILE]...
+Merge multiple JSON files and output to stdout.
+
+Options:
+  -h              Show this help message
+  -l              List available preset JSON files
+  -e <name>       Edit a preset JSON file
+
+If arguments are not files, they will be checked against preset directory.
+Files can be mixed with preset names.
+
+Examples:
+  $(basename "$0") file1.json file2.json
+EOF
+}
+
+# Function to resolve a path - checks if it's a file, otherwise looks in preset dir
+resolve_path() {
+    local arg="$1"
+
+    # If it's a regular file, return it
+    if [ -f "$arg" ]; then
+        echo "$arg"
+        return 0
+    fi
+
+    # Check if it exists in preset directory
+    local preset_path="$CONF_JSON_BUCKET_DIR/$arg"
+    if [ -f "$preset_path" ]; then
+        echo "$preset_path"
+        return 0
+    fi
+
+    # If it doesn't end with .json, try adding .json in preset dir
+    if [[ "$arg" != *.json ]]; then
+        preset_path="$CONF_JSON_BUCKET_DIR/$arg.json"
+        if [ -f "$preset_path" ]; then
+            echo "$preset_path"
+            return 0
+        fi
+    fi
+
+    # Not found
+    echo "$arg"
+    return 1
+}
+
+main() {
+    [ -n "$1" ] || {
+        usage
+        exit 0
+    }
+
+    local files=()
+    local preset_mode=0
+    local preset_name=""
+
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            -h)
+                usage
+                return 0
+                ;;
+            -l)
+                (
+                    cd "$CONF_JSON_BUCKET_DIR"
+                    find . -type f -name '*.json' | sed 's#^\./##g' | sort
+                )
+                shift
+                return 0
+                ;;
+            -e)
+                if [ $# -lt 2 ]; then
+                    echo "Error: -e requires a preset name" >&2
+                    exit 1
+                fi
+                shift
+                preset_path="$CONF_JSON_BUCKET_DIR/$1"
+                ${EDITOR:-vim} "$preset_path"
+                shift
+                return 0
+                ;;
+            *)
+                # Regular argument - try to resolve as file/preset
+                resolved=$(resolve_path "$1" 2>/dev/null || true)
+                if [ -f "$resolved" ]; then
+                    files+=("$resolved")
+                else
+                    echo "Warning: File not found: $1" >&2
+                fi
+                shift
+                ;;
+        esac
+    done
+
+    # Check if we have files to merge
+    if [ ${#files[@]} -eq 0 ]; then
+        echo "Error: No valid JSON files to merge" >&2
+        exit 1
+    fi
+
+    # Merge JSON files using jq
+    if command -v jq >/dev/null 2>&1; then
+        jq -s 'reduce .[] as $item ({}; . * $item)' "${files[@]}"
+    else
+        echo "Error: jq is not installed" >&2
+        exit 1
+    fi
+}
+
+main "$@"

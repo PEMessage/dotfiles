@@ -1,0 +1,34 @@
+#compdef merge-json
+
+local -a commands presets
+
+commands=(
+    '-h:Show help'
+    '-l:List all presets'
+    '-e:Edit presets'
+)
+
+_get_presets() {
+    if [ -z "$presets" ] ; then
+        presets=(${(f)"$(merge-json -l 2>/dev/null)"})
+    fi
+}
+
+# Handle command completion for first argument
+if [[ $CURRENT -eq 2 && $words[2] == -* ]]; then
+    _describe 'command' commands
+    return
+fi
+
+# Handle preset completion for -e option
+if [[ $CURRENT -eq 3 && $words[2] == -e ]]; then
+    _get_presets
+    _describe 'presets' presets
+    return
+fi
+
+# Default: complete presets or files
+_get_presets
+_alternative \
+    'presets:preset:compadd -a presets' \
+    'files:file:_files'
