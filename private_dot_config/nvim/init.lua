@@ -2409,6 +2409,7 @@ require("lazy").setup({
                 -- "java_language_server",
                 "glsl_analyzer",
                 "zls",
+                "nil_ls",
             }
         },
         config = function(_,opts)
