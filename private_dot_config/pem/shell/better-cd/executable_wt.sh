@@ -36,6 +36,9 @@ wt() {
         fi
     }
 
+    if [ $# -eq 0 ]; then
+        set -- '-i'
+    fi
 
     # Parse arguments for interactive flag
     for arg in "$@"; do
@@ -51,11 +54,6 @@ wt() {
         fi
     done
 
-    # Main logic
-    if [ $# -eq 0 ]; then
-        __wt_internal_help_message
-        return 0
-    fi
 
     case "$1" in
         list)
