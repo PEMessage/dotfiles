@@ -11,31 +11,6 @@ wt() {
     local is_interactive=false
     local directory=""
 
-    # Internal functions
-    __wt_internal_worktree_list() {
-        git worktree list
-    }
-
-    __wt_internal_help_message() {
-        echo -e "wt lets you switch between your git worktrees with speed.\n"
-        echo "Usage:"
-        echo -e "\twt <worktree-name>: search for worktree names and change to that directory."
-        echo -e "\twt -i: interactively select a worktree using fzf."
-        echo -e "\twt list: list out all the git worktrees."
-        echo -e "\twt update: update to the latest release of worktree switcher."
-        echo -e "\twt version: show the CLI version."
-        echo -e "\twt help: shows this help message."
-    }
-
-    __wt_internal_goto_main_worktree() {
-        local main_worktree=$(git worktree list --porcelain | grep -E 'worktree ' | awk '{print $0; exit}' | cut -d ' ' -f2-)
-
-        if [ -n "$main_worktree" ]; then
-            echo "Changing to main worktree at: $main_worktree"
-            cd "$main_worktree"
-        fi
-    }
-
     if [ $# -eq 0 ]; then
         set -- '-i'
     fi
@@ -57,16 +32,28 @@ wt() {
 
     case "$1" in
         list)
-            __wt_internal_worktree_list
+            git worktree list
             ;;
         help)
-            __wt_internal_help_message
+            echo -e "wt lets you switch between your git worktrees with speed.\n"
+            echo "Usage:"
+            echo -e "\twt <worktree-name>: search for worktree names and change to that directory."
+            echo -e "\twt -i: interactively select a worktree using fzf."
+            echo -e "\twt list: list out all the git worktrees."
+            echo -e "\twt update: update to the latest release of worktree switcher."
+            echo -e "\twt version: show the CLI version."
+            echo -e "\twt help: shows this help message."
             ;;
         version)
             echo "Version: $VERSION"
             ;;
         -)
-            __wt_internal_goto_main_worktree
+            local main_worktree=$(git worktree list --porcelain | grep -E 'worktree ' | awk '{print $0; exit}' | cut -d ' ' -f2-)
+
+            if [ -n "$main_worktree" ]; then
+                echo "Changing to main worktree at: $main_worktree"
+                cd "$main_worktree"
+            fi
             return 0
             ;;
         *)
