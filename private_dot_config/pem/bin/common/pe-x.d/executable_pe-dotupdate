@@ -5,25 +5,33 @@ temp=$(chezmoi source-path)
 
 
 DO_ADD=1
-
+OTHERS=""
 GIT_ADD_OPT=""
 for x in "$@"
 do
-    if [ "$x" = "-d" ] ; then 
-        cd $temp
-        chezmoi re-add
-        git add .
-        git diff --staged
-        cd -
-        exit 0
-    fi
-    if [ "$x" = '-s' ]; then
-        DO_ADD=0
-    fi
-    if [ "$x" = '-i' ]; then
-        GIT_ADD_OPT="$GIT_ADD_OPT -i"
-    fi
+    case "$x" in
+        -d)
+            cd $temp
+            chezmoi re-add
+            git add .
+            git diff --staged
+            cd -
+            exit 0
+            ;;
+        -s|-m)
+            DO_ADD=0
+            ;;
+        -i)
+            GIT_ADD_OPT="$GIT_ADD_OPT -i"
+            ;;
+        *)
+            OTHERS="$OTHERS $x"
+            ;;
+    esac
 done
+
+# Add to others and then set -- others
+set -- $OTHERS
 
 
 
