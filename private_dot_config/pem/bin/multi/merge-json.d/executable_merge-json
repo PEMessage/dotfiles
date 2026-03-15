@@ -31,7 +31,7 @@ resolve_path() {
     local arg="$1"
 
     # If it's a regular file, return it
-    if [ -f "$arg" ]; then
+    if [ -r "$arg" ] 2>/dev/null; then
         echo "$arg"
         return 0
     fi
@@ -95,7 +95,7 @@ main() {
             *)
                 # Regular argument - try to resolve as file/preset
                 resolved=$(resolve_path "$1" 2>/dev/null || true)
-                if [ -f "$resolved" ]; then
+                if [ -r "$resolved" ]; then
                     files+=("$resolved")
                 else
                     echo "Warning: File not found: $1" >&2
@@ -113,6 +113,7 @@ main() {
 
     # Merge JSON files using jq
     if command -v jq >/dev/null 2>&1; then
+        # echo jq -s 'reduce .[] as $item ({}; . * $item)' "${files[@]}"
         jq -s 'reduce .[] as $item ({}; . * $item)' "${files[@]}"
     else
         echo "Error: jq is not installed" >&2
