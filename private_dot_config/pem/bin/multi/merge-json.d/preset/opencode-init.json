@@ -1,0 +1,9 @@
+{
+    "experimental": {
+        "disable_paste_summary": true
+    },
+    "keybinds": {
+        "app_exit": "ctrl+d,<leader>q",
+        "session_interrupt": "ctrl+c"
+    }
+}

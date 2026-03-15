@@ -41,6 +41,9 @@
 
     run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | grep -o '[0-9]\\\+\\\.[0-9]*')"
 
+    # fix opencode esc not work !
+    set-option -g escape-time 10
+
 # --------------------------------
 # Basic Key map
 # --------------------------------
