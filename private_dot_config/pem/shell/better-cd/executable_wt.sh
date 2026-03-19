@@ -29,10 +29,10 @@ wt() {
         fi
     done
 
-
     case "$1" in
         list)
             git worktree list
+            return 0;
             ;;
         help)
             echo -e "wt lets you switch between your git worktrees with speed.\n"
@@ -43,37 +43,77 @@ wt() {
             echo -e "\twt update: update to the latest release of worktree switcher."
             echo -e "\twt version: show the CLI version."
             echo -e "\twt help: shows this help message."
+            return 0
             ;;
         version)
             echo "Version: $VERSION"
+            return 0
             ;;
         -)
             local main_worktree=$(git worktree list --porcelain | grep -E 'worktree ' | awk '{print $0; exit}' | cut -d ' ' -f2-)
 
             if [ -n "$main_worktree" ]; then
-                echo "Changing to main worktree at: $main_worktree"
-                cd "$main_worktree"
+                # echo "Changing to main worktree at: $main_worktree"
+                wt "$main_worktree"
             fi
             return 0
             ;;
         *)
-            # Escape forward slash for grep
-            local search_term=$(echo "$1" | sed 's/\//\\\//g')
-
-            if [[ "$is_interactive" == true ]]; then
-                directory=$(git worktree list --porcelain |
-                awk '/worktree/ {wt=$2} /branch/ {sub("refs/heads/", "", $2); print wt " [" $2 "]"}' |
-                fzf --query "" --height=10% --no-multi --exit-0 |
-                awk '{print $1}')
-            else
-                directory=$(git worktree list --porcelain | grep -E 'worktree ' | awk '/'"$search_term"'/ {print; exit}' | cut -d ' ' -f2-)
-            fi
-
-            # Change worktree if directory is found
-            if [ -n "$directory" ]; then
-                echo "Changing to worktree at: $directory"
-                cd "$directory"
-            fi
+            # do not return falldown
             ;;
     esac
+
+    local search_term=$(echo "$1" | sed 's/\//\\\//g')
+
+    if [[ "$is_interactive" == true ]]; then
+        directory=$(git worktree list --porcelain |
+            awk '/worktree/ {wt=$2} /branch/ {sub("refs/heads/", "", $2); print wt " [" $2 "]"}' |
+            fzf --query "" --height=10% --no-multi --exit-0 |
+            awk '{print $1}')
+    else
+        directory=$(git worktree list --porcelain | grep -E 'worktree ' | awk '/'"$search_term"'/ {print; exit}' | cut -d ' ' -f2-)
+    fi
+
+    # Change worktree if directory is found
+    if [ ! -n "$directory" ]; then
+        return 0
+    fi
+
+    # Get current directory relative to current worktree root
+    local current_dir=$(pwd)
+    local current_worktree=$(git rev-parse --show-toplevel)
+    local rel_path=""
+
+    # Try to find relative path from current worktree
+    if [[ "$current_dir" == "$current_worktree"* ]]; then
+        rel_path="${current_dir#$current_worktree}"
+        # Remove leading slash if present
+        rel_path="${rel_path#/}"
+    fi
+
+    # Try to change to the same relative path in the new worktree
+    local target_dir="$directory"
+    if [ -n "$repl_path" ] ; then
+        echo "Changing to: $target_dir"
+        cd "$target_dir"
+        return 0
+    fi
+
+       # Try to preserve relative path if it exists
+    local test_path="$rel_path"
+    while [ -n "$test_path" ]; do
+        if [ -d "$directory/$test_path" ]; then
+            target_dir="$directory/$test_path"
+            echo "Found path: $test_path"
+            break
+        fi
+        test_path="${test_path%/*}"
+    done
+
+    if [ "$target_dir" = "$directory" ] && [ -n "$rel_path" ]; then
+        echo "No matching subdirectory found, using worktree root"
+    fi
+
+    echo "Changing to: $target_dir"
+    cd "$target_dir"
 }
