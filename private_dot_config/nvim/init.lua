@@ -2398,6 +2398,7 @@ require("lazy").setup({
                 "rust_analyzer",
                 "neocmake",
                 "clangd",
+                -- "ty",
                 "pylsp",
                 "gopls",
                 "bashls",
@@ -2865,8 +2866,6 @@ require("lazy").setup({
                 name = 'Run native GDB DAP',
                 type = 'gdb',
                 request = 'launch',
-                -- This requires special handling of 'run_last', see
-                -- https://github.com/mfussenegger/nvim-dap/issues/1025#issuecomment-1695852355
                 program = function()
                     local path = vim.fn.input({
                         prompt = 'Path to executable: ',
@@ -2879,6 +2878,9 @@ require("lazy").setup({
             }
             dap.configurations.c = { gdb }
             dap.configurations.cpp = { gdb }
+
+            -- This requires special handling of 'run_last', see
+            -- https://github.com/mfussenegger/nvim-dap/issues/1025#issuecomment-1695852355
 
 
         end
@@ -2986,11 +2988,15 @@ require("lazy").setup({
         "rcarriga/nvim-dap-ui",
         cmd = { 'DapUiToggle' },
         keys = {
-            { "<leader>da", '<cmd>DapNew<cr>', desc = "Debug: Start/Continue" },
+            {
+                "<leader>da",
+                '<cmd>DapNew<cr>',
+                desc = "DAP: Start/Continue"
+            },
             {
                 "<leader>du",
                 function() require("dapui").toggle() end,
-                desc = "Toggle DapUi",
+                desc = "DAP: Toggle DapUi",
             },
             {
                 "<Leader>dh",
@@ -3044,33 +3050,45 @@ require("lazy").setup({
             local debug_mappings = {
                 -- Normal mode mappings
                 ['n'] = {
-                    ['<F5>'] = dap.continue,
-                    ['<F10>'] = dap.step_over,
-                    ['<F11>'] = dap.step_into,
-                    ['<F12>'] = dap.step_out,
+                    ['<F5>'] = { dap.continue, opts = { desc = "DAP: Continue" } },
+                    ['<F10>'] = { dap.step_over, opts = { desc = "DAP: Step Over" } },
+                    ['<F11>'] = { dap.step_into, opts = { desc = "DAP: Step Into" } },
+                    ['<F12>'] = { dap.step_out, opts = { desc = "DAP: Step Out" } },
 
-                    ['<leader>dl'] = dap.run_last,
+                    ['<leader>dl'] = { dap.run_last, opts = { desc = "DAP: Run Last" } },
 
-                    ['<c-l>'] = dap.step_over,
-                    ['<c-k>'] = dap.step_out,
-                    ['<c-j>'] = dap.step_into,
+                    ['<c-l>'] = { dap.step_over, opts = { desc = "DAP: Step Over" } },
+                    ['<c-k>'] = { dap.step_out, opts = { desc = "DAP: Step Out" } },
+                    ['<c-j>'] = { dap.step_into, opts = { desc = "DAP: Step Into" } },
 
-                    ['[f'] = dap.up,
-                    [']f'] = dap.down,
+                    ['<right>'] = { dap.step_over, opts = { desc = "DAP: Step Over" } },
+                    ['<up>'] = { dap.step_out, opts = { desc = "DAP: Step Out" } },
+                    ['<down>'] = { dap.step_into, opts = { desc = "DAP: Step Into" } },
 
-                    ['<c-x>'] = function() require("dapui").eval() end,
+                    ['[f'] = { dap.up, opts = { desc = "DAP: Up" } },
+                    [']f'] = { dap.down, opts = { desc = "DAP: Down" } },
+                    ['<c-up>'] = { dap.up, opts = { desc = "DAP: Up" } },
+                    ['<c-down>'] = { dap.down, opts = { desc = "DAP: Down" } },
+
+                    ['<c-x>'] = { dapui.eval, opts = { desc = "DAP: Evaluate" } },
                 },
                 -- Visual mode mappings
                 ['v'] = {
-                    ['<c-x>'] = function() require("dapui").eval() end,
+                    ['<c-x>'] = { dapui.eval, opts = { desc = "DAP: Evaluate" } },
                 }
             }
 
             local function set_debug_mappings()
-                local keymap_opts = { noremap = true, silent = true }
+                local base_opts = { noremap = true, silent = true }
 
                 for mode, mappings in pairs(debug_mappings) do
-                    for lhs, rhs in pairs(mappings) do
+                    for lhs, mapping in pairs(mappings) do
+                        local rhs = mapping[1] or mapping.fn or mapping.callback
+                        local per_key_opts = mapping.opts or {}
+
+                        -- Merge base options with per-key options (per-key takes precedence)
+                        local keymap_opts = vim.tbl_extend("force", base_opts, per_key_opts)
+
                         vim.keymap.set(mode, lhs, rhs, keymap_opts)
                     end
                 end
