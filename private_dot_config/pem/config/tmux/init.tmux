@@ -246,11 +246,27 @@
     set -g pane-border-style "fg=#3b3b3b"
     set -g pane-active-border-style "fg=#89bbfe"
 
-    setw -g window-status-activity-style "none"
+    # setw -g window-status-activity-style "none"
+    # setw -g window-status-style "none,fg=#777777,bg=#252525"
+    # setw -g window-status-format "#[fg=#777777,bg=#252525] #I |#[fg=#777777,bg=#252525] #W "
+    # setw -g window-status-current-format "#[fg=#252525,bg=#3b3b3b,nobold,nounderscore,noitalics]#[fg=#a1b7cc,bg=#3b3b3b] #I |#[fg=#a1b7cc,bg=#3b3b3b] #W #[fg=#3b3b3b,bg=#252525,nobold,nounderscore,noitalics]"
+
+    # See: https://tmuxai.dev/tmux-alerts-monitoring/
     setw -g window-status-separator ""
-    setw -g window-status-style "none,fg=#777777,bg=#252525"
-    setw -g window-status-format "#[fg=#777777,bg=#252525] #I |#[fg=#777777,bg=#252525] #W "
-    setw -g window-status-current-format "#[fg=#252525,bg=#3b3b3b,nobold,nounderscore,noitalics]#[fg=#a1b7cc,bg=#3b3b3b] #I |#[fg=#a1b7cc,bg=#3b3b3b] #W #[fg=#3b3b3b,bg=#252525,nobold,nounderscore,noitalics]"
+
+    setw -g window-status-style "fg=#777777,bg=#252525"
+    setw -g window-status-format " #I | #W "
+    setw -g window-status-format " #I #{?window_activity_flag,!,|} #W "
+
+    setw -g window-status-current-style "fg=#a1b7cc,bg=#3b3b3b"
+    setw -g window-status-current-format " #I | #W "
+
+    set-window-option -g monitor-activity off
+    set-window-option -g monitor-bell on
+    # set-window-option -g monitor-silence 5
+
+    setw -g window-status-activity-style "fg=#ff5555,bg=#252525,bold"
+    setw -g window-status-bell-style "fg=#ff0000,bg=#252525,bold"
 # --------------------------------
 # Statue Line Theme(pimux)
 # --------------------------------
