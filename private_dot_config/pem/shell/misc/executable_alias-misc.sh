@@ -39,3 +39,5 @@ ttt() {
     fi
     command ls -tp | awk -v n=$n 'NR==n {print}'
 }
+
+alias q-bell='echo -e "\a"'
