@@ -255,8 +255,8 @@
     setw -g window-status-separator ""
 
     setw -g window-status-style "fg=#777777,bg=#252525"
-    setw -g window-status-format " #I | #W "
-    setw -g window-status-format " #I #{?window_activity_flag,!,|} #W "
+    # setw -g window-status-format " #I | #W "
+    setw -g window-status-format " #I #{?window_bell_flag,!,|} #W "
 
     setw -g window-status-current-style "fg=#a1b7cc,bg=#3b3b3b"
     setw -g window-status-current-format " #I | #W "
@@ -265,7 +265,7 @@
     set-window-option -g monitor-bell on
     # set-window-option -g monitor-silence 5
 
-    setw -g window-status-activity-style "fg=#ff0000,bg=#252525,bold"
+    # setw -g window-status-activity-style "fg=#ff0000,bg=#252525,bold"
     setw -g window-status-bell-style "fg=#ff5555,bg=#252525,bold"
 # --------------------------------
 # Statue Line Theme(pimux)
