@@ -265,8 +265,8 @@
     set-window-option -g monitor-bell on
     # set-window-option -g monitor-silence 5
 
-    setw -g window-status-activity-style "fg=#ff5555,bg=#252525,bold"
-    setw -g window-status-bell-style "fg=#ff0000,bg=#252525,bold"
+    setw -g window-status-activity-style "fg=#ff0000,bg=#252525,bold"
+    setw -g window-status-bell-style "fg=#ff5555,bg=#252525,bold"
 # --------------------------------
 # Statue Line Theme(pimux)
 # --------------------------------
