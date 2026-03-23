@@ -34,6 +34,12 @@
     # setopt AUTO_CD #No exec -> cd to it
     setopt no_nomatch
     bindkey -e
+# -----------------------------------------
+# Beep/Bell in zsh
+# -----------------------------------------
+    # https://blog.vghaisas.com/zsh-beep-sound/
+    # unsetopt BEEP
+    unsetopt LIST_BEEP
 
 # -----------------------------------------
 # History Setting Zone
