@@ -1,5 +1,23 @@
 #!/bin/bash
 
+show_usage() {
+    cat << EOF
+Usage: $(basename "$0") [OPTIONS] <file1> <file2>
+       $(basename "$0") [OPTIONS] --bak <filename>
+
+Swap the contents of two files.
+
+OPTIONS:
+  -b, --bak     Swap file with its .bak version (e.g., file.txt <-> file.txt.bak)
+  -h, --help    Show this help message
+
+EXAMPLES:
+  $(basename "$0") file1.txt file2.txt    # Swap two files
+  $(basename "$0") -b config.conf         # Swap config.conf with config.conf.bak
+  $(basename "$0") --bak notes.md         # Swap notes.md with notes.md.bak
+EOF
+}
+
 # Function to swap two files
 swap_files() {
     local file1="$1"
@@ -48,41 +66,63 @@ swap_with_bak() {
     swap_files "$file" "$bakfile"
 }
 
-# Main logic
-if [[ $# -lt 1 ]]; then
-    echo "Usage: $0 <subcommand> [arguments]"
-    echo "Subcommands:"
-    echo "  swap <file1> <file2>    Swap two files (creates missing files if needed)"
-    echo "  bak <filename>          Swap file with its .bak version"
+
+# Parse arguments
+bak_mode=false
+files=()
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -b|--bak)
+            bak_mode=true
+            shift
+            ;;
+        -h|--help)
+            show_usage
+            exit 0
+            ;;
+        --)
+            # End of options
+            shift
+            while [[ $# -gt 0 ]]; do
+                files+=("$1")
+                shift
+            done
+            ;;
+        -*)
+            echo "Error: Unknown option: $1" >&2
+            show_usage
+            exit 1
+            ;;
+        *)
+            # Regular argument (filename)
+            files+=("$1")
+            shift
+            ;;
+    esac
+done
+
+# Validate arguments based on mode
+if [ ${#files[@]} -eq 0 ]; then
+    show_usage
     exit 1
+elif [ "$bak_mode" = true ]; then
+    # Bak mode: exactly one filename
+    if [ ${#files[@]} -ne 1 ]; then
+        echo "Error: --bak mode requires exactly one filename" >&2
+        echo "Usage: $(basename "$0") --bak <filename>" >&2
+        exit 1
+    fi
+    swap_with_bak "${files[0]}"
+    exit $?
+else
+    # Default swap mode: exactly two filenames
+    if [ ${#files[@]} -ne 2 ]; then
+        echo "Error: Default mode requires exactly two filenames" >&2
+        echo "Usage: $(basename "$0") <file1> <file2>" >&2
+        exit 1
+    fi
+    swap_files "${files[0]}" "${files[1]}"
+    exit $?
 fi
 
-subcmd="$1"
-shift
-
-case "$subcmd" in
-    swap)
-        if [[ $# -ne 2 ]]; then
-            echo "Usage: $(basename $0) swap <file1> <file2>" >&2
-            echo "  Swaps the contents of two files" >&2
-            echo "  Creates empty files if one or both don't exist" >&2
-            exit 1
-        fi
-        swap_files "$1" "$2"
-        exit $?
-        ;;
-    bak)
-        if [[ $# -ne 1 ]]; then
-            echo "Usage: $(basename $0) bak <filename>" >&2
-            echo "  Swaps file with its .bak version" >&2
-            exit 1
-        fi
-        swap_with_bak "$1"
-        exit $?
-        ;;
-    *)
-        echo "Unknown subcommand: $subcmd" >&2
-        echo "Available subcommands: swap, bak" >&2
-        exit 1
-        ;;
-esac
