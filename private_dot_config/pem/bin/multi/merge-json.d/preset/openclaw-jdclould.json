@@ -2,7 +2,7 @@
   "models": {
     "mode": "merge",
     "providers": {
-      "joybuildercodingplan": {
+      "joybuilder-plan": {
         "baseUrl": "https://modelservice.jdcloud.com/coding/openai/v1",
         "apiKey": "<API_KEY>",
         "api": "openai-completions",
