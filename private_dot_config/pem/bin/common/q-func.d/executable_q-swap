@@ -1,0 +1,88 @@
+#!/bin/bash
+
+# Function to swap two files
+swap_files() {
+    local file1="$1"
+    local file2="$2"
+    local tmpfile="/tmp/swap_temp.$$"
+
+    # Check if both arguments are provided
+    if [[ -z "$file1" || -z "$file2" ]]; then
+        echo "Error: Both filenames are required" >&2
+        return 1
+    fi
+
+    # Check if both files exist
+    if [[ ! -e "$file1" && ! -e "$file2" ]]; then
+        echo "Error: Neither '$file1' nor '$file2' exist." >&2
+        return 1
+    fi
+
+    # If file1 doesn't exist but file2 does, create empty file1
+    if [[ ! -e "$file1" && -e "$file2" ]]; then
+        echo "Warning: '$file1' does not exist. Creating empty file." >&2
+        touch "$file1"
+    fi
+
+    # If file2 doesn't exist but file1 does, create empty file2
+    if [[ -e "$file1" && ! -e "$file2" ]]; then
+        echo "Warning: '$file2' does not exist. Creating empty file." >&2
+        touch "$file2"
+    fi
+
+    # Both files exist now, perform the swap
+    mv "$file1" "$tmpfile"
+    mv "$file2" "$file1"
+    mv "$tmpfile" "$file2"
+
+    echo "Swapped: '$file1' <-> '$file2'"
+    return 0
+}
+
+# Function to swap file with its .bak version (now using swap_files)
+swap_with_bak() {
+    local file="$1"
+    local bakfile="${file}.bak"
+
+    # Let swap_files handle the swapping logic
+    swap_files "$file" "$bakfile"
+}
+
+# Main logic
+if [[ $# -lt 1 ]]; then
+    echo "Usage: $0 <subcommand> [arguments]"
+    echo "Subcommands:"
+    echo "  swap <file1> <file2>    Swap two files (creates missing files if needed)"
+    echo "  bak <filename>          Swap file with its .bak version"
+    exit 1
+fi
+
+subcmd="$1"
+shift
+
+case "$subcmd" in
+    swap)
+        if [[ $# -ne 2 ]]; then
+            echo "Usage: $(basename $0) swap <file1> <file2>" >&2
+            echo "  Swaps the contents of two files" >&2
+            echo "  Creates empty files if one or both don't exist" >&2
+            exit 1
+        fi
+        swap_files "$1" "$2"
+        exit $?
+        ;;
+    bak)
+        if [[ $# -ne 1 ]]; then
+            echo "Usage: $(basename $0) bak <filename>" >&2
+            echo "  Swaps file with its .bak version" >&2
+            exit 1
+        fi
+        swap_with_bak "$1"
+        exit $?
+        ;;
+    *)
+        echo "Unknown subcommand: $subcmd" >&2
+        echo "Available subcommands: swap, bak" >&2
+        exit 1
+        ;;
+esac
