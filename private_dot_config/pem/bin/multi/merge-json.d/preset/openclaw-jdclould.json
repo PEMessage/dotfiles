@@ -1,0 +1,93 @@
+{
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "joybuildercodingplan": {
+        "baseUrl": "https://modelservice.jdcloud.com/coding/openai/v1",
+        "apiKey": "<API_KEY>",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "DeepSeek-V3.2",
+            "name": "DeepSeek-V3.2",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": {"input": 0.002, "output": 0.003, "cacheRead": 0, "cacheWrite": 0},
+            "contextWindow": 98304,
+            "maxTokens": 65536
+          },
+          {
+            "id": "GLM-5",
+            "name": "GLM-5",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": {"input": 0.0015, "output": 0.002, "cacheRead": 0, "cacheWrite": 0},
+            "contextWindow": 202752,
+            "maxTokens": 16384
+          },
+          {
+            "id": "GLM-4.7",
+            "name": "GLM-4.7",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": {"input": 0.0015, "output": 0.002, "cacheRead": 0, "cacheWrite": 0},
+            "contextWindow": 202752,
+            "maxTokens": 16384
+          },
+          {
+            "id": "MiniMax-M2.5",
+            "name": "MiniMax-M2.5",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": {"input": 0.0018, "output": 0.0025, "cacheRead": 0, "cacheWrite": 0},
+            "contextWindow": 204800,
+            "maxTokens": 131072
+          },
+          {
+            "id": "Kimi-K2-Turbo",
+            "name": "Kimi-K2-Turbo",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": {"input": 0.002, "output": 0.003, "cacheRead": 0, "cacheWrite": 0},
+            "contextWindow": 262144,
+            "maxTokens": 32768
+          },
+          {
+            "id": "Kimi-K2.5",
+            "name": "Kimi-K2.5",
+            "reasoning": false,
+            "input": ["text", "image"],
+            "cost": {"input": 0.002, "output": 0.003, "cacheRead": 0, "cacheWrite": 0},
+            "contextWindow": 262144,
+            "maxTokens": 32768
+          },
+          {
+            "id": "Qwen3-Coder",
+            "name": "Qwen3-Coder",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": {"input": 0.0012, "output": 0.0018, "cacheRead": 0, "cacheWrite": 0},
+            "contextWindow": 262144,
+            "maxTokens": 65536
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "joybuilder-plan/Kimi-K2.5"
+      },
+      "models": {
+        "joybuilder-plan/DeepSeek-V3.2": {},
+        "joybuilder-plan/GLM-5": {},
+        "joybuilder-plan/GLM-4.7": {},
+        "joybuilder-plan/MiniMax-M2.5": {},
+        "joybuilder-plan/Kimi-K2-Turbo": {},
+        "joybuilder-plan/Kimi-K2.5": {},
+        "joybuilder-plan/Qwen3-Coder": {}
+      }
+    }
+  }
+}
