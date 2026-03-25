@@ -11,4 +11,7 @@ chmod 0666 /dev/binderfs/*
 ln -s /dev/binderfs/* /dev/
 
 # https://android.googlesource.com/platform/system/core/+/master/rootdir/ueventd.rc
-chmod 0666 /dev/ashmem
+# linux 6.x remove ashmem
+if [ -e /dev/ashmem ] ; then
+    chmod 0666 /dev/ashmem
+fi
