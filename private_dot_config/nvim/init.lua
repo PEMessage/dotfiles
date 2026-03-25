@@ -365,7 +365,14 @@ require("lazy").setup({
             -- See https://stackoverflow.com/questions/9051837/how-to-map-c-to-toggle-comments-in-vim
             {'<c-_>', mode = {'n'}, '<cmd>lua require("rgflow").open_cword()<CR>', desc = "Rgflow" },
             {'<c-_>', mode = {'v'}, '<cmd>lua require("rgflow").open_visual()<CR>', desc = "Rgflow" },
+            -- {'<leader>ra', '<cmd>lua require("rgflow").abort()<CR>', desc = "Rgflow Abort" },
         },
+        cmds = { "RgflowAbort" },
+        init = function()
+            vim.api.nvim_create_user_command('RgflowAbort', function()
+                require("rgflow").abort()
+            end, {})
+        end,
     },
     {
         "nvim-mini/mini.move",
