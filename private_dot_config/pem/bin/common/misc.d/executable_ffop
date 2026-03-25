@@ -60,16 +60,16 @@ fi
 
 format_sessions() {
     awk -F'\t' -v home="$HOME" "{
-        path = \$4
+        path = \$2
         gsub(home, \"~\", path)
-        print $FMT_NONE \$1 $FMT_NONE \"\t\" $FMT_TITLE \$2 $FMT_RESET \"\t\" $FMT_TIME \$3 $FMT_RESET \"\t\" $FMT_NONE path
+        print $FMT_NONE \$1 $FMT_NONE \"\t\" $FMT_NONE path \"\t\" $FMT_TITLE \$3 $FMT_RESET \"\t\" $FMT_TIME \$4 $FMT_RESET
     }"
 }
 
 
 # Get sessions from database
 list_sessions() {
-    opencode db "SELECT id, title, datetime(time_updated / 1000, 'unixepoch'), directory FROM session WHERE title NOT LIKE '%subagent)' ORDER BY time_updated DESC" | tail -n +2 | format_sessions
+    opencode db "SELECT id, directory, title, datetime(time_updated / 1000, 'unixepoch') FROM session WHERE title NOT LIKE '%subagent)' ORDER BY time_updated DESC" | tail -n +2 | format_sessions
 }
 
 # Interactive selection with fzf
@@ -86,11 +86,13 @@ interactive_select() {
 
     fzf --ansi \
         --delimiter='\t' \
-        --with-nth="{2} {3} {4}" \
+        --with-nth="{3} {4} @{2}" \
         --preview-window="$preview_window" \
         --preview="$0 session-print {1}" \
+        --wrap=word \
         --exit-0 \
-        --scheme history
+        --scheme history \
+        --bind 'ctrl-d:preview-half-page-down,ctrl-u:preview-half-page-up,ctrl-g:preview-bottom,ctrl-t:preview-top'
 }
 
 expand_path() {
@@ -106,7 +108,7 @@ cmd_session() {
     local selected
     selected="$(list_sessions | interactive_select)"
     session_id="$(echo "$selected" | cut -f 1 -d $'\t')"
-    directory="$(echo "$selected" | cut -f 4 -d $'\t')"
+    directory="$(echo "$selected" | cut -f 2 -d $'\t')"
 
     if [ -n "$session_id" ]; then
         echo "Select session: $session_id"
@@ -123,13 +125,49 @@ print_session() {
     RESET='\x1b[0m'
     AGENT_COLOR='\x1b[32m'
     USER_COLOR='\x1b[36m'
+    META_COLOR='\x1b[33m'
 
-    # Use the variables
-    # TODO: better preview
-    opencode db "SELECT data FROM part WHERE session_id='$1' AND json_extract(data, '$.type') = 'text' ORDER BY time_updated" --format json |
+    local sql=""
+    opencode db "
+        SELECT data FROM part
+            WHERE session_id='$1'
+            AND json_extract(data, '$.type') = 'text'
+            AND (json_extract(data, '$.synthetic') IS NULL OR json_extract(data, '$.synthetic') = 0)
+            ORDER BY time_updated
+        " --format json |
     jq -r '.[] | .data | fromjson | if .time != null then "@Agent@: " + .text else "@User@: " + .text end' |
-    sed -e "s/^@Agent@:/${RESET}---\n${AGENT_COLOR}Agent:/" \
-        -e "s/^@User@:/${RESET}---\n${USER_COLOR}User:/"
+    awk -v reset="$RESET" \
+    -v agent_color="$AGENT_COLOR" \
+    -v user_color="$USER_COLOR" '
+        /^@Agent@:/ {
+            sub(/^@Agent@:/, "")
+            current_color = agent_color
+            print reset "---"
+            printf agent_color "Agent:" reset
+            print agent_color $0
+            next
+        }
+        /^@User@:/ {
+            sub(/^@User@:/, "")
+            current_color = user_color
+            print reset "---"
+            printf user_color "User:" reset
+            print user_color $0
+            next
+        }
+        {
+            # For lines without prefix, use the current_color
+            print current_color $0 reset
+        }
+    '
+    opencode db "SELECT * FROM session WHERE id=\"$1\"" --format=json |
+        awk -v reset="$RESET" \
+        -v meta_color="$META_COLOR" '
+            {
+                print meta_color $0 reset
+            }
+        ' # awk end
+
 }
 
 cmd_session_print() {
