@@ -5,37 +5,36 @@ set -eu
 export LC_ALL=C
 
 # Color support
-if [ -t 1 ]; then
-    FFOP_COLORS="always"
-else
-    FFOP_COLORS="never"
+FFOP_COLORS="${FFOP_COLORS:-auto}"
+if [ "$FFOP_COLORS" = "auto" ]; then
+    if [ -t 1 ] ; then
+        export FFOP_COLORS="always"
+    else
+        export FFOP_COLORS="never"
+    fi
 fi
 
 # ANSI color codes
 if [ "$FFOP_COLORS" = "always" ]; then
-    COLOR_ID='\033[1;36m'      # Cyan bold
-    COLOR_TITLE='\033[0m'       # Default (no color)
-    COLOR_TIME='\033[1;32m'     # Green bold
-    COLOR_RESET='\033[0m'
-    COLOR_NONE=''
+    FMT_ID='\033[1;36m'
+    FMT_TITLE='\033[0m'
+    FMT_TIME='\033[1;32m'
+    FMT_RESET='\033[0m'
+    FMT_NONE=''
 
-    FMT_ID='"\033[1;36m"'
-    FMT_TITLE='"\033[0m"'
-    FMT_TIME='"\033[1;32m"'
-    FMT_RESET='"\033[0m"'
-    FMT_NONE='""'
+    AGENT_COLOR='\x1b[32m'
+    USER_COLOR='\x1b[36m'
+    META_COLOR='\x1b[33m'
 else
-    COLOR_ID=''
-    COLOR_TITLE=''
-    COLOR_TIME=''
-    COLOR_RESET=''
-    COLOR_NONE=''
+    FMT_ID=''
+    FMT_TITLE=''
+    FMT_TIME=''
+    FMT_RESET=''
+    FMT_NONE=''
 
-    FMT_ID='""'
-    FMT_TITLE='""'
-    FMT_TIME='""'
-    FMT_RESET='""'
-    FMT_NONE='""'
+    AGENT_COLOR=''
+    USER_COLOR=''
+    META_COLOR=''
 fi
 
 # Function to format timestamp to human readable
@@ -59,11 +58,24 @@ fi
 # }
 
 format_sessions() {
-    awk -F'\t' -v home="$HOME" "{
-        path = \$2
-        gsub(home, \"~\", path)
-        print $FMT_NONE \$1 $FMT_NONE \"\t\" $FMT_NONE path \"\t\" $FMT_TITLE \$3 $FMT_RESET \"\t\" $FMT_TIME \$4 $FMT_RESET
-    }"
+    awk -F'\t' \
+        -v fmt_id="$FMT_NONE" \
+        -v fmt_path="$FMT_NONE" \
+        -v fmt_title="$FMT_TITLE" \
+        -v fmt_time="$FMT_TIME" \
+        -v fmt_reset="$FMT_RESET" \
+        -v fmt_none="$FMT_NONE" \
+        -v home="$HOME" \
+        '{
+            path = $2
+            gsub(home, "~", path)
+            print fmt_id $1 fmt_none "\t" fmt_path path fmt_none "\t" fmt_title $3 fmt_reset "\t" fmt_time $4 fmt_reset
+        }'
+    # awk -F'\t' -v home="$HOME" "{
+    #     path = \$2
+    #     gsub(home, \"~\", path)
+    #     print $FMT_NONE \$1 $FMT_NONE \"\t\" $FMT_NONE path \"\t\" $FMT_TITLE \$3 $FMT_RESET \"\t\" $FMT_TIME \$4 $FMT_RESET
+    # }"
 }
 
 
@@ -92,7 +104,10 @@ interactive_select() {
         --wrap=word \
         --exit-0 \
         --scheme history \
-        --bind 'ctrl-d:preview-half-page-down,ctrl-u:preview-half-page-up,ctrl-g:preview-bottom,ctrl-t:preview-top'
+        --bind 'ctrl-d:preview-half-page-down,ctrl-u:preview-half-page-up,ctrl-g:preview-bottom,ctrl-t:preview-top' \
+        --expect=alt-n \
+        --header-first \
+        --header="[New: Alt-n]  [Preview Scroll: Ctrl-d/u]  [Jump: Ctrl-g/t]"
 }
 
 expand_path() {
@@ -107,6 +122,12 @@ expand_path() {
 cmd_session() {
     local selected
     selected="$(list_sessions | interactive_select)"
+    if [ "$(echo "$selected" | head -n1)" = "alt-n" ] ; then
+        echo "New opencode session"
+        opencode
+        exit 0
+    fi
+
     session_id="$(echo "$selected" | cut -f 1 -d $'\t')"
     directory="$(echo "$selected" | cut -f 2 -d $'\t')"
 
@@ -123,9 +144,6 @@ cmd_session() {
 
 print_session() {
     RESET='\x1b[0m'
-    AGENT_COLOR='\x1b[32m'
-    USER_COLOR='\x1b[36m'
-    META_COLOR='\x1b[33m'
 
     local sql=""
     opencode db "
@@ -136,7 +154,7 @@ print_session() {
             ORDER BY time_updated
         " --format json |
     jq -r '.[] | .data | fromjson | if .time != null then "@Agent@: " + .text else "@User@: " + .text end' |
-    awk -v reset="$RESET" \
+    awk -v reset="$FMT_RESET" \
     -v agent_color="$AGENT_COLOR" \
     -v user_color="$USER_COLOR" '
         /^@Agent@:/ {
@@ -161,7 +179,7 @@ print_session() {
         }
     '
     opencode db "SELECT * FROM session WHERE id=\"$1\"" --format=json |
-        awk -v reset="$RESET" \
+        awk -v reset="$FMT_RESET" \
         -v meta_color="$META_COLOR" '
             {
                 print meta_color $0 reset
