@@ -7,6 +7,10 @@ ff_pm(){
     pm i "$@"
 }
 
+ff_opencode() {
+    ffop "$@"
+}
+
 ff_man() {
     for x in 1 2 3 4 5 6 7 8
     do
@@ -58,8 +62,9 @@ usage() {
     echo "USAGE:"
     echo "       ff path            : search all path bin"
     echo "       ff man             : alias all of MANPATH"
-    echo "       ff [apt|pacman|rpm]: alias of \`ffpm i\`"
-    echo "       ff include         : seach g++/gcc default include path"
+    echo "       ff [apt|pacman|rpm]: alias of \`pm i\`"
+    echo "       ff include         : search g++/gcc default include path"
+    echo "       ff opencode        : search opencode"
 }
 
 
@@ -80,6 +85,10 @@ main() {
         include)
             shift
             ff_include "$@"
+            ;;
+        opencode|op)
+            shift
+            ff_opencode "$@"
             ;;
         *)
             usage

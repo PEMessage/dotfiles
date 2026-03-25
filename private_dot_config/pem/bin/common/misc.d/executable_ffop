@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+
+set -eu
+
+export LC_ALL=C
+
+# Color support
+if [ -t 1 ]; then
+    FFOP_COLORS="always"
+else
+    FFOP_COLORS="never"
+fi
+
+# ANSI color codes
+if [ "$FFOP_COLORS" = "always" ]; then
+    COLOR_ID='\033[1;36m'      # Cyan bold
+    COLOR_TITLE='\033[0m'       # Default (no color)
+    COLOR_TIME='\033[1;32m'     # Green bold
+    COLOR_RESET='\033[0m'
+    COLOR_NONE=''
+
+    FMT_ID='"\033[1;36m"'
+    FMT_TITLE='"\033[0m"'
+    FMT_TIME='"\033[1;32m"'
+    FMT_RESET='"\033[0m"'
+    FMT_NONE='""'
+else
+    COLOR_ID=''
+    COLOR_TITLE=''
+    COLOR_TIME=''
+    COLOR_RESET=''
+    COLOR_NONE=''
+
+    FMT_ID='""'
+    FMT_TITLE='""'
+    FMT_TIME='""'
+    FMT_RESET='""'
+    FMT_NONE='""'
+fi
+
+# Function to format timestamp to human readable
+# format_timestamp() {
+#     local timestamp=$1
+#     # Convert from milliseconds to seconds if needed (timestamp looks like 13 digits)
+#     if [ ${#timestamp} -eq 13 ]; then
+#         timestamp=$((timestamp / 1000))
+#     fi
+#     date -d "@$timestamp" "+%Y-%m-%d %H:%M:%S" 2>/dev/null || echo "Invalid date"
+# }
+#
+# Format sessions with colors using printf
+# format_sessions() {
+#     while IFS=$'\t' read -r id title timestamp; do
+#         local formatted_time
+#         formatted_time=$(format_timestamp "$timestamp")
+#         printf "${COLOR_ID}%s${COLOR_RESET}\t${COLOR_TITLE}%s${COLOR_RESET}\t${COLOR_TIME}%s${COLOR_RESET}\n" \
+#             "$id" "$title" "$formatted_time"
+#     done
+# }
+
+format_sessions() {
+    awk -F'\t' -v home="$HOME" "{
+        path = \$4
+        gsub(home, \"~\", path)
+        print $FMT_NONE \$1 $FMT_NONE \"\t\" $FMT_TITLE \$2 $FMT_RESET \"\t\" $FMT_TIME \$3 $FMT_RESET \"\t\" $FMT_NONE path
+    }"
+}
+
+
+# Get sessions from database
+list_sessions() {
+    opencode db "SELECT id, title, datetime(time_updated / 1000, 'unixepoch'), directory FROM session WHERE title NOT LIKE '%subagent)' ORDER BY time_updated DESC" | tail -n +2 | format_sessions
+}
+
+# Interactive selection with fzf
+interactive_select() {
+    local preview_window
+    if [ "${COLUMNS:-80}" -lt 80 ]; then
+        preview_window="down:50%"
+    else
+        preview_window="right:50%"
+    fi
+
+    # TODO: better preview
+    # opencode db "SELECT data FROM part WHERE session_id='ses_2dbb6b6a8ffeqtzaB47x5BPWBT' AND json_extract(data, '$.type') = 'text' ORDER BY time_updated" --format json |
+    # jq -r '.[] | .data | fromjson | if .time != null then "Agent: " + .text else "User: " + .text end' |
+    # sed -e 's/^Agent:/\x1b[0m---\n\x1b[32mAgent:/' -e 's/^User:/\x1b[0m---\n\x1b[36mUser:/'
+
+
+    fzf --ansi \
+        --delimiter='\t' \
+        --with-nth="{2} {3} {4}" \
+        --preview="opencode db \"SELECT * FROM session WHERE id={1}\" --format=json" \
+        --preview-window="$preview_window" \
+        --exit-0 \
+        --scheme history
+}
+
+expand_path() {
+    local path="$1"
+    if [[ "$path" == "~"* ]]; then
+        path="${HOME}${path:1}"
+    fi
+    echo "$path"
+}
+
+
+main() {
+    local selected
+    selected="$(list_sessions | interactive_select)"
+    session_id="$(echo "$selected" | cut -f 1 -d $'\t')"
+    directory="$(echo "$selected" | cut -f 4 -d $'\t')"
+
+    if [ -n "$session_id" ]; then
+        echo "Select session: $session_id"
+        echo "Change dir to: $directory"
+        cd "$(expand_path "$directory")"
+        opencode -s "$session_id"
+    else
+        echo "No session selected" >&2
+        exit 1
+    fi
+}
+
+main "$@"
