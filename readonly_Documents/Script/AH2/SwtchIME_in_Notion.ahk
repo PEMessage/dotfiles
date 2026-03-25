@@ -12,11 +12,11 @@ SetTimer(CheckWindowFocus, 500)
 
 CheckWindowFocus() {
     global LastActiveWindow
-    
+
     try {
         currentTitle := WinGetTitle("A")
         currentExe := WinGetProcessName("A")
-        
+
         if (LastActiveWindow != currentTitle) {
             ; Windows Terminal focused
             if (currentExe = "WindowsTerminal.exe" || InStr(currentTitle, "Windows Terminal")) {
@@ -26,7 +26,10 @@ CheckWindowFocus() {
             else if (currentExe = "notion.exe" || InStr(currentTitle, "notion")) {
                 RunWait('im-select-imm.exe -d 30 2052 1',, "Hide")
             }
-            
+            else if (currentExe = "msedge.exe") {
+                RunWait('im-select-imm.exe -d 30 2052 1',, "Hide")
+            }
+
             LastActiveWindow := currentTitle
         }
     }
