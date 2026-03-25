@@ -1,0 +1,46 @@
+#!/bin/bash
+
+runcmd() {
+    echo "Runing: $*"
+    "$@"
+}
+git_config_global() {
+    key="$1"
+    value="$2"
+
+    curvalue="$(git config --global --get-all "$key")"
+
+    if [ "$curvalue" = "$value" ] ; then
+        return 0
+    elif [ -z "$curvalue" ] ; then
+        true
+    else
+        runcmd git config --global --unset-all "$key"
+    fi
+    runcmd git config --global "$key" "$value"
+}
+
+main() {
+    if ! command -v gh > /dev/null; then
+        echo "gh is NOT installed"
+        return 0
+    fi
+
+    GH_USER_INFO="$(gh api user)"
+    GH_USER_ID=$(echo "${GH_USER_INFO}" | jq -r .id)
+    GH_USER=$(echo "${GH_USER_INFO}" | jq -r .login)
+    GH_EMAIL=$(echo "${GH_USER_INFO}" | jq -r .email)
+    GH_PRIVATE_EMAIL="${GH_USER_ID}+${GH_USER}@users.noreply.github.com"
+
+    if [ "$GH_EMAIL" = "null" ] || [ -z "$GH_EMAIL" ]; then
+        echo "User email: $GH_PRIVATE_EMAIL (using GitHub private email)"
+        git_config_global user.email "$GH_PRIVATE_EMAIL"
+    else
+        echo "User email: $GH_EMAIL"
+        git_config_global user.email "$GH_EMAIL"
+    fi
+
+    git_config_global user.name "$GH_USER"
+}
+
+main "$@"

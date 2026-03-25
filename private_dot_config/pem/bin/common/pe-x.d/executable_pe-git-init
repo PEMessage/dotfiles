@@ -128,3 +128,6 @@ git_config_global alias.root-commit 'log --all --oneline --decorate --max-parent
 if [ -n "$PEM_HOME" ] && [ -d "$PEM_HOME/config/git" ] ; then
     git_config_global_if_not_set init.templateDir "$PEM_HOME/config/git"
 fi
+
+git_config_global alias.sw "!gh auth switch && git-ghuser"
+git_config_global alias.user "!git config user.name && git config user.email"
