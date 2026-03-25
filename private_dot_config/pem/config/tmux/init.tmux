@@ -12,8 +12,8 @@
     # set-option -g renumber-windows on 
 
     # Ture Color support
-    set -g default-terminal "xterm-256color"
-    set -as terminal-overrides ",xterm*:Tc"
+    # set -g default-terminal "xterm-256color"
+    # set -as terminal-overrides ",xterm*:Tc"
 
     # Thanks to: https://github.com/vercel/hyper/issues/3338#issuecomment-469089888
     bind-key -T copy-mode-vi WheelUpPane send -N3 -X scroll-up
@@ -21,10 +21,10 @@
 
 
     # See: https://github.com/tmux/tmux/wiki/FAQ#how-do-i-use-a-256-colour-terminal
-    # set -g default-terminal "screen-256color"
+    set -g default-terminal "screen-256color"
     # # all term outside 
-    # set-option -ga terminal-overrides ',*-256color*:Tc'
-    # set-option -ga terminal-overrides ',*-256color*:RGB'
+    set-option -ga terminal-overrides ',*-256color*:Tc'
+    set-option -ga terminal-overrides ',*-256color*:RGB'
 
     # From: tmux-plugins/tmux-sensible
     set-option -g history-limit 50000
