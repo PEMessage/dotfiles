@@ -17,6 +17,7 @@ Options:
   -h              Show this help message
   -l              List available preset JSON files
   -e <name>       Edit a preset JSON file
+  --preset-path   print preset path
 
 If arguments are not files, they will be checked against preset directory.
 Files can be mixed with preset names.
@@ -90,6 +91,10 @@ main() {
                 preset_path="$CONF_JSON_BUCKET_DIR/$1"
                 ${EDITOR:-vim} "$preset_path"
                 shift
+                return 0
+                ;;
+            --preset-path)
+                echo "$CONF_JSON_BUCKET_DIR"
                 return 0
                 ;;
             *)
