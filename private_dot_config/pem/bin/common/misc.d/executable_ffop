@@ -81,17 +81,14 @@ interactive_select() {
         preview_window="right:50%"
     fi
 
-    # TODO: better preview
-    # opencode db "SELECT data FROM part WHERE session_id='ses_2dbb6b6a8ffeqtzaB47x5BPWBT' AND json_extract(data, '$.type') = 'text' ORDER BY time_updated" --format json |
-    # jq -r '.[] | .data | fromjson | if .time != null then "Agent: " + .text else "User: " + .text end' |
-    # sed -e 's/^Agent:/\x1b[0m---\n\x1b[32mAgent:/' -e 's/^User:/\x1b[0m---\n\x1b[36mUser:/'
 
+    # --preview="opencode db \"SELECT * FROM session WHERE id={1}\" --format=json"
 
     fzf --ansi \
         --delimiter='\t' \
         --with-nth="{2} {3} {4}" \
-        --preview="opencode db \"SELECT * FROM session WHERE id={1}\" --format=json" \
         --preview-window="$preview_window" \
+        --preview="$0 session-print {1}" \
         --exit-0 \
         --scheme history
 }
@@ -105,7 +102,7 @@ expand_path() {
 }
 
 
-main() {
+cmd_session() {
     local selected
     selected="$(list_sessions | interactive_select)"
     session_id="$(echo "$selected" | cut -f 1 -d $'\t')"
@@ -120,6 +117,49 @@ main() {
         echo "No session selected" >&2
         exit 1
     fi
+}
+
+print_session() {
+    RESET='\x1b[0m'
+    AGENT_COLOR='\x1b[32m'
+    USER_COLOR='\x1b[36m'
+
+    # Use the variables
+    # TODO: better preview
+    opencode db "SELECT data FROM part WHERE session_id='$1' AND json_extract(data, '$.type') = 'text' ORDER BY time_updated" --format json |
+    jq -r '.[] | .data | fromjson | if .time != null then "@Agent@: " + .text else "@User@: " + .text end' |
+    sed -e "s/^@Agent@:/${RESET}---\n${AGENT_COLOR}Agent:/" \
+        -e "s/^@User@:/${RESET}---\n${USER_COLOR}User:/"
+}
+
+cmd_session_print() {
+    local session_id="$1"
+
+    if [ -z "$session_id" ]; then
+        echo "Usage: $0 session-print <session-id>" >&2
+        echo "Get session info from fzf: $0 session-print \$(opencode session | cut -f1)" >&2
+        exit 1
+    fi
+
+    print_session "$session_id"
+}
+
+main() {
+    local cmd="${1:-session}"
+
+    case "$cmd" in
+        session)
+            cmd_session
+            ;;
+        session-print)
+            cmd_session_print "${2:-}"
+            ;;
+        *)
+            echo "Unknown command: $cmd" >&2
+            echo "Run '$0 help' for usage information" >&2
+            exit 1
+            ;;
+    esac
 }
 
 main "$@"
