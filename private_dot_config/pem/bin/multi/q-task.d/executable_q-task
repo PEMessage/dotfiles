@@ -34,7 +34,7 @@ main() {
         -l)
             (
                 cd "$CONF_BUCKET_DIR"
-                find . -type f -name '*sh' -o -name '*.uv.py' | sed 's@^./@@g'
+                find . -type f -name '*sh' -o -name '*.py' | sed 's@^./@@g'
             )
             ;;
         -e)
@@ -53,6 +53,8 @@ main() {
             if [[ "$Q_TASK_SCRIPT" == *.sh ]]; then
                 bash "$Q_TASK_SCRIPT" "$@"
             elif [[ "$Q_TASK_SCRIPT" == *.uv.py ]]; then
+                uv run "$Q_TASK_SCRIPT" "$@"
+            elif [[ "$Q_TASK_SCRIPT" == *.py ]]; then
                 uv run "$Q_TASK_SCRIPT" "$@"
             else
                 echo "[Err]: unknow script"
