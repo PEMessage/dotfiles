@@ -131,7 +131,7 @@
     alias l="ls --color=auto --time-style=long-iso -h"
     alias ll='ls --color=auto --time-style=long-iso -h -l -a'
 
-    if [ "$PEM_OS_VARIANT" == "msys" ] ; then
+    if [ "$PEM_OS_VARIANT" = "msys" ] ; then
         alias chezmoi='chezmoi -S "$(cygpath -w "${XDG_CONFIG_HOME:-${HOME}/.local/share}/chezmoi")"'
     fi
 
