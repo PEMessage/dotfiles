@@ -2889,7 +2889,50 @@ require("lazy").setup({
             -- This requires special handling of 'run_last', see
             -- https://github.com/mfussenegger/nvim-dap/issues/1025#issuecomment-1695852355
 
+            -- Thanks to:
+            -- https://github.com/TaPO4eg3D/my-dotfiles/blob/fbe04062d512c7cc270ecfc19e1493fbb88b5624/.config/nvim/lua/plugins/dap/init.lua#L127
+            -- See also:
+            -- https://github.com/kartoza/django-bims/blob/8fee70596eb5179e5b616d353a7e095678b667ea/.nvim.lua#L66
+            -- Tips:
+            -- uv add --dev debugpy-run
+            -- uv run debugpy-run -m <MODULE> -- <ARG1> <ARG2> ...
+            dap.adapters.python_attach = function (callback, config)
+                ---@diagnostic disable-next-line: undefined-field
+                local port = (config.connect or config).port
+                ---@diagnostic disable-next-line: undefined-field
+                local host = (config.connect or config).host or '127.0.0.1'
 
+                local cfg = {
+                    type = "server",
+                    port = assert(port, '`connect.port` is required for a python `attach` configuration'),
+                    host = host,
+                    options = {
+                        source_filetype = 'python',
+                    },
+                }
+                callback(cfg)
+            end
+            local python_attach = {
+                type = 'python_attach',
+                request = 'attach',
+                name = 'Attach to Running Debugger in Docker',
+                connect = {
+                    host = '127.0.0.1',
+                    port = 5678,
+                },
+                mode = "remote",
+                pathMappings = {
+                    {
+                        localRoot = function ()
+                            return vim.fn.getcwd()
+                        end,
+                        remoteRoot = function ()
+                            return vim.fn.getcwd()
+                        end,
+                    },
+                },
+            }
+            dap.configurations.python = { python_attach }
         end
     },
     {

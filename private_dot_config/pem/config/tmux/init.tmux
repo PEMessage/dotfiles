@@ -75,7 +75,7 @@
     # ----------------------------
     # bind P paste-buffer
     # bind C-v paste-buffer
-    bind -n C-M-v copy-mode
+    # bind -n C-M-v copy-mode
 
     # Trouble shooting with `tmux bind -n TheKey lsk`
     # https://github.com/tmux/tmux/wiki/Modifier-Keys
