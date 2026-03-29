@@ -145,6 +145,12 @@
 # load other setup 
 # Step 1: mkdir and add to path
 # -----------------------------------------
+    PEM_NULL_GLOB_STATE="unset"
+    if [ $PEM_SHELL = "zsh" ] ; then
+        [[ -o null_glob ]] && PEM_NULL_GLOB_STATE="set"
+        setopt NULL_GLOB
+    fi
+
     # var expansion is not split (by default) in zsh,
     # but command expansions are.
     # Therefore in both Bash and zsh you can use
@@ -173,7 +179,7 @@
 
         # common PATH
         for xbin in \
-            "$x/bin/extra"/*.d 
+            "$x/bin/extra"/*.d
         do
             [ -d "$xbin" ] && {
                 case "$xbin" in
@@ -272,6 +278,10 @@
         done
         PATH=${PATH#:}
         unset PEM_TMEP_OLD_PATH x
+    fi
+
+    if [ $PEM_SHELL = "zsh" ]; then
+        [ $PEM_NULL_GLOB_STATE = "set" ] && setopt NULL_GLOB || unsetopt NULL_GLOB
     fi
 
     [ -f "$HOME/.peprofile" ] && . ~/.peprofile
