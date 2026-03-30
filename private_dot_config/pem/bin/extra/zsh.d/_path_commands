@@ -23,7 +23,7 @@ done
 return 1
 }
 
-_call_whatis() { 
+_call_whatis() {
   case "$(whatis --version)" in
   ("whatis from "*)
     local -A args
@@ -80,7 +80,90 @@ if [[ -n $need_desc ]]; then
     compadd "$@" -ld descs -a dcmds && ret=0
   _wanted commands expl 'external command' compadd "$@" -a cmds && ret=0
 else
-  _wanted commands expl 'external command' compadd "$@" -k commands && ret=0
+  ## --------------------------------------------------------
+  ## PEM Modify start
+  ## --------------------------------------------------------
+  typeset -gA _PATH_COMMANDS_CACHE
+  # Single pass: 最多实际检查25个命令（包括重新检查已缓存的命令）
+  local -a filtered_commands matches
+  local cmd cmd_path
+  local actual_checks=0
+  local -a recheck_list=()  # 存储已缓存但可能被重新检查的命令
+
+  # 获取匹配当前输入的命令
+  compadd "$@" -O matches -k commands
+
+  # Single pass 处理所有命令
+  for cmd in $matches; do
+    # 检查是否在缓存中
+    if [[ -n ${_PATH_COMMANDS_CACHE[$cmd]} ]]; then
+      # 在缓存中，记录到重新检查列表（以备需要时重新检查）
+      recheck_list+=("$cmd")
+      # 暂时使用缓存结果
+      (( _PATH_COMMANDS_CACHE[$cmd] )) && filtered_commands+=("$cmd")
+    else
+      # 不在缓存中，需要检查
+      if (( actual_checks < 25 )); then
+        (( actual_checks++ ))
+        cmd_path="$(builtin whence -p "$cmd" 2>/dev/null)"
+        if [[ -n "$cmd_path" ]]; then
+          _PATH_COMMANDS_CACHE[$cmd]=1
+          filtered_commands+=("$cmd")
+        else
+          _PATH_COMMANDS_CACHE[$cmd]=0
+          # 无效命令不添加
+        fi
+      else
+        # 配额用尽，直接添加
+        filtered_commands+=("$cmd")
+      fi
+    fi
+  done
+
+  # This part is optional if you want simply code
+  # 如果实际检查数量不足25个，从已缓存的命令中重新检查（刷新缓存）
+  if (( actual_checks < 25 && ${#recheck_list} > 0 )); then
+    for cmd in $recheck_list; do
+      if (( actual_checks >= 25 )); then
+        break
+      fi
+
+      # 重新检查已缓存的命令
+      (( actual_checks++ ))
+      cmd_path="$(builtin whence -p "$cmd" 2>/dev/null)"
+      local new_valid=$([[ -n "$cmd_path" && -f "$cmd_path" && -x "$cmd_path" ]] && echo 1 || echo 0)
+
+      # 更新缓存
+      _PATH_COMMANDS_CACHE[$cmd]=$new_valid
+
+      # 更新 filtered_commands 中对应的条目
+      # 需要找到并替换或删除该命令
+      local found=0
+      for (( i=1; i<=${#filtered_commands}; i++ )); do
+        if [[ ${filtered_commands[$i]} == "$cmd" ]]; then
+          found=1
+          if (( new_valid )); then
+            # 仍然有效，保留
+            break
+          else
+            # 现在无效了，删除
+            filtered_commands[$i]=()
+            break
+          fi
+        fi
+      done
+      # 如果之前不在 filtered_commands 中但现在是有效的，添加
+      if (( found == 0 && new_valid )); then
+        filtered_commands+=("$cmd")
+      fi
+    done
+  fi
+
+  # 使用过滤后的命令列表进行补全
+  _wanted commands expl 'external command' compadd "$@" -a filtered_commands && ret=0
+  ## --------------------------------------------------------
+  ## PEM Modify end
+  ## --------------------------------------------------------
 fi
 # TODO: this is called from '_command_names -e' which is typically used in
 # contexts (such as _env) that don't accept directory names.  Should this
