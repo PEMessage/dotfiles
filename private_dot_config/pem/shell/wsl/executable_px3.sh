@@ -145,7 +145,7 @@ __px3()
     case "$mode" in
         shell)
             # Process shell commands
-            if [ "$action" == "set" ]; then
+            if [ "$action" = "set" ]; then
                 echo "export $key=\"$value\""
                 eval "export $key=\"$value\""
                 echo "export $upper_key=\"$value\""
@@ -179,7 +179,7 @@ __px3()
                 hostkey=systemProp.$inter.proxyHost
                 portkey=systemProp.$inter.proxyPort
                 # Process shell commands
-                if [ "$action" == "set" ]; then
+                if [ "$action" = "set" ]; then
                     echo "$hostkey=$ip"
                     echo "$portkey=$port"
                 else
@@ -196,7 +196,7 @@ __px3()
                 return 1
             fi
 
-            if [ "$action" == "set" ]; then
+            if [ "$action" = "set" ]; then
                 echo "export $inner_key=\"$value\""
                 eval "export $inner_key=\"$value\""
             else
@@ -257,7 +257,7 @@ __px3()
 
 
                 # Process systemd commands
-                if [[ "$action" == "set" ]]; then
+                if [ "$action" = "set" ]; then
                     if [ "$__px3_callcount" = 0 ] ; then
                         do_init
                     fi

@@ -36,7 +36,7 @@ __env_toggle() {
     fi
 
 
-    if [ "$action" == "set" ]; then
+    if [ "$action" = "set" ]; then
         echo "export $key=\"$value\""
         eval "export $key=\"$value\""
     else
