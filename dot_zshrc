@@ -46,7 +46,11 @@
     # Tips:
     #   `hash | grep preset` to see result
     #   `hash -r` to re-gen
-    setopt hashexecutablesonly
+    # This is too slow, not use it now
+    # setopt hashexecutablesonly
+
+
+
     bindkey -e
 # -----------------------------------------
 # Beep/Bell in zsh
