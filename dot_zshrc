@@ -103,7 +103,12 @@
     # zstyle ':chpwd:*' recent-dirs-max 50
 
     # Tips: use <M-a> to select multiple item
-    # also map <M-w> to incase conflict with wechat
+    # also map <M-w> to avoid the conflict of wechat hotkey
+    #
+    # Set to expand-or-complete, will allow act like <TAB> before menuselect
+    bindkey '^[a' expand-or-complete
+    bindkey -M menuselect '^[a' accept-and-hold
+    bindkey '^[w' expand-or-complete
     bindkey -M menuselect '^[w' accept-and-hold
 
     # zstyle ':autocomplete:tab:*' insert-unambiguous yes
