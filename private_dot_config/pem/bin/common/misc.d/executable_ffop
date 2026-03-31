@@ -88,9 +88,9 @@ list_sessions() {
 interactive_select() {
     local preview_window
     if [ "${COLUMNS:-80}" -lt 80 ]; then
-        preview_window="down:50%"
+        preview_window="wrap:down:50%"
     else
-        preview_window="right:50%"
+        preview_window="wrap:right:50%"
     fi
 
 
@@ -110,8 +110,16 @@ interactive_select() {
         --header="[New: Alt-n]  [Preview Scroll: Ctrl-d/u]  [Jump: Ctrl-g/t]"
 }
 
+trim() {
+    awk 'NF {
+        gsub(/^[[:space:]]+|[[:space:]]+$/, ""); # trim
+        print;
+    }'
+}
+
 expand_path() {
     local path="$1"
+    path="$(echo "$path" | trim)"
     if [[ "$path" == "~"* ]]; then
         path="${HOME}${path:1}"
     fi
@@ -128,8 +136,8 @@ cmd_session() {
         exit 0
     fi
 
-    session_id="$(echo "$selected" | cut -f 1 -d $'\t')"
-    directory="$(echo "$selected" | cut -f 2 -d $'\t')"
+    session_id="$(echo "$selected" | cut -f 1 -d $'\t' | trim)"
+    directory="$(echo "$selected" | cut -f 2 -d $'\t' | trim)"
 
     if [ -n "$session_id" ]; then
         echo "Select session: $session_id"
@@ -146,6 +154,9 @@ print_session() {
     RESET='\x1b[0m'
 
     local sql=""
+    echo "Query:"
+    echo opencode db "\"SELECT data FROM part WHERE session_id='$1' AND json_extract(data, '$.type') = 'text' AND (json_extract(data, '$.synthetic') IS NULL OR json_extract(data, '$.synthetic') = 0) ORDER BY time_updated\"" --format json \
+     "|" jq -r "'"'.[] | .data | fromjson | if .time != null then "@Agent@: " + .text else "@User@: " + .text end'"'"
     opencode db "
         SELECT data FROM part
             WHERE session_id='$1'
