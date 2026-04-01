@@ -153,6 +153,11 @@ local section = function ()
     vim.g.inlay_hints_visible = true
     vim.lsp.inlay_hint.enable(true)
 
+    -- See: https://github.com/lewis6991/gitsigns.nvim/issues/1102#issuecomment-2375842834
+    -- auto:1-2 will use a second column only if there are both staged and unstaged changes in the
+    -- buffer. Otherwise, it will use a single column.
+    vim.opt.signcolumn = 'auto:1-2'
+
 end
 section()
 
