@@ -75,7 +75,11 @@ def create_parser() -> argparse.ArgumentParser:
         return result.stdout.strip().split('\n')  # or parse as needed
 
     opencode_arguments = {
-        ('--jq_expr',): {'default': 'contains(["presets"]) and contains(["model"])'},
+        ('--jq_expr',): {'default': '''
+            ( contains(["presets"]) and contains(["model"]) ) or
+            ( contains(["agent"]) and contains(["model"]) ) or
+            ( contains(["small_model"]) )
+            '''},
         ('--options',): {'default': opencode_options},
         ('-i', '--inplace'): {'default': True}
     }
