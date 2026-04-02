@@ -31,13 +31,7 @@ alias q-west='uvx --with jsonschema --with pyelftools --with anytree west'
 
 # alias ttt='command ls -tp | head -n1'
 ttt() {
-    if [ -n "$1" ] ; then
-        local n="$1"
-        shift
-    else
-        local n="1"
-    fi
-    command ls -tp | awk -v n=$n 'NR==n {print}'
+    command ls -tp "$@" | awk -v n=1 'NR==n {print}'
 }
 
 alias q-bell='echo -e "\a"'
