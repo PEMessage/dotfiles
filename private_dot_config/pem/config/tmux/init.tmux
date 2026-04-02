@@ -153,7 +153,7 @@
 
     bind -n C-M-e next-window
     # Credit: https://nju-projectn.github.io/ics-pa-gitbook/ics2023/0.5.html
-    bind -n C-M-w new-window -c "#{pane_current_path}"
+    bind -n C-M-w new-window -c "#{pane_current_path}" -a -t +1
     bind -n C-M-q previous-window
     
     bind -n C-M-c splitw -h -c '#{pane_current_path}' # 水平方向新增面板，默认进入当前目录
