@@ -165,21 +165,6 @@
     # zinit ice pick"async.zsh" src"pure.zsh" # with zsh-async library that's bundled with it.
     # zinit light sindresorhus/pure
 
-    # Thanks to: https://zenlian.github.io/zsh-zinit/
-    zinit ice as"completion"
-    zinit snippet https://github.com/docker/cli/blob/master/contrib/completion/zsh/_docker
-
-    zinit ice as"completion"
-    zinit snippet https://github.com/sainnhe/zsh-completions/blob/master/src/custom/_fzf
-    zinit ice as"completion"
-    zinit snippet https://github.com/gradle/gradle-completion/blob/master/_gradle
-
-    zinit ice as"completion" mv"just.zsh -> _just"
-    zinit snippet https://github.com/casey/just/blob/master/completions/just.zsh
-
-    # Thanks to https://zhuanlan.zhihu.com/p/98450570
-    zinit ice lucid wait="0" atload="zpcompinit; zpcdreplay"
-    zinit snippet OMZ::plugins/uv/uv.plugin.zsh
 
     zinit for \
         atload"zicompinit; zicdreplay" \
@@ -213,7 +198,6 @@
 
     function lazy_fzf_completion() {
         bindkey -r '^x'
-        zstyle ':completion:*:*:opencode' verbose yes
         zinit snippet 'https://github.com/lincheney/fzf-tab-completion/blob/master/zsh/fzf-zsh-completion.sh'
         # official fzf plugin already bindkey '^I' (tab), and use fzf_default_completion to store origin one
         # snippet above will override it, we should override it back
@@ -246,5 +230,40 @@
     # source ~/.config/pem/shell/vless/vless.sh
 
 # -----------------------------------------
-# Post init.sh
+# lazy load compdef file
+# -----------------------------------------
+    # Thanks to: https://zenlian.github.io/zsh-zinit/
+    if [ -n "$commands[docker]" ]; then
+        zinit ice as"completion"
+        zinit snippet https://github.com/docker/cli/blob/master/contrib/completion/zsh/_docker
+    fi
+
+    if [ -n "$commands[fzf]" ]; then
+        zinit ice as"completion"
+        zinit snippet https://github.com/sainnhe/zsh-completions/blob/master/src/custom/_fzf
+    fi
+
+    if [ -n "$commands[just]" ]; then
+        zinit ice as"completion" mv"just.zsh -> _just"
+        zinit snippet https://github.com/casey/just/blob/master/completions/just.zsh
+    fi
+
+    if [ -n "$commands[gradle]" ]; then
+        zinit ice as"completion"
+        zinit snippet https://github.com/gradle/gradle-completion/blob/master/_gradle
+    fi
+
+    if [ -n "$commands[uv]" ]; then
+        # Thanks to https://zhuanlan.zhihu.com/p/98450570
+        zinit ice lucid wait="0" atload="zpcompinit; zpcdreplay"
+        zinit snippet OMZ::plugins/uv/uv.plugin.zsh
+    fi
+
+    if [ -n "$commands[opencode]" ]; then
+        zinit ice as"completion"
+        zstyle ':completion:*:*:opencode:*' fzf-search-display true
+        zinit snippet https://github.com/PEMessage/opencode-zsh-completion/blob/main/_opencode
+    fi
+# -----------------------------------------
+# End of file
 # -----------------------------------------
