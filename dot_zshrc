@@ -211,6 +211,25 @@
     bindkey '^Z' fancy-ctrl-z
 
 
+    function lazy_fzf_completion() {
+        bindkey -r '^x'
+        zstyle ':completion:*:*:opencode' verbose yes
+        zinit snippet 'https://github.com/lincheney/fzf-tab-completion/blob/master/zsh/fzf-zsh-completion.sh'
+        # official fzf plugin already bindkey '^I' (tab), and use fzf_default_completion to store origin one
+        # snippet above will override it, we should override it back
+        fzf_default_completion=expand-or-complete
+        bindkey '^x' fzf_completion
+
+        # relaunch origin function
+        zle fzf_completion
+    }
+
+    # treat lazy_fzf_completion as a widget
+    zle -N lazy_fzf_completion
+
+    # Register lazy_fzf_completion (ctrl-f to search zle)
+    bindkey '^x' lazy_fzf_completion
+
 
 
 # -----------------------------------------
