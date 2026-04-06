@@ -42,6 +42,8 @@ git_config_global fetch.writeCommitGraph true
 git_config_global log.date iso-local
 git_config_global diff.tool vimdiff
 # git_config_global core.fsmonitor true
+git_config_global difftool.nvim.cmd 'nvim -d "$LOCAL" "$REMOTE"'
+
 
 git_config_global alias.pk cherry-pick
 git_config_global alias.ck checkout
