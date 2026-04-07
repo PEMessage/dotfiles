@@ -95,7 +95,6 @@ rule:
   kind: type_identifier
   inside:
     any:
-      - kind: class_specifier
       - kind: struct_specifier
       - kind: enum_specifier
   regex: '$regex'
