@@ -1176,12 +1176,42 @@ require("lazy").setup({
                 '<leader>gb', '<cmd>Gitsigns toggle_current_line_blame<cr>', mode = 'n',
                 desc = 'Toggle line blame', silent = true
             },
+            -- {
+            --     '[c', "&diff ? '[c' : ':Gitsigns prev_hunk<CR>'", mode = 'n',
+            --     desc = 'Previous git changed line', silent = true, expr = true
+            -- },
+            -- {
+            --     ']c', "&diff ? ']c' : ':Gitsigns next_hunk<CR>'", mode = 'n',
+            --     desc = 'Next git changed line', silent = true, expr = true
+            -- },
             {
-                '[c', "&diff ? '[c' : ':Gitsigns prev_hunk<CR>'", mode = 'n',
+                '[c',
+                function()
+                    if vim.wo.diff then
+                        return '[c'
+                    elseif vim.api.nvim_get_option_value('buftype', { buf = 0 }) == 'quickfix' or
+                        vim.iter(vim.fn.getwininfo()):find(function(w) return w.quickfix == 1 end) then
+                        return ':colder<CR>'
+                    else
+                        return '<cmd>Gitsigns prev_hunk<CR>'
+                    end
+                end,
+                mode = 'n',
                 desc = 'Previous git changed line', silent = true, expr = true
             },
             {
-                ']c', "&diff ? ']c' : ':Gitsigns next_hunk<CR>'", mode = 'n',
+                ']c',
+                function()
+                    if vim.wo.diff then
+                        return ']c'
+                    elseif vim.api.nvim_get_option_value('buftype', { buf = 0 }) == 'quickfix' or
+                        vim.iter(vim.fn.getwininfo()):find(function(w) return w.quickfix == 1 end) then
+                        return ':cnewer<CR>'
+                    else
+                        return '<cmd>Gitsigns next_hunk<CR>'
+                    end
+                end,
+                mode = 'n',
                 desc = 'Next git changed line', silent = true, expr = true
             },
             {
