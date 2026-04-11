@@ -134,3 +134,4 @@ fi
 
 git_config_global alias.sw "!gh auth switch && git-ghuser"
 git_config_global alias.user "!git config user.name && git config user.email"
+git_config_global init.defaultBranch main
