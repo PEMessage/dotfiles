@@ -20,7 +20,7 @@ bcd()
     }
 
     local dirname_input="$(dirname "$input")"
-    [ -d "$dirname_input" ] && {
+    [ -d "$dirname_input" ] && [ -e "$input" ] && {
         "$op" "$dirname_input"
         return 0
     }
@@ -31,7 +31,7 @@ bcd()
     }
 
     local which_input="$(which "$input")"
-    [ "$which_input" ] && {
+    [ -e "$which_input" ] && {
         "$op" "$(dirname "$which_input")"
         return 0
     }
