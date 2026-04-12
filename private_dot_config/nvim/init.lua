@@ -555,6 +555,8 @@ require("lazy").setup({
             -- words = { enabled = true },
         },
         keys = {
+            { "]]",function() Snacks.words.jump(vim.v.count1) end, desc = "Next Lsp Reference", mode = { "n", "t" } },
+            { "[[",function() Snacks.words.jump(-vim.v.count1) end, desc = "Prev Lsp Reference", mode = { "n", "t" } },
         }
     },
     -- {
