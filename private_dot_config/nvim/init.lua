@@ -3343,6 +3343,7 @@ require("lazy").setup({
     },
     {
         'ldelossa/litee-calltree.nvim',
+        enabled = false,
         dependencies = 'ldelossa/litee.nvim',
         event = "LspAttach",
         main = 'litee.calltree',
