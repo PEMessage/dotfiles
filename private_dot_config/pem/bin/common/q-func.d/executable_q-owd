@@ -1,0 +1,43 @@
+#!/bin/bash
+
+function q-sshport()
+{
+    if [ -n "$SSH_CONNECTION" ]; then
+        echo "$SSH_CONNECTION" | awk '{print $4}'
+        return
+    fi
+}
+
+function __q_owd() {
+
+    local out="$(q-pwd "$@")"
+    local out_rsync
+
+    read -d '' out_rsync < \
+    <(
+        IFS=$'\n'
+        for line in $out; do
+            PORT="$(q-sshport)"
+            if [ -n "$PORT" ] && [ ! "$PORT" -eq 22 ] ; then
+                echo "rsync -e 'ssh -p $PORT' '$line'"
+            else
+                echo "rsync '$line'"
+            fi
+        done
+    )
+    echo "$out_rsync"
+}
+
+function q-owd()
+{
+    out="$(__q_owd "$@")"
+    echo "$out"
+
+    if [ -t 1  ] ; then
+        echo "$out" | yank
+        echo "Copy to yank..."
+    fi
+
+}
+
+q-owd "$@"
