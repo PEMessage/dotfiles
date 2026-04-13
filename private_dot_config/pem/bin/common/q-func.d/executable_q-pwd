@@ -1,7 +1,13 @@
 #!/bin/bash
 
+
 function q-myip()
 {
+    if [ -n "$SSH_CONNECTION" ]; then
+        echo "$SSH_CONNECTION" | awk '{print $3}'
+        return
+    fi
+
 	case $(uname -a) in
 	Darwin|*BSD)
 		local ip=$(ifconfig  | grep -E 'inet.[0-9]' | grep -v '127.0.0.1' | awk '{ print $2}')
@@ -24,44 +30,86 @@ function q-myip()
 	echo "${ip}"
 }
 
-function q-pwd() {
-local x
-if [ -n "$PEM_Q_PWD_NR" ] ; then
-    for x in $PEM_Q_PWD_NR
-    do
-        if [ -z "$postcmd" ] ; then
-            local postcmd="NR == $x"
+
+function __q_pwd_filtercmd() {
+    if [ -z "$PEM_Q_PWD_NR" ] ; then
+        echo 'cat'
+        return
+    fi
+
+    local awk_cond=""
+    for n in $PEM_Q_PWD_NR; do
+        # If total line is 10
+        # 0  --> line 10
+        # -1 --> line 9
+        # 1  --> line 1
+        # 11 --> line 11
+        local cond="i == (($n - 1) % total + total) % total + 1"
+
+        if [ -z "$awk_cond" ]; then
+            awk_cond="$cond"
         else
-            local postcmd+=" || NR == $x"
+            awk_cond="$awk_cond || $cond"
         fi
     done
-    # echo $postcmd
-    postcmd="awk '$postcmd'"
-else
-    local postcmd="cat"
-fi
-# echo $postcmd
-
-local out
-# Thanks to https://serverfault.com/questions/377943/how-do-i-read-multiple-lines-from-stdin-into-a-variable
-read -d '' out < \
-<(for x in `q-myip`
-    do
-        if [ -z "$1" ]; then 
-            echo `whoami`@$x:`pwd`
-        else
-            path="$(readlink -f "$1")"
-            echo `whoami`@$x:"$path"
-        fi 
-    done | eval "$postcmd"  )
-
-echo "$out"
-# Thanks: https://stackoverflow.com/questions/911168/how-can-i-detect-if-my-shell-script-is-running-through-a-pipe
-if [ -t 1  ] ; then 
-    echo "$out" | yank
-    echo "Copy to yank..."
-fi
+    postcmd="awk '{ lines[NR] = \$0 } END { total = NR; for (i=1; i<=total; i++) if ($awk_cond) print lines[i] }'"
+    echo "$postcmd"
 }
 
+function __q_pwd() {
+    local x
+    local out
+    # Thanks to https://serverfault.com/questions/377943/how-do-i-read-multiple-lines-from-stdin-into-a-variable
+    read -d '' out < \
+    <(for x in `q-myip | tr ' ' '\n' | eval "$(__q_pwd_filtercmd)"`
+        do
+            if [ $# -eq 0 ]; then
+                echo `whoami`@$x:`pwd`
+                return
+            fi
+
+            for r in "$@" ;
+            do
+                abspath="$(readlink -f "$r")"
+                echo `whoami`@$x:"$abspath"
+            done
+        done)
+
+    echo "$out"
+}
+
+function q-rsync() {
+
+    local out="$(__q_pwd "$@")"
+    local out_rsync
+
+    read -d '' out_rsync < \
+    <(
+        IFS=$'\n'
+        for line in $out; do
+            PORT="$(q-sshport)"
+            if [ -n "$PORT" ] && [ ! "$PORT" -eq 22 ] ; then
+                echo "rsync -e 'ssh -p $PORT' '$line'"
+            else
+                echo "rsync '$line'"
+            fi
+        done
+    )
+    echo "$out_rsync"
+}
+
+
+# Thanks: https://stackoverflow.com/questions/911168/how-can-i-detect-if-my-shell-script-is-running-through-a-pipe
+function q-pwd()
+{
+    out="$(__q_pwd "$@")"
+    echo "$out"
+
+    if [ -t 1  ] ; then
+        echo "$out" | yank
+        echo "Copy to yank..."
+    fi
+
+}
 
 q-pwd "$@"
