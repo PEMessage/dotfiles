@@ -36,6 +36,7 @@
   "hunk.nvim": { "branch": "master", "commit": "a73c34934e87af4f2e615fea3a57ee28b2dceec8" },
   "improved-search.nvim": { "branch": "main", "commit": "9480bfb0e05f990a1658464c1d349dd2acfb9c34" },
   "indent-blankline.nvim": { "branch": "master", "commit": "d28a3f70721c79e3c5f6693057ae929f3d9c0a03" },
+  "inlayhint-filler.nvim": { "branch": "main", "commit": "4b2b8d0df39d1ad7aaa7c101e5c382333b5bde01" },
   "inspector.nvim": { "branch": "main", "commit": "6a2c17df62a9ec9df9e1c37ef7ccc04b315faf34" },
   "lazy.nvim": { "branch": "main", "commit": "306a05526ada86a7b30af95c5cc81ffba93fef97" },
   "lazydev.nvim": { "branch": "main", "commit": "ff2cbcba459b637ec3fd165a2be59b7bbaeedf0d" },

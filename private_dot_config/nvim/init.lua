@@ -530,6 +530,19 @@ require("lazy").setup({
         end
     },
     {
+        "Davidyz/inlayhint-filler.nvim",
+        keys = {
+            {
+                "<Leader>I", -- Use whatever keymap you want.
+                function()
+                    require("inlayhint-filler").fill()
+                end,
+                desc = "Insert the inlay-hint under cursor into the buffer.",
+                mode = { "n", "v" }, -- include 'v' if you want to use it in visual selection mode
+            },
+        },
+    },
+    {
         "folke/snacks.nvim",
         priority = 1000,
         lazy = false,
@@ -1873,7 +1886,7 @@ require("lazy").setup({
                 {"<C-p>", buffers_picker, "Buffers" },
                 {"<C-r>", oldfiles_picker, "MRU" },
                 {"<C-e>", find_files_picker, "Find Files" },
-                {"<C-q>", cmd_history,  "Commands History", mode = {"c", "n"}, noremap = true},
+                {"<C-q>", cmd_history,  "Commands History", mode = {"c", "n", "v"}, noremap = true},
                 {"<leader>tm", "<cmd>Telescope man_pages<cr>", "Telescope Man Pages" },
                 {"<leader>td", "<cmd>Telescope lsp_definitions<cr>", "Telescope LSP Define" },
                 {"<leader>th", "<cmd>Telescope help_tags<cr>", "Telescope Help Pages" },
@@ -2163,8 +2176,8 @@ require("lazy").setup({
                     { name = 'buffer' },
                     { name = 'luasnip' },
                     { name = 'luasnip_choice' },
-                    { name = 'tmux' },
                     { name = 'path' },
+                    -- { name = 'tmux' },
                     -- { name = 'vsnip'}
                 }),
                 formatting = {
@@ -3643,6 +3656,7 @@ local section = function ()
     -- -------------------------------------------
     -- 6.2 Leader Keymap
     -- -------------------------------------------
+    vim.keymap.set('n', '<leader>rcc' , '<cmd>w<CR><cmd>source %<CR>' , { desc = 'Source current file' } )
     vim.keymap.set('n', '<leader>rce' , '<cmd>tabe $MYVIMRC<CR>' , { desc = 'Edit MYVIMRC' } )
     vim.keymap.set('n', '<leader>``' , '<cmd>nohlsearch<CR>' , { desc = 'Close Highlight' } )
     -- vim.keymap.set('n', '<leader><leader>ga' , '<cmd>nohlsearch<CR>' , { desc = 'Close Highlight' } )
