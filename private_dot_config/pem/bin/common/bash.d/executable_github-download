@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # GitHub Auto-Update Download Script with jq parsing
-# Usage: ./github_updater.sh <owner>/<repo> <asset_pattern> [<output_file>] [-v VERSION]
+# Usage: ./github_updater.sh <owner>/<repo> <asset_pattern> [<output_file>] [-v VERSION] [--no-download]
 
 set -euo pipefail
 
@@ -10,6 +10,8 @@ RELEASE_DATA=""
 SELECTED_VERSION="latest"
 ASSET_URL=""
 OUTPUT_FILE=""
+GH_AUTH_AVAILABLE=false
+NO_DOWNLOAD=false
 
 runcmd() {
     echo "Runing: $*"
@@ -32,25 +34,72 @@ check_dependencies() {
     fi
 }
 
-# Get release data from GitHub API
+# Check if GitHub CLI is authenticated
+check_auth() {
+    if ! command -v gh &> /dev/null; then
+        echo "[Info]: GitHub CLI (gh) not found, using unauthenticated API (may have rate limits)"
+        GH_AUTH_AVAILABLE=false
+        return
+    fi
+
+    local auth_status
+    auth_status=$(gh auth status --json hosts 2>/dev/null) || {
+        echo "[Info]: GitHub CLI not authenticated, using unauthenticated API (may have rate limits)"
+        GH_AUTH_AVAILABLE=false
+        return
+    } && {
+        echo "[Info]: gh auth status --json hosts"
+    }
+
+    # Check if we have a successful authentication for github.com
+    local github_auth
+    github_auth=$(jq -r '.hosts["github.com"] | select(. != null) | .[0].state' <<< "$auth_status" 2>/dev/null)
+
+    if [ "$github_auth" = "success" ]; then
+        local login
+        login=$(jq -r '.hosts["github.com"][0].login' <<< "$auth_status")
+        echo "[Info]: GitHub CLI authenticated as: $login"
+        GH_AUTH_AVAILABLE=true
+    else
+        echo "[Info]: GitHub CLI not authenticated for github.com, using unauthenticated API (may have rate limits)"
+        GH_AUTH_AVAILABLE=false
+    fi
+}
+
+# Get release data from GitHub API (dual-stack: gh CLI or curl)
 fetch_release_data() {
     local repo="$1"
     local version="$2"
-    local api_url
+    local api_endpoint
     
     if [ "${version}" = latest ] ; then
-        api_url="https://api.github.com/repos/${repo}/releases/latest"
+        api_endpoint="repos/${repo}/releases/latest"
     else
-        api_url="https://api.github.com/repos/${repo}/releases/tags/${version}"
+        api_endpoint="repos/${repo}/releases/tags/${version}"
     fi
-    echo "[Info]: Fetching release data for version $version from GitHub..."
     
-    echo "[Info]: Runing: RELEASE_DATA=\"\$(curl -sL \"$api_url\")\""
-    RELEASE_DATA="$(curl -sL "$api_url")"
+    # Try authenticated gh CLI first if available
+    if [ "$GH_AUTH_AVAILABLE" = true ]; then
+        echo "[Info]: Fetching release data for version $version using gh CLI..."
+        echo "[Info]: Runing: gh api \"${api_endpoint}\""
+        
+        RELEASE_DATA=$(gh api "${api_endpoint}" 2>&1) || {
+            echo "[Err]: Failed to fetch release data via gh CLI"
+            echo "[Err]: $RELEASE_DATA"
+            exit 1
+        }
+    else
+        # Fallback to unauthenticated curl
+        local api_url="https://api.github.com/${api_endpoint}"
+        echo "[Info]: Fetching release data for version $version from GitHub (unauthenticated)..."
+        echo "[Info]: Runing: curl -sL \"$api_url\""
+        
+        RELEASE_DATA="$(curl -sL "$api_url")"
+    fi
     
     # Check if release data was fetched successfully
-    if [[ $(jq -r '.message' <<< "$RELEASE_DATA") == "Not Found" ]]; then
-        echo "[Err]: Release not found - $api_url"
+    if [[ $(jq -r '.message // empty' <<< "$RELEASE_DATA") == "Not Found" ]]; then
+        echo "[Err]: Release not found - ${api_endpoint}"
         exit 1
     fi
 }
@@ -107,6 +156,10 @@ parse_arguments() {
                 SELECTED_VERSION="$2"
                 shift 2
                 ;;
+            --no-download)
+                NO_DOWNLOAD=true
+                shift
+                ;;
             *)
                 positional+=("$1")
                 shift
@@ -118,9 +171,10 @@ parse_arguments() {
     set -- "${positional[@]}"
     
     if [ $# -lt 2 ]; then
-        echo "Usage: $0 <owner>/<repo> <asset_pattern> [<output_file>] [-v VERSION]"
+        echo "Usage: $0 <owner>/<repo> <asset_pattern> [<output_file>] [-v VERSION] [--no-download]"
         echo "Example: $0 neovim/neovim 'nvim-linux64.tar.gz' nvim.tar.gz -v v0.9.0"
         echo "Example: $0 neovim/neovim 'nvim-linux64.tar.gz' # Uses latest version"
+        echo "Example: $0 neovim/neovim 'nvim-linux64.tar.gz' --no-download # Check only, no download"
         exit 1
     fi
     
@@ -132,12 +186,22 @@ parse_arguments() {
 # Main control function
 main() {
     check_dependencies
+    check_auth
     parse_arguments "$@"
     
     fetch_release_data "$repo" "$SELECTED_VERSION"
     get_version
     find_asset_url "$asset_pattern"
     set_output_filename
+    
+    if [ "$NO_DOWNLOAD" = true ]; then
+        echo "[Info]: --no-download specified, skipping download"
+        echo "Would download: $ASSET_URL"
+        echo "Save to: $(pwd)/$OUTPUT_FILE"
+        echo "Version: $SELECTED_VERSION"
+        exit 0
+    fi
+    
     download_asset
 
     echo "Download completed successfully"
