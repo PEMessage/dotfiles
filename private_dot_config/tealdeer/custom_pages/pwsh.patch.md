@@ -9,3 +9,6 @@
 
 - 💫 remove empty dir
 `Get-ChildItem -Directory -Recurse | Where-Object { $_.GetFileSystemInfos().Count -eq 0 } | Remove-Item`
+
+- 💫 `ip link` for windows
+`Get-NetIPInterface`
