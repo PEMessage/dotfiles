@@ -3911,6 +3911,18 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "markdown",
+  callback = function()
+    vim.keymap.set("x", "F", ":!column -t -s '|' -o '|'<CR>", {
+      noremap = true,
+      silent = false,
+      buffer = true,
+      desc = "Align Markdown table columns",
+    })
+  end,
+})
+
 -- 7.1 Vim Function Zone(I just tired)
 -- ===========================================
 vim.cmd [[
