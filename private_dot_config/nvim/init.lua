@@ -1430,7 +1430,7 @@ require("lazy").setup({
             --     -- colors = {}, -- table of hex strings
             --     -- termcolors = {} -- table of colour name strings
             -- },
-            indent = { enable = { 'python','lua'  } },
+            indent = { enable = { 'python','lua', 'nix' } },
             ensure_installed = {
                 'json',
                 'xml',
@@ -1458,6 +1458,7 @@ require("lazy").setup({
                 'kotlin',
                 'javascript',
                 'zig',
+                'nix',
             },
             incremental_selection = {
                 enable = true,
