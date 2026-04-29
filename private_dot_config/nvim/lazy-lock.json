@@ -1,6 +1,7 @@
 {
   "Comment.nvim": { "branch": "master", "commit": "e30b7f2008e52442154b66f7c519bfd2f1e32acb" },
   "LuaSnip": { "branch": "master", "commit": "a62e1083a3cfe8b6b206e7d3d33a51091df25357" },
+  "MarkdownTable.nvim": { "branch": "main", "commit": "9430386c9332033d21465ddb7ae3996a463f4300" },
   "aerial.nvim": { "branch": "master", "commit": "645d108a5242ec7b378cbe643eb6d04d4223f034" },
   "alpha-nvim": { "branch": "main", "commit": "f6d753d310e7c3aa5e6fbb92d6e8eb82c954a4c8" },
   "aosp-vim": { "branch": "master", "commit": "1fe0707cfc2e435977103d20b888186204d9c29a" },
@@ -36,6 +37,7 @@
   "hunk.nvim": { "branch": "master", "commit": "a73c34934e87af4f2e615fea3a57ee28b2dceec8" },
   "improved-search.nvim": { "branch": "main", "commit": "9480bfb0e05f990a1658464c1d349dd2acfb9c34" },
   "indent-blankline.nvim": { "branch": "master", "commit": "d28a3f70721c79e3c5f6693057ae929f3d9c0a03" },
+  "inlayhint-expand.nvim": { "branch": "main", "commit": "4992aa7d408fc13c9fbc34b1475b57d732aaeab6" },
   "inlayhint-filler.nvim": { "branch": "main", "commit": "4b2b8d0df39d1ad7aaa7c101e5c382333b5bde01" },
   "inspector.nvim": { "branch": "main", "commit": "6a2c17df62a9ec9df9e1c37ef7ccc04b315faf34" },
   "lazy.nvim": { "branch": "main", "commit": "306a05526ada86a7b30af95c5cc81ffba93fef97" },

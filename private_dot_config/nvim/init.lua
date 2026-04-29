@@ -723,6 +723,11 @@ require("lazy").setup({
         opts = {},
     },
     {
+        "PEMessage/inlayhint-expand.nvim",
+        cmd = {'InlayHintExpand'},
+        opts = {},
+    },
+    {
         "PEMessage/inspector.nvim",
         lazy = true,
         cmd = { 'InspectFloat' },
@@ -1551,6 +1556,8 @@ require("lazy").setup({
                     ['identifier'] = function() end,
                     ['arguments'] = actions.toggle_multiline(),
                     ['argument_list'] = actions.toggle_multiline(),
+                    ['initializer_list'] = actions.toggle_multiline(), -- cpp
+                    ['attrset_expression'] = actions.toggle_multiline(), -- nix
                 },
             }
         end,
