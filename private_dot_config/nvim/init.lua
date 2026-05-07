@@ -719,8 +719,11 @@ require("lazy").setup({
         'MeanderingProgrammer/render-markdown.nvim',
         enabled = false,
         -- if you use standalone mini plugins
-        dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' },
+        dependencies = { 'PEMessage/nvim-treesitter', 'nvim-mini/mini.icons' },
         opts = {},
+    },
+    {
+        'tyrossel/MarkdownTable.nvim'
     },
     {
         "PEMessage/inlayhint-expand.nvim",
@@ -796,7 +799,7 @@ require("lazy").setup({
         lazy = true,
         dependencies = {
             "hrsh7th/nvim-cmp",
-            -- "nvim-treesitter/nvim-treesitter",
+            -- "PEMessage/nvim-treesitter",
         },
         config = function(_, _)
             require('cmp').setup.filetype('neorepl', {
@@ -1312,7 +1315,7 @@ require("lazy").setup({
     -- 5.4 Treesitter (HEAVY Zone after)
     -- -------------------------------------------
     -- {
-    --     'nvim-treesitter/nvim-treesitter',
+    --     'PEMessage/nvim-treesitter',
     --     branch = 'main', -- required: main is the new rewrite
     --     build = ':TSUpdate', -- ensures parsers are updated
     --     lazy = false, -- treesitter does NOT support lazy-loading
@@ -1408,7 +1411,7 @@ require("lazy").setup({
     --     end,
     -- },
     {
-        'nvim-treesitter/nvim-treesitter',
+        'PEMessage/nvim-treesitter',
         dependencies = { 'williamboman/mason.nvim' },
         branch = 'main', -- required: main is the new rewrite
         build = ':TSUpdate', -- ensures parsers are updated
@@ -1416,7 +1419,7 @@ require("lazy").setup({
     },
     {
         'MeanderingProgrammer/treesitter-modules.nvim',
-        dependencies = { 'nvim-treesitter/nvim-treesitter' },
+        dependencies = { 'PEMessage/nvim-treesitter' },
         lazy = false, -- treesitter does NOT support lazy-loading
         opts = {
             highlight = {
@@ -1435,7 +1438,7 @@ require("lazy").setup({
             --     -- colors = {}, -- table of hex strings
             --     -- termcolors = {} -- table of colour name strings
             -- },
-            indent = { enable = { 'python','lua', 'nix' } },
+            indent = { enable = { 'python','lua'  } },
             ensure_installed = {
                 'json',
                 'xml',
@@ -1463,7 +1466,7 @@ require("lazy").setup({
                 'kotlin',
                 'javascript',
                 'zig',
-                'nix',
+                'imhex',
             },
             incremental_selection = {
                 enable = true,
@@ -1477,7 +1480,7 @@ require("lazy").setup({
         },
     },
     {
-        "nvim-treesitter/nvim-treesitter-context",
+        "PEMessage/nvim-treesitter-context",
         branch = 'main',
         enabled = false,
         opts = {
@@ -2419,6 +2422,8 @@ require("lazy").setup({
                     -- Check if it's Ubuntu 18.04
                     if content:match('NAME=.*[Uu]buntu') and content:match('VERSION_ID="18%.04"') then
                         tree_sitter = 'tree-sitter-cli-ub1804'
+                    elseif content:match('NAME=.*[Uu]buntu') and content:match('VERSION_ID="22%.04"') then
+                        tree_sitter = 'tree-sitter-cli-ub1804'
                     end
                 end
             end
@@ -3261,7 +3266,7 @@ require("lazy").setup({
         -- Note: this also have barbecue.nvim feature something like
         -- nvim › init.lua › 󰅨 require("lazy").setup ›  [25]
         dependencies = {
-            'nvim-treesitter/nvim-treesitter', -- optional
+            'PEMessage/nvim-treesitter', -- optional
             -- 'nvim-tree/nvim-web-devicons'     -- optional
         },
         enabled = false,
@@ -3338,7 +3343,7 @@ require("lazy").setup({
         opts = {},
         -- Optional dependencies
         dependencies = {
-            "nvim-treesitter/nvim-treesitter",
+            "PEMessage/nvim-treesitter",
             -- "nvim-tree/nvim-web-devicons"
         },
     },
@@ -3930,6 +3935,14 @@ vim.api.nvim_create_autocmd("FileType", {
     })
   end,
 })
+
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+    pattern = "*.hexpat",
+    callback = function()
+        vim.bo.filetype = "imhex"
+    end,
+})
+
 
 -- 7.1 Vim Function Zone(I just tired)
 -- ===========================================
