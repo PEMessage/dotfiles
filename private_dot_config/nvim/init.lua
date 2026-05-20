@@ -998,6 +998,10 @@ require("lazy").setup({
         event = 'VeryLazy',
     },
     {
+        'junegunn/gv.vim',
+        dependencies = { 'tpope/vim-fugitive' },
+    },
+    {
         'justinmk/vim-dirvish',
     },
     {

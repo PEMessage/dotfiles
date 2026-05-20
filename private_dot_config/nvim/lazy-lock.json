@@ -33,6 +33,7 @@
   "ghostty.vim": { "branch": "main", "commit": "71aa5f1452514fb87f7e1659d14734aa8e13dd9d" },
   "gitportal.nvim": { "branch": "main", "commit": "2420f27c6269184f13d018f347f36eb120403110" },
   "gitsigns.nvim": { "branch": "main", "commit": "dd3f588bacbeb041be6facf1742e42097f62165d" },
+  "gv.vim": { "branch": "master", "commit": "ed7e9c6a118d92462c7d709c34a92682b60fa9f7" },
   "hop.nvim": { "branch": "v2", "commit": "90db1b2c61b820e230599a04fedcd2679e64bd07" },
   "hunk.nvim": { "branch": "master", "commit": "c8a8e7b6973576f63e5bf39aa8338d7f37f4dc53" },
   "improved-search.nvim": { "branch": "main", "commit": "9480bfb0e05f990a1658464c1d349dd2acfb9c34" },
