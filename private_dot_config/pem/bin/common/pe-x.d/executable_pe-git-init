@@ -135,3 +135,9 @@ fi
 git_config_global alias.sw "!gh auth switch && git-ghuser"
 git_config_global alias.user "!git config user.name && git config user.email"
 git_config_global init.defaultBranch main
+
+
+
+# hunk: bun install -g hunkdiff
+git_config_global alias.hdiff "-c core.pager=\"hunk pager\" diff"
+git_config_global alias.hshow "-c core.pager=\"hunk pager\" show"

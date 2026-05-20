@@ -21,10 +21,13 @@ ENV PATH="/root/.cargo/bin:\$PATH"
 WORKDIR /build
 
 # Clone tree-sitter repository
-RUN git clone https://github.com/tree-sitter/tree-sitter.git .
+RUN git clone https://github.com/tree-sitter/tree-sitter.git . --depth 1 --branch v0.26.8 
 
-# Checkout specific version (using the version from workspace.package in Cargo.toml)
-RUN git checkout v0.25.10
+# bingen need this
+RUN apt-get install -y \
+    libclang-dev
+RUN apt-get install -y \
+    clang
 
 # Build the CLI binary using the workspace configuration
 RUN . /root/.cargo/env && \
@@ -37,7 +40,7 @@ ENTRYPOINT ["/bin/bash", "-c", "cp /tree-sitter /w/tree-sitter && chown \$UID:\$
 EOF
 
 # Run the container to copy the binary to host
-docker run --rm \
+docker run --rm  \
   -e UID="$(id -u)" \
   -e GID="$(id -g)" \
   -v "$PWD":/w \
