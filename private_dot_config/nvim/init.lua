@@ -158,6 +158,14 @@ local section = function ()
     -- buffer. Otherwise, it will use a single column.
     vim.opt.signcolumn = 'auto:1-2'
 
+    -- -------------------------------------------
+    -- 3.7 nvim 0.12
+    -- -------------------------------------------
+    if vim.fn.has('nvim-0.12') == 1 then
+        require('vim._core.ui2').enable()
+    end
+
+
 end
 section()
 
@@ -1560,6 +1568,7 @@ require("lazy").setup({
                     ['arguments'] = actions.toggle_multiline(),
                     ['argument_list'] = actions.toggle_multiline(),
                     ['initializer_list'] = actions.toggle_multiline(), -- cpp
+                    ['parameter_list'] = actions.toggle_multiline(), -- cpp
                     ['attrset_expression'] = actions.toggle_multiline(), -- nix
                 },
             }
