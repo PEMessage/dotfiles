@@ -63,6 +63,9 @@ let g:startify_custom_header = [
                     " \   'gitbranch': 'FugitiveHead',
                     " \   'searchcount': 'SearchIndex'
 
+    let s:thisfile = expand('<sfile>')
+    let s:thisdir = fnamemodify(s:thisfile, ':h')
+    let s:lockvim = s:thisdir . '/lock.vim'
 
 " 1. Select plug we want
 " ===========================================
@@ -517,6 +520,11 @@ endif
     nnoremap <leader>rcc  :w<CR> :source %<CR> " Re:Configuration
 
     function! PERCEdit()
+        if exists(s:thisfile)
+            execute 'tabedit ' . s:thisfile
+            return
+        endif
+
         if exists('g:pe_rc["file"]') && !empty(g:pe_rc['file'])
             execute 'tabedit ' . g:pe_rc['file']
         else
@@ -744,6 +752,22 @@ if PSelect('*')
         let opts = get(a:000, 0, {})
         return a:cond ? opts : extend(opts, { 'on': [], 'for': [] })
     endfunction
+
+    " if filereadable(s:lockvim)
+    "     execute 'source' s:lockvim
+    " endif
+
+    command! -bang -nargs=? PlugSnapshotSave call s:PlugSnapshotSave(<bang>0, <q-args>)
+    function! s:PlugSnapshotSave(bang, fname)
+        let l:default = s:lockvim
+        let l:target = (a:fname == '') ? l:default : a:fname
+        let l:cmd = 'PlugSnapshot' . (a:bang ? '!' : '')
+        execute l:cmd fnameescape(l:target)
+        echo "Snapshot saved to " . l:target
+    endfunction
+
+
+
 
 " -------------------------------------------
 " 6.1 Basic Funtion
