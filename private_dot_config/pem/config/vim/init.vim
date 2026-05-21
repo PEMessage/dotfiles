@@ -520,17 +520,18 @@ endif
     nnoremap <leader>rcc  :w<CR> :source %<CR> " Re:Configuration
 
     function! PERCEdit()
-        if exists(s:thisfile)
-            execute 'tabedit ' . s:thisfile
-            return
-        endif
+        let full_path = expand(s:thisfile)
 
-        if exists('g:pe_rc["file"]') && !empty(g:pe_rc['file'])
-            execute 'tabedit ' . g:pe_rc['file']
+        let win_ids = win_findbuf(bufnr(full_path))
+        if !empty(win_ids)
+            " Jump to the first window that shows this buffer
+            call win_gotoid(win_ids[0])
         else
-            execute 'tabedit ' . '~/.vimrc'
+            " Open in a new tab
+            execute 'tabedit ' .  fnameescape(full_path)
         endif
     endfunction
+
     nnoremap <leader>rce  :call PERCEdit()<CR>
 
     let g:which_key_map['`'] = {
