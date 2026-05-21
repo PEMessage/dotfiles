@@ -767,7 +767,14 @@ if PSelect('*')
         echo "Snapshot saved to " . l:target
     endfunction
 
-
+    command! -bang -nargs=? PlugSnapshotLoad call s:PlugSnapshotLoad(<bang>0, <q-args>)
+    function! s:PlugSnapshotLoad(bang, fname)
+        let l:default = s:lockvim
+        let l:target = (a:fname == '') ? l:default : a:fname
+        let l:cmd = 'source' . (a:bang ? '!' : '')
+        execute l:cmd fnameescape(l:target)
+        " echo "Snapshot saved to " . l:target
+    endfunction
 
 
 " -------------------------------------------
