@@ -1014,7 +1014,7 @@ require("lazy").setup({
         'tpope/vim-unimpaired',
     },
     {
-        'axelf4/vim-strip-trailing-whitespace',
+        'PEMessage/vim-strip-trailing-whitespace',
         event = {'InsertEnter', 'BufEnter'}
     },
     {

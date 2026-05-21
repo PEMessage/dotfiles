@@ -946,7 +946,7 @@ if PSelect('*')
 
     " NOTICE: THIS will casue termdebug report error
     " TODO: fix it
-    " Plug 'axelf4/vim-strip-trailing-whitespace'
+    Plug 'PEMessage/vim-strip-trailing-whitespace'
 
 
 " -------------------------------------------
