@@ -67,7 +67,12 @@ wt() {
 
     if [[ "$is_interactive" == true ]]; then
         directory=$(git worktree list --porcelain |
-            awk '/worktree/ {wt=$2} /branch/ {sub("refs/heads/", "", $2); print wt " [" $2 "]"}' |
+            awk '
+                /worktree/ {wt=$2}
+                /HEAD/ {hash = substr($2, 1, 7)}
+                /branch/ {sub("refs/heads/", "", $2); print wt " [" $2 "]"}
+                /detached/ {print wt " [" hash "]"}
+            ' |
             fzf --query "" --height=10% --no-multi --exit-0 |
             awk '{print $1}')
     else
