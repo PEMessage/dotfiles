@@ -161,8 +161,45 @@ local section = function ()
     -- -------------------------------------------
     -- 3.7 nvim 0.12
     -- -------------------------------------------
+    -- Thanks to:
+    -- https://www.reddit.com/r/neovim/comments/1sa95g4/no_more_press_enter_with_ui2_with_example/
+    -- https://github.com/neovim/neovim/issues/39373
+    -- https://github.com/neovim/neovim/pull/39781#pullrequestreview-4292324190
     if vim.fn.has('nvim-0.12') == 1 then
-        require('vim._core.ui2').enable()
+        require('vim._core.ui2').enable({
+            enable = false,
+            msg = {
+                targets = {
+                    [''] = 'msg',
+                    empty = 'cmd',
+                    bufwrite = 'msg',
+                    confirm = 'cmd',
+                    emsg = 'pager',
+                    echo = 'msg',
+                    echomsg = 'msg',
+                    echoerr = 'pager',
+                    completion = 'cmd',
+                    list_cmd = 'pager',
+                    lua_error = 'pager',
+                    lua_print = 'msg',
+                    progress = 'pager',
+                    rpc_error = 'pager',
+                    quickfix = 'msg',
+                    search_cmd = 'cmd',
+                    search_count = 'cmd',
+                    shell_cmd = 'pager',
+                    shell_err = 'pager',
+                    shell_out = 'pager',
+                    shell_ret = 'msg',
+                    undo = 'msg',
+                    verbose = 'pager',
+                    wildlist = 'cmd',
+                    wmsg = 'cmd',
+                    typed_cmd = 'cmd',
+                },
+                cmd = { height = 0.5 },
+            }
+        })
     end
 
 
@@ -2341,6 +2378,7 @@ require("lazy").setup({
         "j-hui/fidget.nvim", -- LSP Progress message UI
         event = 'VeryLazy',
         cmd =  { 'NotifyHistory' },
+        enabled = true,
         opts = function ()
             vim.api.nvim_create_user_command('NotifyHistory',
                 'lua require("fidget.notification").show_history()'
