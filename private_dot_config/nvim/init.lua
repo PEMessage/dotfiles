@@ -201,7 +201,11 @@ local section = function ()
             }
         })
     end
-
+    vim.cmd[[
+        packadd nvim.difftool
+        packadd nvim.undotree
+        " packadd nvim.tohtml
+    ]]
 
 end
 section()
