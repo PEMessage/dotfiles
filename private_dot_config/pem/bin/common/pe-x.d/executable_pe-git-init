@@ -5,6 +5,16 @@ runcmd() {
     echo "Runing: $*"
     "$@"
 }
+version_ge() {
+    [ "$(printf '%s\n' "$1" "$2" | sort -V | head -n1)" = "$2" ]
+}
+
+if command -v nvim > /dev/null ; then
+    nvim_version=$(nvim --version | head -1 | awk '{print $2}' | sed 's/^v//')
+else
+    nvim_version=""
+fi
+
 git_config_global() {
     key="$1"
     value="$2"
@@ -41,9 +51,15 @@ git_config_global column.ui auto
 git_config_global fetch.writeCommitGraph true
 git_config_global log.date iso-local
 git_config_global diff.tool vimdiff
-# git_config_global core.fsmonitor true
-git_config_global difftool.nvim.cmd 'nvim -d "$LOCAL" "$REMOTE"'
 
+# git_config_global core.fsmonitor true
+if [ "$nvim_version" ] && version_ge "$nvim_version" "0.12.0" ; then
+    git_config_global difftool.nvim.cmd 'nvim -c "packadd nvim.difftool" -d "$LOCAL" "$REMOTE"'
+    git_config_global alias.nddf 'difftool --ignore-submodules --dir-diff --no-symlinks --tool=nvim'
+else
+    git_config_global difftool.nvim.cmd 'nvim -d "$LOCAL" "$REMOTE"'
+    git_config_global alias.nddf 'difftool --ignore-submodules --dir-diff --no-symlinks --tool=ndirdiff'
+fi
 
 git_config_global alias.pk cherry-pick
 git_config_global alias.ck checkout
@@ -58,7 +74,7 @@ git_config_global alias.di 'diff'
 git_config_global alias.dis 'diff --staged'
 git_config_global alias.dfs 'diff --staged'
 git_config_global alias.ddf 'difftool --ignore-submodules --dir-diff --no-symlinks --tool=dirdiff'
-git_config_global alias.nddf 'difftool --ignore-submodules --dir-diff --no-symlinks --tool=ndirdiff'
+
 git_config_global difftool.dirdiff.cmd 'dirdiff $LOCAL $REMOTE'
 git_config_global difftool.ndirdiff.cmd 'ndirdiff $LOCAL $REMOTE'
 git_config_global difftool.xxd.cmd "bash -c 'vimdiff <(xxd \$1) <(xxd \$2)' -- \$LOCAL \$REMOTE"
