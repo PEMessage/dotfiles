@@ -1072,32 +1072,70 @@ require("lazy").setup({
     {
         "terryma/vim-expand-region",
         dependencies = {
-            'kana/vim-textobj-user',
-            'kana/vim-textobj-line',
+            "kana/vim-textobj-user",
+            "kana/vim-textobj-line",
         },
-        keys = {
-            { "<CR>", mode = { "n", "v", "x" }, "<Plug>(expand_region_expand)", desc = "Expand region expand" },
-            { "<BS>", mode = { "n", "v", "x" }, "<Plug>(expand_region_shrink)", desc = "Expand region shrink" },
-        },
+        -- keys = {
+        --     { "<CR>", mode = { "n", "v", "x" }, "<Plug>(expand_region_expand)", desc = "Expand region expand" },
+        --     { "<BS>", mode = { "n", "v", "x" }, "<Plug>(expand_region_shrink)", desc = "Expand region shrink" },
+        -- },
         init = function()
-            vim.g.expand_region_text_objects = {
-                ['iw'] = 0,
-                ['iW'] = 0,
+            local default_text_objects = {
+                ["iw"] = 0,
+                ["iW"] = 0,
                 ['i"'] = 0,
                 ['a"'] = 0,
                 ["i'"] = 0,
                 ["a'"] = 0,
-                ['i]'] = 0,
-                ['a]'] = 0,
-                ['i)'] = 0,
-                ['a)'] = 0,
-                ['i}'] = 1,
-                ['a}'] = 1,
-                ['il'] = 1,
+                ["i]"] = 0,
+                ["a]"] = 0,
+                ["i)"] = 0,
+                ["a)"] = 0,
+                ["i}"] = 1,
+                ["a}"] = 1,
+                ["il"] = 1,
+                ["ip"] = 0,
             }
-        end
-    },
 
+            local treesitter_text_objects = {
+                ["iw"] = 0,
+                ["iW"] = 0,
+                ["in"] = 1,
+                ["an"] = 1,
+                ["ip"] = 0,
+            }
+
+            vim.g.expand_region_text_objects = default_text_objects
+
+            local do_setting = nil
+            if vim.fn.has('nvim-0.12') == 0 then
+                do_setting = function() end
+            else
+                do_setting = function()
+                    -- Thanks to:
+                    -- https://github.com/neovim/neovim/blob/a5d4b4e0fc438281bd50b4b30bc5d31ac4b208d9/runtime/lua/vim/_core/defaults.lua#L480
+                    if vim.treesitter.get_parser(nil, nil,{ error = false }) then
+                        vim.g.expand_region_text_objects = treesitter_text_objects
+                    else
+                        vim.g.expand_region_text_objects = default_text_objects
+                    end
+                end
+            end
+
+            local function expand_region()
+                do_setting()
+                vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Plug>(expand_region_expand)", true, true, true), "n", false)
+            end
+
+            local function shrink_region()
+                do_setting()
+                vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Plug>(expand_region_shrink)", true, true, true), "n", false)
+            end
+
+            vim.keymap.set({ "n", "v", "x" }, "<CR>", expand_region, { desc = "Expand region expand(terryma)" })
+            vim.keymap.set({ "n", "v", "x" }, "<BS>", shrink_region, { desc = "Expand region shrink(terryma)" })
+        end,
+    },
     -- {
     --     'gorkunov/smartpairs.vim',
     --     init = function ()
@@ -1528,7 +1566,9 @@ require("lazy").setup({
                 'imhex',
             },
             incremental_selection = {
-                enable = true,
+                -- only use this before nvim 0.12
+                -- See: terryma/vim-expand-region for detail
+                enable = vim.fn.has('nvim-0.12') == 0,
                 keymaps = {
                     init_selection = '<CR>',
                     node_incremental = '<CR>',
