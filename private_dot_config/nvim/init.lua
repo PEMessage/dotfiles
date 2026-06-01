@@ -168,37 +168,35 @@ local section = function ()
     if vim.fn.has('nvim-0.12') == 1 then
         require('vim._core.ui2').enable({
             enable = false,
-            msg = {
-                targets = {
-                    [''] = 'msg',
-                    empty = 'cmd',
-                    bufwrite = 'msg',
-                    confirm = 'cmd',
-                    emsg = 'pager',
-                    echo = 'msg',
-                    echomsg = 'msg',
-                    echoerr = 'pager',
-                    completion = 'cmd',
-                    list_cmd = 'pager',
-                    lua_error = 'pager',
-                    lua_print = 'msg',
-                    progress = 'pager',
-                    rpc_error = 'pager',
-                    quickfix = 'msg',
-                    search_cmd = 'cmd',
-                    search_count = 'cmd',
-                    shell_cmd = 'pager',
-                    shell_err = 'pager',
-                    shell_out = 'pager',
-                    shell_ret = 'msg',
-                    undo = 'msg',
-                    verbose = 'pager',
-                    wildlist = 'cmd',
-                    wmsg = 'cmd',
-                    typed_cmd = 'cmd',
-                },
-                cmd = { height = 0.5 },
-            }
+            -- msg = {
+            --     targets = {
+            --         [''] = 'msg',
+            --         empty = 'cmd',
+            --         bufwrite = 'msg',
+            --         confirm = 'cmd',
+            --         emsg = 'pager',
+            --         echo = 'msg',
+            --         echomsg = 'msg',
+            --         echoerr = 'pager',
+            --         completion = 'cmd',
+            --         list_cmd = 'pager',
+            --         lua_error = 'pager',
+            --         lua_print = 'msg',
+            --         progress = 'pager',
+            --         rpc_error = 'pager',
+            --         quickfix = 'msg',
+            --         search_cmd = 'cmd',
+            --         search_count = 'cmd',
+            --         shell_cmd = 'pager',
+            --         shell_err = 'pager',
+            --         shell_out = 'pager',
+            --         shell_ret = 'msg',
+            --         undo = 'msg',
+            --         verbose = 'pager',
+            --         wildlist = 'cmd',
+            --         wmsg = 'cmd',
+            --         typed_cmd = 'cmd',
+            --     },
         })
     end
     vim.cmd[[
@@ -2311,6 +2309,7 @@ require("lazy").setup({
         end,
 
 
+
         config = function(_, opts)
             local cmp = require('cmp')
             cmp.setup(opts)
@@ -2433,6 +2432,10 @@ require("lazy").setup({
                 },
                 notification = {
                     override_vim_notify = true,
+                    window = {
+                        y_padding = 1,
+                        -- align = "top",
+                    }
                 }
             }
         end
@@ -2978,7 +2981,7 @@ require("lazy").setup({
                 },
             }
 
-            vim.api.nvim_create_autocmd("Filetype", {
+            vim.api.nvim_create_autocmd("FileType", {
 				pattern = "java",
 				callback = function()
                     local current_file = vim.fn.expand("%:p")
@@ -3675,8 +3678,6 @@ local section = function ()
 
 
     -- Lsp
-    vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition, { desc = 'Go to Declaration' })
-    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, { desc = 'Go to Declaration' })
     -- Format entire document (Normal mode)
     -- Recommand using `gq` (vim native) to call formatexpr or formatprg
     vim.keymap.set({'n', 'v'}, '<leader>f', vim.lsp.buf.format, { desc = 'Format entire document' })
@@ -3740,11 +3741,19 @@ local section = function ()
                 { silent = true, noremap = true, buffer = bufnr, nowait = true, desc = 'Goto Reference' }
             )
 
+            vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition,
+                { desc = 'Go to Declaration' }
+            )
+
+            vim.keymap.set('n', 'gD', vim.lsp.buf.declaration,
+                { desc = 'Go to Declaration' }
+            )
             if client and client.name == 'clangd' then
                 vim.keymap.set('n', '<m-h>', '<cmd>LspClangdSwitchSourceHeader<cr>', { silent = true, noremap = true, buffer = bufnr })
             end
 
             -- Thanks to: https://github.com/sangoX35X/dotfiles/blob/7aa159668f476f4428422353f48a21fc26797dc4/nvim/lua/plugin/lsp.lua#L126
+            ---@diagnostic disable-next-line: param-type-mismatch
             if client and client:supports_method('textDocument/typeHierarchy', bufnr) then
                 vim.api.nvim_create_user_command('LspTypeHierarchy',
                     function(opts)
