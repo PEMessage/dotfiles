@@ -385,8 +385,8 @@ require("lazy").setup({
         "backdround/improved-search.nvim",
         keys = {
             -- Search next / previous
-            { "n", "<cmd>lua require('improved-search').stable_next()<cr>", mode = {"n", "x", "o"}, desc = "Search next" },
-            { "N", "<cmd>lua require('improved-search').stable_previous()<cr>", mode = {"n", "x", "o"}, desc = "Search previous" },
+            { "n", "<cmd>lua require('improved-search').stable_next()<cr>", mode = {"n", "x", "o"}, desc = "Search next(stable)" },
+            { "N", "<cmd>lua require('improved-search').stable_previous()<cr>", mode = {"n", "x", "o"}, desc = "Search previous(stable)" },
 
             -- Search selected text in visual mode
             -- DO NOT USE IT, it won't add to search history
@@ -3699,7 +3699,7 @@ local section = function ()
     -- https://github.com/neovim/neovim/blob/c18373d9b82d1fabc1f93f3ac1a6f04ed5bc724e/runtime/lua/vim/_core/defaults.lua#L60
     local function _visual_search(mode, forward)
         assert(mode == "replace" or mode == "append")
-        assert(forward == -1 or forward == 0 or forward == 1) -- 0: inplace 1: forward -1: backward
+        assert( forward == 0 or forward == 1 or forward == 2) -- 1: forward, 0: backward, 2: inplace
 
         -- 1. 获取可视区域选中的文本（自动处理跨行）
         local pos = vim.fn.getpos('.')
@@ -3732,10 +3732,15 @@ local section = function ()
         vim.fn.setreg('/', new_search)
         vim.fn.histadd('/', new_search)
 
-        vim.v.searchforward = forward
+
+        if forward == 2 then
+            vim.v.searchforward = 1
+        else
+            vim.v.searchforward = forward
+        end
 
         local count = vim.v.count1
-        if  forward == -1 then
+        if forward == 0 then
             local _, line, col, _ = unpack(pos)
             local _, vline, vcol, _ = unpack(vpos)
             if
@@ -3747,20 +3752,20 @@ local section = function ()
                 count = count + 1
             end
         end
-        if forward ~= 0 then
+        if forward ~= 2 then
             return '<Esc>' .. count .. 'n'
         else
+            vim.cmd [[ set hls ]]
             return '<Esc>'
         end
-
     end
-    vim.keymap.set('x', '*', function() return _visual_search("replace", 0) end,
+    vim.keymap.set('x', '*', function() return _visual_search("replace", 2) end,
         { desc = 'Search forward for selection (replace)', expr = true })
 
-    vim.keymap.set('x', '#', function() return _visual_search("replace", -1) end,
+    vim.keymap.set('x', '#', function() return _visual_search("replace", 0) end,
         { desc = 'Search backward for selection (replace)', expr = true })
 
-    vim.keymap.set('x', '&', function() return _visual_search("append", 0) end,
+    vim.keymap.set('x', '&', function() return _visual_search("append", 2) end,
         { desc = 'Append selection to current search pattern (OR) and search forward', expr = true })
 
 
