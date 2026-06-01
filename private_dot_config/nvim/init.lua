@@ -389,7 +389,8 @@ require("lazy").setup({
             { "N", "<cmd>lua require('improved-search').stable_previous()<cr>", mode = {"n", "x", "o"}, desc = "Search previous" },
 
             -- Search selected text in visual mode
-            { "*", "<cmd>lua require('improved-search').in_place()<cr>", mode = "x", desc = "Search selection forward" },
+            -- DO NOT USE IT, it won't add to search history
+            -- { "*", "<cmd>lua require('improved-search').in_place()<cr>", mode = "x", desc = "Search selection forward" },
         },
     },
     {
@@ -3694,26 +3695,74 @@ local section = function ()
     -- end, { desc = 'Format selected range' })
 
 
-    vim.keymap.set('x', '&', function()
-        -- Save current search register
-        local prev_search = vim.fn.getreg('/')
+    -- Improve from official
+    -- https://github.com/neovim/neovim/blob/c18373d9b82d1fabc1f93f3ac1a6f04ed5bc724e/runtime/lua/vim/_core/defaults.lua#L60
+    local function _visual_search(mode, forward)
+        assert(mode == "replace" or mode == "append")
+        assert(forward == -1 or forward == 0 or forward == 1) -- 0: inplace 1: forward -1: backward
 
-        local saved_register = vim.fn.getreg('v')
-        vim.cmd('noau normal! "vy')
-        local visual_selection = vim.fn.getreg('v')
-        vim.fn.setreg('v', saved_register)
+        -- 1. 获取可视区域选中的文本（自动处理跨行）
+        local pos = vim.fn.getpos('.')
+        local vpos = vim.fn.getpos('v')
+        local visual_mode = vim.fn.mode()
+        local chunks = vim.fn.getregion(pos, vpos, { type = visual_mode })
+        local esc_chunks = vim.iter(chunks):map(function(v)
+            return vim.fn.escape(v, [[\]])  -- 转义正则元字符
+        end):totable()
+        local esc_pat = table.concat(esc_chunks, [[\n]])
 
-        local escaped_pattern = vim.fn.escape(visual_selection, '\\/.*$^~[]')
-
-        local new_pattern = escaped_pattern
-        if prev_search and prev_search ~= "" then
-            new_pattern = prev_search .. '\\|' .. escaped_pattern
+        if #esc_pat == 0 then
+            vim.api.nvim_echo({ { 'E348: No string under cursor' } }, true, { err = true })
+            return '<Esc>'
         end
 
-        vim.fn.setreg('/', new_pattern)
-        vim.fn.histadd('search', new_pattern)
-        vim.cmd('set hls')
-    end, { desc = 'Search selection and combine with previous' })
+        -- 2. 根据模式构造最终搜索模式
+        local new_search
+        if mode == "replace" then
+            new_search = [[\V]] .. esc_pat
+        else  -- append
+            local prev_search = vim.fn.getreg('/')
+            if prev_search == nil or prev_search == "" then
+                new_search = [[\V]] .. esc_pat
+            else
+                new_search = prev_search .. [[\|]] .. [[\V]] .. esc_pat
+            end
+        end
+
+        vim.fn.setreg('/', new_search)
+        vim.fn.histadd('/', new_search)
+
+        vim.v.searchforward = forward
+
+        local count = vim.v.count1
+        if  forward == -1 then
+            local _, line, col, _ = unpack(pos)
+            local _, vline, vcol, _ = unpack(vpos)
+            if
+                line > vline
+                or visual_mode == 'v' and line == vline and col > vcol
+                or visual_mode == 'V' and col ~= 1
+                or visual_mode == '\22' and col > vcol
+            then
+                count = count + 1
+            end
+        end
+        if forward ~= 0 then
+            return '<Esc>' .. count .. 'n'
+        else
+            return '<Esc>'
+        end
+
+    end
+    vim.keymap.set('x', '*', function() return _visual_search("replace", 0) end,
+        { desc = 'Search forward for selection (replace)', expr = true })
+
+    vim.keymap.set('x', '#', function() return _visual_search("replace", -1) end,
+        { desc = 'Search backward for selection (replace)', expr = true })
+
+    vim.keymap.set('x', '&', function() return _visual_search("append", 0) end,
+        { desc = 'Append selection to current search pattern (OR) and search forward', expr = true })
+
 
     vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('LspCustomKeyMaps', {}),
