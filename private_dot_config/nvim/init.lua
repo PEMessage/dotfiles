@@ -71,7 +71,9 @@ local section = function ()
 
     -- Thanks to:
     -- https://github.com/nvim-mini/MiniMax/blob/44a93eaf2652cb437a27489c9620f4b1b4221141/configs/nvim-0.11/plugin/10_options.lua#L77C40-L77C80
-    vim.o.iskeyword = '@,48-57,_,192-255,-'  -- Treat dash as `word` textobject part
+    -- DONT TREAT dash AS PART OF WORD, It leet something like obj->field ==> [obj-][>field]
+    -- vim.o.iskeyword = '@,48-57,_,192-255,-'  -- Treat dash as `word` textobject part
+
     vim.o.virtualedit   = 'block' -- Allow going past end of line in blockwise mode
     vim.o.spelloptions  = 'camel' -- Treat camelCase word parts as separate words
     -- -------------------------------------------
