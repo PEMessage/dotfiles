@@ -1098,10 +1098,10 @@ require("lazy").setup({
 
             local treesitter_text_objects = {
                 ["iw"] = 0,
-                ["iW"] = 0,
+                -- ["iW"] = 0,
                 ["in"] = 1,
                 ["an"] = 1,
-                ["ip"] = 0,
+                -- ["ip"] = 0,
             }
 
             vim.g.expand_region_text_objects = default_text_objects
@@ -1308,7 +1308,7 @@ require("lazy").setup({
                 function()
                     if vim.wo.diff then
                         return '[c'
-                    elseif vim.api.nvim_get_option_value('buftype', { buf = 0 }) == 'quickfix' or
+                    elseif vim.api.nvim_get_option_value('filetype', { scope = 'local', buf = 0 }) == 'quickfix' or
                         vim.iter(vim.fn.getwininfo()):find(function(w) return w.quickfix == 1 end) then
                         return ':colder<CR>'
                     else
@@ -1323,7 +1323,7 @@ require("lazy").setup({
                 function()
                     if vim.wo.diff then
                         return ']c'
-                    elseif vim.api.nvim_get_option_value('buftype', { buf = 0 }) == 'quickfix' or
+                    elseif vim.api.nvim_get_option_value('filetype', { scope = 'local', buf = 0 }) == 'quickfix' or
                         vim.iter(vim.fn.getwininfo()):find(function(w) return w.quickfix == 1 end) then
                         return ':cnewer<CR>'
                     else

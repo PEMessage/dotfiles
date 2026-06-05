@@ -275,6 +275,12 @@
             sed -i "/'::+toolchain -- Release channel (e.g. +stable) or custom toolchain to set override:_default' \\\/d" "$ZSH_CACHE_DIR/completions/_rustup"
         fi
     fi
+
+    if [ -n "$commands[tv]" ]; then
+        if [ ! -f "$ZSH_CACHE_DIR/completions/_tv" ] ; then
+            tv init zsh >| "$ZSH_CACHE_DIR/completions/_rustup"
+        fi
+    fi
 # -----------------------------------------
 # End of file
 # -----------------------------------------
