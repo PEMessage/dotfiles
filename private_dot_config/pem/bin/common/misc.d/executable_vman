@@ -1,12 +1,26 @@
 #!/bin/sh
 
-case $- in
-  *i*)  # assume being sourced 
-    vman() {
-        MANPAGER='vim +MANPAGER "+set nonumber" -c "silent! IndentLinesDisable"  -'  man $@
-    }
-    ;;
-  *) # assume being executed as an executable
-        MANPAGER='vim +MANPAGER "+set nonumber" -c "silent! IndentLinesDisable"  -'  man $@
-    ;;
-esac
+if command -v nvim > /dev/null && [ "$EDITOR" = nvim ] ; then
+    case $- in
+        *i*)  # assume being sourced
+            vman() {
+                MANPAGER='nvim +Man! "+set nonumber" -c "silent! IndentLinesDisable"  -'  man $@
+            }
+        ;;
+        *) # assume being executed as an executable
+            MANPAGER='nvim +Man! "+set nonumber" -c "silent! IndentLinesDisable"  -'  man $@
+        ;;
+    esac
+
+else
+    case $- in
+        *i*)  # assume being sourced
+            vman() {
+                MANPAGER='vim +MANPAGER "+set nonumber" -c "silent! IndentLinesDisable"  -'  man $@
+            }
+        ;;
+        *) # assume being executed as an executable
+            MANPAGER='vim +MANPAGER "+set nonumber" -c "silent! IndentLinesDisable"  -'  man $@
+        ;;
+    esac
+fi
