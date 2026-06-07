@@ -429,6 +429,42 @@ require("lazy").setup({
             end, {})
         end,
     },
+
+    {
+        'bfredl/nvim-miniyank',
+        event = 'TextYankPost',
+        keys = {
+            { "<leader>p", "<Plug>(miniyank-autoput)", mode = { "n" } },
+            { "<leader>P", "<Plug>(miniyank-autoPut)", mode = { "n" } },
+
+            { "<leader>p", "<Plug>(miniyank-autoPut)", mode = { "x" } },
+            { "<leader>P", "<Plug>(miniyank-autoput)", mode = { "x" } },
+
+            { "p", "<Plug>(miniyank-startput)", mode = { "n" } },
+            { "P", "<Plug>(miniyank-startPut)", mode = { "n" } },
+
+            { "p", "<Plug>(miniyank-startPut)", mode = { "x" } },
+            { "P", "<Plug>(miniyank-startput)", mode = { "x" } },
+
+            -- { "<leader>n", "<Plug>(miniyank-cycle)" },
+            -- { "<leader>n", "<Plug>(miniyank-cycle)" },
+        }
+    },
+    -- {
+    --     "gbprod/yanky.nvim",
+    --     opts = {
+    --         -- your configuration comes here
+    --         -- or leave it empty to use the default settings
+    --         -- refer to the configuration section below
+    --     },
+    --     keys = {
+    --         { "p", "<Plug>(YankyPutAfter)", mode = { "n" } },
+    --         { "P", "<Plug>(YankyPutBefore)", mode = { "n" } },
+    --
+    --         { "p", "<Plug>(YankyPutBefore)", mode = { "x" } },
+    --         { "P", "<Plug>(YankyPutAfter)", mode = { "x" } },
+    --     }
+    -- },
     {
         "nvim-mini/mini.move",
         opts = {
@@ -3641,8 +3677,9 @@ local section = function ()
     -- vim.keymap.set("v", "<M-j>", ":m '>+1<cr>gv=gv", { desc = "Move down" })
     -- vim.keymap.set("v", "<M-k>", ":m '<-2<cr>gv=gv", { desc = "Move up" })
 
-    vim.keymap.set('x', 'p', 'P', { noremap = true })
-    vim.keymap.set('x', 'P', 'p', { noremap = true })
+    -- Since we using miniyank
+    -- vim.keymap.set('x', 'p', 'P', { noremap = true })
+    -- vim.keymap.set('x', 'P', 'p', { noremap = true })
 
     -- When exit cmdline, clean input so that will not go into cmdwin(<c-f> or q:c)
     vim.keymap.set('c', '<C-c>', [[getcmdtype() == ':' ? '<C-u><C-c>' : '<C-c>']], { noremap = true, expr = true })
