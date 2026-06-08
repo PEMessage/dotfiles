@@ -584,7 +584,7 @@ require("lazy").setup({
         end
     },
     {
-        'PEMessage/alpha-nvim',
+        'goolord/alpha-nvim',
         event = "VimEnter",
         -- dependencies = { 'nvim-tree/nvim-web-devicons' },
         config = function ()
@@ -593,8 +593,28 @@ require("lazy").setup({
             startify.section.header.val = PE.logo
             startify.section.header.opts.hl = "String"
 
-            startify.mru_opts.mru_start = 0
-            startify.mru_opts.mru_cwd_start = 10
+            -- Thanks to:
+            -- https://github.com/goolord/alpha-nvim/issues/204#issuecomment-1516644965
+            startify.section.mru.val[4].val = function()
+                return { startify.mru(0, nil, 10) }
+            end
+            startify.section.mru_cwd.val = function()
+                local cwd = vim.fn.getcwd()
+                return {
+                    { type = "padding", val = 1 },
+                    {
+                        type = "text",
+                        val = "MRU " .. vim.fn.fnamemodify(cwd, ":~"),
+                        opts = { hl = "SpecialComment", shrink_margin = false }
+                    },
+                    { type = "padding", val = 1 },
+                    {
+                        type = "group",
+                        val = function() return { startify.mru(10, cwd, 10) } end,
+                        opts = { shrink_margin = false },
+                    },
+                }
+            end
 
             startify.config.layout = {
                 { type = "padding", val = 1 },

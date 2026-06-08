@@ -3,7 +3,7 @@
   "LuaSnip": { "branch": "master", "commit": "0abc8f390b278c3b4aabc4c004ac8a088b65cf24" },
   "MarkdownTable.nvim": { "branch": "main", "commit": "9430386c9332033d21465ddb7ae3996a463f4300" },
   "aerial.nvim": { "branch": "master", "commit": "43dd88ad4024b1945906887521057c73d3b0d84e" },
-  "alpha-nvim": { "branch": "main", "commit": "f6d753d310e7c3aa5e6fbb92d6e8eb82c954a4c8" },
+  "alpha-nvim": { "branch": "main", "commit": "6c6a89d5b068b5251c8bdf0dd57bb921bcfeeb09" },
   "aosp-vim": { "branch": "master", "commit": "1fe0707cfc2e435977103d20b888186204d9c29a" },
   "auto-cursorline.nvim": { "branch": "main", "commit": "ad7e0d4f026b43057ca3605459b4f160397385b2" },
   "barbecue": { "branch": "main", "commit": "cd7e7da622d68136e13721865b4d919efd6325ed" },
