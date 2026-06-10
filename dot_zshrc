@@ -1,7 +1,7 @@
 # -----------------------------------------
 # Init Process
 # -----------------------------------------
-    
+
 
 
     # Prvent loading twice
@@ -67,7 +67,7 @@
     HISTSIZE=9000
     SAVEHIST=9000
     [ -e "$HISTFILE" ] || mkdir -p `dirname $HISTFILE` ; touch "$HISTFILE"
-        
+
 
     setopt SHARE_HISTORY          # 多个会话共享历史记录文件
     setopt APPEND_HISTORY         # 添加历史记录，而非覆盖
@@ -76,7 +76,7 @@
     setopt HIST_IGNORE_DUPS       # 去除重复记录
     setopt HIST_REDUCE_BLANKS     # 去除空白记录
     setopt HIST_FIND_NO_DUPS      # 浏览时跳过重复记录
-    
+
 # -----------------------------------------
 # Complete Setting Zone
 # -----------------------------------------
@@ -222,7 +222,7 @@
 
     source ~/.config/pem/init.sh
 
-    # Complete and Prompt 
+    # Complete and Prompt
     # See: https://thevaluable.dev/zsh-completion-guide-examples/
     # :completion:<function>:<completer>:<command>:<argument>:<tag>
     # source ~/.config/chezmoi/chezmoi.zsh
