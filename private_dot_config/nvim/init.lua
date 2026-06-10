@@ -2690,6 +2690,49 @@ require("lazy").setup({
             -- if we type this manually, we might need a `edit %` to make lsp work
             vim.lsp.enable('gopls')
 
+            vim.lsp.config('clice', {
+                filetypes = { 'c', 'cpp' },
+
+                root_markers = {
+                    '.git/',
+                    'clice.toml',
+                    '.clang-tidy',
+                    '.clang-format',
+                    'compile_commands.json',
+                    'compile_flags.txt',
+                    'configure.ac', -- AutoTools
+                },
+
+                capabilities = (function()
+                    local caps = vim.lsp.protocol.make_client_capabilities()
+                    caps.textDocument.completion.completionItem.documentationFormat = {}
+                    caps.textDocument.hover.contentFormat = {}
+                    caps.textDocument.signatureHelp.signatureInformation.documentationFormat = {}
+                    caps.workspace.workspaceEdit.resourceOperations = {}
+                    caps.textDocument.semanticTokens.formats = {}
+
+                    return vim.tbl_deep_extend('force', caps, {
+                        textDocument = {
+                            completion = {
+                                editsNearCursor = true,
+                            },
+                        },
+                        offsetEncoding = { 'utf-8' },
+                    })
+                end)(),
+                before_init = function(params, _)
+                    params.trace = nil
+                    return params
+                end,
+
+
+                cmd = {
+                    'clice',
+                    'server',
+                },
+            })
+            -- vim.lsp.enable('clice')
+
             vim.lsp.config("kotlin_lsp", {
                 inlay_hints = { enabled = true },
                 root_markers = {
@@ -2864,6 +2907,7 @@ require("lazy").setup({
     {
         'p00f/clangd_extensions.nvim',
         event = "LspAttach",
+        enabled = true,
         ft = {'c', 'cpp'},
         cmd = {
             'ClangdTypeHierarchy'
