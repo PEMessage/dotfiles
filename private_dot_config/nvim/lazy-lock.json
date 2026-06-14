@@ -74,6 +74,7 @@
   "nvim-treesitter": { "branch": "main", "commit": "edad5abd2dd15ce8a7903870e16143d7aecbc54f" },
   "nvim-treesitter-context": { "branch": "master", "commit": "ec308c7827b5f8cb2dd0ad303a059c945dd21969" },
   "onedark.nvim": { "branch": "master", "commit": "df4792accde9db0043121f32628bcf8e645d9aea" },
+  "opencode.nvim": { "branch": "main", "commit": "ff9d86d236c8f462219dc6403a4ca3129aa2f9f2" },
   "overseer.nvim": { "branch": "master", "commit": "6271cab7ccc4ca840faa93f54440ffae3a3918bd" },
   "pdir.nvim": { "branch": "main", "commit": "b10b1ab3e7a2dc9d33a09bc8329fe550e29f0b3f" },
   "persistent-breakpoints.nvim": { "branch": "main", "commit": "d1656221836207787b8a7969cc2dc72668c4742a" },
