@@ -53,6 +53,8 @@
     'bind r source-file ~/.tmux.conf \; display "Reload!"' \
     'bind r source-file ~/.config/tmux/tmux.conf \; display "Reload!"'
 
+    bind R move-window -r \; display-message "Windows renumbered"
+
     # Sort all tmux window
     bind s                                      \
         set -g renumber-windows on\;            \
@@ -91,6 +93,7 @@
     # bind -n M-S-DC paste-buffer -p
     # ===============================================================
     bind -n C-M-p command-prompt # maybe this is safe?
+
 
     # Credit: https://stackoverflow.com/questions/12524308/bash-strip-trailing-linebreak-from-output
 
