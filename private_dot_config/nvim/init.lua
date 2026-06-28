@@ -1102,16 +1102,16 @@ require("lazy").setup({
     {
         'justinmk/vim-dirvish',
     },
-    {
-        'tpope/vim-eunuch',
-        event = 'VeryLazy',
-        config = function(_, _)
-            vim.cmd [[
-            delcommand Unlink
-            delcommand Remove
-            ]]
-        end,
-    },
+    -- {
+    --     'tpope/vim-eunuch',
+    --     event = 'VeryLazy',
+    --     config = function(_, _)
+    --         vim.cmd [[
+    --         delcommand Unlink
+    --         delcommand Remove
+    --         ]]
+    --     end,
+    -- },
     {
         'tpope/vim-unimpaired',
     },
