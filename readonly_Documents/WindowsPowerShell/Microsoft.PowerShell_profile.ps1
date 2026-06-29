@@ -18,12 +18,12 @@
 
     Set-PSReadLineOption -EditMode Emacs
 
-    
+
 
 	if (((Get-Module) | Where-Object { $_.Name -eq "PSReadLine" } ).Version.CompareTo([Version]"2.1.0") -gt 0) {
 		# Tips: sudo powershell -Command ' Install-Module -Force PSReadline '
         try {
-            Set-PSReadLineOption -PredictionSource History 
+            Set-PSReadLineOption -PredictionSource History
             # 设置预测文本来源为历史记录
             Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
             Set-PSReadLineKeyHandler -Chord Tab -Function MenuComplete
@@ -44,7 +44,7 @@
 	}
 
 # # =========================================
-# git 
+# git
 # # =========================================
     if (Get-Module -ListAvailable -Name git-completion) {
         Import-Module git-completion
@@ -69,9 +69,9 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 # # =========================================
 # Module Import
 # # =========================================
-    Import-Module better-cd 
+    Import-Module better-cd
     if (Get-Command zoxide.exe -ErrorAction SilentlyCon ) {
-        Import-Module ZoxidePS -ArgumentList "Set-LocationEx"  
+        Import-Module ZoxidePS -ArgumentList "Set-LocationEx"
         Set-Alias -Name cdd -Value z
     } else {
         # Import-Module z
@@ -207,6 +207,56 @@ function SSH-CopyId {
             [string]$Target
          )
     type $env:USERPROFILE\.ssh\id_ed25519.pub |  ssh ${Target} "cat >> .ssh/authorized_keys"
+}
+
+# Copy from https://github.com/Wintellect/WintellectPowerShell/blob/master/Code/Invoke-CmdScript.ps1
+function Invoke-CmdScript {
+    param (
+        [Parameter(Mandatory=$true,
+                   Position=0,
+                   HelpMessage="Please specify the command script to execute.")]
+        [string] $script,
+        [Parameter(Position=1)]
+        [string] $parameters=""
+    )
+
+    # Save off the current environment variables in case there's an issue
+    $oldVars = $(Get-ChildItem -Path env:\)
+    $tempFile = [IO.Path]::GetTempFileName()
+
+    try {
+        ## Store the output of cmd.exe.  We also ask cmd.exe to output
+        ## the environment table after the batch file completes
+        cmd /c " `"$script`" $parameters && set > `"$tempFile`" "
+
+        if ($LASTEXITCODE -ne 0) {
+            throw "Error executing CMD.EXE: $LASTEXITCODE"
+        }
+
+        # Before we delete the environment variables get the output into a string
+        # array.
+        $vars = Get-Content -Path $tempFile
+
+        # Clear out all current environment variables in PowerShell.
+        Get-ChildItem -Path env:\ | Foreach-Object {
+            set-item -force -path "ENV:\$($_.Name)" -value ""
+        }
+
+        ## Go through the environment variables in the temp file.
+        ## For each of them, set the variable in our local environment.
+        $vars | Foreach-Object {
+                            if($_ -match "^(.*?)=(.*)$")
+                            {
+                                Set-Content -Path "env:\$($matches[1])" -Value $matches[2]
+                            }
+                        }
+    } catch     {
+        "ERROR: $_"
+        # Any problems, restore the old environment variables.
+        $oldVars | ForEach-Object { Set-Item -Force -Path "ENV:\$($_.Name)" -value $_.Value }
+    } finally {
+        Remove-Item -Path $tempFile -Force -ErrorAction SilentlyContinue
+    }
 }
 
 
