@@ -278,7 +278,13 @@
 
     if [ -n "$commands[tv]" ]; then
         if [ ! -f "$ZSH_CACHE_DIR/completions/_tv" ] ; then
-            tv init zsh >| "$ZSH_CACHE_DIR/completions/_rustup"
+            tv init zsh >| "$ZSH_CACHE_DIR/completions/_tv"
+        fi
+    fi
+
+    if [ -n "$commands[pixi]" ]; then
+        if [ ! -f "$ZSH_CACHE_DIR/completions/_pixi" ] ; then
+            pixi completion --shell zsh  >| "$ZSH_CACHE_DIR/completions/_pixi"
         fi
     fi
 # -----------------------------------------
