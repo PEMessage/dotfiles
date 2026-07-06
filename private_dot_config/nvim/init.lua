@@ -1346,6 +1346,8 @@ require("lazy").setup({
             diff_opts = {
                 ignore_whitespace = false,
                 ignore_whitespace_change = false,
+                -- WITHOUT THIS, visual mode partial staged not work as expect
+                ignore_whitespace_change_at_eol = true,
             },
         },
         keys = {
@@ -2704,6 +2706,7 @@ require("lazy").setup({
                     'compile_flags.txt',
                     'configure.ac', -- AutoTools
                 },
+
 
                 capabilities = (function()
                     local caps = vim.lsp.protocol.make_client_capabilities()

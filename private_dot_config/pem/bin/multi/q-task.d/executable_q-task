@@ -43,7 +43,6 @@ usage() {
     echo
     echo "CONF:"
     echo
-    echo "CONF_BUCKET_DIR : $CONF_BUCKET_DIR"
     echo "CONF_DBEUG      : $CONF_DBEUG"
     echo
     local _bucket_dirs
