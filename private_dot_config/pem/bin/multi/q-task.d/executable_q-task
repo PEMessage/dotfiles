@@ -8,16 +8,47 @@ LOCAL_SCRIPT_DIR="$(dirname $LOCAL_SCRIPT_PATH)"
 [ -d "$CONF_DBEUG" ] ||
     export CONF_DBEUG=false
 
+_user_bucket_dir="$HOME/.local/share/q-task/bucket"
+
+get_bucket_dirs() {
+    local dirs=()
+    [ -d "$CONF_BUCKET_DIR" ] && dirs+=("$CONF_BUCKET_DIR")
+    [ -d "$_user_bucket_dir" ] && dirs+=("$_user_bucket_dir")
+    if [ -n "$CONF_BUCKET_DIRS" ]; then
+        IFS=':' read -ra _extra <<< "$CONF_BUCKET_DIRS"
+        for _d in "${_extra[@]}"; do
+            [ -d "$_d" ] && dirs+=("$_d")
+        done
+    fi
+    printf '%s\n' "${dirs[@]}"
+}
+
+find_task_script() {
+    local _name="$1"
+    while IFS= read -r _dir; do
+        local _script="$_dir/$_name"
+        if [ -f "$_script" ]; then
+            echo "$_script"
+            return 0
+        fi
+    done < <(get_bucket_dirs)
+    return 1
+}
+
 usage() {
     echo "USAGE:"
     echo
-    echo "-l: print all task list"
+    echo "-l [prefix]: print all task list (filter by path prefix)"
     echo "-h: print this help page"
     echo
     echo "CONF:"
     echo
     echo "CONF_BUCKET_DIR : $CONF_BUCKET_DIR"
     echo "CONF_DBEUG      : $CONF_DBEUG"
+    echo
+    local _bucket_dirs
+    _bucket_dirs="$(get_bucket_dirs | tr '\n' ':')"
+    echo "BUCKET_DIRS     : $_bucket_dirs"
 }
 
 
@@ -27,41 +58,61 @@ main() {
         exit
     }
 
-    case "$1" in
-        -h)
-            usage
-            ;;
-        -l)
-            (
-                cd "$CONF_BUCKET_DIR"
-                find . -type f -name '*sh' -o -name '*.py' | sed 's@^./@@g'
-            )
-            ;;
-        -e)
-            shift
-            Q_TASK_SCRIPT="$CONF_BUCKET_DIR/$1"
-            shift
-            vim "$Q_TASK_SCRIPT"
-            ;;
-        *)
-            if [ ! -f "$CONF_BUCKET_DIR/$1" ] ; then
-                echo "[Err]: Unknow task(file not exist)"
-                echo "[Err]: use '-l' to check all task"
-            fi
-            Q_TASK_SCRIPT="$CONF_BUCKET_DIR/$1"
-            shift
-            if [[ "$Q_TASK_SCRIPT" == *.sh ]]; then
-                bash "$Q_TASK_SCRIPT" "$@"
-            elif [[ "$Q_TASK_SCRIPT" == *.uv.py ]]; then
-                uv run "$Q_TASK_SCRIPT" "$@"
-            elif [[ "$Q_TASK_SCRIPT" == *.py ]]; then
-                uv run "$Q_TASK_SCRIPT" "$@"
-            else
-                echo "[Err]: unknow script"
-            fi
-            ;;
-    esac
-
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            -h)
+                usage
+                exit
+                ;;
+            -l)
+                _filter=""
+                if [ $# -gt 1 ] && [[ "$2" != -* ]]; then
+                    _filter="$(readlink -f "$2")"
+                    shift
+                fi
+                while IFS= read -r _dir; do
+                    (
+                        _dir="$(readlink -f "$_dir")"
+                        find "$_dir" -type f \( -name '*.sh' -o -name '*.py' \) -path "$_filter*" | sed "s@$_dir/@@g"
+                    )
+                done < <(get_bucket_dirs)
+                shift
+                ;;
+            --list-bucket)
+                get_bucket_dirs
+                exit
+                ;;
+            -e)
+                shift
+                Q_TASK_SCRIPT="$(find_task_script "$1")"
+                if [ -z "$Q_TASK_SCRIPT" ]; then
+                    echo "[Err]: task not found: $1"
+                    exit 1
+                fi
+                vim "$Q_TASK_SCRIPT"
+                shift
+                ;;
+            *)
+                Q_TASK_SCRIPT="$(find_task_script "$1")"
+                if [ -z "$Q_TASK_SCRIPT" ]; then
+                    echo "[Err]: Unknown task (file not exist)"
+                    echo "[Err]: use '-l' to check all tasks"
+                    exit 1
+                fi
+                shift
+                if [[ "$Q_TASK_SCRIPT" == *.sh ]]; then
+                    bash "$Q_TASK_SCRIPT" "$@"
+                elif [[ "$Q_TASK_SCRIPT" == *.uv.py ]]; then
+                    uv run "$Q_TASK_SCRIPT" "$@"
+                elif [[ "$Q_TASK_SCRIPT" == *.py ]]; then
+                    uv run "$Q_TASK_SCRIPT" "$@"
+                else
+                    echo "[Err]: unknown script type"
+                fi
+                return
+                ;;
+        esac
+    done
 }
 
 
