@@ -21,8 +21,8 @@ q_iconv() {
     cp -a "$1" "$1.bak"
     echo cp -a "$1" "$1.bak"
 
-    iconv -f "$orgin_locale" -t UTF-8 "$1.bak"  > "$1"
-    echo iconv -f "$orgin_locale" -t UTF-8 "$1.bak"  '>' "$1"
+    echo iconv -f "$origin_locale" -t UTF-8 "$1.bak"  '>' "$1"
+    iconv -f "$origin_locale" -t UTF-8 "$1.bak"  > "$1"
 }
 
 for x in "$@"
