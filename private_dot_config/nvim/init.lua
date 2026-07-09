@@ -96,6 +96,12 @@ local section = function ()
     vim.o.autoindent  = true                       -- 自动缩进
     vim.o.smartindent = true                       -- Insert indents automatically
 
+    vim.o.foldcolumn = '1'
+    vim.o.foldlevel = 99
+    vim.o.foldlevelstart = 99
+    vim.o.foldenable = true
+    vim.o.fillchars = 'eob: ,fold: ,foldopen:*,foldsep: ,foldinner: ,foldclose:>'
+
     vim.o.backspace   = 'eol,start,indent'         -- 类似所有编辑器的删除键
         -- unmenu PopUp.-1-
     vim.cmd [[
@@ -822,6 +828,11 @@ require("lazy").setup({
         opts = {}
     },
     {
+        'norcalli/nvim-terminal.lua',
+        ft = 'terminal',
+        opts = {},
+    },
+    {
         'MeanderingProgrammer/render-markdown.nvim',
         enabled = false,
         -- if you use standalone mini plugins
@@ -1052,6 +1063,31 @@ require("lazy").setup({
     {
         'yianwillis/vimcdoc',
         event = 'CmdlineEnter'
+    },
+    -- {
+    --     'vim-scripts/folddigest.vim',
+    --     enabled = false,
+    -- },
+    {
+        "kevinhwang91/nvim-ufo",
+        enabled = true,
+        dependencies = { "kevinhwang91/promise-async" },
+        config = function()
+            -- use Neovim nightly branch
+
+
+
+            require('ufo').setup({
+                provider_selector = function(bufnr, filetype, buftype)
+                    return {'treesitter', 'indent'}
+                end
+            })
+
+            vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
+            vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
+            vim.keymap.set('n', 'zr', require('ufo').openFoldsExceptKinds)
+            vim.keymap.set('n', 'zm', require('ufo').closeFoldsWith)
+        end
     },
     {
         'PEMessage/pdir.nvim',
