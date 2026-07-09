@@ -96,6 +96,8 @@ local section = function ()
     vim.o.autoindent  = true                       -- 自动缩进
     vim.o.smartindent = true                       -- Insert indents automatically
 
+    vim.o.numberwidth = 1
+
     vim.o.foldcolumn = '1'
     vim.o.foldlevel = 99
     vim.o.foldlevelstart = 99
@@ -164,7 +166,8 @@ local section = function ()
     -- See: https://github.com/lewis6991/gitsigns.nvim/issues/1102#issuecomment-2375842834
     -- auto:1-2 will use a second column only if there are both staged and unstaged changes in the
     -- buffer. Otherwise, it will use a single column.
-    vim.opt.signcolumn = 'auto:1-2'
+    vim.opt.signcolumn = 'auto:2'
+    -- vim.opt.signcolumn = 'auto:1-2'
 
     -- -------------------------------------------
     -- 3.7 nvim 0.12
@@ -373,7 +376,9 @@ require("lazy").setup({
                 TelescopePreviewBorder = {fg = '$grey'},
 
                 -- visual-whitespace
-                VisualNonText = {fg = '$grey', bg = '$bg3'}
+                VisualNonText = {fg = '$grey', bg = '$bg3'},
+                FoldColumn = {fg = "$grey", bg = "$bg0"}
+
             },
 
             code_style = {
