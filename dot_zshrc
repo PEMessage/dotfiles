@@ -287,6 +287,11 @@
             pixi completion --shell zsh  >| "$ZSH_CACHE_DIR/completions/_pixi"
         fi
     fi
+
+    if [ -n "$commands[tr31-tool]" ]; then
+        # it follow standard
+        compdef _gnu_generic tr31-tool
+    fi
 # -----------------------------------------
 # End of file
 # -----------------------------------------
