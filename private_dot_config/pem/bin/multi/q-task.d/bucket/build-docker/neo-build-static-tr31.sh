@@ -1,6 +1,15 @@
 #!/bin/sh
 
-docker build -t tr31-builder - <<EOF
+REPO="https://github.com/openemv/tr31.git"
+IMAGE="tr31-builder"
+case "$1" in
+  --fork|-f)
+    REPO="https://github.com/PEMessage/tr31.git"
+    IMAGE="tr31-fork-builder"
+    ;;
+esac
+
+docker build -t "$IMAGE" - <<EOF
 # Dockerfile with caching optimizations
 FROM alpine:3.18 AS builder
 
@@ -17,7 +26,7 @@ RUN apk add \
 WORKDIR /build
 
 # Clone and build in separate layer to leverage caching
-RUN git clone --recurse-submodules https://github.com/openemv/tr31.git .
+RUN git clone --recurse-submodules $REPO .
 RUN cmake -B out \
     -DFETCH_MBEDTLS=YES \
     -DFETCH_ARGP=YES \
@@ -44,4 +53,4 @@ docker run --rm \
   -e UID="$(id -u)" \
   -e GID="$(id -g)" \
   -v "$PWD":/w \
-  tr31-builder
+  "$IMAGE"
