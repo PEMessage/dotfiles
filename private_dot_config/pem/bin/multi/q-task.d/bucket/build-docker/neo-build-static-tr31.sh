@@ -26,10 +26,17 @@ RUN cmake -B out \
     -DCMAKE_C_FLAGS="-O2 -flto" && \
     cmake --build out
 
+# Collect ELF files from out/src (non-recursive) in a separate layer
+RUN mkdir -p /out-elf && \
+    for f in /build/out/src/*; do \
+        if [ -f "\$f" ] && head -c 4 "\$f" | grep -q "ELF"; then cp "\$f" /out-elf/; fi; \
+    done; \
+    ls -l /out-elf/
+
 # Final stage for minimal image
 FROM alpine:3.18
-COPY --from=builder /build/out/src/tr31-tool /tr31-tool
-ENTRYPOINT ["/bin/sh", "-c", "cp /tr31-tool /w/tr31-tool && chown \$UID:\$GID /w/tr31-tool && chmod +x /w/tr31-tool"]
+COPY --from=builder /out-elf/ /out-elf/
+ENTRYPOINT ["/bin/sh", "-c", "for f in /out-elf/*; do n=\$(basename \$f); cp \$f /w/\$n && chown \$UID:\$GID /w/\$n && chmod +x /w/\$n; done"]
 EOF
 
 # Run the container to copy the binary to host
