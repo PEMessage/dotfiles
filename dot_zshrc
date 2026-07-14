@@ -292,6 +292,11 @@
         # it follow standard
         compdef _gnu_generic tr31-tool
     fi
+
+    if [ -n "$commands[tmux]" ]; then
+        zinit ice as"completion"
+        zinit snippet https://github.com/zsh-users/zsh/blob/master/Completion/Unix/Command/_tmux
+    fi
 # -----------------------------------------
 # End of file
 # -----------------------------------------

@@ -73,6 +73,8 @@
         clear-history\; \
         display-message "Clear All!"
 
+    set -g focus-events on
+
     # copy mode 
     # ----------------------------
     # bind P paste-buffer
@@ -177,6 +179,7 @@
 
     if-shell -b '[ "$(echo "$TMUX_VERSION >= 3.3" | bc)" = 1 ]' " \
         set-window-option -g allow-passthrough on "
+
 
     # transfer copied text to attached terminal with yank
     # transfer most-recently copied text to attached terminal with yank
