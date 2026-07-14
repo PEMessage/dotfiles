@@ -1,0 +1,160 @@
+#!/usr/bin/env bash
+# Credit: https://github.com/raine/workmux
+set -euo pipefail
+
+NAME="tmux-pane-status"
+VERSION="1.0.0"
+
+STATUS_WORKING="#[fg=yellow][*]#[fg=default]"
+STATUS_WAITING="#[fg=red][*]#[fg=default]"
+STATUS_DONE="#[fg=green][*]#[fg=default]"
+
+usage() {
+  cat <<EOF
+${NAME} — Show a status label in the tmux window bar for the current pane.
+
+Usage:
+  ${NAME} [--auto-clear] [--pane <id>] <label>
+  ${NAME} --clear [--pane <id>]
+  ${NAME} -h | --help
+  ${NAME} --version
+
+<label> is arbitrary text displayed in the tmux window status bar.
+
+Convenience aliases that expand to default labels:
+  working          → ${STATUS_WORKING}
+  waiting           → ${STATUS_WAITING}
+  done              → ${STATUS_DONE}
+
+Options:
+  --slot          Default using 73
+  --auto-clear    Remove the label when the pane next gains focus
+  --pane <id>     Target a specific pane (defaults to current pane)
+  --clear         Remove the label from the pane
+  -h, --help      Show this help
+  --version       Print version
+EOF
+}
+
+resolve_label() {
+  case "$1" in
+    working) echo "$STATUS_WORKING" ;;
+    waiting) echo "$STATUS_WAITING"  ;;
+    done)    echo "$STATUS_DONE"     ;;
+    *)       echo "$1"               ;;  # pass through as-is
+  esac
+}
+
+main() {
+  local positionals=()
+  local auto_clear=false
+  local clear=false
+  local pane_target=""
+  local slot="73"
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --slot)
+        [[ $# -lt 2 ]] && { echo "${NAME}: --slot requires a value" >&2; exit 1; }
+        slot="$2"; shift 2
+        ;;
+      --auto-clear)  auto_clear=true; shift ;;
+      --clear)       clear=true;      shift ;;
+      --pane)
+        [[ $# -lt 2 ]] && { echo "${NAME}: --pane requires a value" >&2; exit 1; }
+        pane_target="$2"; shift 2
+        ;;
+      -h|--help)   usage; exit 0 ;;
+      --version)   echo "${NAME} ${VERSION}"; exit 0 ;;
+      --)          shift; positionals+=("$@"); break ;;
+      -*)          echo "${NAME}: unknown option: $1" >&2; exit 1 ;;
+      *)           positionals+=("$1"); shift ;;
+    esac
+  done
+
+  # Gate
+  [[ -n "${WORKMUX_DISABLE_SET_WINDOW_STATUS:-}" ]] && exit 0
+
+  # Resolve pane
+  ensure_tmux
+  [[ -z "$pane_target" ]] && pane_target="${TMUX_PANE:-}"
+  [[ -z "$pane_target" ]] && pane_target=$(tmux display-message -p '#{pane_id}' 2>/dev/null) || true
+
+  # Clear mode
+  if $clear; then
+    tmux set-option -uw @tmux_pane_status 2>/dev/null || true
+    tmux set-option -up @tmux_pane_status 2>/dev/null || true
+    tmux set-hook -u -p -t "$pane_target" "pane-focus-in[$slot]" 2>/dev/null || true
+    exit 0
+  fi
+
+  # Set mode
+  if [[ ${#positionals[@]} -eq 0 ]]; then
+    echo "${NAME}: missing <status> argument" >&2
+    echo "Try '${NAME} --help'." >&2
+    exit 1
+  fi
+
+  local label
+  label=$(resolve_label "${positionals[0]}")
+
+  ensure_status_format
+  tmux set-option -w -t "$pane_target" @tmux_pane_status "$label" 2>/dev/null || true
+  tmux set-option -p -t "$pane_target" @tmux_pane_status "$label" 2>/dev/null || true
+
+  if $auto_clear; then
+    local hook
+    hook='set-option -up @tmux_pane_status '
+    hook+=' ; if-shell -F "#{==:#{@tmux_pane_status},'"${label}"'}" "set-option -uw @tmux_pane_status" ""'
+    hook+=' ; set-hook -u -p -t '"$pane_target"' pane-focus-in['"$slot"']'
+    tmux set-hook -p -t "$pane_target" "pane-focus-in[$slot]" "$hook" 2>/dev/null || true
+  else
+    tmux set-hook -u -p -t "$pane_target" "pane-focus-in[$slot]" 2>/dev/null || true
+  fi
+}
+
+ensure_tmux() {
+  command -v tmux &>/dev/null || { echo "${NAME}: tmux not installed" >&2; exit 2; }
+  if [[ -z "${TMUX:-}" && -z "${TMUX_PANE:-}" ]]; then
+    tmux display-message -p '#{pane_id}' &>/dev/null || {
+      echo "${NAME}: not inside a tmux session" >&2; exit 2
+    }
+  fi
+}
+
+ensure_status_format() {
+  local snippet="#{?@tmux_pane_status, #{@tmux_pane_status},}"
+  for opt in window-status-format window-status-current-format; do
+    local fmt
+    fmt=$(tmux show-option -wv -t "$pane_target" "$opt" 2>/dev/null) || true
+    [[ -z "$fmt" ]] && fmt=$(tmux show-option -gv "$opt" 2>/dev/null) || true
+    [[ -z "$fmt" ]] && fmt="#I:#W#{?window_flags,#{window_flags}, }"
+
+    if [[ "$fmt" != *"@tmux_pane_status"* ]]; then
+      local new_fmt
+      new_fmt=$(inject_snippet "$fmt" "$snippet")
+      tmux set-option -w -t "$pane_target" "$opt" "$new_fmt" 2>/dev/null || true
+    fi
+  done
+}
+
+inject_snippet() {
+  local fmt="$1" snippet="$2"
+  local pos
+  pos=$(awk -v s="$fmt" '
+    BEGIN {
+      p = length(s)
+      n1 = index(s, "#{window_flags");  if (n1 > 0 && n1 < p) p = n1
+      n2 = index(s, "#{?window_flags"); if (n2 > 0 && n2 < p) p = n2
+      n3 = index(s, "#{F}");            if (n3 > 0 && n3 < p) p = n3
+      printf "%d", (p == length(s) ? 0 : p)
+    }
+  ')
+  if [[ "$pos" -gt 0 ]]; then
+    printf '%s%s%s' "${fmt:0:$((pos - 1))}" "$snippet" "${fmt:$((pos - 1))}"
+  else
+    printf '%s%s' "$fmt" "$snippet"
+  fi
+}
+
+main "$@"

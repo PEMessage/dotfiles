@@ -1,10 +1,13 @@
-import type { Plugin } from "@opencode-ai/plugin"
+import type { Plugin } from '@opencode-ai/plugin';
 
-export const TerminalBell: Plugin = async ({ project, client, $, directory, worktree }) => {
+export const TmuxStatusPlugin: Plugin = async ({ $ }) => {
+  // OpenCode can emit repeated `session.status busy` events for a single turn,
+  // and can even emit a stale trailing `busy` after `idle` at the end. Track
+  // per-session status so workmux only sees real transitions.
   const lastStatusBySession = new Map<string, string>();
   const acceptBusyBySession = new Map<string, boolean>();
 
-  async function ringBell(
+  async function setStatus(
     sessionID: string | undefined,
     status: string,
   ) {
@@ -29,7 +32,10 @@ export const TerminalBell: Plugin = async ({ project, client, $, directory, work
       acceptBusyBySession.set(sessionID, true);
     }
 
-    await Bun.write(Bun.stdout, "\x07")
+    const args = ['tmux-pane-status'];
+    if (status !== 'working') args.push('--auto-clear');
+    args.push(status);
+    await $`${args}`.quiet();   // 等同于依次传参
   }
 
   return {
@@ -37,14 +43,26 @@ export const TerminalBell: Plugin = async ({ project, client, $, directory, work
       if (event.type === 'message.updated' && event.properties.info.role === 'user') {
         acceptBusyBySession.set(event.properties.sessionID, true);
       }
+
       switch (event.type) {
         case 'session.status':
+          if (event.properties.status.type === 'busy') {
+            await setStatus(event.properties.sessionID, 'working');
+          }
           if (event.properties.status.type === 'idle') {
-            await ringBell(event.properties.sessionID, 'done');
+            await setStatus(event.properties.sessionID, 'done');
           }
           break;
+        case 'permission.asked':
+        case 'question.asked':
+          await setStatus(event.properties.sessionID, 'waiting');
+          break;
+        case 'permission.replied':
+        case 'question.replied':
+          await setStatus(event.properties.sessionID, 'working');
+          break;
         case 'session.idle':
-          await ringBell(event.properties.sessionID, 'done');
+          await setStatus(event.properties.sessionID, 'done');
           break;
       }
     },
