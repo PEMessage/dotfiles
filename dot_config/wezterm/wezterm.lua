@@ -4,7 +4,7 @@ local act = wezterm.action
 
 -- Thanks to: https://github.com/wezterm/wezterm/discussions/3541
 local function RightClick(window, pane)
-    local has_selection = window:get_selection_text_for_pane(pane) ~= ""
+    local has_selection = window:get_selection_text_for_pane(pane) ~= "" or window:get_selection_escapes_for_pane(pane) ~= ""
     if has_selection then
         window:perform_action(act.CopyTo("ClipboardAndPrimarySelection"), pane)
         window:perform_action(act.ClearSelection, pane)
@@ -13,6 +13,8 @@ local function RightClick(window, pane)
     end
 
 end
+
+
 
 local config = {
     -- ==========================
@@ -43,6 +45,7 @@ local config = {
             action = wezterm.action.ActivateCommandPalette,
         },
     },
+    animation_fps = 120,
 
     mouse_bindings = {
 
