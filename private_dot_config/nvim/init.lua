@@ -505,8 +505,13 @@ require("lazy").setup({
                     vim.b.miniindentscope_disable = true
                 end,
             })
+            -- vim.g.miniindentscope_disable = true
             vim.cmd [[highlight MiniIndentscopeSymbol guifg=#419cff gui=nocombine]]
             return {
+                delay = 300,
+                draw = {
+                    animation = function() return 0 end,
+                },
                 options = { try_as_border = true },
                 symbol = "│",
             }
