@@ -26,6 +26,13 @@
     set-option -ga terminal-overrides ',*-256color*:Tc'
     set-option -ga terminal-overrides ',*-256color*:RGB'
 
+    # sync: Bracketed Synchronized Output
+    #       to avoid neovim cursor blinking during ui update
+    # Using `tmux display -p "#{client_termfeatures}"`
+    # `tmux show-option -s terminal-features` to checking
+    set -as terminal-features ',xterm*:Sync'
+
+
     # From: tmux-plugins/tmux-sensible
     set-option -g history-limit 50000
 
