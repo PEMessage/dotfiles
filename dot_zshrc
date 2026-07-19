@@ -297,6 +297,12 @@
         zinit ice as"completion"
         zinit snippet https://github.com/zsh-users/zsh/blob/master/Completion/Unix/Command/_tmux
     fi
+
+    if [ -n "$commands[zellij]" ]; then
+        if [ ! -f "$ZSH_CACHE_DIR/completions/_zellij" ] ; then
+            zellij setup --generate-completion zsh >| "$ZSH_CACHE_DIR/completions/_zellij"
+        fi
+    fi
 # -----------------------------------------
 # End of file
 # -----------------------------------------
