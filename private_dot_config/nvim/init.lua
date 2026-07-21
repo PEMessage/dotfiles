@@ -3664,42 +3664,45 @@ require("lazy").setup({
     -- -------------------------------------------
     -- 5.10 AI
     -- -------------------------------------------
-    {
-        "cousine/opencode-context.nvim",
-        opts = {
-            tmux_target = nil,  -- Manual override: "session:window.pane"
-            auto_detect_pane = true,  -- Auto-detect opencode pane in current window
-        },
-        keys = {
-            { "<leader>oc", "<cmd>OpencodeSend<cr>", desc = "Send prompt to opencode" },
-            { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = "v", desc = "Send prompt to opencode" },
-            { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
-            { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
-        },
-        cmd = { "OpencodeSend", "OpencodeSwitchMode" },
-    }
     -- {
-    --     "nickjvandyke/opencode.nvim",
-    --     version = "*", -- Latest stable release
-    --     config = function()
-    --         ---@type opencode.Opts
-    --         vim.g.opencode_opts = {
-    --             -- Your configuration, if any; goto definition on the type or field for details
-    --         }
-    --
-    --         vim.o.autoread = true -- Required for `vim.g.opencode_opts.events.reload`
-    --
-    --         -- Recommended/example keymaps
-    --         vim.keymap.set({ "n", "x" }, "<leader>oa", function() require("opencode").ask("@this: ") end, { desc = "Ask opencode…" })
-    --         vim.keymap.set({ "n", "x" }, "<leader>os", function() require("opencode").select() end,       { desc = "Select opencode…" })
-    --
-    --         vim.keymap.set({ "n", "x" }, "go",  function() return require("opencode").operator("@this ") end,        { desc = "Add range to opencode", expr = true })
-    --         vim.keymap.set("n",          "goo", function() return require("opencode").operator("@this ") .. "_" end, { desc = "Add line to opencode", expr = true })
-    --
-    --         -- vim.keymap.set("n", "<C-M-u>", function() require("opencode").command("session.half.page.up") end,   { desc = "Scroll opencode up" })
-    --         -- vim.keymap.set("n", "<S-C-d>", function() require("opencode").command("session.half.page.down") end, { desc = "Scroll opencode down" })
-    --     end,
-    -- },
+    --     "cousine/opencode-context.nvim",
+    --     opts = {
+    --         tmux_target = nil,  -- Manual override: "session:window.pane"
+    --         auto_detect_pane = true,  -- Auto-detect opencode pane in current window
+    --     },
+    --     keys = {
+    --         { "<leader>oc", "<cmd>OpencodeSend<cr>", desc = "Send prompt to opencode" },
+    --         { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = "v", desc = "Send prompt to opencode" },
+    --         { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
+    --         { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
+    --     },
+    --     cmd = { "OpencodeSend", "OpencodeSwitchMode" },
+    -- }
+    {
+        "nickjvandyke/opencode.nvim",
+        version = "*", -- Latest stable release
+        config = function()
+            ---@type opencode.Opts
+            vim.g.opencode_opts = {
+                provider = {
+                    enabled = false,
+                }
+                -- Your configuration, if any; goto definition on the type or field for details
+            }
+
+            vim.o.autoread = true -- Required for `vim.g.opencode_opts.events.reload`
+
+            -- Recommended/example keymaps
+            vim.keymap.set({ "n", "x" }, "<leader>oa", function() require("opencode").ask("@this: ") end, { desc = "Ask opencode…" })
+            vim.keymap.set({ "n", "x" }, "<leader>os", function() require("opencode").select() end,       { desc = "Select opencode…" })
+
+            vim.keymap.set({ "n", "x" }, "go",  function() return require("opencode").operator("@this ") end,        { desc = "Add range to opencode", expr = true })
+            vim.keymap.set("n",          "goo", function() return require("opencode").operator("@this ") .. "_" end, { desc = "Add line to opencode", expr = true })
+
+            -- vim.keymap.set("n", "<C-M-u>", function() require("opencode").command("session.half.page.up") end,   { desc = "Scroll opencode up" })
+            -- vim.keymap.set("n", "<S-C-d>", function() require("opencode").command("session.half.page.down") end, { desc = "Scroll opencode down" })
+        end,
+    },
     -- {
     --     "yetone/avante.nvim",
     --     event = "VeryLazy",

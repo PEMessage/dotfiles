@@ -232,7 +232,7 @@
 
     # Credit: https://hackmd.io/@DailyOops/persistent-tmux-popup?type=view
     # Credit: https://stackoverflow.com/questions/229551/how-to-check-if-a-string-contains-a-substring-in-bash
-    bind -n "C-M-u" if-shell 'case "$(tmux display-message -p #S)" in float* ) exit 0;; *) exit 1;; esac ; ' \
+    bind -n "C-M-t" if-shell 'case "$(tmux display-message -p #S)" in float* ) exit 0;; *) exit 1;; esac ; ' \
         "detach-client" \
         "run-shell 'tmux-popup'"
 
