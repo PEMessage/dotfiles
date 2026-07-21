@@ -2782,7 +2782,8 @@ require("lazy").setup({
 
                 cmd = {
                     'clice',
-                    'server',
+                    'serve',
+                    -- '--log-level=trace',
                 },
             })
             -- vim.lsp.enable('clice')
