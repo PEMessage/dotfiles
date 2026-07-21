@@ -973,13 +973,16 @@ require("lazy").setup({
         },
     },
     {
+        -- TLDR: using 'gc' for line comment, 'gb' for block comment
         'numToStr/Comment.nvim',
-        enabled = vim.fn.has("nvim-0.10.0") == 0,
+        enabled = true,
         opts = {}
     },
     {
         "folke/ts-comments.nvim",
-        enabled = vim.fn.has("nvim-0.10.0") == 1,
+        -- always using comment.nvim since it support 'block comment' (gb)
+        -- enabled = vim.fn.has("nvim-0.10.0") == 1,
+        enabled = false,
         opts = {},
         event = "VeryLazy",
     },
@@ -3069,7 +3072,9 @@ require("lazy").setup({
                         java = {
                             contentProvider = { preferred = 'fernflower' },
                             inlayhints = {
-                                parameterNames = { enabled = true },
+                                parameterNames = {
+                                    enabled = "all"
+                                },
                             },
                             -- autobuild = { enabled = true },
                             import = {
@@ -4127,6 +4132,27 @@ local section = function ()
         vim.cmd("copen")
     end, { desc = "vimgrep @/ (no jump, add to history)" })
 
+    -- Thanks to: https://jdhao.github.io/2026/04/02/nvim-v012-release/?ref=dailydev
+    vim.api.nvim_create_user_command("LspInfo", "checkhealth vim.lsp", {
+        desc = "Show LSP Info",
+    })
+
+    vim.api.nvim_create_user_command("LspLog",
+        function(_)
+            local state_path = vim.fn.stdpath("state")
+            local log_path = vim.fs.joinpath(state_path, "lsp.log")
+
+            vim.cmd(string.format("edit %s", log_path))
+        end,
+        {
+            desc = "Show LSP log",
+        }
+    )
+
+    vim.api.nvim_create_user_command("LspRestart", "lsp restart", {
+        desc = "Restart LSP",
+    })
+
 end ; section()
 
 -- 7. Function Zone
@@ -4318,6 +4344,7 @@ vim.cmd [[
 ]]
 
 vim.cmd [[ command! -nargs=+ -complete=command Redir let s:reg = @@ | redir @"> | silent execute <q-args> | redir END | new | pu | 1,2d_ | let @@ = s:reg ]]
+
 
 -- workaround that if we <leader>rce type too fast
 -- vim: ft=lua
