@@ -2787,11 +2787,17 @@ require("lazy").setup({
                 },
             })
             -- Now clice is enabled when clice.toml is found in the project (or any parent directory)
-            if vim.fn.findfile('clice.toml', '.;') ~= '' then
-                vim.lsp.enable('clice')
-            else
-                vim.lsp.enable('clangd')
-            end
+            vim.api.nvim_create_autocmd('FileType', {
+                pattern = { 'c', 'cpp' },
+                once = true,
+                callback = function()
+                    if vim.fn.findfile('clice.toml', '.;') ~= '' then
+                        vim.lsp.enable('clice')
+                    else
+                        vim.lsp.enable('clangd')
+                    end
+                end,
+            })
 
             vim.lsp.config("kotlin_lsp", {
                 inlay_hints = { enabled = true },
