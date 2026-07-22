@@ -288,6 +288,12 @@
         fi
     fi
 
+    if [ -n "$commands[gh]" ]; then
+        if [ ! -f "$ZSH_CACHE_DIR/completions/_gh" ] ; then
+            gh completion --shell zsh  >| "$ZSH_CACHE_DIR/completions/_gh"
+        fi
+    fi
+
     if [ -n "$commands[tr31-tool]" ]; then
         # it follow standard
         compdef _gnu_generic tr31-tool
