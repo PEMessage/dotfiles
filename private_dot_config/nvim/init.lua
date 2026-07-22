@@ -2683,7 +2683,7 @@ require("lazy").setup({
                 "lua_ls",
                 "rust_analyzer",
                 "neocmake",
-                "clangd",
+                -- "clangd",
                 "ty",
                 -- "pylsp",
                 "gopls",
@@ -2786,7 +2786,12 @@ require("lazy").setup({
                     -- '--log-level=trace',
                 },
             })
-            -- vim.lsp.enable('clice')
+            -- Now clice is enabled when clice.toml is found in the project (or any parent directory)
+            if vim.fn.findfile('clice.toml', '.;') ~= '' then
+                vim.lsp.enable('clice')
+            else
+                vim.lsp.enable('clangd')
+            end
 
             vim.lsp.config("kotlin_lsp", {
                 inlay_hints = { enabled = true },
