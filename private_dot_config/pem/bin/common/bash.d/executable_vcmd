@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+EDITOR="${SUBCMD_EDITOR:-nvim}"
+
+if [ $# -lt 2 ]; then
+  cat <<EOF
+Usage: subcmd <lua|vim|shell> <function|command> [args...]
+
+  Launch \$EDITOR (default: nvim) and call a function or shell command on startup.
+
+Modes:
+  lua    Call a Lua global function (Neovim only)
+  vim    Call a Vimscript function (Vim / Neovim)
+  shell  Run a shell command inside Vim
+
+Examples:
+  subcmd lua print 'Hello, world!'
+  subcmd vim MyVimFunction arg1 arg2
+  subcmd shell ls -la
+
+Environment:
+  SUBCMD_EDITOR  Editor to launch (default: nvim)
+EOF
+  exit 1
+fi
+
+json_args=$(python3 -c 'import sys, json; print(json.dumps(sys.argv[1:]))' "$@")
+VIM_SUBCMD_ARGS="$json_args" exec "$EDITOR" -c 'call subcmd#run()'
