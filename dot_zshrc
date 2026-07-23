@@ -15,7 +15,7 @@
 
     # [[ -e ~/.profile ]] && emulate sh -c 'source ~/.profile'
     # Ubuntu temp fix for snap format package
-    if [ -f "/etc/profile.d/apps-bin-path.sh" ] ; then
+    if [[ -f "/etc/profile.d/apps-bin-path.sh" ]]; then
         source /etc/profile.d/apps-bin-path.sh
     fi
 
@@ -231,41 +231,41 @@
 # -----------------------------------------
 # lazy load compdef file(self included)
 # -----------------------------------------
-    if [ -n "$commands[uv]" ]; then
+    if [[ -n "$commands[uv]" ]]; then
         # Thanks to https://zhuanlan.zhihu.com/p/98450570
         # zinit ice lucid wait="0" atload="zpcompinit; zpcdreplay"
         # zinit snippet OMZ::plugins/uv/uv.plugin.zsh
-        if [ ! -f "$ZSH_CACHE_DIR/completions/_uv" ] ; then
+        if [[ ! -f "$ZSH_CACHE_DIR/completions/_uv" ]]; then
             uv generate-shell-completion zsh >| "$ZSH_CACHE_DIR/completions/_uv" &|
             uvx --generate-shell-completion zsh >| "$ZSH_CACHE_DIR/completions/_uvx" &|
         fi
     fi
 
-    if [ -n "$commands[tv]" ]; then
-        if [ ! -f "$ZSH_CACHE_DIR/completions/_tv" ] ; then
+    if [[ -n "$commands[tv]" ]]; then
+        if [[ ! -f "$ZSH_CACHE_DIR/completions/_tv" ]]; then
             tv init zsh >| "$ZSH_CACHE_DIR/completions/_tv"
         fi
     fi
 
-    if [ -n "$commands[pixi]" ]; then
-        if [ ! -f "$ZSH_CACHE_DIR/completions/_pixi" ] ; then
+    if [[ -n "$commands[pixi]" ]]; then
+        if [[ ! -f "$ZSH_CACHE_DIR/completions/_pixi" ]]; then
             pixi completion --shell zsh  >| "$ZSH_CACHE_DIR/completions/_pixi"
         fi
     fi
 
-    if [ -n "$commands[gh]" ]; then
-        if [ ! -f "$ZSH_CACHE_DIR/completions/_gh" ] ; then
+    if [[ -n "$commands[gh]" ]]; then
+        if [[ ! -f "$ZSH_CACHE_DIR/completions/_gh" ]]; then
             gh completion --shell zsh  >| "$ZSH_CACHE_DIR/completions/_gh"
         fi
     fi
 
-    if [ -n "$commands[tr31-tool]" ]; then
+    if [[ -n "$commands[tr31-tool]" ]]; then
         # it follow standard
         compdef _gnu_generic tr31-tool
     fi
 
-    if [ -n "$commands[zellij]" ]; then
-        if [ ! -f "$ZSH_CACHE_DIR/completions/_zellij" ] ; then
+    if [[ -n "$commands[zellij]" ]]; then
+        if [[ ! -f "$ZSH_CACHE_DIR/completions/_zellij" ]]; then
             zellij setup --generate-completion zsh >| "$ZSH_CACHE_DIR/completions/_zellij"
         fi
     fi
@@ -273,42 +273,42 @@
 # lazy load compdef file
 # -----------------------------------------
     # Thanks to: https://zenlian.github.io/zsh-zinit/
-    if [ -n "$commands[docker]" ]; then
+    if [[ -n "$commands[docker]" ]]; then
         zinit ice as"completion"
         zinit snippet https://github.com/docker/cli/blob/master/contrib/completion/zsh/_docker
     fi
 
-    if [ -n "$commands[fzf]" ]; then
+    if [[ -n "$commands[fzf]" ]]; then
         zinit ice as"completion"
         zinit snippet https://github.com/sainnhe/zsh-completions/blob/master/src/custom/_fzf
     fi
 
-    if [ -n "$commands[just]" ]; then
+    if [[ -n "$commands[just]" ]]; then
         zinit ice as"completion" mv"just.zsh -> _just"
         zinit snippet https://github.com/casey/just/blob/master/completions/just.zsh
     fi
 
-    if [ -n "$commands[gradle]" ]; then
+    if [[ -n "$commands[gradle]" ]]; then
         zinit ice as"completion"
         zinit snippet https://github.com/gradle/gradle-completion/blob/master/_gradle
     fi
 
 
-    if [ -n "$commands[opencode]" ]; then
+    if [[ -n "$commands[opencode]" ]]; then
         zinit ice as"completion"
         zstyle ':completion:*:*:opencode:*' fzf-search-display true
         zinit snippet https://github.com/PEMessage/opencode-zsh-completion/blob/main/_opencode
     fi
 
-    if [ -n "$commands[rustup]" ]; then
-        if [ ! -f "$ZSH_CACHE_DIR/completions/_rustup" ] ; then
+    if [[ -n "$commands[rustup]" ]]; then
+        if [[ ! -f "$ZSH_CACHE_DIR/completions/_rustup" ]]; then
             rustup completions zsh >| "$ZSH_CACHE_DIR/completions/_rustup"
             sed -i "/'::+toolchain -- Release channel (e.g. +stable) or custom toolchain to set override:_default' \\\/d" "$ZSH_CACHE_DIR/completions/_rustup"
         fi
     fi
 
 
-    if [ -n "$commands[tmux]" ]; then
+    if [[ -n "$commands[tmux]" ]]; then
         zinit ice as"completion"
         zinit snippet https://github.com/zsh-users/zsh/blob/master/Completion/Unix/Command/_tmux
     fi
