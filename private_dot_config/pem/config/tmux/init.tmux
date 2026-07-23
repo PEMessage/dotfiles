@@ -32,6 +32,8 @@
     # `tmux show-option -s terminal-features` to checking
     set -as terminal-features ',xterm*:Sync'
 
+    set -g extended-keys on
+
 
     # From: tmux-plugins/tmux-sensible
     set-option -g history-limit 50000
