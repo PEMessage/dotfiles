@@ -1110,6 +1110,28 @@ require("lazy").setup({
             { '<m-right>', function() require('pdir').open_parent(1)   end, },
         }
     },
+    {
+        'PEMessage/termdebug_ex.vim'
+    },
+    {
+        dependencies = {
+            'PEMessage/termdebug_ex.vim'
+            -- "nvim-tree/nvim-web-devicons", -- optional dependency
+        },
+        'PEMessage/subcmd.vim',
+        init = function (self)
+
+            vim.cmd [[
+                let g:termdebug_config = {}
+                let g:termdebug_config['command'] = "gdb-multiarch"
+                let g:termdebug_config['evaluate_in_popup'] = v:true
+                let g:termdebug_config['map_plus'] = v:true
+                let g:termdebug_config['map_mins'] = v:true
+                let g:termdebug_config['variables_window'] = v:true
+                let g:termdebug_config['timeout'] = 6000 " 1000 ~ 10s, for large elf like linux kernel
+            ]]
+        end
+    },
     -- {
     --     'PEMessage/parent_dir_tui.vim',
     --     lazy = false,
@@ -3664,45 +3686,62 @@ require("lazy").setup({
     -- -------------------------------------------
     -- 5.10 AI
     -- -------------------------------------------
-    -- {
-    --     "cousine/opencode-context.nvim",
-    --     opts = {
-    --         tmux_target = nil,  -- Manual override: "session:window.pane"
-    --         auto_detect_pane = true,  -- Auto-detect opencode pane in current window
-    --     },
-    --     keys = {
-    --         { "<leader>oc", "<cmd>OpencodeSend<cr>", desc = "Send prompt to opencode" },
-    --         { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = "v", desc = "Send prompt to opencode" },
-    --         { "<leader>ot", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
-    --         { "<leader>op", "<cmd>OpencodePrompt<cr>", desc = "Open opencode persistent prompt" },
-    --     },
-    --     cmd = { "OpencodeSend", "OpencodeSwitchMode" },
-    -- }
     {
-        "nickjvandyke/opencode.nvim",
-        version = "*", -- Latest stable release
-        config = function()
-            ---@type opencode.Opts
-            vim.g.opencode_opts = {
-                provider = {
-                    enabled = false,
-                }
-                -- Your configuration, if any; goto definition on the type or field for details
-            }
-
-            vim.o.autoread = true -- Required for `vim.g.opencode_opts.events.reload`
-
-            -- Recommended/example keymaps
-            vim.keymap.set({ "n", "x" }, "<leader>oa", function() require("opencode").ask("@this: ") end, { desc = "Ask opencode…" })
-            vim.keymap.set({ "n", "x" }, "<leader>os", function() require("opencode").select() end,       { desc = "Select opencode…" })
-
-            vim.keymap.set({ "n", "x" }, "go",  function() return require("opencode").operator("@this ") end,        { desc = "Add range to opencode", expr = true })
-            vim.keymap.set("n",          "goo", function() return require("opencode").operator("@this ") .. "_" end, { desc = "Add line to opencode", expr = true })
-
-            -- vim.keymap.set("n", "<C-M-u>", function() require("opencode").command("session.half.page.up") end,   { desc = "Scroll opencode up" })
-            -- vim.keymap.set("n", "<S-C-d>", function() require("opencode").command("session.half.page.down") end, { desc = "Scroll opencode down" })
+        "PEMessage/opencode-context.nvim",
+        opts = {
+            -- Tmux settings
+            tmux_target = nil,  -- Manual override: "session:window.pane"
+            auto_detect_pane = true,  -- Auto-detect opencode pane in current window
+        },
+        keys = {
+            { "<leader>oc", "<cmd>OpencodeSend<cr>", desc = "Send prompt to opencode" },
+            { "<leader>oc", "<cmd>OpencodeSend<cr>", mode = "v", desc = "Send prompt to opencode" },
+            { "<leader>om", "<cmd>OpencodeSwitchMode<cr>", desc = "Toggle opencode mode" },
+            { "<leader>of", "<cmd>OpencodeSendFile<cr>", desc = "Send file ref to opencode" },
+            { "<leader>ob", "<cmd>OpencodeSendBuffers<cr>", desc = "Send buffers ref to opencode" },
+            { "<leader>oh", "<cmd>OpencodeSendHere<cr>", desc = "Send cursor ref to opencode" },
+            { "<leader>od", "<cmd>OpencodeSendDiagnostics<cr>", desc = "Send diagnostics ref to opencode" },
+            { "<leader>or", "<cmd>OpencodeSendRange<cr>", mode = "v", desc = "Send range ref to opencode" },
+            { "<leader>os", "<cmd>OpencodeSendSelection<cr>", mode = "v", desc = "Send selection ref to opencode" },
+        },
+        cmd = {
+            "OpencodeSend",
+            "OpencodeSwitchMode",
+            "OpencodeSendFile",
+            "OpencodeSendBuffers",
+            "OpencodeSendHere",
+            "OpencodeSendDiagnostics",
+            "OpencodeSendRange",
+            "OpencodeSendSelection",
+        },
+        config = function(_, opts)
+            require("opencode-context").setup(opts)
         end,
     },
+    -- {
+    --     "nickjvandyke/opencode.nvim",
+    --     version = "*", -- Latest stable release
+    --     config = function()
+    --         ---@type opencode.Opts
+    --         vim.g.opencode_opts = {
+    --             server = {
+    --                 start = false, -- disables auto-start
+    --             },
+    --         }
+    --
+    --         vim.o.autoread = true -- Required for `vim.g.opencode_opts.events.reload`
+    --
+    --         -- Recommended/example keymaps
+    --         vim.keymap.set({ "n", "x" }, "<leader>oa", function() require("opencode").ask("@this: ") end, { desc = "Ask opencode…" })
+    --         vim.keymap.set({ "n", "x" }, "<leader>os", function() require("opencode").select() end,       { desc = "Select opencode…" })
+    --
+    --         vim.keymap.set({ "n", "x" }, "go",  function() return require("opencode").operator("@this ") end,        { desc = "Add range to opencode", expr = true })
+    --         vim.keymap.set("n",          "goo", function() return require("opencode").operator("@this ") .. "_" end, { desc = "Add line to opencode", expr = true })
+    --
+    --         -- vim.keymap.set("n", "<C-M-u>", function() require("opencode").command("session.half.page.up") end,   { desc = "Scroll opencode up" })
+    --         -- vim.keymap.set("n", "<S-C-d>", function() require("opencode").command("session.half.page.down") end, { desc = "Scroll opencode down" })
+    --     end,
+    -- },
     -- {
     --     "yetone/avante.nvim",
     --     event = "VeryLazy",
@@ -4344,7 +4383,6 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
     end,
 })
 
-
 -- 7.1 Vim Function Zone(I just tired)
 -- ===========================================
 vim.cmd [[
@@ -4359,7 +4397,6 @@ vim.cmd [[
 ]]
 
 vim.cmd [[ command! -nargs=+ -complete=command Redir let s:reg = @@ | redir @"> | silent execute <q-args> | redir END | new | pu | 1,2d_ | let @@ = s:reg ]]
-
 
 -- workaround that if we <leader>rce type too fast
 -- vim: ft=lua
