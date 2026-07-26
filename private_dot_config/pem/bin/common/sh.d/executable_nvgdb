@@ -1,0 +1,2 @@
+#!/bin/sh
+vcmd vim termdebug_ex#subcmd "$@"
