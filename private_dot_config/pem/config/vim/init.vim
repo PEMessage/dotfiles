@@ -1970,6 +1970,16 @@ endif
 " -------------------------------------------
     Plug 'puremourning/vimspector'
         let g:vimspector_enable_mappings = 'HUMAN'
+    Plug 'PEMessage/termdebug_ex.vim'
+        let g:termdebug_config = {}
+        let g:termdebug_config['command'] = "gdb-multiarch"
+        let g:termdebug_config['evaluate_in_popup'] = v:true
+        let g:termdebug_config['map_plus'] = v:true
+        let g:termdebug_config['map_mins'] = v:true
+        let g:termdebug_config['variables_window'] = v:true
+        let g:termdebug_config['timeout'] = 6000 " 1000 ~ 10s, for large elf like linux kernel
+
+    Plug 'PEMessage/subcmd.vim'
 " -------------------------------------------
 " 6.13 LSP
 " -------------------------------------------
@@ -2760,14 +2770,6 @@ endif
 
     " Temrdebug config
     " ----------------
-    let g:termdebug_config = {}
-    let g:termdebug_config['command'] = "gdb-multiarch"
-    let g:termdebug_config['evaluate_in_popup'] = v:true
-    let g:termdebug_config['map_plus'] = v:true
-    let g:termdebug_config['map_mins'] = v:true
-    let g:termdebug_config['variables_window'] = v:true
-    let g:termdebug_config['timeout'] = 6000 " 1000 ~ 10s, for large elf like linux kernel
-
     function! TermdebugWrapper(...) abort
         if !exists(':TermdebugCommand')
             packadd termdebug
