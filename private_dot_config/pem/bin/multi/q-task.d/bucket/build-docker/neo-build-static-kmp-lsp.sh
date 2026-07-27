@@ -24,10 +24,22 @@ RUN git clone https://github.com/Hessesian/kmp-lsp.git .
 RUN . /root/.cargo/env && \
     cargo build --release --target x86_64-unknown-linux-musl --bin kmp-lsp
 
+# Build kmp-jar-indexer sidecar (GraalVM native-image)
+FROM ghcr.io/graalvm/graalvm-community:21 AS sidecar
+
+RUN microdnf install -y git && microdnf clean all
+
+WORKDIR /build
+RUN git clone https://github.com/Hessesian/kmp-lsp.git .
+
+WORKDIR /build/java-sidecar
+RUN ./gradlew nativeCompile
+
 # Final stage for minimal operations
 FROM alpine:3.18
 COPY --from=builder /build/target/x86_64-unknown-linux-musl/release/kmp-lsp /kmp-lsp
-ENTRYPOINT ["/bin/sh", "-c", "cp /kmp-lsp /w/kmp-lsp && chown \$UID:\$GID /w/kmp-lsp && chmod +x /w/kmp-lsp"]
+COPY --from=sidecar /build/java-sidecar/build/native/nativeCompile/kmp-jar-indexer /kmp-jar-indexer
+ENTRYPOINT ["/bin/sh", "-c", "cp /kmp-lsp /w/kmp-lsp && cp /kmp-jar-indexer /w/kmp-jar-indexer && chown \$UID:\$GID /w/kmp-lsp /w/kmp-jar-indexer && chmod +x /w/kmp-lsp /w/kmp-jar-indexer"]
 EOF
 
 # Run the container to copy the binary to host
