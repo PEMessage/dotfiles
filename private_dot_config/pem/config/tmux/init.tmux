@@ -58,9 +58,12 @@
 # --------------------------------
     # misc map
     # ----------------------------
-    if-shell 'test -e ~/.tmux.conf' \
+    if-shell "test -e ~/.tmux.conf" \
     'bind r source-file ~/.tmux.conf \; display "Reload!"' \
     'bind r source-file ~/.config/tmux/tmux.conf \; display "Reload!"'
+    # if-shell 'test -e ~/.tmux.conf' \
+    # 'bind r source-file ~/.tmux.conf \; display "Reload!"' \
+    # 'bind r source-file ~/.config/tmux/tmux.conf \; display "Reload!"'
 
     bind R move-window -r \; display-message "Windows renumbered"
 
