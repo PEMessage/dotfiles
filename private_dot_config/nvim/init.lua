@@ -216,6 +216,13 @@ local section = function ()
         " packadd nvim.tohtml
     ]]
 
+    vim.filetype.add({
+        extension = {
+            tmux = 'tmux',
+            hexpat = 'imhex',
+        }
+    })
+
 end
 section()
 
@@ -2711,6 +2718,7 @@ require("lazy").setup({
                 "gopls",
                 "bashls",
                 "kotlin_language_server",
+                -- "kotlin_lsp",
                 -- "ts_ls",
                 "tsgo",
                 -- "kotlin_lsp", -- See: https://github.com/desugar-64/kotlin-lsp-workspace-generator for android
@@ -2835,6 +2843,23 @@ require("lazy").setup({
                     'settings.gradle.kts'
                 }
             })
+
+            vim.lsp.config("kmp_lsp", {
+                cmd = { 'kmp-lsp' },
+
+                filetypes = { 'kotlin', 'java', 'swift' },
+                root_markers = {
+                    'build.gradle',
+                    'build.gradle.kts',
+                    'pom.xml',
+                    'settings.gradle',
+                    'Package.swift',
+                    '.git',
+                },
+                settings = {},
+            })
+            -- vim.lsp.enable('kmp_lsp')
+
             vim.lsp.config("pylsp", {
                 inlay_hints = { enabled = true },
                 settings = {
@@ -4376,12 +4401,13 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
-vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-    pattern = "*.hexpat",
-    callback = function()
-        vim.bo.filetype = "imhex"
-    end,
-})
+-- vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+--     pattern = "*.hexpat",
+--     callback = function()
+--         vim.bo.filetype = "imhex"
+--     end,
+-- })
+
 
 -- 7.1 Vim Function Zone(I just tired)
 -- ===========================================

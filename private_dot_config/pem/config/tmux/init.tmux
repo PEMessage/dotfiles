@@ -106,6 +106,11 @@
     bind -n C-M-p command-prompt # maybe this is safe?
 
 
+    # Thanks to https://www.reddit.com/r/commandline/comments/8wv0w6/interactively_moving_panes_to_other_windows/?tl=zh-hans
+    bind-key M choose-tree -Zw "join-pane -t '%%'"
+    bind-key C-m choose-tree -Zs "join-pane -t '%%'"
+
+
     # Credit: https://stackoverflow.com/questions/12524308/bash-strip-trailing-linebreak-from-output
 
     bind -n M-I \
