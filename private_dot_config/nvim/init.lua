@@ -2717,8 +2717,6 @@ require("lazy").setup({
                 -- "pylsp",
                 "gopls",
                 "bashls",
-                "kotlin_language_server",
-                -- "kotlin_lsp",
                 -- "ts_ls",
                 "tsgo",
                 -- "kotlin_lsp", -- See: https://github.com/desugar-64/kotlin-lsp-workspace-generator for android
@@ -2772,6 +2770,29 @@ require("lazy").setup({
             -- enable gopls automatically even if not install from mason
             -- if we type this manually, we might need a `edit %` to make lsp work
             vim.lsp.enable('gopls')
+
+            -- vim.lsp.config("kotlin_lsp", {
+            --     cmd = {
+            --         "faketime",
+            --         "2026-07-24",
+            --         "intellij-server",
+            --         "--stdio"
+            --     }
+            -- })
+            vim.lsp.config("kmp_lsp" , {
+                cmd = { 'kmp-lsp' },
+                filetypes = { 'kotlin', 'java', 'swift' },
+                root_markers = {
+                    'build.gradle',
+                    'build.gradle.kts',
+                    'pom.xml',
+                    'settings.gradle',
+                    'settings.gradle.kts',
+                    'Package.swift',
+                    '.git',
+                },
+            })
+            vim.lsp.enable('kmp_lsp')
 
             vim.lsp.config('clice', {
                 filetypes = { 'c', 'cpp' },
@@ -2829,36 +2850,6 @@ require("lazy").setup({
                 end,
             })
 
-            vim.lsp.config("kotlin_lsp", {
-                inlay_hints = { enabled = true },
-                root_markers = {
-                    'workspace.json', -- Used to integrate your own build system
-                    'settings.gradle.kts'
-                }
-            })
-
-            vim.lsp.config("kotlin_language_server", {
-                inlay_hints = { enabled = true },
-                root_markers = {
-                    'settings.gradle.kts'
-                }
-            })
-
-            vim.lsp.config("kmp_lsp", {
-                cmd = { 'kmp-lsp' },
-
-                filetypes = { 'kotlin', 'java', 'swift' },
-                root_markers = {
-                    'build.gradle',
-                    'build.gradle.kts',
-                    'pom.xml',
-                    'settings.gradle',
-                    'Package.swift',
-                    '.git',
-                },
-                settings = {},
-            })
-            -- vim.lsp.enable('kmp_lsp')
 
             vim.lsp.config("pylsp", {
                 inlay_hints = { enabled = true },
@@ -3231,6 +3222,90 @@ require("lazy").setup({
         'DrKJeff16/wezterm-types',
         version = false, -- Get the latest version
     },
+    {
+        "AlexandrosAlexiou/kotlin.nvim",
+        ft = { "kotlin" },
+        enabled = false,
+        dependencies = {
+            "mason.nvim",
+            "mason-lspconfig.nvim",
+            "oil.nvim",
+            "trouble.nvim",
+            -- nvim-dap is NOT a kotlin.nvim dependency. Install and configure it
+            -- separately (signs, keymaps, optionally nvim-dap-ui). kotlin.nvim only
+            -- registers a `kotlin` adapter and the `:KotlinDebug` command on top.
+            -- See the "Debugging Support" section below for details.
+        },
+        config = function()
+            require("kotlin").setup {
+                -- Optional: Specify root markers for multi-module projects
+                -- Default: { "build.gradle", "build.gradle.kts", "pom.xml", "mvnw" }
+                root_markers = {
+                    "gradlew",
+                    ".git",
+                    "mvnw",
+                    "settings.gradle",
+                },
+
+                -- Optional: JDK for symbol resolution (analyzing your Kotlin code)
+                -- This is the JDK that your project code will be analyzed against
+                -- (the server itself runs on bin/intellij-server's bundled JBR)
+                -- Required for: Analyzing JDK APIs, standard library symbols, platform types
+                --
+                -- Usually should match your project's target JDK version
+                -- Examples:
+                --   macOS:   "/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home"
+                --   Linux:   "/usr/lib/jvm/java-17-openjdk"
+                --   Windows: "C:\\Program Files\\Java\\jdk-17"
+                --   SDKMAN:  os.getenv("HOME") .. "/.sdkman/candidates/java/17.0.8-tem"
+                jdk_for_symbol_resolution = nil,  -- Auto-detect from project
+
+                -- Optional: Specify additional JVM arguments for the kotlin-lsp server
+                jvm_args = {
+                    "-Xmx4g",  -- Increase max heap (useful for large projects)
+                },
+
+                -- Optional: Configure inlay hints (requires kotlin-lsp v261+)
+                -- All settings default to true, set to false to disable specific hints
+                inlay_hints = {
+                    enabled = true,  -- Enable inlay hints (auto-enable on LSP attach)
+                    parameters = true,  -- Show parameter names
+                    parameters_compiled = true,  -- Show compiled parameter names
+                    parameters_excluded = false,  -- Show excluded parameter names
+                    types_property = true,  -- Show property types
+                    types_variable = true,  -- Show local variable types
+                    function_return = true,  -- Show function return types
+                    function_parameter = true,  -- Show function parameter types
+                    lambda_return = true,  -- Show lambda return types
+                    lambda_receivers_parameters = true,  -- Show lambda receivers/parameters
+                    value_ranges = true,  -- Show value ranges
+                    kotlin_time = true,  -- Show kotlin.time warnings
+                },
+
+                -- Optional: LSP-driven folding (requires kotlin-lsp v262.4739.0+)
+                -- Enabled by default; set folding.enabled = false to opt out.
+                folding = { enabled = true },
+
+                -- Optional: build-importer preference (requires kotlin-lsp v262.4739.0+)
+                -- Mirrors the VSCode `intellij.buildTool` setting:
+                --   nil = let the server pick (default)
+                --   "gradle" or "maven" = force a specific importer
+                --   ""    = none (single-file / no build system)
+                -- build_tool = "gradle",
+
+                -- Optional: file templates for new Kotlin files (requires kotlin-lsp v262.4739.0+)
+                -- When you create a new .kt file the plugin asks the server to interpolate the
+                -- chosen template. Pass a table of name → Velocity template to override the
+                -- defaults (Class, File, Interface, Data Class, Enum, Annotation, Object).
+                -- Set { enabled = false } on the table to disable the prompt entirely.
+                -- file_templates = {
+                --     enabled = true,
+                --     -- Class = "package ${PACKAGE_NAME}\n\nclass ${NAME} {\n\t|\n}",
+                -- },
+            }
+        end,
+    },
+
     -- -------------------------------------------
     -- 5.9 DAP Plug
     -- -------------------------------------------
