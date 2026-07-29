@@ -9,7 +9,6 @@ import os
 import re
 import sys
 import argparse
-import tempfile
 from pathlib import Path
 from typing import Optional
 
@@ -141,6 +140,120 @@ async def _drain_stderr(stderr: Optional[asyncio.StreamReader]) -> None:
 
 # ── Main export routine ────────────────────────────────────────────────
 
+async def _wait_progress_done(
+    writer: asyncio.StreamWriter,
+    reader: asyncio.StreamReader,
+    settle_s: float = 3.0,
+    max_wait_s: float = 300.0,
+) -> None:
+    """
+    Read LSP messages until no $/progress activity settles for settle_s seconds.
+
+    Responds to window/workDoneProgress/create server requests so the server
+    can send $/progress notifications. Displays live progress bars or spinners
+    à la Neovim's LSP progress display.
+    """
+    _SPINNER = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+
+    tokens: dict[str, None] = {}
+    _progress_info: dict[str, dict] = {}
+    last_progress_at = asyncio.get_event_loop().time()
+    spin_idx = 0
+
+    def _fmt_line(info: dict) -> str:
+        """Format one progress line: spinner + bar-or-text."""
+        spin = _SPINNER[spin_idx % len(_SPINNER)]
+        title = info.get("title", "")
+        message = info.get("message", "")
+        pct = info.get("percentage", -1)
+
+        label = message or title
+        if pct > 0:
+            w = 20
+            filled = int(w * pct / 100)
+            bar = "[" + "=" * filled + "-" * (w - filled) + f"] {pct:>3}%"
+            return f"  {spin} {bar}  {label}"
+        else:
+            return f"  {spin} {label}"
+
+    def _render():
+        nonlocal spin_idx
+        spin_idx += 1
+        lines = [_fmt_line(info) for tok in tokens
+                 if (info := _progress_info.get(tok))]
+        if lines:
+            print("\033[K" + "\n".join(lines), flush=True)
+            print(f"\033[{len(lines)}A", end="", flush=True)
+
+    while True:
+        try:
+            msg = await asyncio.wait_for(lsp_read(reader), timeout=min(settle_s, 2.0))
+        except asyncio.TimeoutError:
+            msg = None
+
+        now = asyncio.get_event_loop().time()
+        idle = now - last_progress_at
+
+        if msg is None:
+            if not tokens and idle >= settle_s:
+                print("\033[K", end="", flush=True)
+                return
+            continue
+
+        method = msg.get("method", "")
+
+        if method == "window/workDoneProgress/create":
+            req_id = msg.get("id")
+            lsp_write(writer, {"jsonrpc": "2.0", "id": req_id, "result": None})
+            await writer.drain()
+            continue
+
+        if method == "$/progress":
+            params = msg.get("params", {})
+            token_str = str(params.get("token", ""))
+            value = params.get("value", {})
+            kind = value.get("kind")
+
+            if kind == "begin":
+                tokens[token_str] = None
+                _progress_info[token_str] = {
+                    "title": value.get("title", ""),
+                    "message": value.get("message", ""),
+                    "percentage": 0,
+                }
+                last_progress_at = now
+                _render()
+
+            elif kind == "report":
+                if token_str in _progress_info:
+                    info = _progress_info[token_str]
+                    if "percentage" in value:
+                        info["percentage"] = value["percentage"]
+                    if "message" in value:
+                        info["message"] = value["message"]
+                    last_progress_at = now
+                    _render()
+
+            elif kind == "end":
+                tokens.pop(token_str, None)
+                _progress_info.pop(token_str, None)
+                last_progress_at = now
+                _render()
+
+            continue
+
+        if method in ("window/showMessage", "window/logMessage"):
+            params = msg.get("params", {})
+            mtype = {1: "ERR", 2: "WRN", 3: "INFO", 4: "LOG"}.get(
+                params.get("type", 4), "MSG")
+            print(f"  [{mtype}] {params.get('message', '')}", flush=True)
+            continue
+
+        if now - last_progress_at > max_wait_s:
+            print("\n  reached maximum wait, continuing anyway", flush=True)
+            return
+
+
 async def export_workspace(
     project_dir: str,
     server_path: Optional[str] = None,
@@ -161,18 +274,17 @@ async def export_workspace(
         sys.exit(1)
 
     project_dir = os.path.abspath(project_dir)
-
-    if system_path is None:
-        system_path = tempfile.mkdtemp(prefix="kotlin-lsp-")
-
     root_uri = Path(project_dir).as_uri()
 
     print(f"server  : {server_path}")
     print(f"project : {project_dir}")
-    print(f"system  : {system_path}")
+    if system_path:
+        print(f"system  : {system_path}")
     print()
 
-    cmd = [server_path, "--stdio", f"--system-path={system_path}"]
+    cmd = [server_path, "--stdio"]
+    if system_path:
+        cmd.append(f"--system-path={system_path}")
     proc = await asyncio.create_subprocess_exec(
         *cmd,
         stdin=asyncio.subprocess.PIPE,
@@ -191,7 +303,11 @@ async def export_workspace(
             "processId": os.getpid(),
             "rootUri": root_uri,
             "workspaceFolders": [{"uri": root_uri, "name": os.path.basename(project_dir)}],
-            "capabilities": {},
+            "capabilities": {
+                "window": {
+                    "workDoneProgress": True,
+                },
+            },
             "initializationOptions": {},
         }, msg_id=1, timeout=60.0)
 
@@ -203,7 +319,13 @@ async def export_workspace(
         print(f"  connected → {info.get('name', 'kotlin-lsp')} {info.get('version', '')}")
         print()
 
-        await asyncio.sleep(30.0)  # let the Gradle import run
+        # 2 ── Send initialized + wait for Gradle import to finish
+        print("[2/4] waiting for Gradle import …", flush=True)
+        await lsp_notify(writer, "initialized", {})
+
+        await _wait_progress_done(writer, reader, settle_s=3.0, max_wait_s=300.0)
+        print("  import finished.")
+        print()
 
         # 3 ── Execute exportWorkspace
         print("[3/4] workspace/executeCommand exportWorkspace …", flush=True)
@@ -216,7 +338,12 @@ async def export_workspace(
             print(f"  error: {json.dumps(export_resp['error'], indent=2)}", file=sys.stderr)
             sys.exit(1)
 
-        print(f"  result: {json.dumps(export_resp.get('result'), indent=2)}")
+        result = export_resp.get("result")
+        if result and result.get("status") == "OK":
+            print(f"  OK", flush=True)
+        else:
+            print(f"  result: {json.dumps(result, indent=2)}")
+
         ws_file = os.path.join(project_dir, "workspace.json")
         if os.path.isfile(ws_file):
             print(f"  file  : {ws_file}  ({os.path.getsize(ws_file):,} bytes)")
@@ -258,7 +385,8 @@ def main():
     )
     parser.add_argument(
         "--system-path",
-        help="System data dir for kotlin-lsp (default: temp dir)",
+        default=None,
+        help="System data dir for kotlin-lsp",
     )
     args = parser.parse_args()
     asyncio.run(export_workspace(
