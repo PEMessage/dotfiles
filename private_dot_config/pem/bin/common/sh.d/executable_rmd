@@ -1,0 +1,64 @@
+#!/usr/bin/awk -f
+#
+# Thanks to: https://gist.github.com/schulzh/a7f75e92a5edd15139e8ce6b5dbd46cd
+
+BEGIN {
+    # Color
+    reset       = "\033[0m"
+    bold        = "\033[1m"
+    dim         = "\033[2m"
+    code_color  = "\033[38;5;208m"   # Origin
+    title_color = "\033[1;36m"       # Cyan + Bold
+    list_color  = "\033[1;32m"       # Green + Bold
+    in_code     = 0
+}
+
+# Inline code
+function style_inline(s,    out, m, before) {
+    out = ""
+    while (match(s, /`[^`]+`/) > 0) {
+        before = substr(s, 1, RSTART - 1)
+        m      = substr(s, RSTART , RLENGTH)
+        s      = substr(s, RSTART + RLENGTH)
+        out = out before code_color m reset
+    }
+    return out s
+}
+
+{
+    line = $0
+
+    # 1) code block
+    if (line ~ /^[[:space:]]*```/) {
+        in_code = !in_code
+        printf "%s%s%s\n", dim, line, reset
+        next
+    }
+    if (in_code) {
+        printf "%s%s%s\n", dim, line, reset
+        next
+    }
+
+    # 2) Title
+    if (line ~ /^#{1,6} /) {
+        printf "%s%s%s\n", title_color, line, reset
+        next
+    }
+
+    # 3) List (Keep indent and color)
+    if (match(line, /^[[:space:]]*([-*+]|[0-9]+\.) /)) {
+        marker = substr(line, RSTART, RLENGTH)
+        rest   = substr(line, RSTART + RLENGTH)
+        printf "%s%s%s%s\n", list_color, marker, reset, style_inline(rest)
+        next
+    }
+
+    # 4) Reference
+    if (line ~ /^[[:space:]]*> /) {
+        printf "%s%s%s\n", dim, line, reset
+        next
+    }
+
+    # 5) Text
+    print style_inline(line)
+}
