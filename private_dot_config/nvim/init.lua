@@ -2719,7 +2719,8 @@ require("lazy").setup({
                 "bashls",
                 -- "ts_ls",
                 "tsgo",
-                -- "kotlin_lsp", -- See: https://github.com/desugar-64/kotlin-lsp-workspace-generator for android
+                -- See: https://github.com/desugar-64/kotlin-lsp-workspace-generator for android
+                -- "kotlin_lsp",  -- leave it to kotlin.nvim
                 -- "jdtls" -- leave it to nvim-jdtls
                 -- "java_language_server",
                 "glsl_analyzer",
@@ -2792,7 +2793,7 @@ require("lazy").setup({
                     '.git',
                 },
             })
-            vim.lsp.enable('kmp_lsp')
+            -- vim.lsp.enable('kmp_lsp')
 
             vim.lsp.config('clice', {
                 filetypes = { 'c', 'cpp' },
@@ -3019,7 +3020,6 @@ require("lazy").setup({
     },
     {
         'mfussenegger/nvim-jdtls',
-        enabled = true,
         version = false, -- set this if you want to always pull the latest change
         ft = { "java" }, -- THIS IS KEY, if not this, everything will broken
         -- UPDATE: this will cause jump to class not work as expect, but other function will do work
@@ -3225,7 +3225,7 @@ require("lazy").setup({
     {
         "AlexandrosAlexiou/kotlin.nvim",
         ft = { "kotlin" },
-        enabled = false,
+        enabled = true,
         dependencies = {
             "mason.nvim",
             "mason-lspconfig.nvim",
