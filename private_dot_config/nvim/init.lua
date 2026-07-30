@@ -981,7 +981,7 @@ require("lazy").setup({
     },
     {
         -- TLDR: using 'gc' for line comment, 'gb' for block comment
-        'numToStr/Comment.nvim',
+        'PEMessage/Comment.nvim',
         enabled = true,
         opts = {}
     },
@@ -1800,6 +1800,7 @@ require("lazy").setup({
                     ['initializer_list'] = actions.toggle_multiline(), -- cpp
                     ['parameter_list'] = actions.toggle_multiline(), -- cpp
                     ['attrset_expression'] = actions.toggle_multiline(), -- nix
+                    ['function_value_parameters'] = actions.toggle_multiline(), -- kotlin
                 },
             }
         end,
@@ -3019,7 +3020,7 @@ require("lazy").setup({
         }
     },
     {
-        'mfussenegger/nvim-jdtls',
+        'PEMessage/nvim-jdtls',
         version = false, -- set this if you want to always pull the latest change
         ft = { "java" }, -- THIS IS KEY, if not this, everything will broken
         -- UPDATE: this will cause jump to class not work as expect, but other function will do work
@@ -3035,6 +3036,13 @@ require("lazy").setup({
         --     root_dir = vim.fs.dirname(vim.fs.find({'gradlew', '.git', 'mvnw', '.root'}, { upward = true })[1]),
         -- },
         config = function ()
+            local all_clients = vim.lsp.get_clients()
+            for _, client in ipairs(all_clients) do
+                if client.name == "kotlin_language_server" or client.name == "kotlin_lsp" then
+                    return
+                end
+            end
+
             -- See: https://zhuanlan.zhihu.com/p/574746992
             -- And: https://github.com/redhat-developer/vscode-java/wiki/JDK-Requirements#java.configuration.runtimes
             ---@diagnostic disable-next-line: unused-function
@@ -3198,6 +3206,7 @@ require("lazy").setup({
                     if string.match(current_file, "/tmp/kotlinlangserver") then
                         return
                     end
+
                     require("jdtls").start_or_attach(opts)
 				end,
 			})
@@ -3265,21 +3274,8 @@ require("lazy").setup({
                     "-Xmx4g",  -- Increase max heap (useful for large projects)
                 },
 
-                -- Optional: Configure inlay hints (requires kotlin-lsp v261+)
-                -- All settings default to true, set to false to disable specific hints
                 inlay_hints = {
-                    enabled = true,  -- Enable inlay hints (auto-enable on LSP attach)
-                    parameters = true,  -- Show parameter names
-                    parameters_compiled = true,  -- Show compiled parameter names
-                    parameters_excluded = false,  -- Show excluded parameter names
-                    types_property = true,  -- Show property types
-                    types_variable = true,  -- Show local variable types
-                    function_return = true,  -- Show function return types
-                    function_parameter = true,  -- Show function parameter types
-                    lambda_return = true,  -- Show lambda return types
-                    lambda_receivers_parameters = true,  -- Show lambda receivers/parameters
-                    value_ranges = true,  -- Show value ranges
-                    kotlin_time = true,  -- Show kotlin.time warnings
+                    enabled = true,  -- Auto-enable on LSP attach
                 },
 
                 -- Optional: LSP-driven folding (requires kotlin-lsp v262.4739.0+)
@@ -4276,6 +4272,7 @@ local section = function ()
 
     vim.api.nvim_create_user_command('InlayHintToggle', PE.ToggleInlayHint, {});
     vim.api.nvim_create_user_command('ToggleInlayHint', PE.ToggleInlayHint, {});
+    vim.keymap.set('n', '<leader>`i' , 'InlayHintToggle' , { desc = 'Toggle Highlight' } )
 
     -- vim.keymap.set('n', '<leader>q', [[:vimgrep /<C-r>// %<CR>]], { desc = "vimgrep @/" })
     vim.keymap.set('n', '<leader>q', function()
