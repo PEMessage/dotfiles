@@ -214,6 +214,39 @@
     # Register lazy_fzf_completion (ctrl-f to search zle)
     bindkey '^x' lazy_fzf_completion
 
+    # Source - https://superuser.com/a/1309966
+    # Posted by ZeroKnight, modified by community. See post 'Timeline' for change history
+    # Retrieved 2026-08-06, License - CC BY-SA 3.0
+    setopt ignore_eof
+    IGNOREEOF=1
+    # Emulate Bash $IGNOREEOF behavior
+    noop() { }
+    zle -N noop
+    bash-ctrl-d() {
+        if ! [[ $CURSOR == 0 && -z $BUFFER ]] then
+            zle delete-char-or-list
+            return
+        fi
+        [[ -z $IGNOREEOF || $IGNOREEOF == 0 ]] && exit
+
+        if [[ $LASTWIDGET == bash-ctrl-d  ]] then
+            (( --__BASH_IGNORE_EOF <= 0 )) && exit
+        else
+            printf "\nPress Ctrl-D again to exit..."
+            (( __BASH_IGNORE_EOF = IGNOREEOF - 1 ))
+            # no op to avoid bell
+            zle noop
+        fi
+    }
+
+    zle -N bash-ctrl-d
+    bindkey '^D' bash-ctrl-d
+
+
+    # Debugger
+    # show_last() { echo $LASTWIDGET; }
+    # zle -N show_last
+    # bindkey '^L' show_last  # 绑定到某键
 
 
 # -----------------------------------------
