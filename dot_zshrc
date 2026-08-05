@@ -229,6 +229,11 @@
     # source ~/.config/pem/shell/fzf/fzf-ff.sh
     # source ~/.config/pem/shell/vless/vless.sh
 # -----------------------------------------
+# compdef alias
+# -----------------------------------------
+    compdef q-gcc=gcc
+
+# -----------------------------------------
 # lazy load compdef file(self included)
 # -----------------------------------------
     if [[ -n "$commands[uv]" ]]; then
