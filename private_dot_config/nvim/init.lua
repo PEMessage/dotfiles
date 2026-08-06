@@ -1195,6 +1195,12 @@ require("lazy").setup({
         'tpope/vim-unimpaired',
     },
     {
+        'mfussenegger/nvim-overfly',
+        dependencies = {
+            "mfussenegger/nvim-qwahl",
+        },
+    },
+    {
         'PEMessage/vim-strip-trailing-whitespace',
         event = {'InsertEnter', 'BufEnter'}
     },
@@ -4018,21 +4024,6 @@ local section = function ()
     -- terminal
     vim.keymap.set('t', '<M-q>', '<C-\\><C-n>', { noremap = true, silent = true })
 
-    vim.api.nvim_create_autocmd('TermOpen', {
-        pattern = '*',
-        callback = function()
-            local buf = vim.api.nvim_get_current_buf()
-
-            -- Buffer-local normal mode mapping to re-enter insert mode
-            vim.keymap.set('n', '<M-q>', 'i', {
-                buffer = buf,
-                noremap = true,
-                silent = true
-            })
-        end
-    })
-
-
     -- Lsp
     -- Format entire document (Normal mode)
     -- Recommand using `gq` (vim native) to call formatexpr or formatprg
@@ -4050,140 +4041,8 @@ local section = function ()
     -- end, { desc = 'Format selected range' })
 
 
-    -- Improve from official
-    -- https://github.com/neovim/neovim/blob/c18373d9b82d1fabc1f93f3ac1a6f04ed5bc724e/runtime/lua/vim/_core/defaults.lua#L60
-    local function _visual_search(mode, forward)
-        assert(mode == "replace" or mode == "append")
-        assert( forward == 0 or forward == 1 or forward == 2) -- 1: forward, 0: backward, 2: inplace
-
-        -- 1. 获取可视区域选中的文本（自动处理跨行）
-        local pos = vim.fn.getpos('.')
-        local vpos = vim.fn.getpos('v')
-        local visual_mode = vim.fn.mode()
-        local chunks = vim.fn.getregion(pos, vpos, { type = visual_mode })
-        local esc_chunks = vim.iter(chunks):map(function(v)
-            return vim.fn.escape(v, [[\]])  -- 转义正则元字符
-        end):totable()
-        local esc_pat = table.concat(esc_chunks, [[\n]])
-
-        if #esc_pat == 0 then
-            vim.api.nvim_echo({ { 'E348: No string under cursor' } }, true, { err = true })
-            return '<Esc>'
-        end
-
-        -- 2. 根据模式构造最终搜索模式
-        local new_search
-        if mode == "replace" then
-            new_search = [[\V]] .. esc_pat
-        else  -- append
-            local prev_search = vim.fn.getreg('/')
-            if prev_search == nil or prev_search == "" then
-                new_search = [[\V]] .. esc_pat
-            else
-                new_search = prev_search .. [[\|]] .. [[\V]] .. esc_pat
-            end
-        end
-
-        vim.fn.setreg('/', new_search)
-        vim.fn.histadd('/', new_search)
 
 
-        if forward == 2 then
-            vim.v.searchforward = 1
-        else
-            vim.v.searchforward = forward
-        end
-
-        local count = vim.v.count1
-        if forward == 0 then
-            local _, line, col, _ = unpack(pos)
-            local _, vline, vcol, _ = unpack(vpos)
-            if
-                line > vline
-                or visual_mode == 'v' and line == vline and col > vcol
-                or visual_mode == 'V' and col ~= 1
-                or visual_mode == '\22' and col > vcol
-            then
-                count = count + 1
-            end
-        end
-        if forward ~= 2 then
-            return '<Esc>' .. count .. 'n'
-        else
-            vim.cmd [[ set hls ]]
-            return '<Esc>'
-        end
-    end
-    vim.keymap.set('x', '*', function() return _visual_search("replace", 2) end,
-        { desc = 'Search forward for selection (replace)', expr = true })
-
-    vim.keymap.set('x', '#', function() return _visual_search("replace", 0) end,
-        { desc = 'Search backward for selection (replace)', expr = true })
-
-    vim.keymap.set('x', '&', function() return _visual_search("append", 2) end,
-        { desc = 'Append selection to current search pattern (OR) and search forward', expr = true })
-
-
-    vim.api.nvim_create_autocmd('LspAttach', {
-        group = vim.api.nvim_create_augroup('LspCustomKeyMaps', {}),
-        callback = function(args)
-            local client = vim.lsp.get_client_by_id(args.data.client_id)
-
-            local bufnr = args.buf
-
-            vim.keymap.set('n', '<F2>', vim.lsp.buf.rename,
-                { silent = true, noremap = true, buffer = bufnr, desc = 'Rename' }
-            )
-
-            vim.keymap.set('n', 'gk', vim.lsp.buf.code_action,
-                { silent = true, noremap = true, buffer = bufnr, desc = 'Code Action' }
-            )
-            vim.keymap.set('x', 'gk', vim.lsp.buf.code_action,
-                { silent = true, noremap = true, buffer = bufnr, desc = 'Range Code Action' }
-            )
-
-            vim.keymap.set("n", "gd", '<c-]>',
-                -- vim.lsp.buf.definition will cause error when meet swapfile
-                { silent = true, noremap = true, buffer = bufnr, desc = 'Goto Definition' }
-            )
-            vim.keymap.set("n", "gr", vim.lsp.buf.references,
-                { silent = true, noremap = true, buffer = bufnr, nowait = true, desc = 'Goto Reference' }
-            )
-
-            vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition,
-                { desc = 'Go to Declaration' }
-            )
-
-            vim.keymap.set('n', 'gD', vim.lsp.buf.declaration,
-                { desc = 'Go to Declaration' }
-            )
-            if client and client.name == 'clangd' then
-                vim.keymap.set('n', '<m-h>', '<cmd>LspClangdSwitchSourceHeader<cr>', { silent = true, noremap = true, buffer = bufnr })
-            end
-
-            -- Thanks to: https://github.com/sangoX35X/dotfiles/blob/7aa159668f476f4428422353f48a21fc26797dc4/nvim/lua/plugin/lsp.lua#L126
-            ---@diagnostic disable-next-line: param-type-mismatch
-            if client and client:supports_method('textDocument/typeHierarchy', bufnr) then
-                vim.api.nvim_create_user_command('LspTypeHierarchy',
-                    function(opts)
-                        local direction = opts.args or 'subtypes'
-                        if direction == 'subtypes' or direction == 'supertypes' then
-                            vim.lsp.buf.typehierarchy(direction)
-                        else
-                            vim.notify('LspTypeHierarchy: argument must be "subtypes" or "supertypes"', vim.log.levels.ERROR)
-                        end
-                    end,
-                    {
-                        nargs = '?',
-                        complete = function()
-                            return { 'subtypes', 'supertypes' }
-                        end,
-                        desc = 'Show type hierarchy (subtypes|supertypes)'
-                    }
-                )
-            end
-        end,
-    })
 
     -- -------------------------------------------
     -- 6.2 Leader Keymap
@@ -4210,26 +4069,6 @@ local section = function ()
 
 
 
-    -- Also see @Line-Number
-    vim.keymap.set("n", "<leader>nu",
-        function() M.toggle_opts("number") end,
-        { desc = "Toggle Line Numbers" })
-    vim.keymap.set("n", "<leader>nr",
-        function() M.toggle_opts("relativenumber") end,
-        { desc = "Toggle Relative Numbers" })
-
-    vim.keymap.set('n', '<leader>`d',
-        function() M.toggle_diagnostics() end,
-        { noremap = true, silent = true , desc = "Toggle diagnostic" })
-
-    vim.keymap.set("n", "<leader>wp",
-        function() M.toggle_opts("wrap") end,
-        { desc = "Toggle Word Wrap" })
-
-    vim.keymap.set('n', '<leader>`i',
-        function() M.toggle_inlayhint() end,
-        { desc = 'Toggle Highlight' } )
-
     wk.add({
         { "<leader>t", group = "Tabe Options" },
     })
@@ -4246,6 +4085,14 @@ local section = function ()
 
     vim.keymap.set('n', '<leader>tw', '<cmd>IgnoreWhitespaceToggle<CR>')
 
+    -- vim.keymap.set('n', '<leader>q', [[:vimgrep /<C-r>// %<CR>]], { desc = "vimgrep @/" })
+    vim.keymap.set('n', '<leader>q', function()
+        local search_term = vim.fn.getreg('/')
+        local cmd = string.format("vimgrep /%s/j %%", search_term)
+        vim.fn.histadd("cmd", cmd)
+        vim.cmd(cmd)
+        vim.cmd("copen")
+    end, { desc = "vimgrep @/ (no jump, add to history)" })
 
     -- -------------------------------------------
     -- 6.3 command
@@ -4277,14 +4124,19 @@ local section = function ()
         end
     end, {})
 
-    -- vim.keymap.set('n', '<leader>q', [[:vimgrep /<C-r>// %<CR>]], { desc = "vimgrep @/" })
-    vim.keymap.set('n', '<leader>q', function()
-        local search_term = vim.fn.getreg('/')
-        local cmd = string.format("vimgrep /%s/j %%", search_term)
-        vim.fn.histadd("cmd", cmd)
-        vim.cmd(cmd)
-        vim.cmd("copen")
-    end, { desc = "vimgrep @/ (no jump, add to history)" })
+    vim.api.nvim_create_autocmd('TermOpen', {
+        pattern = '*',
+        callback = function()
+            local buf = vim.api.nvim_get_current_buf()
+
+            -- Buffer-local normal mode mapping to re-enter insert mode
+            vim.keymap.set('n', '<M-q>', 'i', {
+                buffer = buf,
+                noremap = true,
+                silent = true
+            })
+        end
+    })
 
     -- Thanks to: https://jdhao.github.io/2026/04/02/nvim-v012-release/?ref=dailydev
     vim.api.nvim_create_user_command("LspInfo", "checkhealth vim.lsp", {
@@ -4312,7 +4164,7 @@ end ; section()
 -- 7. Function Zone
 -- ===========================================
 
--- 7.1 AutoCmd
+-- 7.1.1 AutoCmd
 -- ===========================================
 vim.api.nvim_create_autocmd("FileType", {
     pattern = "qf",
@@ -4360,6 +4212,69 @@ vim.api.nvim_create_autocmd("FileType", {
 --     end,
 -- })
 
+-- 7.1.2 LspAttach
+-- ===========================================
+vim.api.nvim_create_autocmd('LspAttach', {
+    group = vim.api.nvim_create_augroup('LspCustomKeyMaps', {}),
+    callback = function(args)
+        local client = vim.lsp.get_client_by_id(args.data.client_id)
+
+        local bufnr = args.buf
+
+        vim.keymap.set('n', '<F2>', vim.lsp.buf.rename,
+            { silent = true, noremap = true, buffer = bufnr, desc = 'Rename' }
+        )
+
+        vim.keymap.set('n', 'gk', vim.lsp.buf.code_action,
+            { silent = true, noremap = true, buffer = bufnr, desc = 'Code Action' }
+        )
+        vim.keymap.set('x', 'gk', vim.lsp.buf.code_action,
+            { silent = true, noremap = true, buffer = bufnr, desc = 'Range Code Action' }
+        )
+
+        vim.keymap.set("n", "gd", '<c-]>',
+            -- vim.lsp.buf.definition will cause error when meet swapfile
+            { silent = true, noremap = true, buffer = bufnr, desc = 'Goto Definition' }
+        )
+        vim.keymap.set("n", "gr", vim.lsp.buf.references,
+            { silent = true, noremap = true, buffer = bufnr, nowait = true, desc = 'Goto Reference' }
+        )
+
+        vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition,
+            { desc = 'Go to Declaration' }
+        )
+
+        vim.keymap.set('n', 'gD', vim.lsp.buf.declaration,
+            { desc = 'Go to Declaration' }
+        )
+        if client and client.name == 'clangd' then
+            vim.keymap.set('n', '<m-h>', '<cmd>LspClangdSwitchSourceHeader<cr>', { silent = true, noremap = true, buffer = bufnr })
+        end
+
+        -- Thanks to: https://github.com/sangoX35X/dotfiles/blob/7aa159668f476f4428422353f48a21fc26797dc4/nvim/lua/plugin/lsp.lua#L126
+        ---@diagnostic disable-next-line: param-type-mismatch
+        if client and client:supports_method('textDocument/typeHierarchy', bufnr) then
+            vim.api.nvim_create_user_command('LspTypeHierarchy',
+                function(opts)
+                    local direction = opts.args or 'subtypes'
+                    if direction == 'subtypes' or direction == 'supertypes' then
+                        vim.lsp.buf.typehierarchy(direction)
+                    else
+                        vim.notify('LspTypeHierarchy: argument must be "subtypes" or "supertypes"', vim.log.levels.ERROR)
+                    end
+                end,
+                {
+                    nargs = '?',
+                    complete = function()
+                        return { 'subtypes', 'supertypes' }
+                    end,
+                    desc = 'Show type hierarchy (subtypes|supertypes)'
+                }
+            )
+        end
+    end,
+})
+
 -- 7.2 lua function
 -- ===========================================
 -- toggle_inlayhint
@@ -4371,6 +4286,9 @@ end
 
 vim.api.nvim_create_user_command('InlayHintToggle', M.toggle_inlayhint, {});
 vim.api.nvim_create_user_command('ToggleInlayHint', M.toggle_inlayhint, {});
+vim.keymap.set('n', '<leader>`i',
+    function() M.toggle_inlayhint() end,
+    { desc = 'Toggle Highlight' } )
 
 -- toggle_quickfix
 -- -------------------------------------------
@@ -4418,6 +4336,18 @@ function M.toggle_opts(option, silent, values)
     end
 end
 
+-- Also see @Line-Number
+vim.keymap.set("n", "<leader>nu",
+    function() M.toggle_opts("number") end,
+    { desc = "Toggle Line Numbers" })
+vim.keymap.set("n", "<leader>nr",
+    function() M.toggle_opts("relativenumber") end,
+    { desc = "Toggle Relative Numbers" })
+vim.keymap.set("n", "<leader>wp",
+    function() M.toggle_opts("wrap") end,
+    { desc = "Toggle Word Wrap" })
+
+
 -- toggle_diagnostics
 -- -------------------------------------------
 function M.toggle_diagnostics()
@@ -4428,6 +4358,9 @@ function M.toggle_diagnostics()
         vim.diagnostic.enable()
     end
 end
+vim.keymap.set('n', '<leader>`d',
+    function() M.toggle_diagnostics() end,
+    { noremap = true, silent = true , desc = "Toggle diagnostic" })
 
 
 -- man
@@ -4520,6 +4453,82 @@ function M.prev_diagnostic()
         count = -1,
     })
 end
+
+-- select visual
+-- -------------------------------------------
+
+-- Improve from official
+-- https://github.com/neovim/neovim/blob/c18373d9b82d1fabc1f93f3ac1a6f04ed5bc724e/runtime/lua/vim/_core/defaults.lua#L60
+function M.select_visual(mode, forward)
+    assert(mode == "replace" or mode == "append")
+    assert( forward == 0 or forward == 1 or forward == 2) -- 1: forward, 0: backward, 2: inplace
+
+    -- 1. 获取可视区域选中的文本（自动处理跨行）
+    local pos = vim.fn.getpos('.')
+    local vpos = vim.fn.getpos('v')
+    local visual_mode = vim.fn.mode()
+    local chunks = vim.fn.getregion(pos, vpos, { type = visual_mode })
+    local esc_chunks = vim.iter(chunks):map(function(v)
+        return vim.fn.escape(v, [[\]])  -- 转义正则元字符
+    end):totable()
+    local esc_pat = table.concat(esc_chunks, [[\n]])
+
+    if #esc_pat == 0 then
+        vim.api.nvim_echo({ { 'E348: No string under cursor' } }, true, { err = true })
+        return '<Esc>'
+    end
+
+    -- 2. 根据模式构造最终搜索模式
+    local new_search
+    if mode == "replace" then
+        new_search = [[\V]] .. esc_pat
+    else  -- append
+        local prev_search = vim.fn.getreg('/')
+        if prev_search == nil or prev_search == "" then
+            new_search = [[\V]] .. esc_pat
+        else
+            new_search = prev_search .. [[\|]] .. [[\V]] .. esc_pat
+        end
+    end
+
+    vim.fn.setreg('/', new_search)
+    vim.fn.histadd('/', new_search)
+
+
+    if forward == 2 then
+        vim.v.searchforward = 1
+    else
+        vim.v.searchforward = forward
+    end
+
+    local count = vim.v.count1
+    if forward == 0 then
+        local _, line, col, _ = unpack(pos)
+        local _, vline, vcol, _ = unpack(vpos)
+        if
+            line > vline
+            or visual_mode == 'v' and line == vline and col > vcol
+            or visual_mode == 'V' and col ~= 1
+            or visual_mode == '\22' and col > vcol
+        then
+            count = count + 1
+        end
+    end
+    if forward ~= 2 then
+        return '<Esc>' .. count .. 'n'
+    else
+        vim.cmd [[ set hls ]]
+        return '<Esc>'
+    end
+end
+vim.keymap.set('x', '*', function() return M.select_visual("replace", 2) end,
+    { desc = 'Search forward for selection (replace)', expr = true })
+
+vim.keymap.set('x', '#', function() return M.select_visual("replace", 0) end,
+    { desc = 'Search backward for selection (replace)', expr = true })
+
+vim.keymap.set('x', '&', function() return M.select_visual("append", 2) end,
+    { desc = 'Append selection to current search pattern (OR) and search forward', expr = true })
 
 
 -- 7.3 Vim Function Zone(I just tired)
