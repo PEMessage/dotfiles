@@ -17,6 +17,7 @@ PE.logo = {
     '   ██║     ███████╗██║ ╚═╝ ██║███████╗███████║███████║██║  ██║╚██████╔╝███████╗ ',
     '   ╚═╝     ╚══════╝╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝ ',
 }
+local M = PE
 
 -- 2. LazyNvim Auto Install
 -- ===========================================
@@ -613,7 +614,7 @@ require("lazy").setup({
         config = function ()
             local startify = require('alpha.themes.startify')
             startify.nvim_web_devicons.enabled = false
-            startify.section.header.val = PE.logo
+            startify.section.header.val = M.logo
             startify.section.header.opts.hl = "String"
 
             -- Thanks to:
@@ -3920,7 +3921,7 @@ require("lazy").setup({
 -- 6. KeyMap Zone
 -- ===========================================
 -- local wk = require('which-key')
-function PE.WkCheck()
+function M.check_wk()
     -- return require('which-key')
     local status, maywk = pcall(require, 'which-key')
     if status then
@@ -3932,7 +3933,7 @@ function PE.WkCheck()
         }
     end
 end
-local wk = PE.WkCheck()
+local wk = M.check_wk()
 ---@diagnostic disable-next-line: redefined-local
 local section = function ()
     -- -------------------------------------------
@@ -4002,6 +4003,9 @@ local section = function ()
         '`[' .. 'v' .. '`]',
         { desc = "Go to Previous Paste", noremap = true }
     )
+
+
+    vim.cmd [[ vnoremap tt :s/\s\+$//e<CR> ]]
 
     vim.keymap.set('n', ']d', function()
         vim.diagnostic.jump({ count = vim.v.count1, float = true })
@@ -4188,10 +4192,7 @@ local section = function ()
     vim.keymap.set('n', '<leader>rce' , '<cmd>tabe $MYVIMRC<CR>' , { desc = 'Edit MYVIMRC' } )
     vim.keymap.set('n', '<leader>``' , '<cmd>nohlsearch<CR>' , { desc = 'Close Highlight' } )
     -- vim.keymap.set('n', '<leader><leader>ga' , '<cmd>nohlsearch<CR>' , { desc = 'Close Highlight' } )
-
-    vim.keymap.set("n", "<leader>wp",
-        function() PE.ToggleOpts("wrap") end,
-        { desc = "Toggle Word Wrap" })
+    --
 
     vim.keymap.set('n', '<leader>ro', function()
         vim.opt.modifiable = true
@@ -4208,16 +4209,26 @@ local section = function ()
     end, { silent = true, desc = "Toggle readonly and set modifiable" })
 
 
+
     -- Also see @Line-Number
     vim.keymap.set("n", "<leader>nu",
-        function() PE.ToggleOpts("number") end,
+        function() M.toggle_opts("number") end,
         { desc = "Toggle Line Numbers" })
     vim.keymap.set("n", "<leader>nr",
-        function() PE.ToggleOpts("relativenumber") end,
+        function() M.toggle_opts("relativenumber") end,
         { desc = "Toggle Relative Numbers" })
 
-    -- vim.keymap.set('v','tt','<cmd>s/\\s\\+$//e<cr>',{ desc = 'Clean tail spaces'})
-    vim.cmd [[ vnoremap tt :s/\s\+$//e<CR> ]]
+    vim.keymap.set('n', '<leader>`d',
+        function() M.toggle_diagnostics() end,
+        { noremap = true, silent = true , desc = "Toggle diagnostic" })
+
+    vim.keymap.set("n", "<leader>wp",
+        function() M.toggle_opts("wrap") end,
+        { desc = "Toggle Word Wrap" })
+
+    vim.keymap.set('n', '<leader>`i',
+        function() M.toggle_inlayhint() end,
+        { desc = 'Toggle Highlight' } )
 
     wk.add({
         { "<leader>t", group = "Tabe Options" },
@@ -4229,20 +4240,22 @@ local section = function ()
     -- vim.keymap.set("v", "<leader>y",'"+y', { noremap = true, desc = "Copy to clipboard(Reg\")" })
 
 
+    vim.api.nvim_set_keymap('', '<Leader>y', 'y:<C-U>lua PE.yank(vim.fn.getreg("@0"))<CR>',
+        { noremap = false, silent = true, desc = "yank to 'yank'" })
+    -- vim.keymap.set("v", "<leader>y",'"+y', { noremap = true, desc = "Copy to clipboard(Reg\")" })
 
+    vim.keymap.set('n', '<leader>tw', '<cmd>IgnoreWhitespaceToggle<CR>')
+
+
+    -- -------------------------------------------
+    -- 6.3 command
+    -- -------------------------------------------
     -- Function to toggle diagnostics
-    function PE.ToggleDiagnostics()
-        local enabled = not vim.diagnostic.is_enabled()
-        if enabled then
-            vim.diagnostic.enable(false)
-        else
-            vim.diagnostic.enable()
-        end
-    end
-    vim.keymap.set('n', '<leader>`d', PE.ToggleDiagnostics, { noremap = true, silent = true , desc = "Toggle diagnostic" })
-
     vim.api.nvim_create_user_command('PEMouseON', function() vim.o.mouse = 'a' end, {})
     vim.api.nvim_create_user_command('PEMouseOFF', function() vim.o.mouse = '' end, {})
+
+    -- vim.keymap.set('v','tt','<cmd>s/\\s\\+$//e<cr>',{ desc = 'Clean tail spaces'})
+    vim.cmd [[ command! PCD :cd %:p:h ]]
 
     vim.api.nvim_create_user_command('IgnoreWhitespaceToggle', function()
         local current_diffopt = vim.o.diffopt
@@ -4263,16 +4276,6 @@ local section = function ()
             vim.cmd [[ edit % ]]
         end
     end, {})
-    vim.keymap.set('n', '<leader>tw', '<cmd>IgnoreWhitespaceToggle<CR>')
-
-    function PE.ToggleInlayHint()
-        vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
-        vim.notify("Now inlayhint is " ..  tostring(vim.lsp.inlay_hint.is_enabled()))
-    end
-
-    vim.api.nvim_create_user_command('InlayHintToggle', PE.ToggleInlayHint, {});
-    vim.api.nvim_create_user_command('ToggleInlayHint', PE.ToggleInlayHint, {});
-    vim.keymap.set('n', '<leader>`i' , 'InlayHintToggle' , { desc = 'Toggle Highlight' } )
 
     -- vim.keymap.set('n', '<leader>q', [[:vimgrep /<C-r>// %<CR>]], { desc = "vimgrep @/" })
     vim.keymap.set('n', '<leader>q', function()
@@ -4309,131 +4312,8 @@ end ; section()
 -- 7. Function Zone
 -- ===========================================
 
-
-function PE.ToggleOpts(option, silent, values)
-    local echo = function(str)
-        return vim.api.nvim_echo(
-            { {str , "Question"} }, -- {chunks}: A list of [text, hl_group]
-            false,                -- {history}:if true, add to |message-history|.
-            {}  -- {opts}: Optional parameters.
-        )
-    end
-    if values then
-        if vim.opt_local[option]:get() == values[1] then
-            vim.opt_local[option] = values[2]
-        else
-            vim.opt_local[option] = values[1]
-        end
-        return echo("Set " .. option .. " to " .. vim.opt_local[option]:get())
-    end
-    vim.opt_local[option] = not vim.opt_local[option]:get()
-    if not silent then
-        if vim.opt_local[option]:get() then
-            echo("Enabled " .. option)
-        else
-            echo("Disabled " .. option)
-        end
-    end
-end
-
-
-function PE.man()
-    require("telescope.builtin").man_pages({
-        sections={"ALL"},
-        attach_mappings = function(_, map)
-            map(
-                {'i'},
-                '<Enter>',
-                function(...)
-                    return require("telescope.actions").select_tab(...)
-                end
-            )
-            return true
-        end,
-    })
-    -- vim.cmd [[ wincmd w]]
-    -- vim.cmd [[ wincmd x]]
-end
-
-function PE.PrintTbl(tb)
-    local key = ""
-    function RecuPrint(table , level)
-        level = level or 1
-        local indent = ""
-        for _ = 1, level do
-            indent = indent.."  "
-        end
-
-        if key ~= "" then
-            print(indent..key.." ".."=".." ".."{")
-        else
-            print(indent .. "{")
-        end
-
-        key = ""
-        for k,v in pairs(table) do
-            if type(v) == "table" then
-                key = k
-                RecuPrint(v, level + 1)
-            else
-                local content = string.format("%s%s = %s", indent .. "  ",tostring(k), tostring(v))
-                print(content)
-            end
-        end
-        print(indent .. "}")
-    end
-    return RecuPrint(tb)
-end
-
-
-vim.cmd('command! PCD :cd %:p:h')
-
-local function yank_windows(text)
-    vim.fn.setreg("*", text)
-end
-
-local function yank_unix(text)
-    local escape = vim.fn.system("yank", text)
-
-    if vim.v.shell_error ~= 0 then
-        vim.api.nvim_err_writeln(escape)
-    else
-        -- vim.fn.chan({escape}, "/dev/tty", "b")
-        vim.fn.chansend(vim.v.stderr, escape)
-    end
-end
-
-PE.yank = vim.fn.has("win32") == 1 and yank_windows or yank_unix
-
-function PE.CurrentFile()
-    print(vim.api.nvim_buf_get_name(0))
-    PE.yank(vim.api.nvim_buf_get_name(0))
-end
-vim.cmd('command! PFile lua PE.CurrentFile()')
-
--- Create a mapping
-vim.api.nvim_set_keymap('', '<Leader>y', 'y:<C-U>lua PE.yank(vim.fn.getreg("@0"))<CR>',
-    { noremap = false, silent = true, desc = "yank to 'yank'" })
--- vim.keymap.set("v", "<leader>y",'"+y', { noremap = true, desc = "Copy to clipboard(Reg\")" })
-vim.keymap.set("x", "<space>",'y:<C-U>lua PE.yank(vim.fn.getreg("@0"))<CR>', { silent = true, noremap = true, desc = "yank to 'yank'" })
-
-
-function PE.ToggleQuickfix()
-    local wininfos = vim.fn.getwininfo()
-    local has_quickfix = vim.tbl_contains(
-        vim.tbl_map(function(wininfo) return wininfo.quickfix end, wininfos),
-        1
-    )
-
-    if not has_quickfix then
-        vim.cmd('botright copen')
-    else
-        vim.cmd('cclose')
-    end
-end
-vim.keymap.set('n', '<leader>cc', PE.ToggleQuickfix, { desc = 'Toggle quickfix window' })
-vim.keymap.set('n', '<m-s-t>', PE.ToggleQuickfix, { desc = 'Toggle quickfix window' })
-
+-- 7.1 AutoCmd
+-- ===========================================
 vim.api.nvim_create_autocmd("FileType", {
     pattern = "qf",
     callback = function()
@@ -4480,8 +4360,169 @@ vim.api.nvim_create_autocmd("FileType", {
 --     end,
 -- })
 
+-- 7.2 lua function
+-- ===========================================
+-- toggle_inlayhint
+-- -------------------------------------------
+function M.toggle_inlayhint()
+    vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+    vim.notify("Now inlayhint is " ..  tostring(vim.lsp.inlay_hint.is_enabled()))
+end
 
--- 7.1 Vim Function Zone(I just tired)
+vim.api.nvim_create_user_command('InlayHintToggle', M.toggle_inlayhint, {});
+vim.api.nvim_create_user_command('ToggleInlayHint', M.toggle_inlayhint, {});
+
+-- toggle_quickfix
+-- -------------------------------------------
+function M.toggle_quickfix()
+    local wininfos = vim.fn.getwininfo()
+    local has_quickfix = vim.tbl_contains(
+        vim.tbl_map(function(wininfo) return wininfo.quickfix end, wininfos),
+        1
+    )
+
+    if not has_quickfix then
+        vim.cmd('botright copen')
+    else
+        vim.cmd('cclose')
+    end
+end
+vim.keymap.set('n', '<leader>cc', M.toggle_quickfix, { desc = 'Toggle quickfix window' })
+vim.keymap.set('n', '<m-s-t>', M.toggle_quickfix, { desc = 'Toggle quickfix window' })
+
+-- toggle_opts
+-- -------------------------------------------
+function M.toggle_opts(option, silent, values)
+    local echo = function(str)
+        return vim.api.nvim_echo(
+            { {str , "Question"} }, -- {chunks}: A list of [text, hl_group]
+            false,                -- {history}:if true, add to |message-history|.
+            {}  -- {opts}: Optional parameters.
+        )
+    end
+    if values then
+        if vim.opt_local[option]:get() == values[1] then
+            vim.opt_local[option] = values[2]
+        else
+            vim.opt_local[option] = values[1]
+        end
+        return echo("Set " .. option .. " to " .. vim.opt_local[option]:get())
+    end
+    vim.opt_local[option] = not vim.opt_local[option]:get()
+    if not silent then
+        if vim.opt_local[option]:get() then
+            echo("Enabled " .. option)
+        else
+            echo("Disabled " .. option)
+        end
+    end
+end
+
+-- toggle_diagnostics
+-- -------------------------------------------
+function M.toggle_diagnostics()
+    local enabled = not vim.diagnostic.is_enabled()
+    if enabled then
+        vim.diagnostic.enable(false)
+    else
+        vim.diagnostic.enable()
+    end
+end
+
+
+-- man
+-- -------------------------------------------
+function M.man()
+    require("telescope.builtin").man_pages({
+        sections={"ALL"},
+        attach_mappings = function(_, map)
+            map(
+                {'i'},
+                '<Enter>',
+                function(...)
+                    return require("telescope.actions").select_tab(...)
+                end
+            )
+            return true
+        end,
+    })
+    -- vim.cmd [[ wincmd w]]
+    -- vim.cmd [[ wincmd x]]
+end
+
+
+-- yank
+-- -------------------------------------------
+
+local function yank_windows(text)
+    vim.fn.setreg("*", text)
+end
+
+local function yank_unix(text)
+    local escape = vim.fn.system("yank", text)
+
+    if vim.v.shell_error ~= 0 then
+        vim.api.nvim_err_writeln(escape)
+    else
+        -- vim.fn.chan({escape}, "/dev/tty", "b")
+        vim.fn.chansend(vim.v.stderr, escape)
+    end
+end
+
+M.yank = vim.fn.has("win32") == 1 and yank_windows or yank_unix
+
+vim.keymap.set("x", "<space>",'y:<C-U>lua PE.yank(vim.fn.getreg("@0"))<CR>', { silent = true, noremap = true, desc = "yank to 'yank'" })
+
+-- current_file
+-- -------------------------------------------
+function M.current_file()
+    print(vim.api.nvim_buf_get_name(0))
+    M.yank(vim.api.nvim_buf_get_name(0))
+end
+vim.cmd('command! PFile lua PE.current_file()')
+
+
+-- next_diagnostic
+-- -------------------------------------------
+local function diagnostic_severity()
+    local num_warnings = 0
+    for _, d in ipairs(vim.diagnostic.get(0)) do
+        if d.severity == vim.diagnostic.severity.ERROR then
+            return vim.diagnostic.severity.ERROR
+        elseif d.severity == vim.diagnostic.severity.WARN then
+            num_warnings = num_warnings + 1
+        end
+    end
+    if num_warnings > 0 then
+        return vim.diagnostic.severity.WARN
+    else
+        return nil
+    end
+end
+
+function M.next_diagnostic()
+    ---@diagnostic disable-next-line: deprecated
+    local jump = vim.diagnostic.jump or vim.diagnostic.goto_next
+    jump({
+        severity = diagnostic_severity(),
+        float = { border = 'single' },
+        count = 1,
+    })
+end
+
+
+function M.prev_diagnostic()
+    ---@diagnostic disable-next-line: deprecated
+    local jump = vim.diagnostic.jump or vim.diagnostic.goto_prev
+    jump({
+        severity = diagnostic_severity(),
+        float = { border = 'single' },
+        count = -1,
+    })
+end
+
+
+-- 7.3 Vim Function Zone(I just tired)
 -- ===========================================
 vim.cmd [[
     function! s:DiffWithSaved()
