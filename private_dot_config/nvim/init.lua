@@ -1681,7 +1681,7 @@ require("lazy").setup({
             --     -- colors = {}, -- table of hex strings
             --     -- termcolors = {} -- table of colour name strings
             -- },
-            indent = { enable = { 'python','lua'  } },
+            indent = { enable = { 'python','lua', 'nix' } },
             ensure_installed = {
                 'json',
                 'xml',
