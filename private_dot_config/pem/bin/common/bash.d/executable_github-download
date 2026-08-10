@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # GitHub Auto-Update Download Script with jq parsing
 # Usage: ./github_updater.sh <owner>/<repo> <asset_pattern> [<output_file>] [-v VERSION] [--no-download]

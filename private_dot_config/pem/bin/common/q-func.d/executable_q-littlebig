@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 q_littlebig () {
     [[ "$(printf '\01\03' | hexdump)" == *0103* ]] && echo big || echo little
 }

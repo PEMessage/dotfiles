@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 UPDATE=$1
 CLASSPATH_CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}/classpath-generator"

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 awk -v term_cols="${width:-$(tput cols || echo 80)}" -v term_lines="${height:-1}" 'BEGIN{
     s="/\\";
     total_cols=term_cols*term_lines;

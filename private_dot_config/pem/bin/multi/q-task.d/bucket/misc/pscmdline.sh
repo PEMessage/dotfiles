@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # See:
 # 【【DEFCON33 2025】第81集 - DEF CON 33：Silent Leaks - 共享Linux环境进程泄露秘密全解析】

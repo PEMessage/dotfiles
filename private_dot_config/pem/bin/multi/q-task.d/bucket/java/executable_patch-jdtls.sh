@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Base on https://github.com/eclipse-jdtls/eclipse.jdt.ls/issues/3284#issuecomment-2566351320
 

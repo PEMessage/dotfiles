@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 LOCAL_SCRIPT_PATH="$(readlink -f $0)"
 LOCAL_SCRIPT_DIR="$(dirname $LOCAL_SCRIPT_PATH)"
 

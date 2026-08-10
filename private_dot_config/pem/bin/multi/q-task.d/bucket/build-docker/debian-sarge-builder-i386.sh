@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Thanks to https://www.reddit.com/r/kernel/comments/1hu2hj8/which_version_of_gcc_can_compile_kernel_2611/
 set -e

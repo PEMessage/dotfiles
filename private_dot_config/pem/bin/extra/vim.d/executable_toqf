@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # sendtoqf - send output to Vim's quickfix
 

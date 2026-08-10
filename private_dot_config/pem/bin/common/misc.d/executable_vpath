@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # create temporary file
 TMPFILE1=`mktemp /tmp/vpath.sh1.XXXXXXXX`
 TMPFILE2=`mktemp /tmp/vpath.sh2.XXXXXXXX`

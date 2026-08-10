@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # quick gcc - Compiles C/C++ code and runs the output
 # Default output: filename_prefix.out (e.g., hello.c -> hello.out)
 # Usage: ./q-gcc source_file [compiler_flags] -- [program_args]

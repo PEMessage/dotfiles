@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Check if stdout is a terminal
 if [ -t 1 ]; then

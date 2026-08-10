@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 toggle_gradle_mirror() {
     local wrapper_file="gradle/wrapper/gradle-wrapper.properties"

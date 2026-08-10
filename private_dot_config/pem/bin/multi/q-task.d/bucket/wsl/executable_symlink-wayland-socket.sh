@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # See: https://github.com/microsoft/WSL/issues/11261
 
 # When booting waydroid, `weston --backend=wayland-backend.so` need these

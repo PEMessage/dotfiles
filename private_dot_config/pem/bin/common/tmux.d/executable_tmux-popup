@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Credit: https://hackmd.io/@DailyOops/persistent-tmux-popup?type=view
 # V2

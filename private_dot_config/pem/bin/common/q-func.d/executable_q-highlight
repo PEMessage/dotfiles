@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 function q-highlight() {
     # Check if input is from pipe or terminal
     if [ -t 0 ]; then

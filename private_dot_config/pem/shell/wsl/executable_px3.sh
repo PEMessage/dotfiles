@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # px.sh - Shell wrapper for px proxy tool
 #
 # Principle:

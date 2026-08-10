@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 version=6.6.12
 
 docker run -t \
