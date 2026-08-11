@@ -74,7 +74,12 @@ q_extract() {
         *.tar)              bin="tar"; args=() ;;
         *.zip)             bin="unzip"; args=() ;;
         *.rar)             bin="rar"; args=(x) ;;
-        *.7z)              bin="7z"; args=(x) ;;
+        *.7z)
+            if command -v 7zz > /dev/null ; then
+                bin="7zz"; args=(x);
+            else
+                bin="7z"; args=(x);
+            fi;;
         *.bz2)             bin="bunzip2"; args=() ;;
         *.gz)              bin="gunzip"; args=() ;;
         *.Z)               bin="uncompress"; args=() ;;
