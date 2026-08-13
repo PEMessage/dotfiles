@@ -925,6 +925,7 @@ let g:startify_custom_header = [
         execute l:cmd fnameescape(l:target)
         " echo "Snapshot saved to " . l:target
     endfunction
+
 " -------------------------------------------
 " 4.0 Start of plug
 " -------------------------------------------
@@ -2046,7 +2047,16 @@ if PlugSelect('complete:apt')
 endif
 
 " -------------------------------------------
-" 4.13 debug adapter
+" 4.13 Native autocomplete (fallback)
+" -------------------------------------------
+" When no completion engine group is selected, fall back to Vim's native
+" 'autocomplete' option if available (patch 9.1.1590+).
+if !PlugSelect('complete') && has('patch-9.1.1590')
+    set autocomplete
+endif
+
+" -------------------------------------------
+" 4.14 debug adapter
 " -------------------------------------------
 if PlugSelect('debug')
     Plug 'puremourning/vimspector'
@@ -2064,7 +2074,7 @@ if PlugSelect('debug')
 endif
 
 " -------------------------------------------
-" 4.14 LSP
+" 4.15 LSP
 " -------------------------------------------
 if PlugSelect('lsp')
     Plug 'prabirshrestha/vim-lsp'
