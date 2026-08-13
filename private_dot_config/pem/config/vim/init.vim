@@ -44,6 +44,15 @@ let g:startify_custom_header = [
     endif
     set termguicolors
 
+    " Thanks to: https://github.com/kepbod/ivim/blob/f3b54c567593ed64cd7fc8c52570235c252dfe94/vimrc_mini#L243
+    if has('nvim')
+        set guicursor=n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20
+    else
+        let &t_SI = "\<Esc>[6 q"
+        let &t_SR = "\<Esc>[4 q"
+        let &t_EI = "\<Esc>[2 q"
+    endif
+
     " set viminfo='20,<50,s10,h
 
 
