@@ -143,7 +143,9 @@ let g:startify_custom_header = [
         set encoding=utf-8
 
         " 文件默认编码
-        set fileencoding=utf-8
+        if &modifiable
+            set fileencoding=utf-8
+        endif
 
         " 打开文件时自动尝试下面顺序的编码
         set fileencodings=ucs-bom,utf-8,gbk,gb18030,big5,euc-jp,latin1,utf-16,sjis
@@ -858,11 +860,6 @@ let g:startify_custom_header = [
         endif
     endif
 
-" -------------------------------------------
-" 4.0 Start of plug
-" -------------------------------------------
-if PlugSelect('*')
-    call plug#begin(pe_runtime_path . '/plugged')
     " helper
     function! Cond(cond, ...)
         let opts = get(a:000, 0, {})
@@ -890,8 +887,12 @@ if PlugSelect('*')
         execute l:cmd fnameescape(l:target)
         " echo "Snapshot saved to " . l:target
     endfunction
-
-
+" -------------------------------------------
+" 4.0 Start of plug
+" -------------------------------------------
+if PlugSelect('*')
+    call plug#begin(pe_runtime_path . '/plugged')
+end
 " -------------------------------------------
 " 4.1 Basic Function
 " -------------------------------------------
@@ -2141,6 +2142,7 @@ endif
 " -------------------------------------------
 " Start of plug
 " -------------------------------------------
+if PlugSelect('*')
     call plug#end()
 endif
 
