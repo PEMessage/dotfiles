@@ -24,9 +24,6 @@ let g:startify_custom_header = [
 "   func/command : PE<CamelCase>       e.g. PEGrep / PEDate
 " ------------------------------------------------------------------
 "
-
-
-
 " 0. Configure List
 " ===========================================
 
@@ -52,7 +49,6 @@ let g:startify_custom_header = [
 
     " Comment Color
     let s:comment_color = {"gui": "#00af87", "cterm": "246", "cterm16": "7"}
-    let g:pe_complete_sys=""
 
     let g:lightline = {
                 \ 'colorscheme': 'selenized_black',
@@ -717,12 +713,25 @@ let g:startify_custom_header = [
 " -------------------------------------------
 " Plug Ext -- Select plug level
 " -------------------------------------------
+    " Plug groups: basic / colorscheme / textobj / starify / extrastyle /
+    "              highlight / locale / tpope / git / tmux / tag / quickfix /
+    "              complete / debug / lsp
+    "   Mutually-exclusive engines: complete:async / complete:mu / complete:apt
+    "   (see g:pe_plug_families below; '*' picks the default engine)
     " Plug levels: none(pure vim, no plugins) / lite(basic+colorscheme) / full(all)
     " Default none; use :PlugInit [level] inside vim to install on demand
     let g:pe_plug_levels = {
                 \ 'none': [],
                 \ 'lite': ['basic', 'colorscheme'],
                 \ 'full': ['*'],
+                \ }
+
+    " Mutually-exclusive group families: family_name -> default member.
+    " A group "<family>:<member>" belongs to <family>; only ONE member of a
+    " family can be enabled at a time.  When '*' is used, the default member
+    " of each family is chosen instead of all of them.
+    let g:pe_plug_families = {
+                \ 'complete': 'async',
                 \ }
     let g:pe_plug_level_file = g:pe_cache_dir . '/plug_level'
 
@@ -743,11 +752,35 @@ let g:startify_custom_header = [
     let g:pe_plug_group = copy(g:pe_plug_levels[g:pe_plug_level])
 
     function! PlugSelect(group) abort
-        for pattern in g:pe_plug_group
-            if pattern ==# '*' || a:group ==# '*'
-                return 1
+        " '*' is the query for "are plugins enabled at all"
+        if a:group ==# '*'
+            return !empty(g:pe_plug_group)
+        endif
+
+        " family umbrella: e.g. PlugSelect('complete') matches any engine
+        if has_key(g:pe_plug_families, a:group)
+            for pattern in g:pe_plug_group
+                if pattern ==# '*' || pattern =~# '^' . a:group . ':'
+                    return 1
+                endif
+            endfor
+            return 0
+        endif
+
+        " family member: e.g. PlugSelect('complete:async')
+        for [l:fam, l:default] in items(g:pe_plug_families)
+            if a:group =~# '^' . l:fam . ':'
+                if index(g:pe_plug_group, a:group) >= 0
+                    return 1
+                endif
+                return index(g:pe_plug_group, '*') >= 0
+                            \ && a:group ==# l:fam . ':' . l:default
             endif
-            if a:group ==# pattern
+        endfor
+
+        " regular group
+        for pattern in g:pe_plug_group
+            if a:group ==# pattern || pattern ==# '*'
                 return 1
             endif
         endfor
@@ -862,6 +895,7 @@ if PlugSelect('*')
 " -------------------------------------------
 " 4.1 Basic Function
 " -------------------------------------------
+if PlugSelect('basic')
     " Some little tweak
     " Plug 'drmikehenry/vim-fixkey'
     Plug 'junegunn/vim-plug'
@@ -1061,7 +1095,7 @@ if PlugSelect('*')
     " NOTICE: THIS will casue termdebug report error
     " TODO: fix it
     Plug 'PEMessage/vim-strip-trailing-whitespace'
-
+endif
 
 " -------------------------------------------
 " 4.2 Textobj
@@ -1311,16 +1345,19 @@ endif
 " -------------------------------------------
 " 4.4 Locale
 " -------------------------------------------
+if PlugSelect('locale')
     Plug 'yianwillis/vimcdoc'
     Plug 'voldikss/vim-translator'
     " Plug 'brglng/vim-im-select'
     if has('win32')
         let g:im_select_default = '1033'
     endif
+endif
 
 " -------------------------------------------
 " 4.5 Tpope plugin
 " -------------------------------------------
+if PlugSelect('tpope')
     " Plug 'junegunn/vim-easy-align'
     "     nmap ga <Plug>(EasyAlign)
     "     xmap ga <Plug>(EasyAlign)
@@ -1368,10 +1405,12 @@ endif
     Plug 'tpope/vim-rsi'
     Plug 'tpope/vim-sleuth' , { 'on': [ 'Sleuth' ] }
         command UnSleuth setlocal et sw=4 ts=4
+endif
 
 " -------------------------------------------
 " 4.6 Git plugin
 " -------------------------------------------
+if PlugSelect('git')
     Plug 'airblade/vim-gitgutter'
         let g:gitgutter_map_keys = 0
         command! Gqf GitGutterQuickFix | copen
@@ -1412,13 +1451,12 @@ endif
         " di			<Plug>(agit-diff)
         " dl			<Plug>(agit-diff-with-local)
         " nnoremap <leader>ag :Agit<CR>
-
-
-
+endif
 
 " -------------------------------------------
 " 4.7 Tmux and Terminal
 " -------------------------------------------
+if PlugSelect('tmux')
     Plug 'NickLaMuro/vimux'
         " nmap <Leader>vl :VimuxRunLastCommand<CR>
         " nmap <Leader>vp :VimuxPromptCommand<CR>
@@ -1525,10 +1563,12 @@ endif
         " noremap  <C-j> :<C-U>TmuxNavigateDown<cr>
         " noremap  <C-k> :<C-U>TmuxNavigateUp<cr>
         " noremap  <C-l> :<C-U>TmuxNavigateRight<cr>
+endif
 
 " -------------------------------------------
 " 4.8 Tag Plugin
 " -------------------------------------------
+if PlugSelect('tag')
     " GTAGS for jump
     " Changelog: compare to origin one
     "   1. Only add g:gutentags_gtags_extra_args for extra gtags flag
@@ -1729,12 +1769,12 @@ endif
         "     noremap <silent><leader>aqe :AsyncRun! -cwd=<root> grep -n -s -R <C-R><C-W>
         "                 \ --include='*.h' --include='*.c*' '<root>' <cr>
         " endif
-
-
+endif
 
 " -------------------------------------------
 " 4.9 Quickfix Plugin
 " -------------------------------------------
+if PlugSelect('quickfix')
     " Quickfix Config
     set cscopequickfix=s-,g-,d-,c-,t-,e-,f-,i-,a-
     " override vim-expend-region keymap
@@ -1796,34 +1836,13 @@ endif
         noremap <silent> go :GscopeFind f <C-R>=expand("<cfile>")<cr><cr>
         nnoremap <S-F12> :call QuickfixArrowPreview('j')<CR>
         nnoremap <S-F11> :call QuickfixArrowPreview('k')<CR>
+endif
 
 " -------------------------------------------
-" 4.10 Complete Engine (APC)
+" 4.10 Complete Engine (common)
 " -------------------------------------------
-    " Auto Popup
-    " Plug 'skywind3000/vim-auto-popmenu'
-    " Plug 'skywind3000/vim-dict'
-        " " enable this plugin for filetypes, '*' for all files.
-        " let g:apc_enable_ft = {'*':1}
-        " let g:apc_trigger = "\<c-x>\<c-n>"
-        " let g:apc_cr_confirm = 1
-        " set cpt=.,k,w,b
-        " " source for dictionary, current or other loaded buffers, see ':help cpt'
-        " " don't select the first item.
-        " set completeopt=menu,menuone,noselect
-        " " suppress annoy messages.
-        " set shortmess+=c
-        " filetype plugin on
-        " if has("autocmd") && exists("+omnifunc")
-        " autocmd Filetype *
-        "         \	if &omnifunc == "" |
-        "         \		setlocal omnifunc=syntaxcomplete#Complete |
-        "         \	endif
-        " endif
-
-" -------------------------------------------
-" 4.11 Complete Engine (All)
-" -------------------------------------------
+" Common completion settings, applied when any engine is enabled.
+if PlugSelect('complete')
     " |1. 整行                                                 i_CTRL-X_CTRL-L
     " |2. 当前文件内的关键字                                   i_CTRL-X_CTRL-N
     " |3. 'dictionary' 的关键字                                i_CTRL-X_CTRL-K
@@ -1838,34 +1857,18 @@ endif
     " |12. 拼写建议                                            i_CTRL-X_s
     " |13. 'complete' 的关键字                                 i_CTRL-N i_CTRL-P
     set pumheight=5
-
-    " if v:version >= 9000
-    "     let g:pe_complete_sys = 'vim'
-    " elseif v:version >= 802 && ! has('win32')
-    "     let g:pe_complete_sys = 'easy'
-    " if has('win32') && v:version >= 800
-    "     let g:pe_complete_sys = 'async'
-    if v:version >= 802
-        let g:pe_complete_sys = 'async'
-    elseif has('patch-7.4.775')
-        " Good enought for buffer
-        let g:pe_complete_sys = 'apt'
-    else
-        let g:pe_complete_sys = 'apt'
-    endif
-    " let g:pe_complete_sys = 'apt'
-
+endif
 
 " -------------------------------------------
-" 4.11.1 Complete Engine (async)
+" 4.11 Complete Engine (async)
 " -------------------------------------------
-
+if PlugSelect('complete:async')
     " Buggy buffer
-    Plug 'prabirshrestha/async.vim' , Cond(g:pe_complete_sys == 'async')
-    Plug 'prabirshrestha/asyncomplete.vim' , Cond(g:pe_complete_sys == 'async')
-    Plug 'prabirshrestha/asyncomplete-buffer.vim' , Cond(g:pe_complete_sys == 'async')
+    Plug 'prabirshrestha/async.vim'
+    Plug 'prabirshrestha/asyncomplete.vim'
+    Plug 'prabirshrestha/asyncomplete-buffer.vim'
 
-        Plug 'wellle/tmux-complete.vim' , Cond(g:pe_complete_sys == 'async')
+        Plug 'wellle/tmux-complete.vim'
             let g:tmuxcomplete#asyncomplete_source_options = {
             \ 'name':      'tmuxcomplete',
             \ 'whitelist': ['*'],
@@ -1879,177 +1882,156 @@ endif
             \     'truncate':        0
             \     }
             \ }
-        Plug 'rafamadriz/friendly-snippets' , Cond(g:pe_complete_sys == 'async')
-        Plug 'prabirshrestha/asyncomplete-file.vim' , Cond(g:pe_complete_sys == 'async')
+        Plug 'rafamadriz/friendly-snippets'
+        Plug 'prabirshrestha/asyncomplete-file.vim'
 
     Plug 'prabirshrestha/asyncomplete-lsp.vim'
-    if g:pe_complete_sys == 'async'
-        let g:asyncomplete_auto_popup = 1
+    let g:asyncomplete_auto_popup = 1
 
-        function! s:check_back_space() abort
-            let col = col('.') - 1
-            return !col || getline('.')[col - 1]  =~ '\s'
-        endfunction
+    function! s:check_back_space() abort
+        let col = col('.') - 1
+        return !col || getline('.')[col - 1]  =~ '\s'
+    endfunction
 
-        imap <silent><expr> <TAB>
-                    \ pumvisible() ? "\<C-n>" :
-                    \ vsnip#jumpable(1) ? '<Plug>(vsnip-jump-next)' :
-                    \ <SID>check_back_space() ? "\<TAB>" :
-                    \ asyncomplete#force_refresh()
-        " inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-        imap  <silent><expr> <S-Tab>
-                    \ pumvisible() ? "\<C-p>" :
-                    \ vsnip#jumpable(-1) ? '<Plug>(vsnip-jump-prev)' :
-                    \ "\<C-h>"
-        " See wildmenu CTRL-E  - 结束补全，回到选择匹配之前的状态
-        inoremap <expr> <C-c>  pumvisible() ? "\<C-y>\<C-c>" : "\<C-c>"
+    imap <silent><expr> <TAB>
+                \ pumvisible() ? "\<C-n>" :
+                \ vsnip#jumpable(1) ? '<Plug>(vsnip-jump-next)' :
+                \ <SID>check_back_space() ? "\<TAB>" :
+                \ asyncomplete#force_refresh()
+    " inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+    imap  <silent><expr> <S-Tab>
+                \ pumvisible() ? "\<C-p>" :
+                \ vsnip#jumpable(-1) ? '<Plug>(vsnip-jump-prev)' :
+                \ "\<C-h>"
+    " See wildmenu CTRL-E  - 结束补全，回到选择匹配之前的状态
+    inoremap <expr> <C-c>  pumvisible() ? "\<C-y>\<C-c>" : "\<C-c>"
 
-        inoremap <expr> <cr>   pumvisible() ? asyncomplete#close_popup() : "\<cr>"
-        " imap <c-space> <Plug>(asyncomplete_force_refresh)
+    inoremap <expr> <cr>   pumvisible() ? asyncomplete#close_popup() : "\<cr>"
+    " imap <c-space> <Plug>(asyncomplete_force_refresh)
 
-        if has('patch-8.0.1494')
-            Plug 'hrsh7th/vim-vsnip'
-            Plug 'hrsh7th/vim-vsnip-integ'
-        endif
+    if has('patch-8.0.1494')
+        Plug 'hrsh7th/vim-vsnip'
+        Plug 'hrsh7th/vim-vsnip-integ'
     endif
+endif
 
 " -------------------------------------------
-" 4.11.2 Complete Engine (easy)
+" 4.12 Complete Engine (mu)
 " -------------------------------------------
-    " Disable due to casully eatting some keyhit
-    " Plug 'jayli/vim-easycomplete', Cond(g:pe_complete_sys == 'easy')
-    "     Plug 'SirVer/ultisnips' , Cond(g:pe_complete_sys == 'easy' && has('python3'))
-
-    "     let g:easycomplete_nerd_font = 0
-    "     " See: https://github.com/jayli/vim-easycomplete/issues/131
-    "     let g:easycomplete_lsp_checking = 0
-" -------------------------------------------
-" 4.11.3 Complete Engine (*mu*)
-" -------------------------------------------
-
+if PlugSelect('complete:mu')
     " See: ins-completion for origin complete help
-    Plug 'lifepillar/vim-mucomplete' , Cond(g:pe_complete_sys == 'mu')
-    Plug 'skywind3000/vim-dict' , Cond(g:pe_complete_sys == 'mu')
+    Plug 'lifepillar/vim-mucomplete'
+    Plug 'skywind3000/vim-dict'
 
     " Plug 'PEMessage/T.vim' , { 'on' : ['Trans'] }
     Plug 'PEMessage/T.vim'
         vnoremap <leader>t :<c-u>Trans<cr>
         command! -n=0 Trans call T#VisualSearch(visualmode())
-    " Plug 'Konfekt/complete-common-words.vim' , Cond(g:pe_complete_sys == 'mu')
+    " Plug 'Konfekt/complete-common-words.vim'
     " let g:common_words_dicts_dir = g:plug_home .. 'complete-common-words.vim/dicts'
     " set dictionary+=spell
 
-    " Plug 'garbas/vim-snipmate' , Cond(g:pe_complete_sys == 'mu')
-    " Plug 'MarcWeber/vim-addon-mw-utils' , Cond(g:pe_complete_sys == 'mu')
+    " Plug 'garbas/vim-snipmate'
+    " Plug 'MarcWeber/vim-addon-mw-utils'
 
-    if g:pe_complete_sys == 'mu'
-        " 4.11.3.1 General Setting
-        " -------------------------------------------
-        set completeopt+=menuone
-        set completeopt+=noselect
-        set completeopt+=noinsert
+    " General Setting
+    set completeopt+=menuone
+    set completeopt+=noselect
+    set completeopt+=noinsert
 
-        " See: https://github.com/lifepillar/vim-mucomplete/issues/153
-        " Mucomplete is automatically inserting completions without trigger
-        " set completeopt+=longest
+    " See: https://github.com/lifepillar/vim-mucomplete/issues/153
+    " Mucomplete is automatically inserting completions without trigger
+    " set completeopt+=longest
 
-        set completeopt-=preview
+    set completeopt-=preview
 
-        set shortmess+=c   " Shut off completion messages
-        set belloff+=ctrlg " Add only if Vim beeps during completion
-        set cpt=.,w,b,u,U
+    set shortmess+=c   " Shut off completion messages
+    set belloff+=ctrlg " Add only if Vim beeps during completion
+    set cpt=.,w,b,u,U
 
-        " 4.11.3.2 Better dict complete setting(disable file path)
-        " -------------------------------------------
-        " Credit:
-        " https://stackoverflow.com/questions/1830221/how-to-remove-file-name-from-vim-dictionary-menu
-        function! PEDictGrep( leader, file )
-            try
-                exe "vimgrep /^" . a:leader . ".*/j " . a:file
-            catch /.*/
-                echo "no matches"
-            endtry
-        endfunction
+    " Better dict complete setting (disable file path)
+    " Credit:
+    " https://stackoverflow.com/questions/1830221/how-to-remove-file-name-from-vim-dictionary-menu
+    function! PEDictGrep( leader, file )
+        try
+            exe "vimgrep /^" . a:leader . ".*/j " . a:file
+        catch /.*/
+            echo "no matches"
+        endtry
+    endfunction
 
-        " Slight modified one
-        function! PEDictComp( findstart, base )
-            if a:findstart
-                let line = getline('.')
-                let start = col('.') - 1
-                while start > 0 && line[start - 1] =~ '[A-Za-z_]'
-                    let start -= 1
-                endwhile
-                return start
-            else
-                silent call PEDictGrep( a:base, &dictionary )
-                let matches = []
-                for thismatch in getqflist()
-                    let obj = {
-                                \ 'word': thismatch.text,
-                                \ 'menu': '[dict]',
-                                \}
-                    call add(matches, obj )
-
-                endfor
-                return matches
-            endif
-        endfunction
-        set completefunc=PEDictComp
-        " General Setting
-        " let g:mucomplete#chains = {
-        "             \ 'default' : ['path','user','incl'],
-        "             \ }
-
-        " 4.11.3.3 Sub Setting for neosnippet
-        " -------------------------------------------
-        Plug 'Shougo/neosnippet.vim' , Cond(g:pe_complete_sys == 'mu')
-        Plug 'Shougo/neosnippet-snippets' , Cond(g:pe_complete_sys == 'mu')
-        Plug 'honza/vim-snippets' , Cond(g:pe_complete_sys == 'mu')
-        let g:neosnippet#enable_snipmate_compatibility = 1
-        let g:mucomplete#enable_auto_at_startup = 1
-        " Do not use conceal marker(hide some visiable text)
-        let g:neosnippet#enable_conceal_markers = 1
-        let g:neosnippet#expand_word_boundary = 1
-        inoremap <silent> <expr> <plug><MyCR>
-                    \ mucomplete#neosnippet#expand_snippet("\<cr>")
-        imap <cr> <plug><MyCR>
-        let g:mucomplete#chains = {
-                    \ 'default' : ['path','nsnp','user','tags','incl'],
-                    \ }
-        " In order to trigger InsertLeave autocmd
-        " inoremap <C-c> <ESC>
-        " autocmd InsertLeave * NeoSnippetClearMarkers
-        " snoremap <silent><ESC>  <ESC>:NeoSnippetClearMarkers<CR>
-
-        " Another usage
-        if exists('##ModeChanged')
-            autocmd ModeChanged * NeoSnippetClearMarkers
+    " Slight modified one
+    function! PEDictComp( findstart, base )
+        if a:findstart
+            let line = getline('.')
+            let start = col('.') - 1
+            while start > 0 && line[start - 1] =~ '[A-Za-z_]'
+                let start -= 1
+            endwhile
+            return start
         else
-            autocmd InsertLeave * NeoSnippetClearMarkers
-            snoremap <silent><ESC>  <ESC>:NeoSnippetClearMarkers<CR>
+            silent call PEDictGrep( a:base, &dictionary )
+            let matches = []
+            for thismatch in getqflist()
+                let obj = {
+                            \ 'word': thismatch.text,
+                            \ 'menu': '[dict]',
+                            \}
+                call add(matches, obj )
+
+            endfor
+            return matches
         endif
+    endfunction
+    set completefunc=PEDictComp
+    " let g:mucomplete#chains = {
+    "             \ 'default' : ['path','user','incl'],
+    "             \ }
 
+    " Sub Setting for neosnippet
+    Plug 'Shougo/neosnippet.vim'
+    Plug 'Shougo/neosnippet-snippets'
+    Plug 'honza/vim-snippets'
+    let g:neosnippet#enable_snipmate_compatibility = 1
+    let g:mucomplete#enable_auto_at_startup = 1
+    " Do not use conceal marker(hide some visiable text)
+    let g:neosnippet#enable_conceal_markers = 1
+    let g:neosnippet#expand_word_boundary = 1
+    inoremap <silent> <expr> <plug><MyCR>
+                \ mucomplete#neosnippet#expand_snippet("\<cr>")
+    imap <cr> <plug><MyCR>
+    let g:mucomplete#chains = {
+                \ 'default' : ['path','nsnp','user','tags','incl'],
+                \ }
+    " In order to trigger InsertLeave autocmd
+    " inoremap <C-c> <ESC>
+    " autocmd InsertLeave * NeoSnippetClearMarkers
+    " snoremap <silent><ESC>  <ESC>:NeoSnippetClearMarkers<CR>
+
+    " Another usage
+    if exists('##ModeChanged')
+        autocmd ModeChanged * NeoSnippetClearMarkers
+    else
+        autocmd InsertLeave * NeoSnippetClearMarkers
+        snoremap <silent><ESC>  <ESC>:NeoSnippetClearMarkers<CR>
     endif
-
-
-                    " \ 'default' : ['nsnp'],
-
+endif
 
 " -------------------------------------------
-" 4.11.4 Complete Engine (apt)
+" 4.13 Complete Engine (apt)
 " -------------------------------------------
-"  se
-    Plug 'skywind3000/vim-auto-popmenu' , Cond(g:pe_complete_sys == 'apt')
-    if g:pe_complete_sys == 'apt'
-        let g:apc_enable_ft = {'text':1, '*':1, 'vim':1}
-        set cpt=.,k,w,b
-        set completeopt=menu,menuone,noselect
-        set shortmess+=c
-    endif
+if PlugSelect('complete:apt')
+    Plug 'skywind3000/vim-auto-popmenu'
+    let g:apc_enable_ft = {'text':1, '*':1, 'vim':1}
+    set cpt=.,k,w,b
+    set completeopt=menu,menuone,noselect
+    set shortmess+=c
+endif
 
 " -------------------------------------------
-" 4.12 debug adapter
+" 4.14 debug adapter
 " -------------------------------------------
+if PlugSelect('debug')
     Plug 'puremourning/vimspector'
         let g:vimspector_enable_mappings = 'HUMAN'
     Plug 'PEMessage/termdebug_ex.vim'
@@ -2062,9 +2044,12 @@ endif
         let g:termdebug_config['timeout'] = 6000 " 1000 ~ 10s, for large elf like linux kernel
 
     Plug 'PEMessage/subcmd.vim'
+endif
+
 " -------------------------------------------
-" 4.13 LSP
+" 4.15 LSP
 " -------------------------------------------
+if PlugSelect('lsp')
     Plug 'prabirshrestha/vim-lsp'
         let g:lsp_diagnostics_virtual_text_enabled = 0 " this will cause display random empty line when cursor move
         let g:lsp_diagnostics_echo_cursor = 1
@@ -2144,13 +2129,15 @@ endif
                 \     },
                 \   }
                 \ } 
-    " let g:lsp_settings['eclipse-jdt-ls'] = {
+   " let g:lsp_settings['eclipse-jdt-ls'] = {
     "             \ 'root_uri_patterns'  : ['.root'],
     "             \}
     " let g:lsp_settings['clangd'] = {
     "             \ 'args': ['123']
     "             \ }
     Plug 'PEMessage/jorenar-lsp-calltree'
+endif
+
 " -------------------------------------------
 " Start of plug
 " -------------------------------------------
@@ -2165,7 +2152,8 @@ endif
 if PlugSelect('colorscheme') && !empty(globpath(&rtp, 'colors/onedark.vim'))
     colorscheme onedark
 else
-    colorscheme desert
+    set background=dark
+    colorscheme wildcharm
 endif
 " -------------------------------------------
 " 5.2 Async complete
