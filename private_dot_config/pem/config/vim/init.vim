@@ -69,16 +69,40 @@ let g:startify_custom_header = [
 
 " 1. Select plug we want
 " ===========================================
-    if exists('$PEM_PLUG_GROUP') && $PEM_PLUG_GROUP ==# 'none'
-        let g:pe_plug_group = []
-    elseif exists('$PEM_PLUG_GROUP') && $PEM_PLUG_GROUP ==# 'lite'
-        let g:pe_plug_group = ['basic', 'colorscheme']
-    else
-        let g:pe_plug_group = ['*'] " by default is full
+    " 插件等级：none(纯 vim, 无插件) / lite(基础+配色) / full(全部)
+    " 默认 none，进入 vim 后可用 :PlugInit [level] 动态下载不同等级
+    let g:pe_plug_levels = {
+                \ 'none': [],
+                \ 'lite': ['basic', 'colorscheme'],
+                \ 'full': ['*'],
+                \ }
+
+    " 缓存目录与等级持久化文件（PlugInit 会写入 level）
+    let g:pe_cachedir = expand('~/.cache/vim')
+    if !isdirectory(g:pe_cachedir)
+        call mkdir(g:pe_cachedir, "p")
     endif
+    let g:pe_plug_level_file = g:pe_cachedir . '/plug_level'
+
+    function! s:ReadPlugLevel() abort
+        if exists('$PEM_PLUG_GROUP') && has_key(g:pe_plug_levels, tolower($PEM_PLUG_GROUP))
+            return tolower($PEM_PLUG_GROUP)
+        endif
+        if filereadable(g:pe_plug_level_file)
+            let l:lv = trim(get(readfile(g:pe_plug_level_file), 0, ''))
+            if has_key(g:pe_plug_levels, l:lv)
+                return l:lv
+            endif
+        endif
+        return 'none'
+    endfunction
+
+    let g:pe_plug_level = s:ReadPlugLevel()
+    let g:pe_plug_group = copy(g:pe_plug_levels[g:pe_plug_level])
+
     function! PSelect(group) abort
         for pattern in g:pe_plug_group
-            if pattern ==# '*' || a:group ==# '*' 
+            if pattern ==# '*' || a:group ==# '*'
                 return 1
             endif
             if a:group ==# pattern
@@ -88,27 +112,66 @@ let g:startify_custom_header = [
         return 0
     endfunction
 
-" 2. Auto Install ViM-Plug
+" 2. Auto Install ViM-Plug & PlugInit
 " ===========================================
 
-if PSelect('*') 
-    if has('nvim')
-        let g:pe_runtimepath = stdpath('data') . '/site'
-    else
-        exe 'set rtp+=' . expand('~/.config/vim')
-        let g:pe_runtimepath = expand('~/.config/vim')
-    endif
-    if empty(glob(pe_runtimepath . '/autoload/plug.vim'))
-      silent execute '!curl -fLo '.pe_runtimepath.'/autoload/plug.vim --create-dirs '.s:vim_plug_url
-      source $MYVIMRC
-    endif
+    " 确保 vim-plug 已安装；返回 1=刚安装 / 0=已存在 / -1=失败
+    function! s:EnsurePlug() abort
+        if has('nvim')
+            let g:pe_runtimepath = stdpath('data') . '/site'
+        else
+            exe 'set rtp+=' . expand('~/.config/vim')
+            let g:pe_runtimepath = expand('~/.config/vim')
+        endif
+        if !empty(glob(g:pe_runtimepath . '/autoload/plug.vim'))
+            return 0
+        endif
+        echo 'Installing vim-plug ...'
+        silent execute '!curl -fLo '.g:pe_runtimepath.'/autoload/plug.vim --create-dirs '.s:vim_plug_url
+        if empty(glob(g:pe_runtimepath . '/autoload/plug.vim'))
+            echohl ErrorMsg | echo 'vim-plug download failed' | echohl None
+            return -1
+        endif
+        return 1
+    endfunction
 
-endif
+    " 校验并写入等级；成功返回 1，否则返回 0
+    function! s:PlugInitPrepare(level) abort
+        let l:level = (a:level == '') ? g:pe_plug_level : tolower(a:level)
+        if !has_key(g:pe_plug_levels, l:level)
+            echohl WarningMsg
+            echo 'Unknown plug level "' . l:level . '". Available: ' . join(sort(keys(g:pe_plug_levels)), ', ')
+            echohl None
+            return 0
+        endif
+        let g:pe_plug_level = l:level
+        let g:pe_plug_group = copy(g:pe_plug_levels[l:level])
+        let $PEM_PLUG_GROUP = l:level
+        call writefile([l:level], g:pe_plug_level_file)
+        let g:pe_plug_need_install = (l:level !=# 'none')
+        return 1
+    endfunction
 
-let g:pe_cachedir = expand('~/.cache/vim')
-if !isdirectory(pe_cachedir)
-    call mkdir(pe_cachedir, "p")
-endif
+    function! s:PlugLevelList(A, L, P) abort
+        return filter(sort(keys(g:pe_plug_levels)), 'v:val =~ "^" . a:A')
+    endfunction
+
+    " :PlugInit [none|lite|full]  下载并启用对应等级的插件
+    command! -nargs=? -complete=customlist,<SID>PlugLevelList PlugInit
+                \ if s:PlugInitPrepare(<q-args>)
+                \ |   execute 'source' s:thisfile
+                \ |   if get(g:, 'pe_plug_need_install', 0) && exists(':PlugInstall')
+                \ |       execute 'PlugInstall'
+                \ |       execute 'source' s:thisfile
+                \ |   endif
+                \ | endif
+
+    " 启动时若已启用插件，则自动确保 vim-plug 存在并重载
+    if PSelect('*')
+        if s:EnsurePlug() > 0
+            execute 'source' s:thisfile
+        endif
+    endif
 
 
 
@@ -203,7 +266,9 @@ endif
 
     if has('mouse')
         set mouse+=a
-        set ttymouse=sgr
+        if !has('nvim')
+            set ttymouse=sgr
+        endif
         vnoremap RightMouse "+y
     endif
 
@@ -1097,10 +1162,10 @@ if PSelect('colorscheme')
         augroup colorextend
             autocmd!
             " Override the `Identifier` background color in GUI mode
-            autocmd ColorScheme * call onedark#extend_highlight("Search", { "gui" : "underline,bold,italic,standout",  "bg": { "gui": "#444959" } , "fg" : {"gui":"#ffde87" }})
-            autocmd ColorScheme * call onedark#extend_highlight("IncSearch", { "gui" : "underline,bold,italic,standout",  "bg": { "gui": "#ffde87" } , "fg" : {"gui":"#444959" }})
-            autocmd ColorScheme * call onedark#extend_highlight("QuickFixLine", { "gui" : "underline",  "bg": { "gui": "NONE" } , "fg" : {"gui":"yellow" }})
-            autocmd ColorScheme * highlight QuickFixLineScope gui=underline guifg=#e5c07b guibg=#444959
+            autocmd ColorScheme onedark call onedark#extend_highlight("Search", { "gui" : "underline,bold,italic,standout",  "bg": { "gui": "#444959" } , "fg" : {"gui":"#ffde87" }})
+            autocmd ColorScheme onedark call onedark#extend_highlight("IncSearch", { "gui" : "underline,bold,italic,standout",  "bg": { "gui": "#ffde87" } , "fg" : {"gui":"#444959" }})
+            autocmd ColorScheme onedark call onedark#extend_highlight("QuickFixLine", { "gui" : "underline",  "bg": { "gui": "NONE" } , "fg" : {"gui":"yellow" }})
+            autocmd ColorScheme onedark highlight QuickFixLineScope gui=underline guifg=#e5c07b guibg=#444959
 
         augroup END
 
@@ -2080,7 +2145,7 @@ endif
 " -------------------------------------------
 " 7.1 Style
 " -------------------------------------------
-if PSelect('colorscheme')
+if PSelect('colorscheme') && !empty(globpath(&rtp, 'colors/onedark.vim'))
     colorscheme onedark
 else
     colorscheme desert
