@@ -2158,12 +2158,18 @@ endif
 " -------------------------------------------
 " 5.1 Style
 " -------------------------------------------
-if PlugSelect('colorscheme') && !empty(globpath(&rtp, 'colors/onedark.vim'))
-    colorscheme onedark
-else
+function! s:TryColorschemes(names)
     set background=dark
-    colorscheme wildcharm
-endif
+    for name in a:names
+        try
+            execute 'colorscheme' name
+            return
+        catch /E185:/
+        endtry
+    endfor
+endfunction
+
+call s:TryColorschemes(['onedark', 'wildcharm', 'desert', 'default'])
 " -------------------------------------------
 " 5.2 Async complete
 " -------------------------------------------
