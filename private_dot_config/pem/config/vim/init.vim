@@ -157,12 +157,20 @@ let g:startify_custom_header = [
     endfunction
 
     " :PlugInit [none|lite|full]  下载并启用对应等级的插件
-    command! -nargs=? -complete=customlist,<SID>PlugLevelList PlugInit
+    "   默认优先用 lockfile(PlugSnapshotLoad) 恢复插件版本；:PlugInit! 强制全新安装
+    command! -bang -nargs=? -complete=customlist,<SID>PlugLevelList PlugInit
                 \ if s:PlugInitPrepare(<q-args>)
                 \ |   execute 'source' s:thisfile
                 \ |   if get(g:, 'pe_plug_need_install', 0) && exists(':PlugInstall')
-                \ |       execute 'PlugInstall'
+                \ |       if !<bang>0 && filereadable(s:lockvim)
+                \ |           echo 'Restoring plugins from lockfile: ' . s:lockvim
+                \ |           execute 'source' s:lockvim
+                \ |       else
+                \ |           echo 'Installing plugins (no lockfile / forced) ...'
+                \ |           execute 'PlugInstall'
+                \ |       endif
                 \ |       execute 'source' s:thisfile
+                \ |       echo 'Plug level "' . g:pe_plug_level . '" ready.'
                 \ |   endif
                 \ | endif
 
