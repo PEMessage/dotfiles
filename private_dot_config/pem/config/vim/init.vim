@@ -75,129 +75,18 @@ let g:startify_custom_header = [
     let s:thisdir = fnamemodify(s:thisfile, ':h')
     let s:lockvim = s:thisdir . '/lock.vim'
 
-" 1. Select plug we want
-" ===========================================
-    " Plug levels: none(pure vim, no plugins) / lite(basic+colorscheme) / full(all)
-    " Default none; use :PlugInit [level] inside vim to install on demand
-    let g:pe_plug_levels = {
-                \ 'none': [],
-                \ 'lite': ['basic', 'colorscheme'],
-                \ 'full': ['*'],
-                \ }
-
-    " Cache dir and level-persistence file (PlugInit writes the level here)
+    " Cache dir (shared by view / session / plug level / localvimrc ...)
     let g:pe_cache_dir = expand('~/.cache/vim')
     if !isdirectory(g:pe_cache_dir)
         call mkdir(g:pe_cache_dir, "p")
     endif
-    let g:pe_plug_level_file = g:pe_cache_dir . '/plug_level'
 
-    function! s:ReadPlugLevel() abort
-        if exists('$PE_PLUG_GROUP') && has_key(g:pe_plug_levels, tolower($PE_PLUG_GROUP))
-            return tolower($PE_PLUG_GROUP)
-        endif
-        if filereadable(g:pe_plug_level_file)
-            let l:lv = trim(get(readfile(g:pe_plug_level_file), 0, ''))
-            if has_key(g:pe_plug_levels, l:lv)
-                return l:lv
-            endif
-        endif
-        return 'none'
-    endfunction
-
-    let g:pe_plug_level = s:ReadPlugLevel()
-    let g:pe_plug_group = copy(g:pe_plug_levels[g:pe_plug_level])
-
-    function! PSelect(group) abort
-        for pattern in g:pe_plug_group
-            if pattern ==# '*' || a:group ==# '*'
-                return 1
-            endif
-            if a:group ==# pattern
-                return 1
-            endif
-        endfor
-        return 0
-    endfunction
-
-" 2. Auto Install ViM-Plug & PlugInit
-" ===========================================
-
-    " Ensure vim-plug is installed; returns 1=just installed / 0=already present / -1=failed
-    function! s:EnsurePlug() abort
-        if has('nvim')
-            let g:pe_runtime_path = stdpath('data') . '/site'
-        else
-            exe 'set rtp+=' . expand('~/.config/vim')
-            let g:pe_runtime_path = expand('~/.config/vim')
-        endif
-        if !empty(glob(g:pe_runtime_path . '/autoload/plug.vim'))
-            return 0
-        endif
-        echo 'Installing vim-plug ...'
-        silent execute '!curl -fLo '.g:pe_runtime_path.'/autoload/plug.vim --create-dirs '.s:vim_plug_url
-        if empty(glob(g:pe_runtime_path . '/autoload/plug.vim'))
-            echohl ErrorMsg | echo 'vim-plug download failed' | echohl None
-            return -1
-        endif
-        return 1
-    endfunction
-
-    " Validate and persist the level; returns 1 on success, 0 otherwise
-    function! s:PlugInitPrepare(level) abort
-        let l:level = (a:level == '') ? g:pe_plug_level : tolower(a:level)
-        if !has_key(g:pe_plug_levels, l:level)
-            echohl WarningMsg
-            echo 'Unknown plug level "' . l:level . '". Available: ' . join(sort(keys(g:pe_plug_levels)), ', ')
-            echohl None
-            return 0
-        endif
-        let g:pe_plug_level = l:level
-        let g:pe_plug_group = copy(g:pe_plug_levels[l:level])
-        let $PE_PLUG_GROUP = l:level
-        call writefile([l:level], g:pe_plug_level_file)
-        let g:pe_plug_need_install = (l:level !=# 'none')
-        return 1
-    endfunction
-
-    function! s:PlugLevelList(A, L, P) abort
-        return filter(sort(keys(g:pe_plug_levels)), 'v:val =~ "^" . a:A')
-    endfunction
-
-    " :PlugInit [none|lite|full]  install and enable plugins for the level
-    "   Prefer restoring pinned versions from lockfile (PlugSnapshotLoad);
-    "   :PlugInit! forces a fresh install.
-    command! -bang -nargs=? -complete=customlist,<SID>PlugLevelList PlugInit
-                \ if s:PlugInitPrepare(<q-args>)
-                \ |   execute 'source' s:thisfile
-                \ |   if get(g:, 'pe_plug_need_install', 0) && exists(':PlugInstall')
-                \ |       if !<bang>0 && filereadable(s:lockvim)
-                \ |           echo 'Restoring plugins from lockfile: ' . s:lockvim
-                \ |           execute 'source' s:lockvim
-                \ |       else
-                \ |           echo 'Installing plugins (no lockfile / forced) ...'
-                \ |           execute 'PlugInstall'
-                \ |       endif
-                \ |       execute 'source' s:thisfile
-                \ |       echo 'Plug level "' . g:pe_plug_level . '" ready.'
-                \ |   endif
-                \ | endif
-
-    " At startup, if plugins are enabled, ensure vim-plug exists and reload
-    if PSelect('*')
-        if s:EnsurePlug() > 0
-            execute 'source' s:thisfile
-        endif
-    endif
-
-
-
-" 3. Some General Setting
+" 1. Some General Setting
 " ===========================================
 
 
 " -------------------------------------------
-" 3.1 Basic Setting Zone
+" 1.1 Basic Setting Zone
 " -------------------------------------------
     filetype plugin indent on
     set nrformats-=octal
@@ -251,7 +140,7 @@ let g:startify_custom_header = [
 
 
 " -------------------------------------------
-" 3.2 Coding Zone
+" 1.2 Coding Zone
 " -------------------------------------------
     if has('multi_byte')
         " 内部工作编码
@@ -308,7 +197,7 @@ let g:startify_custom_header = [
 
 
 " -------------------------------------------
-" 3.3 Search Zone
+" 1.3 Search Zone
 " -------------------------------------------
     set ignorecase  " smartcase depend this options
     set smartcase   " 智能搜索大小写判断，默认忽略大小写，除非搜索内容包含大写字母
@@ -321,7 +210,7 @@ let g:startify_custom_header = [
 
 
 " -------------------------------------------
-" 3.4 Tab and Indent Setting
+" 1.4 Tab and Indent Setting
 " -------------------------------------------
     set tabstop=4                  " Tab 长度，默认为8
     set smarttab                   " 根据文件中其他地方的缩进空格个数来确定一个tab是多少个空格
@@ -354,7 +243,7 @@ let g:startify_custom_header = [
     set hidden
 
 " -------------------------------------------
-" 3.5 Window Setting
+" 1.5 Window Setting
 " -------------------------------------------
     augroup vimrc_help
         autocmd!
@@ -443,7 +332,7 @@ let g:startify_custom_header = [
 
 
 " -------------------------------------------
-" 3.6 Meta Setting
+" 1.6 Meta Setting
 " -------------------------------------------
     if $TMUX != ''
         set ttimeoutlen=30
@@ -486,7 +375,7 @@ let g:startify_custom_header = [
     "     endfor
     " endif
 " -------------------------------------------
-" 3.7 VIM Style Setting
+" 1.7 VIM Style Setting
 " -------------------------------------------
     set laststatus=2            " 总是显示状态栏
     set showtabline=2           " 总是显示标签栏
@@ -504,7 +393,7 @@ let g:startify_custom_header = [
     set statusline+=\ %0(%{&fileformat}\ [%{(&fenc==\"\"?&enc:&fenc).(&bomb?\",BOM\":\"\")}]\ %v:%l/%L%)
 
 " -------------------------------------------
-" 3.8 Basic Tag setting
+" 1.8 Basic Tag setting
 " -------------------------------------------
     " See: https://www.zhihu.com/question/35808196/answer/130915301
     " './' 的意思是，vim解析时，碰到 "./" 会被替换成当前编辑文件的文件夹
@@ -520,7 +409,7 @@ let g:startify_custom_header = [
 
 
 
-" 4. Keybending list
+" 2. Keybending list
 " ===========================================
 
 "  Mark A
@@ -540,7 +429,7 @@ let g:startify_custom_header = [
 "
 
 " -------------------------------------------
-" 4.1 Basic Setting Zone ( Input Mode  )
+" 2.1 Basic Setting Zone ( Input Mode  )
 " -------------------------------------------
     " inoremap jj <ESC>
     nnoremap <silent> j gj
@@ -569,7 +458,7 @@ let g:startify_custom_header = [
     " nnoremap <silent><M-S-K> :wincmd k<CR>
 
 " -------------------------------------------
-" 4.2 wincmd/buffer/tab keymap
+" 2.2 wincmd/buffer/tab keymap
 " -------------------------------------------
     " Switch window
     tnoremap <silent><M-S-H> <C-W>:wincmd h<CR>
@@ -589,7 +478,7 @@ let g:startify_custom_header = [
     " nnoremap gq :exit<CR>
 
 " -------------------------------------------
-" 4.3 Mouse mapping
+" 2.3 Mouse mapping
 " -------------------------------------------
     " nnoremap <MiddleMouse>     :tabclose<CR>
     vnoremap <RightMouse>            "+y
@@ -597,7 +486,7 @@ let g:startify_custom_header = [
 
 
 " -------------------------------------------
-" 4.4 Extend mapping and command
+" 2.4 Extend mapping and command
 " -------------------------------------------
     nnoremap <leader>rcc  :w<CR> :source %<CR> " Re:Configuration
 
@@ -665,7 +554,7 @@ let g:startify_custom_header = [
     " vnoremap <cr> iwoiwo
 
 " -------------------------------------------
-" 4.5 Extend mapping on cmap and vmap
+" 2.5 Extend mapping on cmap and vmap
 " -------------------------------------------
     " 1. There is no such thing as "search mode": / and ? are like :,
     "    they start command-line mode so you need a command-line mode mapping.
@@ -738,11 +627,11 @@ let g:startify_custom_header = [
     vnoremap <silent> * :<C-u>call VisualSelection('fs')<CR>:set hls<CR>
     vnoremap <silent> & :<C-u>call VisualSelection('fsa')<CR>:set hls<CR>
     vnoremap <silent> # :<C-u>call VisualSelection('b')<CR>:set hls<CR>
-" 5. Netrw Setting
+" 3. Netrw Setting
 " ===========================================
 
 " -------------------------------------------
-" 5.1 Basic netrw setting
+" 3.1 Basic netrw setting
 " -------------------------------------------
     let g:netrw_banner = 0                      " 设置是否显示横幅
     " if argv(0) ==# '.'
@@ -801,7 +690,7 @@ let g:startify_custom_header = [
     autocmd CmdwinEnter * call s:MapCmdWin()
 
 " -------------------------------------------
-" 5.2 Buffer mapping
+" 3.2 Buffer mapping
 " -------------------------------------------
 
     " command! PEWrite execute 'w !sudo tee % <bar> edit! '
@@ -823,12 +712,123 @@ let g:startify_custom_header = [
 
 
 
-" 6. VIM Plug-in Zone (Part1)
+" 4. VIM Plug-in Zone (Part1)
 " ===========================================
 " -------------------------------------------
-" 6.0 Start of plug
+" Plug Ext -- Select plug level
 " -------------------------------------------
-if PSelect('*')
+    " Plug levels: none(pure vim, no plugins) / lite(basic+colorscheme) / full(all)
+    " Default none; use :PlugInit [level] inside vim to install on demand
+    let g:pe_plug_levels = {
+                \ 'none': [],
+                \ 'lite': ['basic', 'colorscheme'],
+                \ 'full': ['*'],
+                \ }
+    let g:pe_plug_level_file = g:pe_cache_dir . '/plug_level'
+
+    function! s:ReadPlugLevel() abort
+        if exists('$PE_PLUG_GROUP') && has_key(g:pe_plug_levels, tolower($PE_PLUG_GROUP))
+            return tolower($PE_PLUG_GROUP)
+        endif
+        if filereadable(g:pe_plug_level_file)
+            let l:lv = trim(get(readfile(g:pe_plug_level_file), 0, ''))
+            if has_key(g:pe_plug_levels, l:lv)
+                return l:lv
+            endif
+        endif
+        return 'none'
+    endfunction
+
+    let g:pe_plug_level = s:ReadPlugLevel()
+    let g:pe_plug_group = copy(g:pe_plug_levels[g:pe_plug_level])
+
+    function! PlugSelect(group) abort
+        for pattern in g:pe_plug_group
+            if pattern ==# '*' || a:group ==# '*'
+                return 1
+            endif
+            if a:group ==# pattern
+                return 1
+            endif
+        endfor
+        return 0
+    endfunction
+
+" -------------------------------------------
+" Plug Ext -- Auto install ViM-Plug & PlugInit
+" -------------------------------------------
+
+    " Ensure vim-plug is installed; returns 1=just installed / 0=already present / -1=failed
+    function! s:EnsurePlug() abort
+        if has('nvim')
+            let g:pe_runtime_path = stdpath('data') . '/site'
+        else
+            exe 'set rtp+=' . expand('~/.config/vim')
+            let g:pe_runtime_path = expand('~/.config/vim')
+        endif
+        if !empty(glob(g:pe_runtime_path . '/autoload/plug.vim'))
+            return 0
+        endif
+        echo 'Installing vim-plug ...'
+        silent execute '!curl -fLo '.g:pe_runtime_path.'/autoload/plug.vim --create-dirs '.s:vim_plug_url
+        if empty(glob(g:pe_runtime_path . '/autoload/plug.vim'))
+            echohl ErrorMsg | echo 'vim-plug download failed' | echohl None
+            return -1
+        endif
+        return 1
+    endfunction
+
+    " Validate and persist the level; returns 1 on success, 0 otherwise
+    function! s:PlugInitPrepare(level) abort
+        let l:level = (a:level == '') ? g:pe_plug_level : tolower(a:level)
+        if !has_key(g:pe_plug_levels, l:level)
+            echohl WarningMsg
+            echo 'Unknown plug level "' . l:level . '". Available: ' . join(sort(keys(g:pe_plug_levels)), ', ')
+            echohl None
+            return 0
+        endif
+        let g:pe_plug_level = l:level
+        let g:pe_plug_group = copy(g:pe_plug_levels[l:level])
+        let $PE_PLUG_GROUP = l:level
+        call writefile([l:level], g:pe_plug_level_file)
+        let g:pe_plug_need_install = (l:level !=# 'none')
+        return 1
+    endfunction
+
+    function! s:PlugLevelList(A, L, P) abort
+        return filter(sort(keys(g:pe_plug_levels)), 'v:val =~ "^" . a:A')
+    endfunction
+
+    " :PlugInit [none|lite|full]  install and enable plugins for the level
+    "   Prefer restoring pinned versions from lockfile (PlugSnapshotLoad);
+    "   :PlugInit! forces a fresh install.
+    command! -bang -nargs=? -complete=customlist,<SID>PlugLevelList PlugInit
+                \ if s:PlugInitPrepare(<q-args>)
+                \ |   execute 'source' s:thisfile
+                \ |   if get(g:, 'pe_plug_need_install', 0) && exists(':PlugInstall')
+                \ |       if !<bang>0 && filereadable(s:lockvim)
+                \ |           echo 'Restoring plugins from lockfile: ' . s:lockvim
+                \ |           execute 'source' s:lockvim
+                \ |       else
+                \ |           echo 'Installing plugins (no lockfile / forced) ...'
+                \ |           execute 'PlugInstall'
+                \ |       endif
+                \ |       execute 'source' s:thisfile
+                \ |       echo 'Plug level "' . g:pe_plug_level . '" ready.'
+                \ |   endif
+                \ | endif
+
+    " At startup, if plugins are enabled, ensure vim-plug exists and reload
+    if PlugSelect('*')
+        if s:EnsurePlug() > 0
+            execute 'source' s:thisfile
+        endif
+    endif
+
+" -------------------------------------------
+" 4.0 Start of plug
+" -------------------------------------------
+if PlugSelect('*')
     call plug#begin(pe_runtime_path . '/plugged')
     " helper
     function! Cond(cond, ...)
@@ -860,7 +860,7 @@ if PSelect('*')
 
 
 " -------------------------------------------
-" 6.1 Basic Function
+" 4.1 Basic Function
 " -------------------------------------------
     " Some little tweak
     " Plug 'drmikehenry/vim-fixkey'
@@ -1064,10 +1064,10 @@ if PSelect('*')
 
 
 " -------------------------------------------
-" 6.2 Textobj
+" 4.2 Textobj
 " -------------------------------------------
 
-if PSelect('textobj')
+if PlugSelect('textobj')
     Plug 'kana/vim-submode'
         let g:submode_timeout = 0
         " let g:submode_keep_leaving_key = 0
@@ -1136,9 +1136,9 @@ endif
 
 
 " -------------------------------------------
-" 6.3.1 Style PlugIn -- colorscheme
+" 4.3.1 Style PlugIn -- colorscheme
 " -------------------------------------------
-if PSelect('colorscheme')
+if PlugSelect('colorscheme')
     Plug 'joshdick/onedark.vim'
     " let g:onedark_color_overrides = {
     "             \ "QuickFixLine": {"gui": "#2F343F", "cterm": "235", "cterm16": "0" },
@@ -1196,9 +1196,9 @@ if PSelect('colorscheme')
 endif
 
 " -------------------------------------------
-" 6.3.2 Style PlugIn -- starify
+" 4.3.2 Style PlugIn -- starify
 " -------------------------------------------
-if PSelect('starify')
+if PlugSelect('starify')
     Plug 'mhinz/vim-startify'
         nnoremap <leader>st :tab new<CR>:Startify<CR>
         " Most Recent File MRF
@@ -1212,9 +1212,9 @@ if PSelect('starify')
 endif
 
 " -------------------------------------------
-" 6.3.3 Style PlugIn -- extrastyle
+" 4.3.3 Style PlugIn -- extrastyle
 " -------------------------------------------
-if PSelect('extrastyle')
+if PlugSelect('extrastyle')
     Plug 'itchyny/lightline.vim'
     " Plug 'google/vim-searchindex' , Cond( stridx(&shortmess, 'S')  != -1)
     " let g:searchindex_enabled = stridx(&shortmess, 'S') != -1  || has('patch-8.1.1270') != 1
@@ -1234,9 +1234,9 @@ endif
 
 
 " -------------------------------------------
-" 6.3.4 Style PlugIn -- highlight
+" 4.3.4 Style PlugIn -- highlight
 " -------------------------------------------
-if PSelect('highlight')
+if PlugSelect('highlight')
     " Plug 'ARM9/arm-syntax-vim'
         " autocmd BufNewFile,BufRead *.s,*.S set filetype=arm " arm = armv6/7
     Plug 'rubberduck203/aosp-vim'
@@ -1309,7 +1309,7 @@ if PSelect('highlight')
 endif
 
 " -------------------------------------------
-" 6.4 Locale
+" 4.4 Locale
 " -------------------------------------------
     Plug 'yianwillis/vimcdoc'
     Plug 'voldikss/vim-translator'
@@ -1319,7 +1319,7 @@ endif
     endif
 
 " -------------------------------------------
-" 6.5 Tpope plugin
+" 4.5 Tpope plugin
 " -------------------------------------------
     " Plug 'junegunn/vim-easy-align'
     "     nmap ga <Plug>(EasyAlign)
@@ -1370,7 +1370,7 @@ endif
         command UnSleuth setlocal et sw=4 ts=4
 
 " -------------------------------------------
-" 6.6 Git plugin
+" 4.6 Git plugin
 " -------------------------------------------
     Plug 'airblade/vim-gitgutter'
         let g:gitgutter_map_keys = 0
@@ -1417,7 +1417,7 @@ endif
 
 
 " -------------------------------------------
-" 6.7 Tmux and Terminal
+" 4.7 Tmux and Terminal
 " -------------------------------------------
     Plug 'NickLaMuro/vimux'
         " nmap <Leader>vl :VimuxRunLastCommand<CR>
@@ -1527,7 +1527,7 @@ endif
         " noremap  <C-l> :<C-U>TmuxNavigateRight<cr>
 
 " -------------------------------------------
-" 6.8 Tag Plugin
+" 4.8 Tag Plugin
 " -------------------------------------------
     " GTAGS for jump
     " Changelog: compare to origin one
@@ -1733,7 +1733,7 @@ endif
 
 
 " -------------------------------------------
-" 6.9 Quickfix Plugin
+" 4.9 Quickfix Plugin
 " -------------------------------------------
     " Quickfix Config
     set cscopequickfix=s-,g-,d-,c-,t-,e-,f-,i-,a-
@@ -1798,7 +1798,7 @@ endif
         nnoremap <S-F11> :call QuickfixArrowPreview('k')<CR>
 
 " -------------------------------------------
-" 6.10 Complete Engine (APC)
+" 4.10 Complete Engine (APC)
 " -------------------------------------------
     " Auto Popup
     " Plug 'skywind3000/vim-auto-popmenu'
@@ -1822,7 +1822,7 @@ endif
         " endif
 
 " -------------------------------------------
-" 6.11 Complete Engine (All)
+" 4.11 Complete Engine (All)
 " -------------------------------------------
     " |1. 整行                                                 i_CTRL-X_CTRL-L
     " |2. 当前文件内的关键字                                   i_CTRL-X_CTRL-N
@@ -1857,7 +1857,7 @@ endif
 
 
 " -------------------------------------------
-" 6.11.1 Complete Engine (async)
+" 4.11.1 Complete Engine (async)
 " -------------------------------------------
 
     " Buggy buffer
@@ -1914,7 +1914,7 @@ endif
     endif
 
 " -------------------------------------------
-" 6.11.2 Complete Engine (easy)
+" 4.11.2 Complete Engine (easy)
 " -------------------------------------------
     " Disable due to casully eatting some keyhit
     " Plug 'jayli/vim-easycomplete', Cond(g:pe_complete_sys == 'easy')
@@ -1924,7 +1924,7 @@ endif
     "     " See: https://github.com/jayli/vim-easycomplete/issues/131
     "     let g:easycomplete_lsp_checking = 0
 " -------------------------------------------
-" 6.11.3 Complete Engine (*mu*)
+" 4.11.3 Complete Engine (*mu*)
 " -------------------------------------------
 
     " See: ins-completion for origin complete help
@@ -1943,7 +1943,7 @@ endif
     " Plug 'MarcWeber/vim-addon-mw-utils' , Cond(g:pe_complete_sys == 'mu')
 
     if g:pe_complete_sys == 'mu'
-        " 6.11.3.1 General Setting
+        " 4.11.3.1 General Setting
         " -------------------------------------------
         set completeopt+=menuone
         set completeopt+=noselect
@@ -1959,7 +1959,7 @@ endif
         set belloff+=ctrlg " Add only if Vim beeps during completion
         set cpt=.,w,b,u,U
 
-        " 6.11.3.2 Better dict complete setting(disable file path)
+        " 4.11.3.2 Better dict complete setting(disable file path)
         " -------------------------------------------
         " Credit:
         " https://stackoverflow.com/questions/1830221/how-to-remove-file-name-from-vim-dictionary-menu
@@ -2000,7 +2000,7 @@ endif
         "             \ 'default' : ['path','user','incl'],
         "             \ }
 
-        " 6.11.3.3 Sub Setting for neosnippet
+        " 4.11.3.3 Sub Setting for neosnippet
         " -------------------------------------------
         Plug 'Shougo/neosnippet.vim' , Cond(g:pe_complete_sys == 'mu')
         Plug 'Shougo/neosnippet-snippets' , Cond(g:pe_complete_sys == 'mu')
@@ -2036,7 +2036,7 @@ endif
 
 
 " -------------------------------------------
-" 6.11.4 Complete Engine (apt)
+" 4.11.4 Complete Engine (apt)
 " -------------------------------------------
 "  se
     Plug 'skywind3000/vim-auto-popmenu' , Cond(g:pe_complete_sys == 'apt')
@@ -2048,7 +2048,7 @@ endif
     endif
 
 " -------------------------------------------
-" 6.12 debug adapter
+" 4.12 debug adapter
 " -------------------------------------------
     Plug 'puremourning/vimspector'
         let g:vimspector_enable_mappings = 'HUMAN'
@@ -2063,7 +2063,7 @@ endif
 
     Plug 'PEMessage/subcmd.vim'
 " -------------------------------------------
-" 6.13 LSP
+" 4.13 LSP
 " -------------------------------------------
     Plug 'prabirshrestha/vim-lsp'
         let g:lsp_diagnostics_virtual_text_enabled = 0 " this will cause display random empty line when cursor move
@@ -2157,18 +2157,18 @@ endif
     call plug#end()
 endif
 
-" 7. VIM Plug-in Zone (Part2)
+" 5. VIM Plug-in Zone (Part2)
 " ===========================================
 " -------------------------------------------
-" 7.1 Style
+" 5.1 Style
 " -------------------------------------------
-if PSelect('colorscheme') && !empty(globpath(&rtp, 'colors/onedark.vim'))
+if PlugSelect('colorscheme') && !empty(globpath(&rtp, 'colors/onedark.vim'))
     colorscheme onedark
 else
     colorscheme desert
 endif
 " -------------------------------------------
-" 7.2 Async complete
+" 5.2 Async complete
 " -------------------------------------------
 if exists('*asyncomplete#register_source')
     au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options({
@@ -2196,9 +2196,9 @@ endif
 " endif
 
 " -------------------------------------------
-" 7.3 Expand region
+" 5.3 Expand region
 " -------------------------------------------
-if PSelect('textobj')
+if PlugSelect('textobj')
     " call expand_region#custom_text_objects()
     " call expand_region#custom_text_objects('java', {
     "             \ 'iF' :0,
@@ -2244,7 +2244,7 @@ if PSelect('textobj')
                 \ })
 endif
 " -------------------------------------------
-" 7.4 Submode Map
+" 5.4 Submode Map
 " -------------------------------------------
 
     " call submode#enter_with('viewcode', 'n', '', 'gh', 'zz')
@@ -2269,7 +2269,7 @@ endif
 
 
 " -------------------------------------------
-" 7.5 Quick UI
+" 5.5 Quick UI
 " -------------------------------------------
     " Quick UI Register
     " let g:quickui_color_scheme = 'system'
@@ -2350,11 +2350,11 @@ endif
     " nnoremap <RightMouse> :call quickui#context#open(n_rightmouse_content, n_rightmouse_opts)<CR>
 
 " -------------------------------------------
-" 7.6 local vimrc load
+" 5.6 local vimrc load
 " -------------------------------------------
 
 " -------------------------------------------
-" 7.7 vim-lsp
+" 5.7 vim-lsp
 " -------------------------------------------
     if executable('ccls')
 	    au User lsp_setup call lsp#register_server({
@@ -2414,7 +2414,7 @@ endif
 
 
 
-" 8 Self Function Zone
+" 6. Self Function Zone
 " ===========================================
     let s:exitKeyList = [ 'q', "\<ESC>" ]
     let s:delKeyList  = [ 'x', 'd' ]
@@ -2554,7 +2554,7 @@ endif
     endfunction
 
 
-" 9 Some others Function snippet
+" 7. Some others Function snippet
 " ===========================================
     " copy to attached terminal using the yank(1) script:
     " Credit:
