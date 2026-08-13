@@ -16,6 +16,14 @@ let g:startify_custom_header = [
 " Last Modified:  2024-03-12 19:39
 " +++++++++++++++++++++++++++++++++++++++++++
 "
+" ------------------------------------------------------------------
+" Naming Convention
+"   global       : g:pe_<snake_case>   e.g. g:pe_cache_dir
+"   script-local : s:<snake_case>      e.g. s:thisfile
+"   environment  : $PE_<UPPER_CASE>    e.g. $PE_PLUG_GROUP
+"   func/command : PE<CamelCase>       e.g. PEGrep / PEDate
+" ------------------------------------------------------------------
+"
 
 
 
@@ -43,8 +51,8 @@ let g:startify_custom_header = [
 
 
     " Comment Color
-    let s:pe_commentcolor = {"gui": "#00af87", "cterm": "246", "cterm16": "7"}
-    let g:pe_competesys=""
+    let s:comment_color = {"gui": "#00af87", "cterm": "246", "cterm16": "7"}
+    let g:pe_complete_sys=""
 
     let g:lightline = {
                 \ 'colorscheme': 'selenized_black',
@@ -69,24 +77,24 @@ let g:startify_custom_header = [
 
 " 1. Select plug we want
 " ===========================================
-    " 插件等级：none(纯 vim, 无插件) / lite(基础+配色) / full(全部)
-    " 默认 none，进入 vim 后可用 :PlugInit [level] 动态下载不同等级
+    " Plug levels: none(pure vim, no plugins) / lite(basic+colorscheme) / full(all)
+    " Default none; use :PlugInit [level] inside vim to install on demand
     let g:pe_plug_levels = {
                 \ 'none': [],
                 \ 'lite': ['basic', 'colorscheme'],
                 \ 'full': ['*'],
                 \ }
 
-    " 缓存目录与等级持久化文件（PlugInit 会写入 level）
-    let g:pe_cachedir = expand('~/.cache/vim')
-    if !isdirectory(g:pe_cachedir)
-        call mkdir(g:pe_cachedir, "p")
+    " Cache dir and level-persistence file (PlugInit writes the level here)
+    let g:pe_cache_dir = expand('~/.cache/vim')
+    if !isdirectory(g:pe_cache_dir)
+        call mkdir(g:pe_cache_dir, "p")
     endif
-    let g:pe_plug_level_file = g:pe_cachedir . '/plug_level'
+    let g:pe_plug_level_file = g:pe_cache_dir . '/plug_level'
 
     function! s:ReadPlugLevel() abort
-        if exists('$PEM_PLUG_GROUP') && has_key(g:pe_plug_levels, tolower($PEM_PLUG_GROUP))
-            return tolower($PEM_PLUG_GROUP)
+        if exists('$PE_PLUG_GROUP') && has_key(g:pe_plug_levels, tolower($PE_PLUG_GROUP))
+            return tolower($PE_PLUG_GROUP)
         endif
         if filereadable(g:pe_plug_level_file)
             let l:lv = trim(get(readfile(g:pe_plug_level_file), 0, ''))
@@ -115,27 +123,27 @@ let g:startify_custom_header = [
 " 2. Auto Install ViM-Plug & PlugInit
 " ===========================================
 
-    " 确保 vim-plug 已安装；返回 1=刚安装 / 0=已存在 / -1=失败
+    " Ensure vim-plug is installed; returns 1=just installed / 0=already present / -1=failed
     function! s:EnsurePlug() abort
         if has('nvim')
-            let g:pe_runtimepath = stdpath('data') . '/site'
+            let g:pe_runtime_path = stdpath('data') . '/site'
         else
             exe 'set rtp+=' . expand('~/.config/vim')
-            let g:pe_runtimepath = expand('~/.config/vim')
+            let g:pe_runtime_path = expand('~/.config/vim')
         endif
-        if !empty(glob(g:pe_runtimepath . '/autoload/plug.vim'))
+        if !empty(glob(g:pe_runtime_path . '/autoload/plug.vim'))
             return 0
         endif
         echo 'Installing vim-plug ...'
-        silent execute '!curl -fLo '.g:pe_runtimepath.'/autoload/plug.vim --create-dirs '.s:vim_plug_url
-        if empty(glob(g:pe_runtimepath . '/autoload/plug.vim'))
+        silent execute '!curl -fLo '.g:pe_runtime_path.'/autoload/plug.vim --create-dirs '.s:vim_plug_url
+        if empty(glob(g:pe_runtime_path . '/autoload/plug.vim'))
             echohl ErrorMsg | echo 'vim-plug download failed' | echohl None
             return -1
         endif
         return 1
     endfunction
 
-    " 校验并写入等级；成功返回 1，否则返回 0
+    " Validate and persist the level; returns 1 on success, 0 otherwise
     function! s:PlugInitPrepare(level) abort
         let l:level = (a:level == '') ? g:pe_plug_level : tolower(a:level)
         if !has_key(g:pe_plug_levels, l:level)
@@ -146,7 +154,7 @@ let g:startify_custom_header = [
         endif
         let g:pe_plug_level = l:level
         let g:pe_plug_group = copy(g:pe_plug_levels[l:level])
-        let $PEM_PLUG_GROUP = l:level
+        let $PE_PLUG_GROUP = l:level
         call writefile([l:level], g:pe_plug_level_file)
         let g:pe_plug_need_install = (l:level !=# 'none')
         return 1
@@ -156,8 +164,9 @@ let g:startify_custom_header = [
         return filter(sort(keys(g:pe_plug_levels)), 'v:val =~ "^" . a:A')
     endfunction
 
-    " :PlugInit [none|lite|full]  下载并启用对应等级的插件
-    "   默认优先用 lockfile(PlugSnapshotLoad) 恢复插件版本；:PlugInit! 强制全新安装
+    " :PlugInit [none|lite|full]  install and enable plugins for the level
+    "   Prefer restoring pinned versions from lockfile (PlugSnapshotLoad);
+    "   :PlugInit! forces a fresh install.
     command! -bang -nargs=? -complete=customlist,<SID>PlugLevelList PlugInit
                 \ if s:PlugInitPrepare(<q-args>)
                 \ |   execute 'source' s:thisfile
@@ -174,7 +183,7 @@ let g:startify_custom_header = [
                 \ |   endif
                 \ | endif
 
-    " 启动时若已启用插件，则自动确保 vim-plug 存在并重载
+    " At startup, if plugins are enabled, ensure vim-plug exists and reload
     if PSelect('*')
         if s:EnsurePlug() > 0
             execute 'source' s:thisfile
@@ -376,7 +385,7 @@ let g:startify_custom_header = [
     " hi
 
     " See https://vim.fandom.com/wiki/Make_views_automatic
-    execute "set viewdir=" . g:pe_cachedir . '/view'
+    execute "set viewdir=" . g:pe_cache_dir . '/view'
     set viewoptions-=options
     let g:skipview_files = [
                 \ '[EXAMPLE PLUGIN BUFFER]'
@@ -438,12 +447,12 @@ let g:startify_custom_header = [
 " -------------------------------------------
     if $TMUX != ''
         set ttimeoutlen=30
-        let g:pem_tmux_pane_id = system("tmux display-message -p '#{pane_id}'")
-        let g:pem_tmux_window_id = system("tmux display-message -p '#{window_id}'")
+        let g:pe_tmux_pane_id = system("tmux display-message -p '#{pane_id}'")
+        let g:pe_tmux_window_id = system("tmux display-message -p '#{window_id}'")
     elseif &ttimeoutlen > 80 || &ttimeoutlen <= 0
         set ttimeoutlen=80
-        let g:pem_tmux_pane_id = ''
-        let g:pem_tmux_window_id = ''
+        let g:pe_tmux_pane_id = ''
+        let g:pe_tmux_window_id = ''
     endif
     " 终端下允许 ALT，详见：http://www.skywind.me/blog/archives/2021
     " 记得设置 ttimeout （见 init-basic.vim） 和 ttimeoutlen （上面）
@@ -656,7 +665,7 @@ let g:startify_custom_header = [
     " vnoremap <cr> iwoiwo
 
 " -------------------------------------------
-" 4.4 Extend mapping on cmap and vmap
+" 4.5 Extend mapping on cmap and vmap
 " -------------------------------------------
     " 1. There is no such thing as "search mode": / and ? are like :,
     "    they start command-line mode so you need a command-line mode mapping.
@@ -820,7 +829,7 @@ let g:startify_custom_header = [
 " 6.0 Start of plug
 " -------------------------------------------
 if PSelect('*')
-    call plug#begin(pe_runtimepath . '/plugged')
+    call plug#begin(pe_runtime_path . '/plugged')
     " helper
     function! Cond(cond, ...)
         let opts = get(a:000, 0, {})
@@ -851,7 +860,7 @@ if PSelect('*')
 
 
 " -------------------------------------------
-" 6.1 Basic Funtion
+" 6.1 Basic Function
 " -------------------------------------------
     " Some little tweak
     " Plug 'drmikehenry/vim-fixkey'
@@ -1010,7 +1019,7 @@ if PSelect('*')
     "     " if !isdirectory(vimd_path)
     "     "     call mkdir(vimd_path, "p")
     "     " endif
-    "     let g:yankring_history_dir = pe_cachedir
+    "     let g:yankring_history_dir = pe_cache_dir
     "     " nnoremap <silent> <leader>yy :YRShow<CR>
     "     nnoremap <silent> <C-y> :YRShow<CR>
     "     inoremap <silent> <C-y> <ESC>:YRShow<CR>
@@ -1195,7 +1204,7 @@ if PSelect('starify')
         " Most Recent File MRF
         nnoremap <leader>sb :Startify<CR>
         " Most Recent File MRF
-        let g:startify_session_dir = pe_cachedir . "/session"
+        let g:startify_session_dir = pe_cache_dir . "/session"
         " Plug 'ap/vim-buftabline'
         let g:startify_enable_unsafe = 1
         let g:startify_files_number = 8
@@ -1203,7 +1212,7 @@ if PSelect('starify')
 endif
 
 " -------------------------------------------
-" 6.3.2 Style PlugIn -- extrastyle
+" 6.3.3 Style PlugIn -- extrastyle
 " -------------------------------------------
 if PSelect('extrastyle')
     Plug 'itchyny/lightline.vim'
@@ -1216,7 +1225,7 @@ if PSelect('extrastyle')
         let g:localvimrc_persistent = 2 " Store and restore all decisions
         let g:localvimrc_event  = [ 'VimEnter' ]
         if has('unix')
-            let g:localvimrc_persistence_file = pe_cachedir . '/localvimrc_persistent'
+            let g:localvimrc_persistence_file = pe_cache_dir . '/localvimrc_persistent'
         endif
 
     Plug 'edkolev/tmuxline.vim' , { 'on' : [ 'TmuxlineSnapshot', 'Tmuxline' ] }
@@ -1831,20 +1840,20 @@ endif
     set pumheight=5
 
     " if v:version >= 9000
-    "     let g:pe_competesys = 'vim'
+    "     let g:pe_complete_sys = 'vim'
     " elseif v:version >= 802 && ! has('win32')
-    "     let g:pe_competesys = 'easy'
+    "     let g:pe_complete_sys = 'easy'
     " if has('win32') && v:version >= 800
-    "     let g:pe_competesys = 'async'
+    "     let g:pe_complete_sys = 'async'
     if v:version >= 802
-        let g:pe_competesys = 'async'
+        let g:pe_complete_sys = 'async'
     elseif has('patch-7.4.775')
         " Good enought for buffer
-        let g:pe_competesys = 'apt'
+        let g:pe_complete_sys = 'apt'
     else
-        let g:pe_competesys = 'apt'
+        let g:pe_complete_sys = 'apt'
     endif
-    " let g:pe_competesys = 'apt'
+    " let g:pe_complete_sys = 'apt'
 
 
 " -------------------------------------------
@@ -1852,11 +1861,11 @@ endif
 " -------------------------------------------
 
     " Buggy buffer
-    Plug 'prabirshrestha/async.vim' , Cond(g:pe_competesys == 'async')
-    Plug 'prabirshrestha/asyncomplete.vim' , Cond(g:pe_competesys == 'async')
-    Plug 'prabirshrestha/asyncomplete-buffer.vim' , Cond(g:pe_competesys == 'async')
+    Plug 'prabirshrestha/async.vim' , Cond(g:pe_complete_sys == 'async')
+    Plug 'prabirshrestha/asyncomplete.vim' , Cond(g:pe_complete_sys == 'async')
+    Plug 'prabirshrestha/asyncomplete-buffer.vim' , Cond(g:pe_complete_sys == 'async')
 
-        Plug 'wellle/tmux-complete.vim' , Cond(g:pe_competesys == 'async')
+        Plug 'wellle/tmux-complete.vim' , Cond(g:pe_complete_sys == 'async')
             let g:tmuxcomplete#asyncomplete_source_options = {
             \ 'name':      'tmuxcomplete',
             \ 'whitelist': ['*'],
@@ -1870,11 +1879,11 @@ endif
             \     'truncate':        0
             \     }
             \ }
-        Plug 'rafamadriz/friendly-snippets' , Cond(g:pe_competesys == 'async')
-        Plug 'prabirshrestha/asyncomplete-file.vim' , Cond(g:pe_competesys == 'async')
+        Plug 'rafamadriz/friendly-snippets' , Cond(g:pe_complete_sys == 'async')
+        Plug 'prabirshrestha/asyncomplete-file.vim' , Cond(g:pe_complete_sys == 'async')
 
     Plug 'prabirshrestha/asyncomplete-lsp.vim'
-    if g:pe_competesys == 'async'
+    if g:pe_complete_sys == 'async'
         let g:asyncomplete_auto_popup = 1
 
         function! s:check_back_space() abort
@@ -1908,8 +1917,8 @@ endif
 " 6.11.2 Complete Engine (easy)
 " -------------------------------------------
     " Disable due to casully eatting some keyhit
-    " Plug 'jayli/vim-easycomplete', Cond(g:pe_competesys == 'easy')
-    "     Plug 'SirVer/ultisnips' , Cond(g:pe_competesys == 'easy' && has('python3'))
+    " Plug 'jayli/vim-easycomplete', Cond(g:pe_complete_sys == 'easy')
+    "     Plug 'SirVer/ultisnips' , Cond(g:pe_complete_sys == 'easy' && has('python3'))
 
     "     let g:easycomplete_nerd_font = 0
     "     " See: https://github.com/jayli/vim-easycomplete/issues/131
@@ -1919,22 +1928,22 @@ endif
 " -------------------------------------------
 
     " See: ins-completion for origin complete help
-    Plug 'lifepillar/vim-mucomplete' , Cond(g:pe_competesys == 'mu')
-    Plug 'skywind3000/vim-dict' , Cond(g:pe_competesys == 'mu')
+    Plug 'lifepillar/vim-mucomplete' , Cond(g:pe_complete_sys == 'mu')
+    Plug 'skywind3000/vim-dict' , Cond(g:pe_complete_sys == 'mu')
 
     " Plug 'PEMessage/T.vim' , { 'on' : ['Trans'] }
     Plug 'PEMessage/T.vim'
         vnoremap <leader>t :<c-u>Trans<cr>
         command! -n=0 Trans call T#VisualSearch(visualmode())
-    " Plug 'Konfekt/complete-common-words.vim' , Cond(g:pe_competesys == 'mu')
+    " Plug 'Konfekt/complete-common-words.vim' , Cond(g:pe_complete_sys == 'mu')
     " let g:common_words_dicts_dir = g:plug_home .. 'complete-common-words.vim/dicts'
     " set dictionary+=spell
 
-    " Plug 'garbas/vim-snipmate' , Cond(g:pe_competesys == 'mu')
-    " Plug 'MarcWeber/vim-addon-mw-utils' , Cond(g:pe_competesys == 'mu')
+    " Plug 'garbas/vim-snipmate' , Cond(g:pe_complete_sys == 'mu')
+    " Plug 'MarcWeber/vim-addon-mw-utils' , Cond(g:pe_complete_sys == 'mu')
 
-    if g:pe_competesys == 'mu'
-        " 6.11.3.1 Gernal Setting
+    if g:pe_complete_sys == 'mu'
+        " 6.11.3.1 General Setting
         " -------------------------------------------
         set completeopt+=menuone
         set completeopt+=noselect
@@ -1950,7 +1959,7 @@ endif
         set belloff+=ctrlg " Add only if Vim beeps during completion
         set cpt=.,w,b,u,U
 
-        " 6.11.3.1 Better dict complete setting(disable file path)
+        " 6.11.3.2 Better dict complete setting(disable file path)
         " -------------------------------------------
         " Credit:
         " https://stackoverflow.com/questions/1830221/how-to-remove-file-name-from-vim-dictionary-menu
@@ -1991,11 +2000,11 @@ endif
         "             \ 'default' : ['path','user','incl'],
         "             \ }
 
-        " 6.11.3.2 Sub Setting for neosnippet
+        " 6.11.3.3 Sub Setting for neosnippet
         " -------------------------------------------
-        Plug 'Shougo/neosnippet.vim' , Cond(g:pe_competesys == 'mu')
-        Plug 'Shougo/neosnippet-snippets' , Cond(g:pe_competesys == 'mu')
-        Plug 'honza/vim-snippets' , Cond(g:pe_competesys == 'mu')
+        Plug 'Shougo/neosnippet.vim' , Cond(g:pe_complete_sys == 'mu')
+        Plug 'Shougo/neosnippet-snippets' , Cond(g:pe_complete_sys == 'mu')
+        Plug 'honza/vim-snippets' , Cond(g:pe_complete_sys == 'mu')
         let g:neosnippet#enable_snipmate_compatibility = 1
         let g:mucomplete#enable_auto_at_startup = 1
         " Do not use conceal marker(hide some visiable text)
@@ -2027,11 +2036,11 @@ endif
 
 
 " -------------------------------------------
-" 6.11.3 Complete Engine (apt)
+" 6.11.4 Complete Engine (apt)
 " -------------------------------------------
 "  se
-    Plug 'skywind3000/vim-auto-popmenu' , Cond(g:pe_competesys == 'apt')
-    if g:pe_competesys == 'apt'
+    Plug 'skywind3000/vim-auto-popmenu' , Cond(g:pe_complete_sys == 'apt')
+    if g:pe_complete_sys == 'apt'
         let g:apc_enable_ft = {'text':1, '*':1, 'vim':1}
         set cpt=.,k,w,b
         set completeopt=menu,menuone,noselect
@@ -2099,7 +2108,7 @@ endif
     "      File: gradle.properties
     "      org.gradle.java.home=/usr/lib/jvm/java-1.17.0-openjdk-amd64
 
-    if $PEM_VIM_DEBUG_LSP == '1'
+    if $PE_DEBUG_LSP == '1'
         let g:lsp_log_verbose = 1
         let g:lsp_log_file = expand('~/vim-lsp.log')
     endif
@@ -2341,11 +2350,11 @@ endif
     " nnoremap <RightMouse> :call quickui#context#open(n_rightmouse_content, n_rightmouse_opts)<CR>
 
 " -------------------------------------------
-" 7.4 local vimrc load
+" 7.6 local vimrc load
 " -------------------------------------------
 
 " -------------------------------------------
-" 7.5 vim-lsp
+" 7.7 vim-lsp
 " -------------------------------------------
     if executable('ccls')
 	    au User lsp_setup call lsp#register_server({
@@ -2405,7 +2414,7 @@ endif
 
 
 
-" 8 Self Funtion Zone
+" 8 Self Function Zone
 " ===========================================
     let s:exitKeyList = [ 'q', "\<ESC>" ]
     let s:delKeyList  = [ 'x', 'd' ]
@@ -2448,8 +2457,8 @@ endif
 
 
     command! PEDate :call PEDate("en")
-    " Surround Viusal Zone
-    function! PESurroundViusalZone()
+    " Surround Visual Zone
+    function! PESurroundVisualZone()
         echo "VIM Surround"
         let follow = nr2char(getchar())
         if index( s:exitKeyList , follow ) >= 0
@@ -2479,7 +2488,7 @@ endif
         exec "normal `<i" .follow . "\<esc>"
         exec "normal `>la".follow . "\<esc>"
     endfunction
-    noremap <silent><leader>sr :call PESurroundViusalZone()<CR>
+    noremap <silent><leader>sr :call PESurroundVisualZone()<CR>
 
     " function! PEToggleReadonly()
     "     set readonly!
@@ -2545,7 +2554,7 @@ endif
     endfunction
 
 
-" 9 Some others Funtion snippet
+" 9 Some others Function snippet
 " ===========================================
     " copy to attached terminal using the yank(1) script:
     " Credit:
@@ -2829,7 +2838,7 @@ endif
 
     function! TmuxFocusCurrentPane()
         " Check if we're running inside tmux
-        if ! ( exists('$TMUX') && g:pem_tmux_pane_id != '' && g:pem_tmux_window_id != '' )
+        if ! ( exists('$TMUX') && g:pe_tmux_pane_id != '' && g:pe_tmux_window_id != '' )
             echohl WarningMsg
             echo "Not running inside tmux!"
             echohl None
@@ -2837,8 +2846,8 @@ endif
         endif
         " Get tmux pane ID for current vim instance
         " Focus on this pane in tmux
-        call system("tmux select-window -t " . g:pem_tmux_window_id)
-        call system("tmux select-pane -t " . g:pem_tmux_pane_id)
+        call system("tmux select-window -t " . g:pe_tmux_window_id)
+        call system("tmux select-pane -t " . g:pe_tmux_pane_id)
     endfunction
 
     " Temrdebug config
