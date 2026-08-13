@@ -405,6 +405,25 @@ let g:startify_custom_header = [
     " set tags=./.tags;,.tags
     set tags=./tags;,tags,./.tags;,.tags
 
+" -------------------------------------------
+" 1.9 Completion setting
+" -------------------------------------------
+    " Vim 原生补全 i_CTRL-X 一览:
+    " |1. 整行                                                 i_CTRL-X_CTRL-L
+    " |2. 当前文件内的关键字                                   i_CTRL-X_CTRL-N
+    " |3. 'dictionary' 的关键字                                i_CTRL-X_CTRL-K
+    " |4. 'thesaurus' 的关键字，同义词风格                     i_CTRL-X_CTRL-T
+    " |5. 当前文件及其头文件内的关键字                         i_CTRL-X_CTRL-I
+    " |6. 标签                                                 i_CTRL-X_CTRL-]
+    " |7. 文件名                                               i_CTRL-X_CTRL-F
+    " |8. 定义或宏                                             i_CTRL-X_CTRL-D
+    " |9. Vim 命令                                             i_CTRL-X_CTRL-V
+    " |10. 用户定义的补全                                      i_CTRL-X_CTRL-U
+    " |11. 全能 (omni) 补全                                    i_CTRL-X_CTRL-O
+    " |12. 拼写建议                                            i_CTRL-X_s
+    " |13. 'complete' 的关键字                                 i_CTRL-N i_CTRL-P
+    set pumheight=5
+
 
 
 " 2. Keybending list
@@ -475,12 +494,22 @@ let g:startify_custom_header = [
     " inoremap <silent><C-TAB>   <C-o>:tabn<CR>
     " nnoremap gq :exit<CR>
 
+    " Tmux-style window/tab keys (not tmux-specific)
+    nnoremap <silent><M-S-C> :vsplit<CR>
+    nnoremap <silent><M-S-X> :confirm q<CR>
+    nnoremap <silent><M-S-E> :tabn<CR>
+    nnoremap <silent><M-S-W> :tab new<CR>
+    nnoremap <silent><M-S-Q> :tabp<CR>
+
 " -------------------------------------------
 " 2.3 Mouse mapping
 " -------------------------------------------
     " nnoremap <MiddleMouse>     :tabclose<CR>
     vnoremap <RightMouse>            "+y
     inoremap <RightMouse>       <C-o>"+p
+
+    command! -nargs=0 PEMouseON set mouse=a
+    command! -nargs=0 PEMouseOFF set mouse=""
 
 
 " -------------------------------------------
@@ -1534,7 +1563,6 @@ if PlugSelect('tmux')
         noremap  <silent><M-S-k> :TmuxNavigateUp<cr>
         noremap  <silent><M-S-l> :TmuxNavigateRight<cr>
 
-
         inoremap  <silent><M-S-h> <C-o>:TmuxNavigateLeft<cr>
         inoremap  <silent><M-S-j> <C-o>:TmuxNavigateDown<cr>
         inoremap  <silent><M-S-k> <C-o>:TmuxNavigateUp<cr>
@@ -1549,21 +1577,21 @@ if PlugSelect('tmux')
         cnoremap  <silent><M-S-j> <cmd>TmuxNavigateDown<cr>
         cnoremap  <silent><M-S-k> <cmd>TmuxNavigateUp<cr>
         cnoremap  <silent><M-S-l> <cmd>TmuxNavigateRight<cr>
-        " Tmux Like
-        nnoremap <silent><M-S-C> :vsplit<CR>
-        nnoremap <silent><M-S-X> :confirm q<CR>
-
-        nnoremap <silent><M-S-E> :tabn<CR>
-        nnoremap <silent><M-S-W> :tab new<CR>
-        nnoremap <silent><M-S-Q> :tabp<CR>
-
-        command! -nargs=0 PEMouseON set mouse=a
-        command! -nargs=0 PEMouseOFF set mouse=""
 
         " noremap  <C-h> :<C-U>TmuxNavigateLeft<cr>
         " noremap  <C-j> :<C-U>TmuxNavigateDown<cr>
         " noremap  <C-k> :<C-U>TmuxNavigateUp<cr>
         " noremap  <C-l> :<C-U>TmuxNavigateRight<cr>
+else
+    " tmux not selected: fall back to plain vim window navigation
+    noremap <silent><M-S-h> <C-W>h
+    noremap <silent><M-S-j> <C-W>j
+    noremap <silent><M-S-k> <C-W>k
+    noremap <silent><M-S-l> <C-W>l
+    inoremap <silent><M-S-h> <C-o><C-W>h
+    inoremap <silent><M-S-j> <C-o><C-W>j
+    inoremap <silent><M-S-k> <C-o><C-W>k
+    inoremap <silent><M-S-l> <C-o><C-W>l
 endif
 
 " -------------------------------------------
@@ -1840,28 +1868,7 @@ if PlugSelect('quickfix')
 endif
 
 " -------------------------------------------
-" 4.10 Complete Engine (common)
-" -------------------------------------------
-" Common completion settings, applied when any engine is enabled.
-if PlugSelect('complete')
-    " |1. 整行                                                 i_CTRL-X_CTRL-L
-    " |2. 当前文件内的关键字                                   i_CTRL-X_CTRL-N
-    " |3. 'dictionary' 的关键字                                i_CTRL-X_CTRL-K
-    " |4. 'thesaurus' 的关键字，同义词风格                     i_CTRL-X_CTRL-T
-    " |5. 当前文件及其头文件内的关键字                         i_CTRL-X_CTRL-I
-    " |6. 标签                                                 i_CTRL-X_CTRL-]
-    " |7. 文件名                                               i_CTRL-X_CTRL-F
-    " |8. 定义或宏                                             i_CTRL-X_CTRL-D
-    " |9. Vim 命令                                             i_CTRL-X_CTRL-V
-    " |10. 用户定义的补全                                      i_CTRL-X_CTRL-U
-    " |11. 全能 (omni) 补全                                    i_CTRL-X_CTRL-O
-    " |12. 拼写建议                                            i_CTRL-X_s
-    " |13. 'complete' 的关键字                                 i_CTRL-N i_CTRL-P
-    set pumheight=5
-endif
-
-" -------------------------------------------
-" 4.11 Complete Engine (async)
+" 4.10 Complete Engine (async)
 " -------------------------------------------
 if PlugSelect('complete:async')
     " Buggy buffer
@@ -1917,7 +1924,7 @@ if PlugSelect('complete:async')
 endif
 
 " -------------------------------------------
-" 4.12 Complete Engine (mu)
+" 4.11 Complete Engine (mu)
 " -------------------------------------------
 if PlugSelect('complete:mu')
     " See: ins-completion for origin complete help
@@ -2019,7 +2026,7 @@ if PlugSelect('complete:mu')
 endif
 
 " -------------------------------------------
-" 4.13 Complete Engine (apt)
+" 4.12 Complete Engine (apt)
 " -------------------------------------------
 if PlugSelect('complete:apt')
     Plug 'skywind3000/vim-auto-popmenu'
@@ -2030,7 +2037,7 @@ if PlugSelect('complete:apt')
 endif
 
 " -------------------------------------------
-" 4.14 debug adapter
+" 4.13 debug adapter
 " -------------------------------------------
 if PlugSelect('debug')
     Plug 'puremourning/vimspector'
@@ -2048,7 +2055,7 @@ if PlugSelect('debug')
 endif
 
 " -------------------------------------------
-" 4.15 LSP
+" 4.14 LSP
 " -------------------------------------------
 if PlugSelect('lsp')
     Plug 'prabirshrestha/vim-lsp'
