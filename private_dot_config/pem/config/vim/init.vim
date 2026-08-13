@@ -432,8 +432,9 @@ let g:startify_custom_header = [
     " |12. 拼写建议                                            i_CTRL-X_s
     " |13. 'complete' 的关键字                                 i_CTRL-N i_CTRL-P
     set pumheight=5
-
-
+    if exists('+pummaxwidth')
+        set pummaxwidth=30
+    end
 
 " 2. Keybending list
 " ===========================================
@@ -762,7 +763,7 @@ let g:startify_custom_header = [
     " Default none; use :PlugInit [level] inside vim to install on demand
     let g:pe_plug_levels = {
                 \ 'none': [],
-                \ 'lite': ['basic', 'colorscheme'],
+                \ 'lite': ['basic', 'colorscheme', 'tmux', 'tpope'],
                 \ 'full': ['*'],
                 \ }
 
@@ -1035,10 +1036,12 @@ if PlugSelect('basic')
                     \ 'grepprg':    'rg -i --vimgrep',
                     \ 'grepformat': '%f:%l:%c:%m,%f'
                     \ }
-        noremap <C-k> viw<plug>(GrepperOperator)
+        " vim treat C-_ as C-/
+        noremap <C-_> viw<plug>(GrepperOperator)
         let g:grepper.operator = {}
         let g:grepper.operator.prompt = 1
-        vnoremap <C-k> <plug>(GrepperOperator)
+        vnoremap <C-_> <plug>(GrepperOperator)
+
     Plug 'duane9/nvim-rg'
 
     Plug 'lambdalisue/vim-fern'
@@ -1121,16 +1124,16 @@ if PlugSelect('basic')
     "     Plug 'girishji/vimsuggest'
     " endif
 
-    Plug 'inkarkat/vim-ingo-library'
-    Plug 'inkarkat/vim-mark'
-        let g:mw_no_mappings = 1
-        let g:mwAutoLoadMarks = 1
-        nmap <Leader>mt <Plug>MarkToggle
-        nmap <Leader>M <Plug>MarkToggle
-        xmap <Leader>m <Plug>MarkSet
-        nmap n <Plug>MarkSearchAnyOrDefaultNext
-        nmap N <Plug>MarkSearchAnyOrDefaultPrev
-        nmap <Leader>m <Plug>MarkSet
+    " Plug 'inkarkat/vim-ingo-library'
+    " Plug 'inkarkat/vim-mark'
+    "     let g:mw_no_mappings = 1
+    "     let g:mwAutoLoadMarks = 1
+    "     nmap <Leader>mt <Plug>MarkToggle
+    "     nmap <Leader>M <Plug>MarkToggle
+    "     xmap <Leader>m <Plug>MarkSet
+    "     nmap n <Plug>MarkSearchAnyOrDefaultNext
+    "     nmap N <Plug>MarkSearchAnyOrDefaultPrev
+    "     nmap <Leader>m <Plug>MarkSet
 
     " NOTICE: THIS will casue termdebug report error
     " TODO: fix it
@@ -2052,6 +2055,13 @@ endif
 " When no completion engine group is selected, fall back to Vim's native
 " 'autocomplete' option if available (patch 9.1.1590+).
 if !PlugSelect('complete') && has('patch-9.1.1590')
+
+    set complete=o,.,k,w,
+    set completeopt=fuzzy
+
+
+    inoremap <silent><expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+    inoremap <silent><expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
     set autocomplete
 endif
 
