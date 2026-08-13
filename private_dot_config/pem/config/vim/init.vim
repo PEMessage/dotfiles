@@ -763,7 +763,7 @@ let g:startify_custom_header = [
     " Default none; use :PlugInit [level] inside vim to install on demand
     let g:pe_plug_levels = {
                 \ 'none': [],
-                \ 'lite': ['basic', 'colorscheme', 'tmux', 'tpope'],
+                \ 'lite': ['basic', 'colorscheme', 'tmux', 'tpope', 'complete:apt'],
                 \ 'full': ['*'],
                 \ }
 
@@ -2041,7 +2041,7 @@ endif
 " -------------------------------------------
 " 4.12 Complete Engine (apt)
 " -------------------------------------------
-if PlugSelect('complete:apt')
+if !exists('+autocomplete') && PlugSelect('complete:apt')
     Plug 'skywind3000/vim-auto-popmenu'
     let g:apc_enable_ft = {'text':1, '*':1, 'vim':1}
     set cpt=.,k,w,b
@@ -2054,16 +2054,20 @@ endif
 " -------------------------------------------
 " When no completion engine group is selected, fall back to Vim's native
 " 'autocomplete' option if available (patch 9.1.1590+).
-if !PlugSelect('complete') && has('patch-9.1.1590')
+if exists('+autocomplete') && (!PlugSelect('complete') || PlugSelect('complete:apt'))
 
     set complete=o,.,k,w,
-    set completeopt=fuzzy
-
+    set completeopt=fuzzy,menu,noselect
+    set completeitemalign=kind,abbr,menu
 
     inoremap <silent><expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
     inoremap <silent><expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
     set autocomplete
 endif
+
+if exists('+pummaxwidth') &&  PlugSelect('complete:apt')
+    Plug 'skywind3000/vim-dict'
+end
 
 " -------------------------------------------
 " 4.14 debug adapter
