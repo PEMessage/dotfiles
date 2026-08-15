@@ -65,7 +65,7 @@ Restart=on-failure
 RestartSec=5
 
 [Install]
-WantedBy=default.target
+WantedBy=graphical-session.target
 EOF
     echo "[Info]: systemd user unit created"
 }
