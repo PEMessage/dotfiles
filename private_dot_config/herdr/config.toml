@@ -1,0 +1,18 @@
+[theme]
+name = "one-dark"
+auto_switch = false
+
+[keys]
+prefix = "ctrl+b"
+focus_pane_left = "ctrl+alt+h"
+focus_pane_down = "ctrl+alt+j"
+focus_pane_up = "ctrl+alt+k"
+focus_pane_right = "ctrl+alt+l"
+
+new_tab = "ctrl+alt+w"
+next_tab = "ctrl+alt+e"
+previous_tab = "ctrl+alt+q"
+
+split_vertical = "ctrl+alt+c"
+close_pane = "ctrl+alt+x"
+zoom = "ctrl+alt+z"
