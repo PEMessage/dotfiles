@@ -763,7 +763,7 @@ let g:startify_custom_header = [
     " Default none; use :PlugInit [level] inside vim to install on demand
     let g:pe_plug_levels = {
                 \ 'none': [],
-                \ 'lite': ['basic', 'colorscheme', 'tmux', 'tpope', 'complete:apt'],
+                \ 'lite': ['basic', 'textobj', 'colorscheme', 'tmux', 'tpope', 'complete:apt'],
                 \ 'full': ['*'],
                 \ }
 
@@ -2202,7 +2202,7 @@ function! s:TryColorschemes(names)
     endfor
 endfunction
 
-call s:TryColorschemes(['onedark', 'wildcharm', 'desert', 'default'])
+call s:TryColorschemes(['wildcharm', 'onedark', 'desert', 'default'])
 " -------------------------------------------
 " 5.2 Async complete
 " -------------------------------------------

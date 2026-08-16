@@ -1,6 +1,10 @@
+onboarding = false
 [theme]
 name = "one-dark"
 auto_switch = false
+
+[ui]
+pane_gaps = false
 
 [keys]
 prefix = "ctrl+b"
