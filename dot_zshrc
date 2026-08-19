@@ -307,6 +307,12 @@
             zellij setup --generate-completion zsh >| "$ZSH_CACHE_DIR/completions/_zellij"
         fi
     fi
+
+    if [[ -n "$commands[herdr]" ]]; then
+        if [[ ! -f "$ZSH_CACHE_DIR/completions/_herder" ]]; then
+            herdr completion zsh >| "$ZSH_CACHE_DIR/completions/_herder"
+        fi
+    fi
 # -----------------------------------------
 # lazy load compdef file
 # -----------------------------------------
