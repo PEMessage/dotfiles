@@ -96,6 +96,14 @@ local section = function ()
     vim.o.shiftwidth  = 4                          -- 缩进长度，设置为4
     vim.o.autoindent  = true                       -- 自动缩进
     vim.o.smartindent = true                       -- Insert indents automatically
+    vim.api.nvim_create_autocmd('FileType', {
+        pattern = 'nix',
+        callback = function(args)
+            vim.bo[args.buf].tabstop     = 2
+            vim.bo[args.buf].shiftwidth  = 2
+            vim.bo[args.buf].softtabstop = 2
+        end,
+    })
 
     vim.o.numberwidth = 1
 
@@ -1711,6 +1719,7 @@ require("lazy").setup({
                     ['initializer_list'] = actions.toggle_multiline(), -- cpp
                     ['parameter_list'] = actions.toggle_multiline(), -- cpp
                     ['attrset_expression'] = actions.toggle_multiline(), -- nix
+                    ['list_expression'] = actions.toggle_multiline(), -- nix
                     ['function_value_parameters'] = actions.toggle_multiline(), -- kotlin
                 },
             }
@@ -2637,7 +2646,7 @@ require("lazy").setup({
                 -- "java_language_server",
                 "glsl_analyzer",
                 "zls",
-                "nil_ls",
+                -- "nil_ls",
             }
         },
         config = function(_,opts)
@@ -2838,6 +2847,28 @@ require("lazy").setup({
                     },
                 },
             })
+            vim.lsp.config('nixd', {
+                settings = {
+                    nixd = {
+                        nixpkgs = { expr = 'import <nixpkgs> { }' },
+                        options = {
+                            nixos = {
+                                -- Thanks to: https://github.com/SimonYde/Config/blob/34ffbaa10ef2e0b715f6245d6f8508263e4197de/dotfiles/.config/nvim/plugin/15_lsp.lua#L42
+                                expr = '(builtins.getFlake ("git+file://" + toString ./.)).nixosConfigurations.'
+                                    .. vim.uv.os_gethostname()
+                                    .. '.options',
+                            },
+                            home_manager = {
+                                expr = '(builtins.getFlake ("git+file://" + toString ./.)).nixosConfigurations.'
+                                    .. vim.uv.os_gethostname()
+                                    .. '.options'
+                                    .. '.home-manager.users.type.getSubOptions []'
+                            },
+                        },
+                    },
+                },
+            })
+            vim.lsp.enable('nixd')
 
             vim.lsp.config('java_language_server', {
                 -- borrow root marker from jdtls
