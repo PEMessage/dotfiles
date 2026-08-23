@@ -266,7 +266,7 @@ require("lazy").setup({
                 { "g", group = "goto" },
             },
             icons = {
-                mappings = false,
+                mappings = true,
                 keys = {
                     Up = "Up",
                     Down = "Down",
@@ -3266,6 +3266,8 @@ require("lazy").setup({
                 },
             })
 
+            -- gdb
+            -- ===============================
             dap.adapters.gdb = {
                 id = 'gdb',
                 type = 'executable',
@@ -3290,6 +3292,8 @@ require("lazy").setup({
             dap.configurations.c = { gdb }
             dap.configurations.cpp = { gdb }
 
+            -- attach to pdb
+            -- ===============================
             -- This requires special handling of 'run_last', see
             -- https://github.com/mfussenegger/nvim-dap/issues/1025#issuecomment-1695852355
 
@@ -3337,6 +3341,7 @@ require("lazy").setup({
                 },
             }
             dap.configurations.python = { python_attach }
+
         end
     },
     {
@@ -3473,16 +3478,22 @@ require("lazy").setup({
                 element = "repl",
                 enabled = true,
                 icons = {
+                    pause = "stop",
+                    play = "continue",
+                    run_last = "run",
+                    step_back = "back",
+                    step_into = "step",
+                    step_out = "finish",
+                    step_over = "next",
+                    terminate = "X",
                     disconnect = "D",
-                    pause = "S",
-                    play = "C",
-                    run_last = "R",
-                    step_back = "←",
-                    step_into = "↓",
-                    step_out = "↑",
-                    step_over = "→",
-                    terminate = "X"
                 }
+            },
+            element_mappings = {
+                stacks = {
+                    open = { 'o', "<2-LeftMouse>" },
+                    expand = { "<CR>" }
+                },
             },
             icons = {
                 collapsed = "*",
@@ -3494,8 +3505,16 @@ require("lazy").setup({
             local dapui = require('dapui')
             local dap = require('dap')
             dapui.setup(opts)
-            vim.api.nvim_create_user_command('DapUiToggle', function() require('dapui').toggle() end, { nargs = 0 })
             vim.cmd [[ highlight link NvimDapVirtualText DiagnosticVirtualTextUnnecessary ]]
+
+            vim.api.nvim_create_user_command('DapUiToggle', function()
+                require('dapui').toggle()
+            end, { nargs = 0 })
+
+            vim.api.nvim_create_user_command('DapInfo', function()
+                print(vim.inspect(require('dap').configurations[vim.bo.filetype]))
+            end, { nargs = 0 })
+
 
             require('cmp').setup.filetype('dap-repl', {
                 enabled = false
@@ -3567,6 +3586,9 @@ require("lazy").setup({
             -- dap.listeners.after.disconnected['me'] = clear_debug_mappings
             dap.listeners.after.event_exited['me'] = clear_debug_mappings
         end,
+    },
+    {
+        'igorlfs/nvim-dap-view'
     },
     {
         'Weissle/persistent-breakpoints.nvim',
