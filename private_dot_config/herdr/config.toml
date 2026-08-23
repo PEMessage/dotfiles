@@ -11,7 +11,6 @@ pane_outer_borders = false
 
 [keys]
 prefix = "ctrl+b"
-detach = "prefix+d"
 
 focus_pane_left = "ctrl+alt+h"
 focus_pane_down = "ctrl+alt+j"
