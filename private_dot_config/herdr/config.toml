@@ -17,7 +17,6 @@ focus_pane_left = "ctrl+alt+h"
 focus_pane_down = "ctrl+alt+j"
 focus_pane_up = "ctrl+alt+k"
 focus_pane_right = "ctrl+alt+l"
-
 new_tab = "ctrl+alt+w"
 next_tab = "ctrl+alt+e"
 previous_tab = "ctrl+alt+q"
@@ -25,3 +24,34 @@ previous_tab = "ctrl+alt+q"
 split_vertical = "ctrl+alt+c"
 close_pane = "ctrl+alt+x"
 zoom = "ctrl+alt+z"
+
+
+[[keys.command]]
+key = "alt+shift+h"
+type = "shell"
+command = "herdr-passthough if-proc '^(g?(view|l?n?vim?x?))(diff)?$' alt+shift+h herdr pane focus --direction left --current"
+
+[[keys.command]]
+key = "alt+shift+j"
+type = "shell"
+command = "herdr-passthough if-proc '^(g?(view|l?n?vim?x?))(diff)?$' alt+shift+j herdr pane focus --direction down --current"
+
+[[keys.command]]
+key = "alt+shift+k"
+type = "shell"
+command = "herdr-passthough if-proc '^(g?(view|l?n?vim?x?))(diff)?$' alt+shift+k herdr pane focus --direction up --current"
+
+[[keys.command]]
+key = "alt+shift+l"
+type = "shell"
+command = "herdr-passthough if-proc '^(g?(view|l?n?vim?x?))(diff)?$' alt+shift+l herdr pane focus --direction right --current"
+
+[[keys.command]]
+key = "alt+shift+c"
+type = "shell"
+command = "herdr-passthough if-proc '^(g?(view|l?n?vim?x?))(diff)?$' alt+shift+c herdr pane split --direction right"
+
+[[keys.command]]
+key = "alt+shift+x"
+type = "shell"
+command = "herdr-passthough if-proc '^(g?(view|l?n?vim?x?))(diff)?$' alt+shift+x herdr pane close $HERDR_ACTIVE_PANE_ID"
