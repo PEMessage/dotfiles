@@ -3266,6 +3266,20 @@ require("lazy").setup({
         config = function ()
             local dap = require("dap")
             local repl = require("dap.repl")
+
+            local function print_expr(expr)
+                repl.execute(string.format('-exec p %s', expr))
+            end
+
+            -- Thanks to: https://github.com/wasabeef/dotfiles/blob/014236fb2ca9c6a339515d3f1e733ae5398aa92c/dot_config/nvim/init.lua#L4065
+            vim.api.nvim_create_autocmd("FileType", { -- add completion in DAP Repl
+                group = vim.api.nvim_create_augroup("dap", { clear = true }),
+                pattern = "dap-repl",
+                callback = function()
+                    require("dap.ext.autocompl").attach()
+                end,
+            })
+
             repl.commands = vim.tbl_extend("force", repl.commands, {
                 -- Add a new alias for the existing .exit command
                 exit = { ".exit", "exit", "e", "q" },
@@ -3280,6 +3294,8 @@ require("lazy").setup({
                 up = { ".up", "up", "u" },
                 down = { ".down", "down", "d" },
 
+                capabilities = { ".capabilities", "capabilities", "cap" },
+
                 -- Add your own commands; run `.echo hello world` to invoke
                 -- this function with the text "hello world"
                 custom_commands = {
@@ -3288,6 +3304,11 @@ require("lazy").setup({
                     end,
                     -- Hook up a new command to an existing dap function
                     ['.restart'] = dap.restart,
+                    [".hot-reload"] = function() dap.session():request("hotReload") end,
+                    [".hot-restart"] = function() dap.session():request("hotRestart") end,
+                    ['.run_to_cursor'] = dap.run_to_cursor,
+                    ['.print'] = print_expr,
+                    ['.p'] = print_expr,
                 },
             })
 
@@ -3528,7 +3549,9 @@ require("lazy").setup({
     -- -------------------------------------------
     {
         "theHamsta/nvim-dap-virtual-text",
-        opts = {}
+        opts = {
+            virt_text_pos = "eol",
+        }
     },
     {
         "rcarriga/nvim-dap-ui",
@@ -3610,25 +3633,16 @@ require("lazy").setup({
             local debug_mappings = {
                 -- Normal mode mappings
                 ['n'] = {
-                    ['<F5>'] = { dap.continue, opts = { desc = "DAP: Continue" } },
-                    ['<F10>'] = { dap.step_over, opts = { desc = "DAP: Step Over" } },
-                    ['<F11>'] = { dap.step_into, opts = { desc = "DAP: Step Into" } },
+                    -- IDA PRO like keymap
+                    ['<F2>'] = { dap.toggle_breakpoint, opts = { desc = "DAP: breakpoint"} },
+                    ['<F4>'] = { dap.run_to_cursor, opts = { desc = "DAP: run to curosr"} },
+                    ['<F7>'] = { dap.step_into, opts = { desc = "DAP: Step Into" } },
+
+                    ['<C-F7>'] = { dap.step_out, opts = { desc = "DAP: Step Out" } },
                     ['<F12>'] = { dap.step_out, opts = { desc = "DAP: Step Out" } },
 
-                    ['<leader>dl'] = { dap.run_last, opts = { desc = "DAP: Run Last" } },
-
-                    ['<c-l>'] = { dap.step_over, opts = { desc = "DAP: Step Over" } },
-                    ['<c-k>'] = { dap.step_out, opts = { desc = "DAP: Step Out" } },
-                    ['<c-j>'] = { dap.step_into, opts = { desc = "DAP: Step Into" } },
-
-                    ['<right>'] = { dap.step_over, opts = { desc = "DAP: Step Over" } },
-                    ['<up>'] = { dap.step_out, opts = { desc = "DAP: Step Out" } },
-                    ['<down>'] = { dap.step_into, opts = { desc = "DAP: Step Into" } },
-
-                    ['[f'] = { dap.up, opts = { desc = "DAP: Up" } },
-                    [']f'] = { dap.down, opts = { desc = "DAP: Down" } },
-                    ['<c-up>'] = { dap.up, opts = { desc = "DAP: Up" } },
-                    ['<c-down>'] = { dap.down, opts = { desc = "DAP: Down" } },
+                    ['<F8>'] = { dap.step_over, opts = { desc = "DAP: Step Over" } },
+                    ['<F9>'] = { dap.continue, opts = { desc = "DAP: countine" } },
 
                     ['<c-x>'] = { dapui.eval, opts = { desc = "DAP: Evaluate" } },
                 },
