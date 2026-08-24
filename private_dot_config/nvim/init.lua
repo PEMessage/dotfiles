@@ -1551,6 +1551,7 @@ require("lazy").setup({
     {
         "christoomey/vim-tmux-navigator",
         -- Do not use very lazy prevent not init
+        enabled = false,
         lazy = true,
         keys = {
             { "<M-S-h>", "<cmd>TmuxNavigateLeft<cr>", mode = {"n", "i", "v", "t"}, desc = "Navigate Left" },
@@ -1561,6 +1562,16 @@ require("lazy").setup({
         init = function()
             vim.g.tmux_navigator_no_mappings = 1
         end
+    },
+    {
+        'PEMessage/mux-navigate.vim',
+        lazy = true,
+        keys = {
+            { "<M-S-h>", "<cmd>MuxNavigate left<cr>", mode = {"n", "i", "v", "t"}, desc = "Navigate Left" },
+            { "<M-S-j>", "<cmd>MuxNavigate down<cr>", mode = {"n", "i", "v", "t"}, desc = "Navigate Down" },
+            { "<M-S-k>", "<cmd>MuxNavigate up<cr>", mode = {"n", "i", "v", "t"}, desc = "Navigate Up" },
+            { "<M-S-l>", "<cmd>MuxNavigate right<cr>", mode = {"n", "i", "v", "t"}, desc = "Navigate Right" },
+        }
     },
     -- -------------------------------------------
     -- 5.4 Treesitter (HEAVY Zone after)

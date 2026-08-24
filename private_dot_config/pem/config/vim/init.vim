@@ -1569,27 +1569,48 @@ if PlugSelect('tmux')
             let g:floaterm_keymap_toggle = '<M-S-u>'
             let g:floaterm_opener = 'tabe'
     endif
-    Plug 'christoomey/vim-tmux-navigator'
-        let g:tmux_navigator_no_mappings = 1
-        noremap  <silent><M-S-h> :TmuxNavigateLeft<cr>
-        noremap  <silent><M-S-j> :TmuxNavigateDown<cr>
-        noremap  <silent><M-S-k> :TmuxNavigateUp<cr>
-        noremap  <silent><M-S-l> :TmuxNavigateRight<cr>
+    " Plug 'christoomey/vim-tmux-navigator'
+    "     let g:tmux_navigator_no_mappings = 1
+    "     noremap  <silent><M-S-h> :TmuxNavigateLeft<cr>
+    "     noremap  <silent><M-S-j> :TmuxNavigateDown<cr>
+    "     noremap  <silent><M-S-k> :TmuxNavigateUp<cr>
+    "     noremap  <silent><M-S-l> :TmuxNavigateRight<cr>
 
-        inoremap  <silent><M-S-h> <C-o>:TmuxNavigateLeft<cr>
-        inoremap  <silent><M-S-j> <C-o>:TmuxNavigateDown<cr>
-        inoremap  <silent><M-S-k> <C-o>:TmuxNavigateUp<cr>
-        inoremap  <silent><M-S-l> <C-o>:TmuxNavigateRight<cr>
+    "     inoremap  <silent><M-S-h> <C-o>:TmuxNavigateLeft<cr>
+    "     inoremap  <silent><M-S-j> <C-o>:TmuxNavigateDown<cr>
+    "     inoremap  <silent><M-S-k> <C-o>:TmuxNavigateUp<cr>
+    "     inoremap  <silent><M-S-l> <C-o>:TmuxNavigateRight<cr>
 
-        tnoremap  <silent><M-S-h> <cmd>TmuxNavigateLeft<cr>
-        tnoremap  <silent><M-S-j> <cmd>TmuxNavigateDown<cr>
-        tnoremap  <silent><M-S-k> <cmd>TmuxNavigateUp<cr>
-        tnoremap  <silent><M-S-l> <cmd>TmuxNavigateRight<cr>
+    "     tnoremap  <silent><M-S-h> <cmd>TmuxNavigateLeft<cr>
+    "     tnoremap  <silent><M-S-j> <cmd>TmuxNavigateDown<cr>
+    "     tnoremap  <silent><M-S-k> <cmd>TmuxNavigateUp<cr>
+    "     tnoremap  <silent><M-S-l> <cmd>TmuxNavigateRight<cr>
 
-        cnoremap  <silent><M-S-h> <cmd>TmuxNavigateLeft<cr>
-        cnoremap  <silent><M-S-j> <cmd>TmuxNavigateDown<cr>
-        cnoremap  <silent><M-S-k> <cmd>TmuxNavigateUp<cr>
-        cnoremap  <silent><M-S-l> <cmd>TmuxNavigateRight<cr>
+    "     cnoremap  <silent><M-S-h> <cmd>TmuxNavigateLeft<cr>
+    "     cnoremap  <silent><M-S-j> <cmd>TmuxNavigateDown<cr>
+    "     cnoremap  <silent><M-S-k> <cmd>TmuxNavigateUp<cr>
+    "     cnoremap  <silent><M-S-l> <cmd>TmuxNavigateRight<cr>
+
+    Plug 'PEMessage/mux-navigate.vim'
+        noremap  <silent><M-S-h> :MuxNavigate left<cr>
+        noremap  <silent><M-S-j> :MuxNavigate down<cr>
+        noremap  <silent><M-S-k> :MuxNavigate up<cr>
+        noremap  <silent><M-S-l> :MuxNavigate right<cr>
+
+        inoremap  <silent><M-S-h> <C-o>:MuxNavigate left<cr>
+        inoremap  <silent><M-S-j> <C-o>:MuxNavigate down<cr>
+        inoremap  <silent><M-S-k> <C-o>:MuxNavigate up<cr>
+        inoremap  <silent><M-S-l> <C-o>:MuxNavigate right<cr>
+
+        tnoremap  <silent><M-S-h> <cmd>MuxNavigate left<cr>
+        tnoremap  <silent><M-S-j> <cmd>MuxNavigate down<cr>
+        tnoremap  <silent><M-S-k> <cmd>MuxNavigate up<cr>
+        tnoremap  <silent><M-S-l> <cmd>MuxNavigate right<cr>
+
+        cnoremap  <silent><M-S-h> <cmd>MuxNavigate left<cr>
+        cnoremap  <silent><M-S-j> <cmd>MuxNavigate down<cr>
+        cnoremap  <silent><M-S-k> <cmd>MuxNavigate up<cr>
+        cnoremap  <silent><M-S-l> <cmd>MuxNavigate right<cr>
 
         " noremap  <C-h> :<C-U>TmuxNavigateLeft<cr>
         " noremap  <C-j> :<C-U>TmuxNavigateDown<cr>
