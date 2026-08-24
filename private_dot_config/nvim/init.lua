@@ -3268,7 +3268,18 @@ require("lazy").setup({
             local repl = require("dap.repl")
             repl.commands = vim.tbl_extend("force", repl.commands, {
                 -- Add a new alias for the existing .exit command
-                exit = {'exit', '.exit', '.bye'},
+                exit = { ".exit", "exit", "e", "q" },
+                continue = { ".continue", "continue", "c" },
+
+                into = { 'into', 'step', '.s', 's' },
+                next_ = { ".next", "next", "n" },
+                step_back = { ".back", "back", "b" },
+                out = { ".out", "out", "o", "finish", "fin", },
+
+                frames = { ".frames", "frames", "bt" },
+                up = { ".up", "up", "u" },
+                down = { ".down", "down", "d" },
+
                 -- Add your own commands; run `.echo hello world` to invoke
                 -- this function with the text "hello world"
                 custom_commands = {
