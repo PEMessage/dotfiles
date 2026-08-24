@@ -3260,6 +3260,9 @@ require("lazy").setup({
     -- -------------------------------------------
     {
         'mfussenegger/nvim-dap',
+        dependencies = {
+            'williamboman/mason.nvim',
+        },
         config = function ()
             local dap = require("dap")
             local repl = require("dap.repl")
@@ -3303,7 +3306,7 @@ require("lazy").setup({
             dap.configurations.c = { gdb }
             dap.configurations.cpp = { gdb }
 
-            -- attach to pdb
+            -- python
             -- ===============================
             -- This requires special handling of 'run_last', see
             -- https://github.com/mfussenegger/nvim-dap/issues/1025#issuecomment-1695852355
@@ -3353,6 +3356,68 @@ require("lazy").setup({
             }
             dap.configurations.python = { python_attach }
 
+            -- go
+            -- ===============================
+            dap.adapters.go = {
+                type = "executable",
+                command = vim.fn.exepath("go-debug-adapter"), -- Find go-debug-adapter on $PATH
+            }
+            dap.configurations.go = {
+                {
+                    type = "go",
+                    name = "Attach remote :2345",
+                    request = "attach",
+                    cwd = "${workspaceFolder}",
+                    -- program = "./${relativeFileDirname}",
+                    -- console = "integratedTerminal",
+                    dlvToolPath = vim.fn.exepath("dlv"),
+                    host = "127.0.0.1",
+                    port = "2345",
+                    mode = "remote",
+                    showLog = true,
+                    showRegisters = true,
+                    stopOnEntry = false,
+                },
+            }
+
+        end
+    },
+    {
+        "leoluz/nvim-dap-go",
+        ft = 'go',
+        enabled = false,
+        dependencies = {
+            'williamboman/mason.nvim',
+            'mfussenegger/nvim-dap',
+        },
+        config = function ()
+            require('dap-go').setup( {
+                dap_configurations = {
+                    {
+                        -- Must be "go" or it will be ignored by the plugin
+                        type = "go",
+                        name = "Attach remote",
+                        mode = "remote",
+                        request = "attach",
+                        host = "127.0.0.1",
+                        port = "2345",
+                    },
+                },
+            })
+            local dap = require "dap"
+            local dap_go_adapter = dap.adapters.go
+            dap.adapters.go = function(callback, client_config)
+                if client_config.mode == "remote" and client_config.host and client_config.port then
+                    callback {
+                        type = "server",
+                        host = client_config.host,
+                        port = client_config.port,
+                        stopOnEntry = true,
+                    }
+                    return
+                end
+                dap_go_adapter(callback, client_config)
+            end
         end
     },
     {
