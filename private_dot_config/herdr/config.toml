@@ -4,6 +4,12 @@ onboarding = false
 name = "one-dark"
 auto_switch = false
 
+[theme.custom]
+# Change the dim gray to OneDark's normal text color. Numbers on unnamed tabs will become noticeably brighter.
+overlay0 = "#abb2bf"
+# # Optional: Make the inactive tab background slightly darker for stronger contrast with the numbers.
+surface0 = "#21252b"
+
 [ui]
 pane_gaps = false
 prompt_new_tab_name = false
