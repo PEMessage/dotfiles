@@ -11,6 +11,7 @@ pane_outer_borders = false
 
 [keys]
 prefix = "ctrl+b"
+detach = ["prefix+q", "prefix+d"]
 
 focus_pane_left = "ctrl+alt+h"
 focus_pane_down = "ctrl+alt+j"
@@ -19,8 +20,8 @@ focus_pane_right = "ctrl+alt+l"
 
 new_tab = ["ctrl+alt+w", "prefix+n"]
 next_tab = "ctrl+alt+e"
-
 previous_tab = "ctrl+alt+q"
+rename_tab = ["prefix+,", "prefix+shift+t"]
 
 split_vertical = ["ctrl+alt+c", "prefix+c"]
 close_pane = ["ctrl+alt+x", "prefix+x"]
