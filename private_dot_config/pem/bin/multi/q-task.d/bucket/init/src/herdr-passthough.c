@@ -13,6 +13,16 @@
  *         herdr-passthough if-proc '^nvim$' ctrl+h \
  *           herdr pane focus --direction left
  *
+ *       A builtin fallback is the three-token form
+ *
+ *         herdr-passthough if-proc '^nvim$' ctrl+h \
+ *           builtin current-pane left
+ *
+ *       (the action is one of up/down/left/right/close). Instead of running
+ *       the `herdr` CLI it talks to herdr's socket directly — pane.focus_
+ *       direction or pane.close — so the miss path costs one socket round
+ *       trip, like the match path, instead of a fork/exec + binary load.
+ *
  *       With no fallback arguments, a miss does nothing.
  *
  * The pane comes from $HERDR_ACTIVE_PANE_ID, which herdr exports to every
@@ -22,7 +32,9 @@
  * Why C: a shell dispatcher paid fork/exec + shell startup + loading the
  * herdr binary twice (~50ms+) to do two ~0.3ms socket round trips. The match
  * path here is one fork/exec plus raw socket writes; only the fallback pays
- * for whatever command it runs.
+ * for whatever command it runs. A `builtin current-pane <dir|close>` fallback
+ * skips even that: it reuses the open socket to call pane.focus_direction /
+ * pane.close directly, so the miss path is just one more ~0.3ms round trip.
  *
  * Env overrides: HERDR_SOCKET_PATH (API socket), HERDR_SESSION (named
  * session), XDG_CONFIG_HOME/HOME (default config dir).
@@ -56,6 +68,8 @@
  * adjacent string literals below. */
 #define METHOD_PROCESS_INFO "pane.process_info"
 #define METHOD_SEND_KEYS "pane.send_keys"
+#define METHOD_FOCUS_DIRECTION "pane.focus_direction"
+#define METHOD_CLOSE "pane.close"
 
 /* ------------------------------------------------------------------ */
 /* diagnostics                                                         */
@@ -117,12 +131,17 @@ static int make_process_info_req(const char *pane, char *out, size_t cap) {
     char pane_q[PANE_Q_BUF];
     if (!json_quote(pane_q, sizeof pane_q, pane))
         return -1;
-    if (snprintf(out, cap,
-                 "{\"id\":\"" REQ_ID "\",\"method\":\"" METHOD_PROCESS_INFO "\","
-                 "\"params\":{\"pane_id\":%s}}\n",
-                 pane_q) >= (int)cap)
-        return -1;
-    return 0;
+    /* An empty pane id means "no HERDR_ACTIVE_PANE_ID" (e.g. manual
+     * invocation). Omit pane_id entirely so herdr uses its active focused
+     * pane, rather than sending "" which it rejects as pane_not_found. */
+    if (*pane)
+        return snprintf(out, cap,
+                        "{\"id\":\"" REQ_ID "\",\"method\":\"" METHOD_PROCESS_INFO "\","
+                        "\"params\":{\"pane_id\":%s}}\n",
+                        pane_q) >= (int)cap ? -1 : 0;
+    return snprintf(out, cap,
+                    "{\"id\":\"" REQ_ID "\",\"method\":\"" METHOD_PROCESS_INFO "\","
+                    "\"params\":{}}\n") >= (int)cap ? -1 : 0;
 }
 
 static int make_send_keys_req(const char *pane, const char *key, char *out, size_t cap) {
@@ -136,6 +155,44 @@ static int make_send_keys_req(const char *pane, const char *key, char *out, size
                  pane_q, key_q) >= (int)cap)
         return -1;
     return 0;
+}
+
+/*
+ * Move herdr focus in <direction> (one of up/down/left/right), starting from
+ * <pane>. Mirrors `herdr pane focus --direction <dir>`. An empty pane omits
+ * pane_id so the server uses the active focused pane.
+ */
+static int make_focus_direction_req(const char *pane, const char *direction,
+                                    char *out, size_t cap) {
+    char pane_q[PANE_Q_BUF], dir_q[64];
+    if (!json_quote(pane_q, sizeof pane_q, pane) ||
+        !json_quote(dir_q, sizeof dir_q, direction))
+        return -1;
+    if (*pane)
+        return snprintf(out, cap,
+                        "{\"id\":\"" REQ_ID "\",\"method\":\"" METHOD_FOCUS_DIRECTION "\","
+                        "\"params\":{\"direction\":%s,\"pane_id\":%s}}\n",
+                        dir_q, pane_q) >= (int)cap ? -1 : 0;
+    return snprintf(out, cap,
+                    "{\"id\":\"" REQ_ID "\",\"method\":\"" METHOD_FOCUS_DIRECTION "\","
+                    "\"params\":{\"direction\":%s}}\n",
+                    dir_q) >= (int)cap ? -1 : 0;
+}
+
+/* Close <pane> (the current pane). Mirrors `herdr pane close`. An empty pane
+ * omits pane_id so the server closes the active focused pane. */
+static int make_close_req(const char *pane, char *out, size_t cap) {
+    char pane_q[PANE_Q_BUF];
+    if (!json_quote(pane_q, sizeof pane_q, pane))
+        return -1;
+    if (*pane)
+        return snprintf(out, cap,
+                        "{\"id\":\"" REQ_ID "\",\"method\":\"" METHOD_CLOSE "\","
+                        "\"params\":{\"pane_id\":%s}}\n",
+                        pane_q) >= (int)cap ? -1 : 0;
+    return snprintf(out, cap,
+                    "{\"id\":\"" REQ_ID "\",\"method\":\"" METHOD_CLOSE "\","
+                    "\"params\":{}}\n") >= (int)cap ? -1 : 0;
 }
 
 /* ------------------------------------------------------------------ */
@@ -422,6 +479,55 @@ static void run_fallback(char **fallback) {
     exit(127);
 }
 
+/*
+ * A builtin fallback is the three-token form
+ *
+ *     builtin current-pane <up|down|left|right|close>
+ *
+ * which maps onto herdr's own API (pane.focus_direction / pane.close).
+ * Instead of fork/exec-ing the `herdr` CLI, we dispatch the request down the
+ * socket we already hold open — the miss path then costs one ~0.3ms round
+ * trip, exactly like the match path, instead of a ~50ms+ fork/exec + binary
+ * load. This is the herdr-nvim-nav trick: do the work in the one process herdr
+ * already started for us.
+ *
+ * Returns:
+ *   0  fallback is NOT the builtin form — caller should execvp it
+ *   1  builtin form handled successfully
+ *   2  builtin form recognized but the socket request failed
+ */
+static int run_builtin_fallback(char **fallback, const char *pane) {
+    if (!fallback[0] || !fallback[1] || !fallback[2] || fallback[3])
+        return 0; /* not the exact builtin form */
+    if (strcmp(fallback[0], "builtin") != 0 ||
+        strcmp(fallback[1], "current-pane") != 0)
+        return 0;
+
+    const char *action = fallback[2];
+    char req[REQ_BUF];
+
+    int built = 0;
+    if (strcmp(action, "up") == 0 || strcmp(action, "down") == 0 ||
+        strcmp(action, "left") == 0 || strcmp(action, "right") == 0) {
+        built = make_focus_direction_req(pane, action, req, sizeof req) == 0;
+    } else if (strcmp(action, "close") == 0) {
+        built = make_close_req(pane, req, sizeof req) == 0;
+    } else {
+        warn("unknown builtin action '%s'", action);
+        return 2;
+    }
+    if (!built) {
+        warn("pane id too long");
+        return 2;
+    }
+
+    char *reply = herdr_request(req);
+    if (!reply)
+        return 2;
+    free(reply);
+    return 1;
+}
+
 static int run_if_proc(int argc, char **argv) {
     IfProcArgs args;
     parse_if_proc_args(&args, argc, argv);
@@ -458,6 +564,15 @@ static int run_if_proc(int argc, char **argv) {
 
     if (args.fallback[0] == NULL)
         return 0; /* no fallback configured: a miss does nothing */
+
+    /* A builtin fallback dispatches straight to herdr's API in this process
+     * — no fork/exec of the CLI. Anything else falls through to execvp. */
+    int builtin = run_builtin_fallback(args.fallback, pane);
+    if (builtin == 1)
+        return 0;
+    if (builtin == 2)
+        return 1;
+
     run_fallback(args.fallback);
     return 127; /* unreachable */
 }

@@ -37,22 +37,22 @@ zoom = ["ctrl+alt+z", "prefix+z"]
 [[keys.command]]
 key = "alt+shift+h"
 type = "shell"
-command = "herdr-passthough if-proc '^(g?(view|l?n?vim?x?))(diff)?$' alt+shift+h herdr pane focus --direction left --current"
+command = "herdr-passthough if-proc '^(g?(view|l?n?vim?x?))(diff)?$' alt+shift+h builtin current-pane left"
 
 [[keys.command]]
 key = "alt+shift+j"
 type = "shell"
-command = "herdr-passthough if-proc '^(g?(view|l?n?vim?x?))(diff)?$' alt+shift+j herdr pane focus --direction down --current"
+command = "herdr-passthough if-proc '^(g?(view|l?n?vim?x?))(diff)?$' alt+shift+j builtin current-pane down"
 
 [[keys.command]]
 key = "alt+shift+k"
 type = "shell"
-command = "herdr-passthough if-proc '^(g?(view|l?n?vim?x?))(diff)?$' alt+shift+k herdr pane focus --direction up --current"
+command = "herdr-passthough if-proc '^(g?(view|l?n?vim?x?))(diff)?$' alt+shift+k builtin current-pane up"
 
 [[keys.command]]
 key = "alt+shift+l"
 type = "shell"
-command = "herdr-passthough if-proc '^(g?(view|l?n?vim?x?))(diff)?$' alt+shift+l herdr pane focus --direction right --current"
+command = "herdr-passthough if-proc '^(g?(view|l?n?vim?x?))(diff)?$' alt+shift+l builtin current-pane right"
 
 [[keys.command]]
 key = "alt+shift+c"
@@ -62,4 +62,4 @@ command = "herdr-passthough if-proc '^(g?(view|l?n?vim?x?))(diff)?$' alt+shift+c
 [[keys.command]]
 key = "alt+shift+x"
 type = "shell"
-command = "herdr-passthough if-proc '^(g?(view|l?n?vim?x?))(diff)?$' alt+shift+x herdr pane close $HERDR_ACTIVE_PANE_ID"
+command = "herdr-passthough if-proc '^(g?(view|l?n?vim?x?))(diff)?$' alt+shift+x herdr current-pane close"
