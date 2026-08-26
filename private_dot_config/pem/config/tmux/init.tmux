@@ -263,8 +263,15 @@
     set -g status-right "#[fg=#3b3b3b,bg=#252525,nobold,nounderscore,noitalics]#[fg=#a1b7cc,bg=#3b3b3b] %Y-%m-%d | %H:%M #[fg=#89bbfe,bg=#3b3b3b,nobold,nounderscore,noitalics]#[fg=#252525,bg=#89bbfe] #S "
 
 
-    set -g message-command-style "fg=#a1b7cc,bg=#3b3b3b"
-    set -g message-style "fg=#a1b7cc,bg=#3b3b3b"
+    # https://raw.githubusercontent.com/tmux/tmux/3.7/CHANGES
+    # Since 3.7:
+    #   In the command prompt (C-b :) and message line,
+    #   the background is by default drawn only behind the text itself;
+    #   it fills the entire line width only
+    #   if fill= is explicitly added (see the CHANGES entry for tmux 3.7, commit 19f3fb1).
+    set -g message-command-style "fg=#a1b7cc,bg=#3b3b3b,fill=#3b3b3b"
+    set -g message-style "fg=#a1b7cc,bg=#3b3b3b,fill=#3b3b3b"
+
 
     set -g pane-border-style "fg=#3b3b3b"
     set -g pane-active-border-style "fg=#89bbfe"
