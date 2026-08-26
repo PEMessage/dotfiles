@@ -29,6 +29,9 @@ next_tab = "ctrl+alt+e"
 previous_tab = "ctrl+alt+q"
 rename_tab = ["prefix+,", "prefix+shift+t"]
 
+move_tab_previous = "ctrl+alt+left"
+move_tab_next     = "ctrl+alt+right"
+
 split_vertical = ["ctrl+alt+c", "prefix+c"]
 close_pane = ["ctrl+alt+x", "prefix+x"]
 zoom = ["ctrl+alt+z", "prefix+z"]

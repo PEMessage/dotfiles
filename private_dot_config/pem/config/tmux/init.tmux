@@ -32,6 +32,16 @@
     # `tmux show-option -s terminal-features` to checking
     set -as terminal-features ',xterm*:Sync'
 
+    # Override terminal capabilities to forward cursor-shape escape sequences.
+    # Fixes Vim/Neovim cursor not changing on mode switch.
+    # Work on tmux v2.6 but not v3.7c
+    # Ss = set cursor style (CSI Ps SP q)
+    #   \E[ = ESC [ (CSI)
+    #   %p1%d = print first argument (style number: 1-6)
+    #   ' q' = space + q (required by ANSI)
+    # Se = reset to steady block (CSI 2 SP q)
+    set -ga terminal-overrides ',*:Ss=\E[%p1%d q:Se=\E[2 q'
+
     set -g extended-keys on
 
 
