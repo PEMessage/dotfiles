@@ -3182,6 +3182,7 @@ require("lazy").setup({
     },
     {
         'DrKJeff16/wezterm-types',
+        ft = 'lua',
         version = false, -- Get the latest version
     },
     {
@@ -3411,6 +3412,35 @@ require("lazy").setup({
                     stopOnEntry = true,
                 },
             }
+            -- bash
+            -- ===============================
+            local BASHDB_DIR = require('mason.settings').current.install_root_dir .. "/opt/bashdb"
+            dap.adapters.bash = {
+                type = 'executable',
+                command = vim.fn.exepath('bash-debug-adapter'),
+            }
+            dap.configurations.sh = {
+                {
+                    -- This need script itself call $BASHDB_BIN
+                    -- Example:
+                    --  "$BASHDB_BIN" --quiet --tty "$BASHDB_FIFO" --tty_in "$BASHDB_FIFO_IN"  --library "$BASHDB_LIB" --  build/soong/soong_ui.bash --dumpvar-mode $1
+                    type = 'bash',
+                    request = 'launch',
+                    name = 'Bash: waitForConnect',
+                    program = '${file}',
+                    cwd = '${fileDirname}',
+                    waitForConnect = true,
+                    pathBashdb = BASHDB_DIR .. '/bashdb',
+                    pathBashdbLib = BASHDB_DIR,
+                    pathBash = 'bash',
+                    pathCat = 'cat',
+                    pathMkfifo = 'mkfifo',
+                    pathPkill = 'pkill',
+                    env = {},
+                    args = {},
+                    terminalKind = 'integrated',
+                }
+            }
 
         end
     },
@@ -3496,6 +3526,7 @@ require("lazy").setup({
     },
     {
         "gergol/cmake-debugger.nvim",
+        ft = 'cmake',
         dependencies = {
             "mfussenegger/nvim-dap",
         },
