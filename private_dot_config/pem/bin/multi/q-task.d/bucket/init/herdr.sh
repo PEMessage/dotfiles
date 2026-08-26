@@ -2,7 +2,7 @@
 
 set -x
 SCRIPT_PATH="$(readlink -f $0)"
-SCRIPT_DIR="$(dirname "$THIS_SCRIPT")"
+SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
 BIN_PATH="${PEM_DATA_HOME:-${HOME}/.local/share/pem}/bin/misc.d"
 
 mkdir -p "$BIN_PATH"
