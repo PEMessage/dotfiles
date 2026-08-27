@@ -6,10 +6,12 @@
 # --------------------------------
 # Basic Setting Zone
 # --------------------------------
+    run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | grep -o '[0-9]\\\+\\\.[0-9]*')"
+
     set -g base-index 1 # 设置窗口的起始下标为1
     set -g pane-base-index 1 # 设置面板的起始下标为1
     set-window-option -g automatic-rename on # 自动重命名
-    # set-option -g renumber-windows on 
+    # set-option -g renumber-windows on
 
     # Ture Color support
     # set -g default-terminal "xterm-256color"
@@ -22,7 +24,7 @@
 
     # See: https://github.com/tmux/tmux/wiki/FAQ#how-do-i-use-a-256-colour-terminal
     set -g default-terminal "screen-256color"
-    # # all term outside 
+    # # all term outside
     set-option -ga terminal-overrides ',*-256color*:Tc'
     set-option -ga terminal-overrides ',*-256color*:RGB'
 
@@ -30,7 +32,10 @@
     #       to avoid neovim cursor blinking during ui update
     # Using `tmux display -p "#{client_termfeatures}"`
     # `tmux show-option -s terminal-features` to checking
-    set -as terminal-features ',xterm*:Sync'
+    if-shell -b '[ "$(echo "$TMUX_VERSION >= 3.0" | bc)" = 1 ]' " \
+        set -as terminal-features ',xterm*:Sync'; \
+        set -g extended-keys on; \
+    "
 
     # Override terminal capabilities to forward cursor-shape escape sequences.
     # Fixes Vim/Neovim cursor not changing on mode switch.
@@ -43,7 +48,6 @@
     # !!! REMOVE !!!: DUE TO ISSUE ON OLD DISTRO
     # set -ga terminal-overrides ',*:Ss=\E[%p1%d q:Se=\E[2 q'
 
-    set -g extended-keys on
 
 
     # From: tmux-plugins/tmux-sensible
@@ -59,7 +63,6 @@
 
     set -g xterm-keys on
 
-    run-shell "tmux setenv -g TMUX_VERSION $(tmux -V | grep -o '[0-9]\\\+\\\.[0-9]*')"
 
     # fix opencode esc not work !
     set-option -g escape-time 10
@@ -98,7 +101,7 @@
 
     set -g focus-events on
 
-    # copy mode 
+    # copy mode
     # ----------------------------
     # bind P paste-buffer
     # bind C-v paste-buffer
@@ -121,8 +124,9 @@
 
 
     # Thanks to https://www.reddit.com/r/commandline/comments/8wv0w6/interactively_moving_panes_to_other_windows/?tl=zh-hans
-    bind-key M choose-tree -Zw "join-pane -t '%%'"
-    bind-key C-m choose-tree -Zs "join-pane -t '%%'"
+    if-shell -b '[ "$(echo "$TMUX_VERSION >= 3.0" | bc)" = 1 ]' " \
+        bind-key M choose-tree -Zw \"join-pane -t '%%'\" \
+    "
 
 
     # Credit: https://stackoverflow.com/questions/12524308/bash-strip-trailing-linebreak-from-output
@@ -143,14 +147,14 @@
 
     # vi copy mode
     # ----------------------------
-    # setw -g mode-keys vi 
+    # setw -g mode-keys vi
     set-window-option -g mode-keys vi # 开启vi风格后，支持vi的C-d、C-u、hjkl等快捷键
 
     bind-key -T copy-mode-vi v send-keys -X begin-selection
     bind-key -T copy-mode-vi r send-keys -X rectangle-toggle
 
     # exit copy mode after 'y'
-    bind-key -T copy-mode-vi y send -X copy-pipe-and-cancel 
+    bind-key -T copy-mode-vi y send -X copy-pipe-and-cancel
     # bind-key -T copy-mode-vi y send-keys -X copy-selection
 
     # prevent tmux from exiting copy mode after selection with mouse
@@ -159,7 +163,7 @@
     bind-key -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-selection
     bind-key -T copy-mode-vi MouseDown2Pane paste-buffer -p
 
-    # another setup by may report error 
+    # another setup by may report error
     # ----------------------------
     # bind -n vi-copy v begin-selection # 绑定v键为开始选择文本
     # bind -n vi-copy y copy-selection # 绑定y键为复制选中文本
@@ -188,7 +192,7 @@
     # Credit: https://nju-projectn.github.io/ics-pa-gitbook/ics2023/0.5.html
     bind -n C-M-w new-window -c "#{pane_current_path}" -a -t +1
     bind -n C-M-q previous-window
-    
+
     bind -n C-M-c splitw -h -c '#{pane_current_path}' # 水平方向新增面板，默认进入当前目录
     bind -n C-M-x confirm-before -p "kill-pane #P? (y/n)" kill-pane
 
@@ -279,9 +283,15 @@
     #   In the command prompt (C-b :) and message line,
     #   the background is by default drawn only behind the text itself;
     #   it fills the entire line width only
-    #   if fill= is explicitly added (see the CHANGES entry for tmux 3.7, commit 19f3fb1).
-    set -g message-command-style "fg=#a1b7cc,bg=#3b3b3b,fill=#3b3b3b"
-    set -g message-style "fg=#a1b7cc,bg=#3b3b3b,fill=#3b3b3b"
+    #   if fill= is explicitly added (see the CHANGES w -g window-status-activity-style "none"
+    if-shell -b '[ "$(echo "$TMUX_VERSION >= 3.7" | bc)" = 1 ]' " \
+        set -g message-command-style \"fg=#a1b7cc,bg=#3b3b3b,fill=#3b3b3b\"; \
+        set -g message-style \"fg=#a1b7cc,bg=#3b3b3b,fill=#3b3b3b\"; \
+    " " \
+        # else \
+        set -g message-command-style \"fg=#a1b7cc,bg=#3b3b3b\"; \
+        set -g message-style \"fg=#a1b7cc,bg=#3b3b3b\"; \
+    "
 
 
     set -g pane-border-style "fg=#3b3b3b"
@@ -315,7 +325,7 @@
     # PEM_TMUX_INACTIVITY="#3b3b3b"
     # PEM_INACTIVITY_MINUS="#252525"
 
-    
+
     # PEM_TMUX_HIGHTLIGHT_PLUS="#a0d0f0"
     # PEM_TMUX_HIGHTLIGHT="#3fcfff"
     # PEM_TMUX_HIGHTLIGHT_MINUS="#32a5cc"
@@ -396,8 +406,8 @@
     # # # List of plugins
     # # set -g @plugin 'tmux-plugins/tmux-copycat'
 
-        
-    # # Initialize TMUX plugin manager 
+
+    # # Initialize TMUX plugin manager
     # # (keep this line at the very bottom of tmux.conf)
     # run-shell '~/.config/tmux/plugins/tmux-thumbs/tmux-thumbs.tmux'
     # run '~/.config/tmux/plugins/tpm/tpm'
