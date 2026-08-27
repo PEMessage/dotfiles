@@ -284,6 +284,8 @@
     #   the background is by default drawn only behind the text itself;
     #   it fills the entire line width only
     #   if fill= is explicitly added (see the CHANGES w -g window-status-activity-style "none"
+    # Notice:
+    #  '#{>=:#{version},3.7}' only work above 3.1, otherwise always use else branch
     if-shell -b -F '#{>=:#{version},3.7}' " \
         set -g message-command-style 'fg=#a1b7cc,bg=#3b3b3b,fill=#3b3b3b'; \
         set -g message-style 'fg=#a1b7cc,bg=#3b3b3b,fill=#3b3b3b'; \
