@@ -284,13 +284,12 @@
     #   the background is by default drawn only behind the text itself;
     #   it fills the entire line width only
     #   if fill= is explicitly added (see the CHANGES w -g window-status-activity-style "none"
-    if-shell -b '[ "$(echo "$TMUX_VERSION >= 3.7" | bc)" = 1 ]' " \
-        set -g message-command-style \"fg=#a1b7cc,bg=#3b3b3b,fill=#3b3b3b\"; \
-        set -g message-style \"fg=#a1b7cc,bg=#3b3b3b,fill=#3b3b3b\"; \
+    if-shell -b -F '#{>=:#{version},3.7}' " \
+        set -g message-command-style 'fg=#a1b7cc,bg=#3b3b3b,fill=#3b3b3b'; \
+        set -g message-style 'fg=#a1b7cc,bg=#3b3b3b,fill=#3b3b3b'; \
     " " \
-        # else \
-        set -g message-command-style \"fg=#a1b7cc,bg=#3b3b3b\"; \
-        set -g message-style \"fg=#a1b7cc,bg=#3b3b3b\"; \
+        set -g message-command-style 'fg=#a1b7cc,bg=#3b3b3b'; \
+        set -g message-style 'fg=#a1b7cc,bg=#3b3b3b'; \
     "
 
 
