@@ -40,7 +40,8 @@
     #   %p1%d = print first argument (style number: 1-6)
     #   ' q' = space + q (required by ANSI)
     # Se = reset to steady block (CSI 2 SP q)
-    set -ga terminal-overrides ',*:Ss=\E[%p1%d q:Se=\E[2 q'
+    # !!! REMOVE !!!: DUE TO ISSUE ON OLD DISTRO
+    # set -ga terminal-overrides ',*:Ss=\E[%p1%d q:Se=\E[2 q'
 
     set -g extended-keys on
 
