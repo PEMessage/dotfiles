@@ -2574,7 +2574,7 @@ require("lazy").setup({
         event = 'VeryLazy',
         opts = {
             registries = {
-                "github:PEMessage/mason-registry", -- custom for tree-sitter-cli static
+                "github:PEMessage/mason-reg", -- custom for tree-sitter-cli static
                 "github:mason-org/mason-registry",
             },
         }
@@ -2598,9 +2598,9 @@ require("lazy").setup({
                     handle:close()
                     -- Check if it's Ubuntu 18.04
                     if content:match('NAME=.*[Uu]buntu') and content:match('VERSION_ID="18%.04"') then
-                        tree_sitter = 'tree-sitter-cli-ub1804'
+                        tree_sitter = 'tree-sitter-release'
                     elseif content:match('NAME=.*[Uu]buntu') and content:match('VERSION_ID="22%.04"') then
-                        tree_sitter = 'tree-sitter-cli-ub1804'
+                        tree_sitter = 'tree-sitter-release'
                     end
                 end
             end
@@ -3408,7 +3408,7 @@ require("lazy").setup({
                     mode = "remote",
                     showLog = true,
                     showRegisters = true,
-                    stopOnEntry = false,
+                    stopOnEntry = true,
                 },
             }
 
@@ -3636,6 +3636,7 @@ require("lazy").setup({
                     -- IDA PRO like keymap
                     ['<F2>'] = { dap.toggle_breakpoint, opts = { desc = "DAP: breakpoint"} },
                     ['<F4>'] = { dap.run_to_cursor, opts = { desc = "DAP: run to curosr"} },
+                    ['<F5>'] = { dapui.eval, opts = { desc = "DAP: Eval"} },
                     ['<F7>'] = { dap.step_into, opts = { desc = "DAP: Step Into" } },
 
                     ['<C-F7>'] = { dap.step_out, opts = { desc = "DAP: Step Out" } },
@@ -3648,6 +3649,7 @@ require("lazy").setup({
                 },
                 -- Visual mode mappings
                 ['v'] = {
+                    ['<F5>'] = { dapui.eval, opts = { desc = "DAP: Eval"} },
                     ['<c-x>'] = { dapui.eval, opts = { desc = "DAP: Evaluate" } },
                 }
             }
