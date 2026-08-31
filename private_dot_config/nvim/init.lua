@@ -1466,11 +1466,19 @@ require("lazy").setup({
                         --     vim.iter(vim.fn.getwininfo()):find(function(w) return w.quickfix == 1 end) then
                         return ':colder<CR>'
                     else
-                        return '<cmd>Gitsigns prev_hunk<CR>'
+                        return '<cmd>lua require("gitsigns").nav_hunk("prev")<CR>'
                     end
                 end,
                 mode = 'n',
                 desc = 'Previous git changed line', silent = true, expr = true
+            },
+            {
+                '[x',
+                function()
+                    return '<cmd>lua require("gitsigns").nav_hunk("prev", {target = "staged"})<CR>'
+                end,
+                mode = 'n',
+                desc = 'Previous git changed line(staged)', silent = true, expr = true
             },
             {
                 ']c',
@@ -1482,11 +1490,19 @@ require("lazy").setup({
                         --     vim.iter(vim.fn.getwininfo()):find(function(w) return w.quickfix == 1 end) then
                         return ':cnewer<CR>'
                     else
-                        return '<cmd>Gitsigns next_hunk<CR>'
+                        return '<cmd>lua require("gitsigns").nav_hunk("next")<CR>'
                     end
                 end,
                 mode = 'n',
                 desc = 'Next git changed line', silent = true, expr = true
+            },
+            {
+                ']x',
+                function()
+                    return '<cmd>lua require("gitsigns").nav_hunk("next", {target = "staged"})<CR>'
+                end,
+                mode = 'n',
+                desc = 'Next git changed line(staged)', silent = true, expr = true
             },
             {
                 --- @note if we want pass range to cmd, we must use : instead of <cmd>
