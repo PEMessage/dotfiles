@@ -39,6 +39,7 @@ usage() {
     echo "USAGE:"
     echo
     echo "-l [prefix]: print all task list (filter by path prefix)"
+    echo "-p <task>: print the task script path"
     echo "-h: print this help page"
     echo
     echo "CONF:"
@@ -89,6 +90,16 @@ main() {
                     exit 1
                 fi
                 vim "$Q_TASK_SCRIPT"
+                shift
+                ;;
+            -p)
+                shift
+                Q_TASK_SCRIPT="$(find_task_script "$1")"
+                if [ -z "$Q_TASK_SCRIPT" ]; then
+                    echo "[Err]: task not found: $1"
+                    exit 1
+                fi
+                echo "$Q_TASK_SCRIPT"
                 shift
                 ;;
             *)

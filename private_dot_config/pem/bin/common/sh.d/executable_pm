@@ -491,7 +491,8 @@ apt_upgrade() {
 }
 
 apt_fetch() {
-    with_sudo apt update
+    # with_sudo apt update
+    true
 }
 
 apt_info() {
