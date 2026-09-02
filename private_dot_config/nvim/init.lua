@@ -393,7 +393,9 @@ require("lazy").setup({
 
                 -- visual-whitespace
                 VisualNonText = {fg = '$grey', bg = '$bg3'},
-                FoldColumn = {fg = "$grey", bg = "$bg0"}
+                FoldColumn = {fg = "$grey", bg = "$bg0"},
+
+                debugPC = { fg = '$none', bg = '$diff_add' },
 
             },
 
@@ -3411,6 +3413,12 @@ require("lazy").setup({
                 type = "executable",
                 command = vim.fn.exepath("go-debug-adapter"), -- Find go-debug-adapter on $PATH
             }
+            -- https://github.com/golang/vscode-go/blob/46048018519b6f727e920f5f5a4335acc436bdd3/docs/debugging.md?plain=1#L812
+            -- dlv debug /path/to/program/ --headless --listen=:12345 # also add as needed: --accept-multiclient --continue
+            --
+            -- Android microfactory(dlv 1.20.2) case:
+            -- -    GOROOT=$(cd $GOROOT; pwd) ${mf_cmd} -b "${mf_bin}" \
+            -- +    GOROOT=$(cd $GOROOT; pwd) dlv --check-go-version=false exec --headless --api-version 2 --listen=:2345 ${mf_cmd} --  -b "${mf_bin}" \
             dap.configurations.go = {
                 {
                     type = "go",
@@ -3426,6 +3434,16 @@ require("lazy").setup({
                     showLog = true,
                     showRegisters = true,
                     stopOnEntry = true,
+                    -- debugAdapter = "leagcy",
+                    debugAdapter = "dlv-dap",
+                    dlvFlags = {
+                        "--check-go-version=false",
+                    },
+                    dlvLoadConfig = {
+                        maxStringLen = 100,
+                        maxArrayValues = 100,
+                        maxStructFields = -1,
+                    },
                 },
             }
             -- bash
@@ -3629,6 +3647,7 @@ require("lazy").setup({
             --
             "hrsh7th/nvim-cmp",
             "theHamsta/nvim-dap-virtual-text",
+            --
         },
         opts = {
             controls = {
@@ -3648,8 +3667,12 @@ require("lazy").setup({
             },
             element_mappings = {
                 stacks = {
-                    open = { 'o', "<2-LeftMouse>" },
-                    expand = { "<CR>" }
+                    open = { '<CR>', "<2-LeftMouse>" },
+                    expand = { "o" }
+                },
+                breakpoints = {
+                    open = { '<CR>', "<2-LeftMouse>" },
+                    expand = { "o" }
                 },
             },
             icons = {
@@ -3662,6 +3685,7 @@ require("lazy").setup({
             local dapui = require('dapui')
             local dap = require('dap')
             dapui.setup(opts)
+
             vim.cmd [[ highlight link NvimDapVirtualText DiagnosticVirtualTextUnnecessary ]]
 
             vim.api.nvim_create_user_command('DapUiToggle', function()
@@ -3681,7 +3705,9 @@ require("lazy").setup({
                 -- Normal mode mappings
                 ['n'] = {
                     -- IDA PRO like keymap
-                    ['<F2>'] = { dap.toggle_breakpoint, opts = { desc = "DAP: breakpoint"} },
+
+                    -- Using F1 instead!!
+                    -- ['<F2>'] = { dap.toggle_breakpoint, opts = { desc = "DAP: breakpoint"} },
                     ['<F4>'] = { dap.run_to_cursor, opts = { desc = "DAP: run to curosr"} },
                     ['<F5>'] = { dapui.eval, opts = { desc = "DAP: Eval"} },
                     ['<F7>'] = { dap.step_into, opts = { desc = "DAP: Step Into" } },
@@ -3745,6 +3771,7 @@ require("lazy").setup({
         dependencies = {
             "mfussenegger/nvim-dap",
         },
+        enabled = true,
         cmd = { "PBToggleBreakpoint" },
         event = 'BufReadPost',
         keys = {
@@ -4325,12 +4352,25 @@ vim.api.nvim_create_autocmd('LspAttach', {
     group = vim.api.nvim_create_augroup('LspCustomKeyMaps', {}),
     callback = function(args)
         local client = vim.lsp.get_client_by_id(args.data.client_id)
-
         local bufnr = args.buf
+        local function is_key_mapped(lhs, mode, buffer)
+            if vim.fn.maparg(lhs, mode, false) ~= '' then
+                return true
+            end
+            if buffer and vim.fn.maparg(lhs, mode, false, buffer) ~= '' then
+                return true
+            end
+            return false
+        end
 
-        vim.keymap.set('n', '<F2>', vim.lsp.buf.rename,
-            { silent = true, noremap = true, buffer = bufnr, desc = 'Rename' }
-        )
+        -- vim.keymap.set('n', '<F2>', vim.lsp.buf.rename,
+        --     { silent = true, noremap = true, buffer = bufnr, desc = 'Rename' }
+        -- )
+        if not is_key_mapped('<F2>', 'n', bufnr) then
+            vim.keymap.set('n', '<F2>', vim.lsp.buf.rename,
+                { silent = true, noremap = true, buffer = bufnr, desc = 'Rename' }
+            )
+        end
 
         vim.keymap.set('n', 'gk', vim.lsp.buf.code_action,
             { silent = true, noremap = true, buffer = bufnr, desc = 'Code Action' }
