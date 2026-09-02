@@ -491,8 +491,8 @@ apt_upgrade() {
 }
 
 apt_fetch() {
-    # with_sudo apt update
     true
+    # with_sudo apt update
 }
 
 apt_info() {
@@ -748,24 +748,21 @@ scoop_format_installed() {
 # Nix
 # =============================================================================
 
-# Flakes to search for packages. `nixpkgs` is always searched first and plain
-# package names are assumed to come from it. Channel variants of `nixpkgs`
-# (`nixpkgs/...`) are skipped to avoid listing the same packages repeatedly.
+# All flakes from the registry are searched for packages. `nixpkgs` is always
+# searched first and plain package names are assumed to come from it. Channel
+# variants of `nixpkgs` (`nixpkgs/...`) are skipped to avoid listing the same
+# packages repeatedly.
 nix_flakes() {
-    if [ -n "${PM_NIX_FLAKES-}" ]; then
-        printf '%s\n' "$PM_NIX_FLAKES"
-    else
-        {
-            echo nixpkgs
-            nix registry list 2>/dev/null | awk '
-                /flake:/ {
-                    name = $2
-                    sub(/^flake:/, "", name)
-                    if (name !~ /^nixpkgs\//) print name
-                }
-            '
-        } | awk '!seen[$0]++'
-    fi
+    {
+        echo nixpkgs
+        nix registry list 2>/dev/null | awk '
+            /flake:/ {
+                name = $2
+                sub(/^flake:/, "", name)
+                if (name !~ /^nixpkgs\//) print name
+            }
+        '
+    } | awk '!seen[$0]++'
 }
 
 nix_install() {
@@ -806,34 +803,43 @@ nix_info() {
 }
 
 nix_list_all() {
-    # Evaluating every flake is expensive, so the package list is cached for a
-    # week. Delete `~/.cache/pm/nix/packages` to force a refresh.
-    if [ ! -f "$PM_CACHE_DIR/packages" ] || [ -n "$(find "$PM_CACHE_DIR/packages" -mtime +7 2>/dev/null)" ]; then
-        echo >&2 "Fetching packages..."
-        TMP=$(mktemp "$PM_CACHE_DIR/packages.XXXXXX")
-        for FLAKE in $(nix_flakes); do
-            # `nix search <flake> ^` lists every package in the given flake.
-            nix search --quiet "$FLAKE" ^ --json 2>/dev/null | awk -v flake="$FLAKE" '
-                {
-                    gsub(/\},"/, "}\n\"")
-                    n = split($0, lines, "\n")
-                    for (i = 1; i <= n; i++) {
-                        e = lines[i]
-                        name = e
-                        sub(/^\{?"/, "", name)
-                        sub(/":\{.*/, "", name)
-                        sub(/^legacyPackages\.[^.]*\./, "", name)
-                        sub(/^packages\.[^.]*\./, "", name)
-                        version = e
-                        if (sub(/.*"version":"/, "", version)) sub(/".*/, "", version); else version = ""
-                        if (name != "") print flake "#" name " " version
-                    }
-                }
-            ' >>"$TMP"
-        done
-        mv "$TMP" "$PM_CACHE_DIR/packages"
-    fi
-    cat "$PM_CACHE_DIR/packages"
+    # Nix has no package database; packages are evaluated on demand by
+    # `nix search`. We do not maintain our own copy of the results but rely on
+    # nix's evaluation cache (`~/.cache/nix/eval-cache-*`), so the list is
+    # always current and repeated runs are reasonably fast. Flake searches run
+    # in parallel (one worker per flake by default; not CPU-intensive since
+    # they mostly wait on I/O), each capped by `timeout` so a slow flake (e.g.
+    # an uncached first evaluation) can never keep the output stream open
+    # indefinitely. Set `PM_NIX_TIMEOUT=0` to disable the cap.
+    FLAKES=$(nix_flakes)
+    JOBS=${PM_NIX_JOBS:-$(printf '%s\n' "$FLAKES" | wc -l)}
+    printf '%s\n' "$FLAKES" | xargs -r -n 1 -P "$JOBS" sh -c '
+        flake=$1
+        search_flake() {
+            if command -v timeout >/dev/null 2>&1 && [ "${PM_NIX_TIMEOUT:-300}" -gt 0 ] 2>/dev/null; then
+                # `nix search <flake> ^` lists every package in the given flake.
+                timeout -- "${PM_NIX_TIMEOUT:-300}" nix search --quiet "$flake" ^ --json 2>/dev/null
+            else
+                nix search --quiet "$flake" ^ --json 2>/dev/null
+            fi
+        }
+        search_flake |
+        awk -v flake="$flake" '\''{
+            gsub(/\},"/, "}\n\"")
+            n = split($0, lines, "\n")
+            for (i = 1; i <= n; i++) {
+                e = lines[i]
+                name = e
+                sub(/^\{?"/, "", name)
+                sub(/":\{.*/, "", name)
+                sub(/^legacyPackages\.[^.]*\./, "", name)
+                sub(/^packages\.[^.]*\./, "", name)
+                version = e
+                if (sub(/.*"version":"/, "", version)) sub(/".*/, "", version); else version = ""
+                if (name != "") print flake "#" name " " version
+            }
+        }'\''
+    ' _
 }
 
 nix_list_installed() {
