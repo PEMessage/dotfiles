@@ -196,6 +196,8 @@
     bindkey '^Z' fancy-ctrl-z
 
 
+    zstyle ':completion:*' fzf-search-display true
+    # zstyle ':completion:*:*:rg:*' fzf-search-display true
     function lazy_fzf_completion() {
         bindkey -r '^x'
         zinit snippet 'https://github.com/lincheney/fzf-tab-completion/blob/master/zsh/fzf-zsh-completion.sh'
