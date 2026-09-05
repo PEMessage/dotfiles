@@ -32,6 +32,9 @@
 fasd() {
     _FASD_get_vcs() {
         local begin_path=$1
+        # zsh: this function may run in an "emulate sh" scope; keep cd from
+        # triggering chpwd hooks (they would fail to parse in sh mode)
+        [ "$ZSH_VERSION" ] && emulate -L zsh && chpwd_functions=
         cd "$begin_path"
         while [ "$PWD" != "/" ] && [ "$PWD" != "//" ]  ; do
             if { [ -d .git ] || [ -d .hg ] ;} then
@@ -49,7 +52,7 @@ fasd() {
     }
 
   # make zsh do word splitting inside this function
-  [ "$ZSH_VERSION" ] && emulate sh && setopt localoptions
+  [ "$ZSH_VERSION" ] && emulate -L sh
 
   case $1 in
   --init) shift
