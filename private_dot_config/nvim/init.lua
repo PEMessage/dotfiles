@@ -118,10 +118,10 @@ local section = function ()
     vim.cmd [[
         unmenu PopUp.How-to\ disable\ mouse
     ]]
-    vim.cmd [[
-        menu PopUp.Go\ to\ Define <c-]>
-        menu PopUp.Back\  <c-t>
-    ]]
+    -- vim.cmd [[
+    --     menu PopUp.Go\ to\ Define <c-]>
+    --     menu PopUp.Back\  <c-t>
+    -- ]]
     vim.cmd [[ set cinkeys-=0# ]]
     -- -------------------------------------------
     -- 3.5 Windows Setting
@@ -3761,6 +3761,34 @@ require("lazy").setup({
             dap.listeners.after.event_terminated['me'] = clear_debug_mappings
             -- dap.listeners.after.disconnected['me'] = clear_debug_mappings
             dap.listeners.after.event_exited['me'] = clear_debug_mappings
+
+            local dap_menu_augroup = vim.api.nvim_create_augroup('dap_popup_menu', { clear = true })
+
+            vim.api.nvim_create_autocmd('MenuPopup', {
+                pattern = '*',
+                group = dap_menu_augroup,
+                desc = 'Add DAP items to right-click menu',
+                callback = function()
+                    local ok, dap = pcall(require, 'dap')
+                    if not ok then return end
+
+                    local session_active = dap.session() ~= nil
+
+                    vim.cmd([[
+                      silent! aunmenu PopUp.DAP\ Toggle\ Breakpoint <Cmd>PBToggleBreakpoint<CR>
+                      silent! aunmenu PopUp.DAP\ Run\ to\ cursor <Cmd>lua require('dap').run_to_cursor()<CR>
+                      silent! aunmenu PopUp.-DAP-
+                    ]])
+
+                    if session_active then
+                        vim.cmd([[
+                        anoremenu .100 PopUp.DAP:\ Toggle\ Breakpoint <Cmd>PBToggleBreakpoint<CR>
+                        anoremenu .100 PopUp.DAP:\ Run\ to\ cursor <Cmd>lua require('dap').run_to_cursor()<CR>
+                        anoremenu .100 PopUp.-DAP- <Nop>
+                        ]])
+                    end
+                end,
+            })
         end,
     },
     {
