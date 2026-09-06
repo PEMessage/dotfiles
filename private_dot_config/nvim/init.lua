@@ -3719,6 +3719,8 @@ require("lazy").setup({
                     ['<F9>'] = { dap.continue, opts = { desc = "DAP: countine" } },
 
                     ['<c-x>'] = { dapui.eval, opts = { desc = "DAP: Evaluate" } },
+                    ['<c-a>'] = { dap.step_into, opts = { desc = "DAP: Step Into" } },
+                    ['<c-s>'] = { dap.step_over, opts = { desc = "DAP: Step Over" } },
                 },
                 -- Visual mode mappings
                 ['v'] = {
@@ -3775,15 +3777,15 @@ require("lazy").setup({
                     local session_active = dap.session() ~= nil
 
                     vim.cmd([[
-                      silent! aunmenu PopUp.DAP\ Toggle\ Breakpoint <Cmd>PBToggleBreakpoint<CR>
                       silent! aunmenu PopUp.DAP\ Run\ to\ cursor <Cmd>lua require('dap').run_to_cursor()<CR>
+                      silent! aunmenu PopUp.DAP\ Toggle\ Breakpoint <Cmd>PBToggleBreakpoint<CR>
                       silent! aunmenu PopUp.-DAP-
                     ]])
 
                     if session_active then
                         vim.cmd([[
-                        anoremenu .100 PopUp.DAP:\ Toggle\ Breakpoint <Cmd>PBToggleBreakpoint<CR>
                         anoremenu .100 PopUp.DAP:\ Run\ to\ cursor <Cmd>lua require('dap').run_to_cursor()<CR>
+                        anoremenu .100 PopUp.DAP:\ Toggle\ Breakpoint <Cmd>PBToggleBreakpoint<CR>
                         anoremenu .100 PopUp.-DAP- <Nop>
                         ]])
                     end
