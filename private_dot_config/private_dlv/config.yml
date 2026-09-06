@@ -1,0 +1,11 @@
+aliases:
+  # command: ["alias1", "alias2"]
+
+max-array-values: 100
+max-string-len: 150
+max-variable-recurse: 3
+disassemble-flavor: go
+show-location-expr: true
+
+# List of directories to use when searching for separate debug info files.
+debug-info-directories: ["/usr/lib/debug/.build-id"]
