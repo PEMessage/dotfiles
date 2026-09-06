@@ -3440,7 +3440,9 @@ require("lazy").setup({
                         "--check-go-version=false",
                     },
                     dlvLoadConfig = {
-                        maxStringLen = 100,
+                        followPointers = true,
+                        maxVariableRecurse = 5,
+                        maxStringLen = 300,
                         maxArrayValues = 100,
                         maxStructFields = -1,
                     },
