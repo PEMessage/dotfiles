@@ -1211,7 +1211,7 @@ require("lazy").setup({
         },
     },
     {
-        'PEMessage/vim-strip-trailing-whitespace',
+        'lewis6991/spaceless.nvim',
         event = {'InsertEnter', 'BufEnter'}
     },
     {
