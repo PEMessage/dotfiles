@@ -1,8 +1,8 @@
 aliases:
   # command: ["alias1", "alias2"]
 
-max-array-values: 100
-max-string-len: 150
+max-array-values: 500
+max-string-len: 500
 max-variable-recurse: 3
 disassemble-flavor: go
 show-location-expr: true

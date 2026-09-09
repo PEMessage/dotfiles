@@ -1141,7 +1141,7 @@ require("lazy").setup({
 
             vim.cmd [[
                 let g:termdebug_config = {}
-                let g:termdebug_config['command'] = "gdb-multiarch"
+                let g:termdebug_config['command'] = executable('gdb-multiarch') ? 'gdb-multiarch' : 'gdb'
                 let g:termdebug_config['evaluate_in_popup'] = v:true
                 let g:termdebug_config['map_plus'] = v:true
                 let g:termdebug_config['map_mins'] = v:true
@@ -3336,7 +3336,7 @@ require("lazy").setup({
             dap.adapters.gdb = {
                 id = 'gdb',
                 type = 'executable',
-                command = 'gdb-multiarch',
+                command = vim.fn.executable('gdb-multiarch') == 1 and 'gdb-multiarch' or 'gdb',
                 args = { '--quiet', '--interpreter=dap' },
             }
 
@@ -3442,8 +3442,8 @@ require("lazy").setup({
                     dlvLoadConfig = {
                         followPointers = true,
                         maxVariableRecurse = 5,
-                        maxStringLen = 300,
-                        maxArrayValues = 100,
+                        maxStringLen = 1000,
+                        maxArrayValues = 1000,
                         maxStructFields = -1,
                     },
                 },
@@ -3723,6 +3723,9 @@ require("lazy").setup({
                     ['<c-x>'] = { dapui.eval, opts = { desc = "DAP: Evaluate" } },
                     ['<c-a>'] = { dap.step_into, opts = { desc = "DAP: Step Into" } },
                     ['<c-s>'] = { dap.step_over, opts = { desc = "DAP: Step Over" } },
+
+                    [']f'] = { dap.down, opts = { desc = "DAP: Down" }  },
+                    ['[f'] = { dap.up, opts = { desc = "DAP: Up" }  },
                 },
                 -- Visual mode mappings
                 ['v'] = {
