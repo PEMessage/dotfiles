@@ -45,6 +45,24 @@ git_config_global_if_not_set() {
         echo "[Notice]: skip setting '${key}' since it's already has value..."
     fi
 }
+
+git_config_global_list() {
+    key="$1"
+    shift
+
+    expected="$(printf '%s\n' "$@")"
+    curvalue="$(git config --global --get-all "$key" 2>/dev/null || true)"
+
+    if [ "$curvalue" = "$expected" ] ; then
+        return 0
+    fi
+
+    runcmd git config --global --unset-all "$key" 2>/dev/null || true
+
+    for v in "$@" ; do
+        runcmd git config --global --add "$key" "$v"
+    done
+}
  
 git_config_global branch.sort -committerdate
 git_config_global column.ui auto
@@ -162,3 +180,13 @@ git_config_global alias.hshow "-c core.pager=\"hunk pager\" show"
 git_config_global  core.quotepath false
 
 git_config_global  alias.add-upstream '!f() { git remote add upstream "$(gh api repos/{owner}/{repo} --jq .parent.clone_url)"; }; f'
+
+
+# codeberg(need git-credential-oauth)
+git_config_global_list credential.https://codeberg.org.helper \
+    '' \
+    'cache --timeout 7200' \
+    'oauth'
+git_config_global credential.https://codeberg.org.oauthClientId 'a4792ccc-144e-407e-86c9-5e7d8d9c3269'
+git_config_global credential.https://codeberg.org.oauthAuthURL  '/login/oauth/authorize'
+git_config_global credential.https://codeberg.org.oauthTokenURL '/login/oauth/access_token'
