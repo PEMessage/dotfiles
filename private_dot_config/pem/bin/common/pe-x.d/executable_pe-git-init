@@ -157,3 +157,6 @@ git_config_global init.defaultBranch main
 # hunk: bun install -g hunkdiff
 git_config_global alias.hdiff "-c core.pager=\"hunk pager\" diff"
 git_config_global alias.hshow "-c core.pager=\"hunk pager\" show"
+
+# by default, git escape special character(chinese character)
+git_config_global  core.quotepath false
