@@ -160,3 +160,5 @@ git_config_global alias.hshow "-c core.pager=\"hunk pager\" show"
 
 # by default, git escape special character(chinese character)
 git_config_global  core.quotepath false
+
+git_config_global  alias.add-upstream '!f() { git remote add upstream "$(gh api repos/{owner}/{repo} --jq .parent.clone_url)"; }; f'
