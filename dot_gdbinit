@@ -254,7 +254,13 @@ python
 Plug.begin(autoload='none')
 if True:
     Plug.plug('lebr0nli/GEP')
+
     Plug.plug('PEMessage/regdiff-gdb', autoload=True)
+    Plug.plug("koutheir/libcxx-pretty-printers", autoload=True,
+        path="src",
+        setup="from libcxx.v1.printers import register_libcxx_printers\n"
+            "register_libcxx_printers(None)",
+    )
 Plug.end()
 end
 
