@@ -217,8 +217,6 @@ class ShellPipe (gdb.Command):
             shell_process.communicate(output.encode('utf-8'))
         else:
             sys.stdout.write(output)
-
-
 ShellPipe()
 
 
@@ -243,9 +241,29 @@ class Cmds(gdb.Command):
             # to_string is false. We just want to write the output of the commands, not capture it.  # noqa
             gdb.execute(fragment, from_tty=from_tty, to_string=False)
         print()
-
-
 Cmds()
+
+
+class GAttach(gdb.Command):
+    """gattach NAME  -- attach to process by exact name (pgrep -x)"""
+    def __init__(self):
+        super().__init__("gattach", gdb.COMMAND_RUNNING, gdb.COMPLETE_NONE)
+
+    def invoke(self, arg, from_tty):
+        name = arg.strip()
+        if not name:
+            print("usage: gattach <procname>")
+            return
+        out = subprocess.run(["pgrep", "-x", name],
+                             capture_output=True, text=True)
+        pids = out.stdout.split()
+        if not pids:
+            print(f"no process named '{name}'")
+            return
+        if len(pids) > 1:
+            print(f"multiple pids: {pids}, attaching to first")
+        gdb.execute(f"attach {pids[0]}")
+GAttach()
 
 end
 
