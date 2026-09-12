@@ -13,7 +13,7 @@ PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 
 # -----------------------------------------
 # PS1 Setting
-# ----------------------------------------- 
+# -----------------------------------------
     # parse_git_branch() {
     #     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
     # }
@@ -61,26 +61,26 @@ PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 
         # local exit_code="\$(VALU="\$?" ; echo -n \$VALU)"
         # local exit_code='$(code=${?##0};echo ${code:+:${code}})'
-        case "$TERM" in 
+        case "$TERM" in
             xterm-color|xterm-ghostty|*-256color) color_prompt=yes;;
         esac
         if [ "$color_prompt" = yes ]; then
             local blackF="\[\e[30m\]" # Fonts color
-            local redF="\[\e[1;31m\]" 
-            local yellowF="\[\e[1;33m\]" 
-            local magentaF="\[\e[1;35m\]" 
-            local cyanF="\[\e[1;36m\]" 
-            local blueF="\[\e[1;34m\]" 
-            local greenF="\[\e[1;32m\]" 
-            local whiteF="\[\e[37m\]" 
+            local redF="\[\e[1;31m\]"
+            local yellowF="\[\e[1;33m\]"
+            local magentaF="\[\e[1;35m\]"
+            local cyanF="\[\e[1;36m\]"
+            local blueF="\[\e[1;34m\]"
+            local greenF="\[\e[1;32m\]"
+            local whiteF="\[\e[37m\]"
             local blackB="\[\e[30m\]" # Background color
-            local redB="\[\e[41m\]" 
-            local greenB="\[\e[42m\]" 
-            local yellowB="\[\e[43m\]" 
-            local blueB="\[\e[44m\]" 
-            local magentaB="\[\e[45m\]" 
-            local cyanB="\[\e[46m\]" 
-            local whiteB="\[\e[47m\]" 
+            local redB="\[\e[41m\]"
+            local greenB="\[\e[42m\]"
+            local yellowB="\[\e[43m\]"
+            local blueB="\[\e[44m\]"
+            local magentaB="\[\e[45m\]"
+            local cyanB="\[\e[46m\]"
+            local whiteB="\[\e[47m\]"
             local colorEnd="\[\e[00m\]"
         fi
 
@@ -92,7 +92,7 @@ PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 
         PS1+="$greenF\w$colorEnd"
         # PS1+="$greenF\$(_pe_last3dir)$colorEnd"
-        
+
         PS1+="]"
         PS1+="$yellowF\$(_parse_git_branch_v3)$colorEnd"
         # PS1+="$exit_code"
@@ -119,5 +119,8 @@ PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
     bind '"\e[A": history-search-backward'
     bind '"\e[B": history-search-forward'
     # bind 'TAB:menu-complete'
+    bind 'set colored-completion-prefix on'
 
     [ -f "$HOME/.config/pem/init.sh" ] && source ~/.config/pem/init.sh
+
+
