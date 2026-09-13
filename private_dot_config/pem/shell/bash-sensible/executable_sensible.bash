@@ -25,7 +25,8 @@ shopt -s checkwinsize
 
 # Enable history expansion with space
 # E.g. typing !!<space> will replace the !! with your last command
-bind Space:magic-space
+# NOTICE: THIS will rebind readline, cause omarchy-bash-autosuggest not work
+# bind Space:magic-space
 
 # Turn on recursive globbing (enables ** to recurse all directories)
 shopt -s globstar 2> /dev/null
