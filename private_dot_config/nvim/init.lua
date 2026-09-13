@@ -229,8 +229,11 @@ local section = function ()
         extension = {
             tmux = 'tmux',
             hexpat = 'imhex',
+            ets = 'arkts',
         }
     })
+    vim.treesitter.language.register('typescript', 'arkts')
+
 
 end
 section()
@@ -1649,6 +1652,7 @@ require("lazy").setup({
                 'bash',
                 'kotlin',
                 'javascript',
+                'typescript',
                 'zig',
                 'imhex',
             },
