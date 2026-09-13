@@ -2667,8 +2667,8 @@ require("lazy").setup({
                 -- "pylsp",
                 "gopls",
                 "bashls",
-                -- "ts_ls",
-                "tsgo",
+                "ts_ls",
+                -- "tsgo",
                 -- See: https://github.com/desugar-64/kotlin-lsp-workspace-generator for android
                 -- "kotlin_lsp",  -- leave it to kotlin.nvim
                 -- "jdtls" -- leave it to nvim-jdtls
@@ -2837,8 +2837,24 @@ require("lazy").setup({
                     }
                 }
             })
+            local ts_settings = {
+                inlayHints = {
+                    includeInlayParameterNameHints = 'all',
+                    includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                    includeInlayFunctionParameterTypeHints = true,
+                    includeInlayVariableTypeHints = true,
+                    includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+                    includeInlayPropertyDeclarationTypeHints = true,
+                    includeInlayFunctionLikeReturnTypeHints = true,
+                    includeInlayEnumMemberValueHints = true,
+                },
+            }
 
             vim.lsp.config("ts_ls", {
+                settings = {
+                    javascript = ts_settings,
+                    typescript = ts_settings,
+                },
                 on_attach = function(client, bufnr)
                     -- disable for android.bp, only borrow synatx of javascript
                     local filename = vim.api.nvim_buf_get_name(bufnr)
