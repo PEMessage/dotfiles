@@ -4,7 +4,8 @@
       "npm": "@ai-sdk/openai-compatible",
       "name": "goat",
       "options": {
-        "baseURL": "https://api.commandcode.ai/provider/v1"
+        "baseURL": "https://api.commandcode.ai/provider/v1",
+        "headers": { "x-cmd-zdr": "1" }
       },
       "models": {
         "deepseek/deepseek-v4.1-flash": {
