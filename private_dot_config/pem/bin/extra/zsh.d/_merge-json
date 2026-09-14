@@ -15,16 +15,14 @@ commands=(
     '-e:Edit presets'
 )
 
-# Handle command completion for first argument
-if [[ $CURRENT -eq 2 && $words[2] == -* ]]; then
+# Offer options only while the current argument starts with '-'
+if [[ $words[CURRENT] == -* ]]; then
     _describe 'command' commands
     return
 fi
 
-# Handle preset completion for -e option or default arguments
-if [[ $CURRENT -eq 3 && $words[2] == -e ]] || [[ $CURRENT -eq 2 && $words[2] != -* ]]; then
-    _alternative \
-        "presets:preset:_path_files -W ${preset_path} -g '*(/)' -g '*.json' " \
-        'files:file:_files'
-    return
-fi
+# For any argument not starting with '-', complete presets and files
+_alternative \
+    "presets:preset:_path_files -W ${preset_path} -g '*(/)' -g '*.json' " \
+    'files:file:_files'
+return
