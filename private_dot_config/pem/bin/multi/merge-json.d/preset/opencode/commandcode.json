@@ -1,0 +1,17 @@
+{
+  "provider": {
+    "goat": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "goat",
+      "options": {
+        "baseURL": "https://api.commandcode.ai/provider/v1"
+      },
+      "models": {
+        "deepseek/deepseek-v4.1-flash": {
+          "name": "deepseek-v4.1-flash",
+          "limit": { "context": 1000000, "output": 262144 }
+        }
+      }
+    }
+  }
+}
