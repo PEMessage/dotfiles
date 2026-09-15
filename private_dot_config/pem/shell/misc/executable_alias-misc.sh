@@ -36,3 +36,4 @@ ttt() {
 
 alias q-bell='echo -e "\a"'
 alias q-pixi='eval "$(pixi shell-hook)"'
+alias opencode2='opencode2 --standalone'
