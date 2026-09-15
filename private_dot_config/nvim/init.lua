@@ -2755,6 +2755,29 @@ require("lazy").setup({
             })
             -- vim.lsp.enable('kmp_lsp')
 
+            -- Java + Kotlin by IntelliJ IDEA (mason package `intellij-server`).
+            -- The installed `intellij-server` is a wrapper around JetBrains' launcher that
+            -- appends `--stdio` and the accepted-EULA hash, so no extra arguments are needed.
+            vim.lsp.config('intellij_server', {
+                cmd = { 'intellij-server' },
+                filetypes = { 'java', 'kotlin' },
+                single_file_support = false,
+                root_markers = {
+                    'pom.xml',
+                    'build.gradle',
+                    'build.gradle.kts',
+                    'settings.gradle',
+                    'settings.gradle.kts',
+                    'WORKSPACE',
+                    'WORKSPACE.bazel',
+                    'MODULE.bazel',
+                    'gradlew',
+                    'mvnw',
+                    '.git',
+                },
+            })
+            vim.lsp.enable('intellij_server')
+
             vim.lsp.config('clice', {
                 filetypes = { 'c', 'cpp' },
 
@@ -3047,6 +3070,8 @@ require("lazy").setup({
     {
         'PEMessage/nvim-jdtls',
         version = false, -- set this if you want to always pull the latest change
+        -- Disabled: replaced by the `intellij_server` LSP (Java + Kotlin by IntelliJ IDEA).
+        enabled = false,
         ft = { "java" }, -- THIS IS KEY, if not this, everything will broken
         -- UPDATE: this will cause jump to class not work as expect, but other function will do work
         -- See: https://github.com/mfussenegger/nvim-jdtls/issues/639#issuecomment-3079720936
@@ -3260,7 +3285,8 @@ require("lazy").setup({
     {
         "AlexandrosAlexiou/kotlin.nvim",
         ft = { "kotlin" },
-        enabled = true,
+        -- Disabled: replaced by the `intellij_server` LSP (Java + Kotlin by IntelliJ IDEA).
+        enabled = false,
         dependencies = {
             "mason.nvim",
             "mason-lspconfig.nvim",
