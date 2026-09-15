@@ -18,9 +18,13 @@ uvsx() {
         uv venv "$script_env"
         uv export --script "$script" |  uv pip install -r - -p "$script_env"
     fi
-    (
-        . "$script_env/bin/activate" && "$@"
-    )
+    if [ "$#" = 0 ] ; then
+        . "$script_env/bin/activate"
+    else
+        (
+            . "$script_env/bin/activate" && "$@"
+        )
+    fi
 }
 
 
