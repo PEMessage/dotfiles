@@ -2726,6 +2726,7 @@ require("lazy").setup({
             -- if we type this manually, we might need a `edit %` to make lsp work
             vim.lsp.enable('gopls')
 
+
             -- vim.lsp.config("kotlin_lsp", {
             --     cmd = {
             --         "faketime",
@@ -2896,6 +2897,34 @@ require("lazy").setup({
                     },
                 },
             })
+
+            -- vim.lsp.config('arkts-lsp', {
+            --     cmd = { 'arkts-lsp' },
+            --     filetypes = { 'arkts' },
+            --     root_markers = { '.git' },
+            -- })
+            -- vim.lsp.enable('arkts-lsp')
+            vim.lsp.config('ets', {
+                cmd = { 'ets-language-server', '--stdio' },
+                filetypes = { 'arkts' },          -- You can also add 'json5'; the server selector includes json/json5
+                root_markers = { '.git' },
+                -- Important: The ArkTS server only creates virtual code when languageId === 'ets'.
+                -- The filetype for .ets is 'arkts', so by default languageId='arkts' is sent.
+                -- The server attaches successfully, but all features (hover/completion/diagnostics) are empty.
+                -- Here we map languageId back to 'ets'.
+                get_language_id = function(_, filetype)
+                    return filetype == 'arkts' and 'ets' or filetype
+                end,
+                init_options = {
+                    ets = {
+                        -- Required: DevEco's sdk/default/openharmony (contains ets/build-tools/ets-loader/tsconfig.json)
+                        -- Example: /Applications/DevEco-Studio.app/Contents/sdk/default/openharmony
+                        sdkPath = vim.env.OHOS_SDK_PATH,
+                    },
+                },
+            })
+            vim.lsp.enable('ets')
+
             vim.lsp.config('nixd', {
                 settings = {
                     nixd = {
