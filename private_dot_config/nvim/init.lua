@@ -3611,6 +3611,19 @@ require("lazy").setup({
                     config.adapters.options = { initialize_timeout_sec = 180 }
                     require('mason-nvim-dap').default_setup(config)
                 end,
+                codelldb = function(config)
+                    local lldb_attach = {
+                        name = 'LLDB: Attach to Process',
+                        type = 'codelldb',
+                        request = 'attach',
+                        pid = require("dap.utils").pick_process,
+                        cwd = '${workspaceFolder}',
+                        stopOnEntry = true,
+                        console = 'integratedTerminal',
+                    }
+                    config.configurations = vim.list_extend(config.configurations, { lldb_attach })
+                    require('mason-nvim-dap').default_setup(config)
+                end
             }
         },
     },
