@@ -2756,10 +2756,10 @@ require("lazy").setup({
             -- vim.lsp.enable('kmp_lsp')
 
             -- Java + Kotlin by IntelliJ IDEA (mason package `intellij-server`).
-            -- The installed `intellij-server` is a wrapper around JetBrains' launcher that
+            -- The installed `intellij-server-lsp` is a wrapper around JetBrains' launcher that
             -- appends `--stdio` and the accepted-EULA hash, so no extra arguments are needed.
             vim.lsp.config('intellij_server', {
-                cmd = { 'intellij-server' },
+                cmd = { 'intellij-server-lsp' },
                 filetypes = { 'java', 'kotlin' },
                 single_file_support = false,
                 root_markers = {
@@ -2947,9 +2947,98 @@ require("lazy").setup({
                     ets = {
                         -- Required: DevEco's sdk/default/openharmony (contains ets/build-tools/ets-loader/tsconfig.json)
                         -- Example: /Applications/DevEco-Studio.app/Contents/sdk/default/openharmony
-                        sdkPath = vim.env.OHOS_SDK_PATH,
+                        -- sdkPath = vim.env.OHOS_SDK_PATH,
                     },
                 },
+                ---@param params lsp.InitializeParams
+                ---@param config vim.lsp.ClientConfig
+                before_init = function(params, config)
+                    local root_dir = config.root_dir
+
+                    -- Validator: a candidate SDK root must contain
+                    -- ets/build-tools/ets-loader/tsconfig.json
+                    local function is_valid_sdk(path)
+                        if not path or path == "" or vim.fn.isdirectory(path) == 0 then
+                            return false
+                        end
+                        local tsconfig = vim.fs.joinpath(path, "ets", "build-tools", "ets-loader", "tsconfig.json")
+                        return vim.fn.filereadable(tsconfig) == 1
+                    end
+
+                    local rules = {
+                        -- Rule 1: environment variables
+                        function()
+                            return {
+                                vim.env.OHOS_SDK_PATH,
+                                vim.env.HARMONYOS_SDK_PATH,
+                            }
+                        end,
+
+                        -- Rule 2: in-project prebuilts path
+                        function()
+                            if not root_dir then return {} end
+                            return {
+                                vim.fs.joinpath(root_dir, "prebuilts", "commandline-tools", "sdk", "default", "openharmony"),
+                            }
+                        end,
+
+                        -- Rule 3: platform default install locations
+                        function()
+                            local home = vim.env.HOME or vim.env.USERPROFILE or ""
+                            return {
+                                "/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony",      -- macOS
+                                vim.fs.joinpath(home, ".deveco-sdk", "default", "openharmony"),          -- Linux (user)
+                                "/opt/deveco-studio/sdk/default/openharmony",                            -- Linux (system)
+                                "C:\\Program Files\\Huawei\\DevEco Studio\\sdk\\default\\openharmony",   -- Windows
+                            }
+                        end,
+
+                        -- Rule 4: read from local.properties (searched upwards)
+                        function()
+                            local result = {}
+                            local local_props = vim.fs.find("local.properties", {
+                                upward = true,
+                                path = root_dir or vim.fn.getcwd(),
+                            })[1]
+                            if not local_props then return result end
+
+                            local file = io.open(local_props, "r")
+                            if not file then return result end
+                            for line in file:lines() do
+                                local sdk_path = line:match("^%s*[%w%.]*sdk[%w%.]*%s*=%s*(.+)")
+                                if sdk_path then
+                                    -- Unescape Windows-style paths.
+                                    sdk_path = sdk_path:gsub("\\\\", "\\"):gsub("\\:", ":")
+                                    table.insert(result, sdk_path)
+                                end
+                            end
+                            file:close()
+                            return result
+                        end,
+                    }
+
+                    -- Walk the rules; take the first candidate that passes validation.
+                    local sdk_path = nil
+                    for _, rule in ipairs(rules) do
+                        for _, candidate in ipairs(rule()) do
+                            if is_valid_sdk(candidate) then
+                                sdk_path = candidate
+                                break
+                            end
+                        end
+                        if sdk_path then break end
+                    end
+
+                    -- Inject into the outgoing initialize params.
+                    if sdk_path then
+                        params.initializationOptions = params.initializationOptions or {}
+                        params.initializationOptions.ets = params.initializationOptions.ets or {}
+                        params.initializationOptions.ets.sdkPath = sdk_path
+                        vim.notify(" using SDK: " .. sdk_path, vim.log.levels.INFO)
+                    else
+                        vim.notify( "No valid SDK found!",vim.log.levels.WARN)
+                    end
+                end,
             })
             vim.lsp.enable('ets')
 
