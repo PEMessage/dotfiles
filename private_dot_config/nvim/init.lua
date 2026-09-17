@@ -2758,25 +2758,25 @@ require("lazy").setup({
             -- Java + Kotlin by IntelliJ IDEA (mason package `intellij-server`).
             -- The installed `intellij-server-lsp` is a wrapper around JetBrains' launcher that
             -- appends `--stdio` and the accepted-EULA hash, so no extra arguments are needed.
-            vim.lsp.config('intellij_server', {
-                cmd = { 'intellij-server-lsp' },
-                filetypes = { 'java', 'kotlin' },
-                single_file_support = false,
-                root_markers = {
-                    'pom.xml',
-                    'build.gradle',
-                    'build.gradle.kts',
-                    'settings.gradle',
-                    'settings.gradle.kts',
-                    'WORKSPACE',
-                    'WORKSPACE.bazel',
-                    'MODULE.bazel',
-                    'gradlew',
-                    'mvnw',
-                    '.git',
-                },
-            })
-            vim.lsp.enable('intellij_server')
+            -- vim.lsp.config('intellij_server', {
+            --     cmd = { 'intellij-server-lsp' },
+            --     filetypes = { 'java', 'kotlin' },
+            --     single_file_support = false,
+            --     root_markers = {
+            --         'pom.xml',
+            --         'build.gradle',
+            --         'build.gradle.kts',
+            --         'settings.gradle',
+            --         'settings.gradle.kts',
+            --         'WORKSPACE',
+            --         'WORKSPACE.bazel',
+            --         'MODULE.bazel',
+            --         'gradlew',
+            --         'mvnw',
+            --         '.git',
+            --     },
+            -- })
+            -- vim.lsp.enable('intellij_server')
 
             vim.lsp.config('clice', {
                 filetypes = { 'c', 'cpp' },
@@ -3370,6 +3370,13 @@ require("lazy").setup({
         'DrKJeff16/wezterm-types',
         ft = 'lua',
         version = false, -- Get the latest version
+    },
+    {
+        "AlexandrosAlexiou/intellij-server.nvim",
+        ft = { "java", "kotlin" },
+        dependencies = { "mfussenegger/nvim-dap" }, -- optional
+        -- build = ":IntellijServerInstall",  -- auto-download on install/update
+        opts = {},
     },
     {
         "AlexandrosAlexiou/kotlin.nvim",
