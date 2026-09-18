@@ -65,4 +65,4 @@ command = "herdr-passthough if-proc '^(g?(view|l?n?vim?x?))(diff)?$' alt+shift+c
 [[keys.command]]
 key = "alt+shift+x"
 type = "shell"
-command = "herdr-passthough if-proc '^(g?(view|l?n?vim?x?))(diff)?$' alt+shift+x herdr current-pane close"
+command = "herdr-passthough if-proc '^(g?(view|l?n?vim?x?))(diff)?$' alt+shift+x builtin current-pane close"
