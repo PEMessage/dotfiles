@@ -4,13 +4,28 @@
       "npm": "@ai-sdk/openai-compatible",
       "name": "goat",
       "options": {
-        "baseURL": "https://api.commandcode.ai/provider/v1",
-        "headers": { "x-cmd-zdr": "1" }
+        "baseURL": "https://api.commandcode.ai/provider/v1"
       },
       "models": {
         "deepseek/deepseek-v4.1-flash": {
+          "name": "Deepseek V4.1 Flash (ZDR)",
+          "headers": {
+            "x-cmd-zdr": "1"
+          },
+          "limit": {
+            "context": 1000000,
+            "output": 262144
+          }
+        },
+        "deepseek/deepseek-v4.1-flash-nozdr": {
           "name": "Deepseek V4.1 Flash",
-          "limit": { "context": 1000000, "output": 262144 }
+          "options": {
+            "modelID": "deepseek/deepseek-v4.1-flash"
+          },
+          "limit": {
+            "context": 1000000,
+            "output": 262144
+          }
         }
       }
     }
