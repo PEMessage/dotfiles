@@ -19,9 +19,7 @@
         },
         "deepseek/deepseek-v4.1-flash-nozdr": {
           "name": "Deepseek V4.1 Flash",
-          "options": {
-            "modelID": "deepseek/deepseek-v4.1-flash"
-          },
+          "id": "deepseek/deepseek-v4.1-flash",
           "limit": {
             "context": 1000000,
             "output": 262144
