@@ -97,7 +97,14 @@ local section = function ()
     vim.o.autoindent  = true                       -- 自动缩进
     vim.o.smartindent = true                       -- Insert indents automatically
     vim.api.nvim_create_autocmd('FileType', {
-        pattern = {'nix', 'json', 'jsonc'},
+        pattern = {
+            'nix',
+            'json',
+            'jsonc',
+            -- https://ukupat.github.io/tabs-or-spaces/
+            'javascript', -- 59% 2 space, and Prettier
+            'typescript',
+        },
         callback = function(args)
             vim.bo[args.buf].tabstop     = 2
             vim.bo[args.buf].shiftwidth  = 2
@@ -2826,6 +2833,7 @@ require("lazy").setup({
                 cmd = {
                     'clangd',
                     -- See: https://clangd.llvm.org/guides/system-headers#query-driver
+                    -- NixOS will not have stdpath
                     -- will run something like `/custom/compiler -E -xc++ -v /dev/null`
                     '--query-driver=**/c++,**/g++,**/clang,**/cc,**/arm-none-eabi**'
                 }
