@@ -2822,6 +2822,14 @@ require("lazy").setup({
                     -- '--log-level=trace',
                 },
             })
+            vim.lsp.config('clangd', {
+                cmd = {
+                    'clangd',
+                    -- See: https://clangd.llvm.org/guides/system-headers#query-driver
+                    -- will run something like `/custom/compiler -E -xc++ -v /dev/null`
+                    '--query-driver=**/c++,**/g++,**/clang,**/cc,**/arm-none-eabi**'
+                }
+            })
             -- Now clice is enabled when clice.toml is found in the project (or any parent directory)
             vim.api.nvim_create_autocmd('FileType', {
                 pattern = { 'c', 'cpp' },
