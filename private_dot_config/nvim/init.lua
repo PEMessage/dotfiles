@@ -241,7 +241,6 @@ local section = function ()
     })
     vim.treesitter.language.register('typescript', 'arkts')
 
-
 end
 section()
 
@@ -834,6 +833,17 @@ require("lazy").setup({
         opts = {
             open_mapping = [[<M-S-u>]],
             direction = 'float',
+            -- Float terminal background: nvim's :terminal derives its default
+            -- background from the window's NormalFloat group, and toggleterm
+            -- maps NormalFloat -> ToggleTerm<n>NormalFloat. Point both that and
+            -- FloatBorder at `TerminalBackground`, which is filled at startup
+            -- with the real host terminal color (detected via OSC 11 below).
+            -- NOTE: toggleterm highlight values must use guibg/guifg + link; a
+            -- plain `bg`/`fg` key is dropped by colors.convert_options.
+            highlights = {
+                NormalFloat = { link = 'TerminalBackground' },
+                FloatBorder = { link = 'TerminalBackground' },
+            },
             float_opts = {
                 col = function()
                     return vim.o.columns - math.floor(vim.o.columns * 0.4)
@@ -848,7 +858,52 @@ require("lazy").setup({
                     return math.floor(vim.o.lines * 0.4)
                 end,
             }
-        }
+        },
+        config = function(_, opts)
+            -- Fallback until the terminal answers: behave like before.
+            vim.api.nvim_set_hl(0, 'TerminalBackground', { link = 'Normal' })
+
+            -- Ask the host terminal for its background color and store the RGB
+            -- in `TerminalBackground`. Same method as Nvim core
+            -- (runtime/lua/vim/_core/defaults.lua): OSC 11 query + DSR, reply
+            -- read via |TermResponse|. Nvim only keeps the derived
+            -- 'dark'/'light' in 'background', so we parse the color ourselves.
+            local function parse_osc11(resp)
+                local r, g, b = resp:match('^\027%]11;rgb:(%x+)/(%x+)/(%x+)$')
+                if not r then
+                    local a
+                    r, g, b, a = resp:match('^\027%]11;rgba:(%x+)/(%x+)/(%x+)/(%x+)$')
+                    if not a or #a > 4 then return nil end
+                end
+                if r and g and b and #r <= 4 and #g <= 4 and #b <= 4 then return r, g, b end
+                return nil
+            end
+
+            -- Scale a 1..4 hex-digit component to 0..255 (like core's parsecolor)
+            local function to_byte(c)
+                return math.floor(tonumber(c, 16) / tonumber(string.rep('f', #c), 16) * 255 + 0.5)
+            end
+
+            local group = vim.api.nvim_create_augroup('TerminalBackground', { clear = true })
+            vim.api.nvim_create_autocmd('TermResponse', {
+                group = group,
+                desc = 'Detect host terminal background color (OSC 11)',
+                callback = function(ev)
+                    local seq = tostring((ev.data and ev.data.sequence) or vim.v.termresponse or '')
+                    local r, g, b = parse_osc11(seq)
+                    if not r then return end
+                    local bg = ('#%02x%02x%02x'):format(to_byte(r), to_byte(g), to_byte(b))
+                    if vim.g._terminal_background == bg then return end
+                    vim.g._terminal_background = bg
+                    local normal = vim.api.nvim_get_hl(0, { name = 'Normal' })
+                    vim.api.nvim_set_hl(0, 'TerminalBackground', { fg = normal.fg, bg = bg })
+                end,
+            })
+            -- OSC 11 query (BEL-terminated) + DSR, exactly like Nvim core.
+            pcall(vim.api.nvim_ui_send, '\027]11;?\007\027[5n')
+
+            require('toggleterm').setup(opts)
+        end,
     },
     -- {
     --     'sunjon/Shade.nvim',
