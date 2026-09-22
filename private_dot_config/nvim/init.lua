@@ -1821,6 +1821,7 @@ require("lazy").setup({
                     ['attrset_expression'] = actions.toggle_multiline(), -- nix
                     ['list_expression'] = actions.toggle_multiline(), -- nix
                     ['function_value_parameters'] = actions.toggle_multiline(), -- kotlin
+                    ['array_initializer'] = actions.toggle_multiline(), -- java
                 },
             }
         end,
