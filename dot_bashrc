@@ -31,7 +31,10 @@ PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
         while [[ -n "$_dir" ]]; do
             _head_file="$_dir/.git/HEAD"
             if [[ -f "$_dir/.git" ]]; then
-                read -r _head_file < "$_dir/.git" && _head_file="$_dir/${_head_file#gitdir: }/HEAD"
+                read -r _head_file < "$_dir/.git"
+                _head_file="${_head_file#gitdir: }"
+                [[ "$_head_file" != /* ]] && _head_file="$_dir/$_head_file"
+                _head_file="$_head_file/HEAD"
             fi
             [[ -e "$_head_file" ]] && break
             _dir="${_dir%/*}"
