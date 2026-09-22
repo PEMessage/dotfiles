@@ -1979,6 +1979,7 @@ require("lazy").setup({
     {
         "jmacadie/telescope-hierarchy.nvim",
         brnach = 'feature/type',
+        enabled = false,
         dependencies = {
             {
                 "nvim-telescope/telescope.nvim",
@@ -2015,6 +2016,39 @@ require("lazy").setup({
             require("telescope").setup(opts)
             require("telescope").load_extension("hierarchy")
         end,
+    },
+    {
+        "retran/meow.yarn.nvim",
+        dependencies = { "MunifTanjim/nui.nvim" },
+        main = 'meow.yarn',
+        opts = {
+            hierarchies = {
+                type_hierarchy = {
+                    icons = {
+                        class = "C",
+                        struct = "S",
+                        interface = "I",
+                        default = "",
+                    },
+                },
+                call_hierarchy = {
+                    icons = {
+                        method = "m",
+                        func = "f",
+                        variable = "v",
+                        default = "",
+                    },
+                },
+            },
+
+        },
+        cmds = { "MeowYarn" },
+        keys = {
+            { "<leader>yS", "<Cmd>MeowYarn type super<CR>", desc = "Yarn: Super Types" },
+            { "<leader>ys", "<Cmd>MeowYarn type sub<CR>",   desc = "Yarn: Sub Types" },
+            { "<leader>yC", "<Cmd>MeowYarn call callers<CR>", desc = "Yarn: Callers" },
+            { "<leader>yc", "<Cmd>MeowYarn call callees<CR>", desc = "Yarn: Callees" },
+        },
     },
     {
         'nvim-telescope/telescope.nvim',
@@ -4196,6 +4230,7 @@ require("lazy").setup({
     -- },
     {
         'ldelossa/litee.nvim',
+        enabled = false,
         lazy = true,
         main = 'litee.lib',
         opts = {
