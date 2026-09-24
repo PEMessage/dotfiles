@@ -37,3 +37,6 @@ ttt() {
 alias q-bell='echo -e "\a"'
 alias q-pixi='eval "$(pixi shell-hook)"'
 alias opencode2='opencode2 --standalone'
+
+alias q-ssh='ssh -R 7890:localhost:7890'
+alias p-ssh='ssh -R 7890:localhost:7890 -o "SetEnv=http_proxy=http://localhost:7890 HTTP_PROXY=http://localhost:7890 https_proxy=http://localhost:7890 HTTPS_PROXY=http://localhost:7890 socks5h_proxy=socks5h://localhost:7890 SOCKS5H_PROXY=socks5h://localhost:7890"'
