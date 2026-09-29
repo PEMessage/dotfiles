@@ -2533,11 +2533,11 @@ require("lazy").setup({
                 mapping = cmp.mapping.preset.cmdline(),
                 sources = {
                     { name = 'cmdline' },
-                    {
-                        name = 'cmdline_history',
-                        max_item_count = 10,
-                        keyword_length = 4
-                    }
+                    -- {
+                    --     name = 'cmdline_history',
+                    --     max_item_count = 10,
+                    --     keyword_length = 4
+                    -- }
                 },
                 formatting = {
                     fields = { 'abbr', 'menu', 'kind' }, -- Remove 'kind' from fields
