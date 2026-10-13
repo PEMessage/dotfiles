@@ -3166,6 +3166,19 @@ require("lazy").setup({
                                     .. '.options'
                                     .. '.home-manager.users.type.getSubOptions []'
                             },
+                            -- This repo is a flake-parts / flake-aspects flake: NixOS options
+                            -- live under `flake.modules.nixos.<name>` / `flake.aspects.<name>.nixos`,
+                            -- not at a file's toplevel. Without a flake-parts option scope, nixd
+                            -- resolves the cursor's attrpath from `flake.*` -> "attrname flake not
+                            -- found in attrset" -> no goto-definition / hover.
+                            -- Requires `debug = true;` in flake.nix (see https://flake.parts/debug).
+                            ["flake-parts"] = {
+                                expr = '(builtins.getFlake ("git+file://" + toString ./.)).debug.options',
+                            },
+                            -- And if the flake ever uses `perSystem`:
+                            -- ["flake-parts2"] = {
+                            --     expr = '(builtins.getFlake ("git+file://" + toString ./.)).currentSystem.options',
+                            -- },
                         },
                     },
                 },
@@ -3262,6 +3275,13 @@ require("lazy").setup({
         cmd = {
             'ClangdTypeHierarchy'
         }
+    },
+
+    {
+        'mfussenegger/nvim-dap-python',
+        config = function (...)
+            require("dap-python").setup("uv")
+        end
     },
     {
         'PEMessage/nvim-jdtls',
@@ -4552,13 +4572,29 @@ local section = function ()
     vim.keymap.set('n', '<leader>tw', '<cmd>IgnoreWhitespaceToggle<CR>')
 
     -- vim.keymap.set('n', '<leader>q', [[:vimgrep /<C-r>// %<CR>]], { desc = "vimgrep @/" })
+    -- vim.keymap.set('n', '<leader>q', function()
+    --     local search_term = vim.fn.getreg('/')
+    --     local cmd = string.format("vimgrep /%s/j %%", search_term)
+    --     vim.fn.histadd("cmd", cmd)
+    --     vim.cmd(cmd)
+    --     vim.cmd("copen")
+    -- end, { desc = "vimgrep @/ (no jump, add to history)" })
+
     vim.keymap.set('n', '<leader>q', function()
-        local search_term = vim.fn.getreg('/')
-        local cmd = string.format("vimgrep /%s/j %%", search_term)
-        vim.fn.histadd("cmd", cmd)
-        vim.cmd(cmd)
-        vim.cmd("copen")
-    end, { desc = "vimgrep @/ (no jump, add to history)" })
+        local pat, buf = vim.fn.getreg('/'), vim.api.nvim_get_current_buf()
+        local items = {}
+        for i, line in ipairs(vim.api.nvim_buf_get_lines(buf, 0, -1, false)) do
+            local from = 0
+            while true do
+                local m = vim.fn.matchstrpos(line, pat, from)
+                if m[2] < 0 then break end
+                items[#items + 1] = { bufnr = buf, lnum = i, col = m[2] + 1, text = line }
+                from = m[3] + 1
+            end
+        end
+        vim.fn.setqflist({}, 'r', { title = '/' .. pat, items = items })
+        vim.cmd('copen')
+    end, { desc = 'quickfix @/' })
 
     -- -------------------------------------------
     -- 6.3 command
