@@ -311,8 +311,14 @@
     fi
 
     if [[ -n "$commands[herdr]" ]]; then
-        if [[ ! -f "$ZSH_CACHE_DIR/completions/_herder" ]]; then
-            herdr completion zsh >| "$ZSH_CACHE_DIR/completions/_herder"
+        if [[ ! -f "$ZSH_CACHE_DIR/completions/_herdr" ]]; then
+            herdr completion zsh >| "$ZSH_CACHE_DIR/completions/_herdr"
+        fi
+    fi
+
+    if [[ -n "$commands[infisical]" ]]; then
+        if [[ ! -f "$ZSH_CACHE_DIR/completions/_infisical" ]]; then
+            INFISICAL_DISABLE_UPDATE_CHECK=true infisical completion zsh >| "$ZSH_CACHE_DIR/completions/_infisical"
         fi
     fi
 # -----------------------------------------
