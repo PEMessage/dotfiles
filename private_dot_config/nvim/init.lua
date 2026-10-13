@@ -2828,6 +2828,14 @@ require("lazy").setup({
                     }
                 }
             })
+
+            vim.lsp.config('ty', {
+                init_options = {
+                    experimental = {
+                        useUv = 'scripts',
+                    },
+                },
+            })
             -- Thanks to:
             -- https://github.com/derekzyl/nvim/blob/6537239beda2b54925bd7640cf384d086c7dc4ea/lua/inlay_hint.lua#L56C1-L67C7
             vim.lsp.config("gopls", {
