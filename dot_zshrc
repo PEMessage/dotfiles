@@ -320,6 +320,26 @@
         if [[ ! -f "$ZSH_CACHE_DIR/completions/_infisical" ]]; then
             INFISICAL_DISABLE_UPDATE_CHECK=true infisical completion zsh >| "$ZSH_CACHE_DIR/completions/_infisical"
         fi
+
+        # Make `infisical run -- <cmd>` complete <cmd> recursively (like sudo/env)
+        # instead of falling back to file completion. Delegates to zsh's normal
+        # command completion machinery via _normal.
+        if (( $+functions[compdef] )); then
+            _infisical_with_run() {
+                local i dash=0
+                for (( i = 2; i < CURRENT; i++ )); do
+                    [[ $words[i] == '--' ]] && { dash=$i; break }
+                done
+                if (( dash )) && [[ $words[2] == run ]]; then
+                    words=( $words[dash+1,-1] )   # re-root the command line after --
+                    (( CURRENT -= dash ))
+                    _normal -p infisical-run      # command names + recursion
+                    return
+                fi
+                _infisical "$@"                   # everything else: cobra default
+            }
+            compdef _infisical_with_run infisical
+        fi
     fi
 # -----------------------------------------
 # lazy load compdef file
