@@ -1,0 +1,173 @@
+#!/usr/bin/env python3
+"""Clipboard helpers for Herdr keybindings.
+
+Usage:
+  herdr-clipboard copy-path   Copy the active pane's working directory.
+  herdr-clipboard paste       Paste the system clipboard into the active pane
+                              using Herdr's bracketed-paste handling.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import shutil
+import socket
+import subprocess
+import sys
+import time
+
+REQUEST_ID = "herdr-clipboard"
+LOG_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "herdr-clipboard.log",
+)
+
+
+def log(message: str) -> None:
+    try:
+        with open(LOG_PATH, "a", encoding="utf-8") as handle:
+            stamp = time.strftime("%Y-%m-%dT%H:%M:%S")
+            handle.write(f"{stamp} {message}\n")
+    except OSError:
+        pass
+
+
+def socket_path() -> str:
+    explicit = os.environ.get("HERDR_SOCKET_PATH")
+    if explicit:
+        return explicit
+    config_home = os.environ.get("XDG_CONFIG_HOME") or os.path.join(
+        os.environ.get("HOME", ""), ".config"
+    )
+    session = os.environ.get("HERDR_SESSION") or "default"
+    return os.path.join(config_home, "herdr", "sessions", session, "herdr.sock")
+
+
+def request(method: str, params: dict) -> dict:
+    path = socket_path()
+    payload = json.dumps({"id": REQUEST_ID, "method": method, "params": params}) + "\n"
+    with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
+        sock.settimeout(5)
+        try:
+            sock.connect(path)
+        except OSError as err:
+            raise SystemExit(f"herdr-clipboard: cannot reach {path}: {err}") from err
+        sock.sendall(payload.encode())
+        buf = b""
+        while not buf.endswith(b"\n"):
+            chunk = sock.recv(65536)
+            if not chunk:
+                break
+            buf += chunk
+    if not buf:
+        raise SystemExit("herdr-clipboard: no reply from herdr")
+    reply = json.loads(buf.decode())
+    if "error" in reply:
+        raise SystemExit(f"herdr-clipboard: request rejected: {reply['error']}")
+    return reply
+
+
+def active_pane_id() -> str:
+    pane_id = os.environ.get("HERDR_ACTIVE_PANE_ID") or os.environ.get("HERDR_PANE_ID")
+    if not pane_id:
+        raise SystemExit("herdr-clipboard: not running inside a Herdr pane")
+    return pane_id
+
+
+def clipboard_read() -> str:
+    if os.environ.get("WAYLAND_DISPLAY") and shutil.which("wl-paste"):
+        cmd = ["wl-paste", "--no-newline"]
+    elif shutil.which("xclip"):
+        cmd = ["xclip", "-o", "-selection", "clipboard"]
+    else:
+        raise SystemExit("herdr-clipboard: no clipboard tool found (wl-paste or xclip)")
+    try:
+        return subprocess.run(
+            cmd, check=True, capture_output=True, text=True, timeout=5
+        ).stdout
+    except (OSError, subprocess.SubprocessError) as err:
+        raise SystemExit(f"herdr-clipboard: cannot read clipboard: {err}") from err
+
+
+def clipboard_write(text: str) -> None:
+    if os.environ.get("WAYLAND_DISPLAY") and shutil.which("wl-copy"):
+        cmd = ["wl-copy"]
+    elif shutil.which("xclip"):
+        cmd = ["xclip", "-selection", "clipboard", "-in"]
+    else:
+        raise SystemExit("herdr-clipboard: no clipboard tool found (wl-copy or xclip)")
+    try:
+        subprocess.run(cmd, input=text, text=True, check=True, timeout=5)
+    except (OSError, subprocess.SubprocessError) as err:
+        raise SystemExit(f"herdr-clipboard: cannot write clipboard: {err}") from err
+
+
+def notify(title: str, body: str) -> None:
+    herdr = os.environ.get("HERDR_BIN_PATH") or shutil.which("herdr")
+    if not herdr:
+        return
+    try:
+        subprocess.run(
+            [herdr, "notification", "show", title, "--body", body],
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=3,
+        )
+    except (OSError, subprocess.SubprocessError):
+        pass
+
+
+def copy_path() -> None:
+    cwd = os.environ.get("HERDR_ACTIVE_PANE_CWD")
+    if not cwd:
+        pane = request("pane.get", {"pane_id": active_pane_id()})["result"]["pane"]
+        cwd = pane.get("foreground_cwd") or pane.get("cwd")
+    if not cwd:
+        raise SystemExit("herdr-clipboard: cannot resolve the active pane path")
+    clipboard_write(cwd)
+    log(f"copy-path pane={active_pane_id()} path={cwd}")
+    notify("Copied path", cwd)
+
+
+def paste() -> None:
+    text = clipboard_read()
+    if not text:
+        log(f"paste pane={active_pane_id()} skipped=empty")
+        notify("Nothing to paste", "System clipboard is empty")
+        return
+    # Drop the single trailing newline clipboard tools commonly append so the
+    # paste lands at the prompt instead of starting a blank line.
+    if text.endswith("\r\n"):
+        text = text[:-2]
+    elif text.endswith("\n"):
+        text = text[:-1]
+    # pane.send_input applies the pane's live bracketed-paste mode and sends
+    # the text without submitting it.
+    request(
+        "pane.send_input",
+        {"pane_id": active_pane_id(), "text": text, "keys": []},
+    )
+    log(f"paste pane={active_pane_id()} chars={len(text)}")
+
+
+def main(argv: list[str]) -> int:
+    if len(argv) != 2 or argv[1] not in {"copy-path", "paste"}:
+        print(__doc__.strip(), file=sys.stderr)
+        return 2
+    try:
+        if argv[1] == "copy-path":
+            copy_path()
+        else:
+            paste()
+    except SystemExit as err:
+        message = str(err) or "unknown error"
+        log(f"{argv[1]} failed: {message}")
+        notify("herdr-clipboard", message)
+        raise
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv))

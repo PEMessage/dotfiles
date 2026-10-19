@@ -15,6 +15,12 @@ pane_gaps = false
 prompt_new_tab_name = false
 pane_outer_borders = false
 
+[ui.toast]
+delivery = "herdr"
+#
+[ui.toast.herdr]
+position = "top-right"
+
 [keys]
 prefix = "ctrl+b"
 detach = ["prefix+q", "prefix+d"]
@@ -66,3 +72,15 @@ command = "herdr-passthough if-proc '^(g?(view|l?n?vim?x?))(diff)?$' alt+shift+c
 key = "alt+shift+x"
 type = "shell"
 command = "herdr-passthough if-proc '^(g?(view|l?n?vim?x?))(diff)?$' alt+shift+x builtin current-pane close"
+
+[[keys.command]]
+key = ["alt+shift+i", "ctrl+alt+i"]
+type = "shell"
+description = "copy pane path to clipboard"
+command = "$HOME/.config/herdr/bin/herdr-clipboard copy-path"
+
+[[keys.command]]
+key = ["alt+shift+o", "ctrl+alt+o"]
+type = "shell"
+description = "paste clipboard into pane"
+command = "$HOME/.config/herdr/bin/herdr-clipboard paste"
