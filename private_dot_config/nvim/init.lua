@@ -2793,6 +2793,15 @@ require("lazy").setup({
                 inlay_hints = { enabled = true },
             })
 
+            vim.lsp.config('ty', {
+                init_options = {
+                    experimental = {
+                        -- For PEP 723 Script
+                        useUv = 'on',
+                    },
+                },
+            })
+
             -- See: https://github.com/LuaLS/lua-language-server/blob/996e21adedc503e92958105cb8e8959eaa9ab6f9/doc/en-us/config.md#hintenable
             vim.lsp.config('lua_ls', {
                 settings = {
