@@ -929,7 +929,7 @@ require("lazy").setup({
         'MeanderingProgrammer/render-markdown.nvim',
         enabled = false,
         -- if you use standalone mini plugins
-        dependencies = { 'PEMessage/nvim-treesitter', 'nvim-mini/mini.icons' },
+        dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' },
         opts = {},
     },
     {
@@ -1009,7 +1009,7 @@ require("lazy").setup({
         lazy = true,
         dependencies = {
             "hrsh7th/nvim-cmp",
-            -- "PEMessage/nvim-treesitter",
+            -- "nvim-treesitter/nvim-treesitter",
         },
         config = function(_, _)
             require('cmp').setup.filetype('neorepl', {
@@ -1665,15 +1665,31 @@ require("lazy").setup({
     -- 5.4 Treesitter (HEAVY Zone after)
     -- -------------------------------------------
     {
-        'PEMessage/nvim-treesitter',
+        'nvim-treesitter/nvim-treesitter',
         dependencies = { 'williamboman/mason.nvim' },
-        branch = 'main', -- required: main is the new rewrite
-        build = ':TSUpdate', -- ensures parsers are updated
-        lazy = false, -- treesitter does NOT support lazy-loading
+        branch = 'main',
+        build = ':TSUpdate',
+        lazy = false,
+
+        init = function()
+            vim.api.nvim_create_autocmd('User', {
+                pattern = 'TSUpdate',
+                callback = function()
+                    require('nvim-treesitter.parsers').imhex = {
+                        install_info = {
+                            url = 'https://github.com/Daniel-Esteban/tree-sitter-imhex',
+                            revision = '3034450a9863b6b4318af80233c504e73dc829e4',
+                            queries = 'queries',
+                        },
+                        tier = 2,
+                    }
+                end,
+            })
+        end,
     },
     {
         'MeanderingProgrammer/treesitter-modules.nvim',
-        dependencies = { 'PEMessage/nvim-treesitter' },
+        dependencies = { 'nvim-treesitter/nvim-treesitter' },
         lazy = false, -- treesitter does NOT support lazy-loading
         opts = {
             highlight = {
@@ -1737,7 +1753,7 @@ require("lazy").setup({
         },
     },
     {
-        "PEMessage/nvim-treesitter-context",
+        "nvim-treesitter/nvim-treesitter-context",
         branch = 'main',
         enabled = false,
         opts = {
@@ -4166,7 +4182,7 @@ require("lazy").setup({
         -- Note: this also have barbecue.nvim feature something like
         -- nvim › init.lua › 󰅨 require("lazy").setup ›  [25]
         dependencies = {
-            'PEMessage/nvim-treesitter', -- optional
+            'nvim-treesitter/nvim-treesitter', -- optional
             -- 'nvim-tree/nvim-web-devicons'     -- optional
         },
         enabled = false,
@@ -4243,7 +4259,7 @@ require("lazy").setup({
         opts = {},
         -- Optional dependencies
         dependencies = {
-            "PEMessage/nvim-treesitter",
+            "nvim-treesitter/nvim-treesitter",
             -- "nvim-tree/nvim-web-devicons"
         },
     },
