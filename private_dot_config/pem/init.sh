@@ -100,7 +100,7 @@
     # readlink is not builtin cmd, only use it if we need
     # PEM_INIT_SCRIPT="$(readlink -f ${BASH_SOURCE[0]-$0})"
     export PEM_HOME="${XDG_CONFIG_HOME:-${HOME}/.config}/pem"
-    export PEM_DATA_HOME="${XDG_CONFIG_HOME:-${HOME}/.local/share}/pem"
+    export PEM_DATA_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/pem"
     export PEM_CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}/pem"
     # No space in these variable
     PEM_ROOT_LIST="$PEM_CACHE_HOME $PEM_DATA_HOME $PEM_HOME"
@@ -132,7 +132,7 @@
     alias ll='ls --color=auto --time-style=long-iso -h -l -a'
 
     if [ "$PEM_OS_VARIANT" = "msys" ] ; then
-        alias chezmoi='chezmoi -S "$(cygpath -w "${XDG_CONFIG_HOME:-${HOME}/.local/share}/chezmoi")"'
+        alias chezmoi='chezmoi -S "$(cygpath -w "${XDG_DATA_HOME:-${HOME}/.local/share}/chezmoi")"'
     fi
 
 # -----------------------------------------
