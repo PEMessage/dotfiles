@@ -63,7 +63,7 @@
 # History Setting Zone
 # -----------------------------------------
     # HISTFILE=$HOME/.local/share/zsh/zsh_history
-    HISTFILE=${XDG_CONFIG_HOME:-${HOME}/.local/share}/zsh/zsh_history
+    HISTFILE=${XDG_DATA_HOME:-${HOME}/.local/share}/zsh/zsh_history
     HISTSIZE=9000
     SAVEHIST=9000
     [ -e "$HISTFILE" ] || mkdir -p `dirname $HISTFILE` ; touch "$HISTFILE"
