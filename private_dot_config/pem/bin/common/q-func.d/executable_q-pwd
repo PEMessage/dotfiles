@@ -1,10 +1,56 @@
 #!/usr/bin/env bash
 
 
+# Only used for SSH_CONNECTION: prefer a name that reverse-resolves and
+# forward-resolves back to the same address, because the client must be able
+# to reach whatever we print.
+function __q_pwd_ssh_name()
+{
+    local ip="$1"
+    command -v getent >/dev/null 2>&1 || { echo "$ip"; return; }
+
+    local name short
+    name=$(getent hosts "$ip" 2>/dev/null | awk 'NR == 1 { print $2 }')
+    if [ -z "$name" ] || \
+       ! getent hosts "$name" 2>/dev/null | awk -v ip="$ip" '$1 == ip { found = 1 } END { exit !found }'; then
+        echo "$ip"
+        return
+    fi
+
+    short=${name%%.*}
+    if getent hosts "$short" 2>/dev/null | awk -v ip="$ip" '$1 == ip { found = 1 } END { exit !found }'; then
+        echo "$short"
+    else
+        echo "$name"
+    fi
+}
+
 function q-myip()
 {
     if [ -n "$SSH_CONNECTION" ]; then
-        echo "$SSH_CONNECTION" | awk '{print $3}'
+        # SSH_CONNECTION: <client_ip> <client_port> <server_ip> <server_port>
+        # The 3rd field is the address the client actually connected to, so it
+        # is guaranteed to be reachable from the client.  (The 1st field is the
+        # client itself and would point back to the client.)
+        local client_ip client_port server_ip server_port
+        read -r client_ip client_port server_ip server_port <<<"$SSH_CONNECTION"
+
+        case "$server_ip" in
+            127.*|::1|0.0.0.0|0:0:0:0:0:0:0:0)
+                # Tunnel/port-forward: 127.0.0.1 on the client means the
+                # client itself, so fall back to a real local address
+                # (LAN/Tailscale first, then the machine name).
+                server_ip=$(hostname -I 2>/dev/null | tr ' ' '\n' | \
+                    grep -E '^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.|100\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\.)' | \
+                    head -n 1)
+                [ -n "$server_ip" ] || server_ip=$(hostname -f 2>/dev/null || hostname)
+                ;;
+            *)
+                server_ip=$(__q_pwd_ssh_name "$server_ip")
+                ;;
+        esac
+
+        echo "$server_ip"
         return
     fi
 
