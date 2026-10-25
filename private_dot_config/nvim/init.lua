@@ -3536,7 +3536,17 @@ require("lazy").setup({
         ft = { "java", "kotlin" },
         dependencies = { "mfussenegger/nvim-dap" }, -- optional
         -- build = ":IntellijServerInstall",  -- auto-download on install/update
-        opts = {},
+        opts = {
+            code_lens = {
+                -- default
+                --   play  = nf-fa-play  U+F04B
+                --   debug = nf-fa-bug   U+F188
+                icons = {
+                    play  = "",
+                    debug = "",
+                },
+            },
+        },
     },
     {
         "AlexandrosAlexiou/kotlin.nvim",
@@ -4776,8 +4786,13 @@ vim.api.nvim_create_autocmd('LspAttach', {
         vim.keymap.set('n', 'gk', vim.lsp.buf.code_action,
             { silent = true, noremap = true, buffer = bufnr, desc = 'Code Action' }
         )
+
         vim.keymap.set('x', 'gk', vim.lsp.buf.code_action,
             { silent = true, noremap = true, buffer = bufnr, desc = 'Range Code Action' }
+        )
+
+        vim.keymap.set('n', 'gl', vim.lsp.codelens.run,
+            { silent = true, noremap = true, buffer = bufnr, desc = 'Code Lens' }
         )
 
         vim.keymap.set("n", "gd", '<c-]>',
