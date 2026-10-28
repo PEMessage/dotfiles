@@ -1059,7 +1059,38 @@ require("lazy").setup({
         -- TLDR: using 'gc' for line comment, 'gb' for block comment
         'PEMessage/Comment.nvim',
         enabled = true,
-        opts = {}
+        opts = {},
+        config = function(_, opts)
+            require('Comment').setup(opts)
+
+            local esc = vim.api.nvim_replace_termcodes('<ESC>', true, false, true)
+
+            local function devtodo_config()
+                local base = require('Comment.config'):get()
+
+                return vim.tbl_deep_extend('force', base, {
+                    pre_hook = function(ctx)
+                        local cstr = (base.pre_hook and base.pre_hook(ctx))
+                        or require('Comment.ft').calculate(ctx)
+                        or vim.bo.commentstring
+
+                        if not cstr or not cstr:find('%%s') then
+                            return cstr
+                        end
+
+                        -- '//%s' -> '// DEVTODO %s'
+                        -- '#%s'  -> '# DEVTODO %s'
+                        -- '<!--%s-->' -> '<!-- DEVTODO %s-->'
+                        return (cstr:gsub('%s?%%s', ' !DEVTODO! %%s', 1))
+                    end,
+                })
+            end
+
+            vim.keymap.set('x', 'gz', function()
+                vim.api.nvim_feedkeys(esc, 'nx', false)
+                require('Comment.api').toggle.linewise('V', devtodo_config())
+            end, { desc = 'Toggle DEVTODO comment' })
+        end,
     },
     {
         "folke/ts-comments.nvim",
