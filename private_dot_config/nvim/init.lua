@@ -4772,6 +4772,17 @@ vim.api.nvim_create_autocmd("FileType", {
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "markdown",
   callback = function()
+    -- 1. wrap
+    vim.opt_local.wrap = true          -- 开启软换行（仅屏幕视觉折行，不写入换行符）
+    -- vim.opt_local.linebreak = true  -- 智能折行，不会从英文单词或中文字符中间截断
+    vim.opt_local.breakindent = true   -- 折行后的文本与上一行对齐（保持列表优雅缩进）
+
+    -- 2. indent
+    vim.opt_local.expandtab = true     -- Tab 转换为空格
+    vim.opt_local.tabstop = 4          -- Tab 占 4 个空格
+    vim.opt_local.shiftwidth = 4       -- 自动缩进/层级调整使用 4 个空格
+    vim.opt_local.softtabstop = 4      -- 按退格键时一次删除 4 个空格
+
     vim.keymap.set("x", "F", ":!column -t -s '|' -o '|'<CR>", {
       noremap = true,
       silent = false,
