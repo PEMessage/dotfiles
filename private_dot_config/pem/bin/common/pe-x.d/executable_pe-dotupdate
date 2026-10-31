@@ -1,6 +1,8 @@
 #!/bin/sh
-GREEN='\e[092m'
-STOP='\e[0m'
+# Build the escape bytes with printf: bash's `echo` does not expand `\e`
+# (and `\e` is not POSIX), so the raw strings would be printed literally.
+GREEN=$(printf '\033[92m')
+STOP=$(printf '\033[0m')
 temp=$(chezmoi source-path)
 
 
