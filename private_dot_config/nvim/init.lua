@@ -270,6 +270,7 @@ require("lazy").setup({
             },
             spec = {
                 { "<leader>n", group = "Line Nuber" },
+                { "<leader>l", group = "Outline" },
                 { "[", group = "prev" },
                 { "]", group = "next" },
                 { "g", group = "goto" },
@@ -527,7 +528,7 @@ require("lazy").setup({
         event = { "BufReadPre", "BufNewFile" },
         opts = function()
             vim.api.nvim_create_autocmd("FileType", {
-                pattern = { "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy", "mason", "notify" },
+                pattern = { "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy", "mason", "notify", "aerial" },
                 callback = function()
                     vim.b.miniindentscope_disable = true
                 end,
@@ -617,7 +618,8 @@ require("lazy").setup({
                         "neo-tree",
                         "Trouble",
                         "lazy",
-                        "mason"
+                        "mason",
+                        "aerial"
                     }
                 },
                 scope = {
@@ -719,6 +721,8 @@ require("lazy").setup({
         keys = {
             { "]]",function() Snacks.words.jump(vim.v.count1) end, desc = "Next Lsp Reference", mode = { "n", "t" } },
             { "[[",function() Snacks.words.jump(-vim.v.count1) end, desc = "Prev Lsp Reference", mode = { "n", "t" } },
+            { "<leader>ls", function() Snacks.picker.lsp_symbols() end, desc = "Outline: symbols (picker)" },
+            { "<leader>lS", function() Snacks.picker.lsp_workspace_symbols() end, desc = "Outline: workspace symbols (picker)" },
         }
     },
     -- {
@@ -4303,13 +4307,38 @@ require("lazy").setup({
         end,
     },
     {
+        -- VSCode-like outline: LSP first, then treesitter/markdown
         'stevearc/aerial.nvim',
         event = "VeryLazy",
-        opts = {},
         -- Optional dependencies
         dependencies = {
             "nvim-treesitter/nvim-treesitter",
             -- "nvim-tree/nvim-web-devicons"
+        },
+        keys = {
+            { "<leader>lo", "<cmd>AerialToggle! right<cr>", desc = "Outline: toggle sidebar" },
+            { "<leader>ln", "<cmd>AerialNavToggle<cr>",     desc = "Outline: navigator (float)" },
+        },
+        opts = {
+            backends = { "lsp", "treesitter", "markdown", "asciidoc", "man" },
+            layout = {
+                default_direction = "right",  -- right side, like VSCode
+                width = 32,
+                max_width = { 60, 0.25 },     -- 60 cols or 25% of screen, whichever is smaller
+                min_width = 20,
+            },
+            -- follow the active window (like VSCode)
+            attach_mode = "global",
+            -- auto-close only when the buffer has no symbol source
+            close_automatic_events = { "unsupported" },
+            -- stay open after jump (VSCode behavior)
+            close_on_select = false,
+            -- highlight the matching symbol in source on hover
+            highlight_on_hover = true,
+            -- VSCode jumps on <CR>, not on cursor move
+            autojump = false,
+            show_guides = false,
+            nerd_font = false,
         },
     },
     -- {
