@@ -1059,11 +1059,25 @@ require("lazy").setup({
             },
         },
     },
+
     {
-        -- TLDR: using 'gc' for line comment, 'gb' for block comment
         'PEMessage/Comment.nvim',
-        enabled = true,
         opts = {},
+        lazy = true,
+        keys = {
+            -- custom
+            { 'gz',  mode = 'x', desc = 'Toggle DEVTODO comment (visual)' },
+            { 'gzz', mode = 'n', desc = 'Toggle DEVTODO comment on current line' },
+
+            -- built-in
+            { 'gc',  mode = { 'n', 'x' }, desc = 'Comment toggle linewise' },
+            { 'gcc', mode = 'n',          desc = 'Comment toggle current line' },
+            { 'gb',  mode = { 'n', 'x' }, desc = 'Comment toggle blockwise' },
+            { 'gbc', mode = 'n',          desc = 'Comment toggle current block' },
+            { 'gcO', mode = 'n',          desc = 'Comment insert above' },
+            { 'gco', mode = 'n',          desc = 'Comment insert below' },
+            { 'gcA', mode = 'n',          desc = 'Comment insert end of line' },
+        },
         config = function(_, opts)
             require('Comment').setup(opts)
 
@@ -1082,9 +1096,8 @@ require("lazy").setup({
                             return cstr
                         end
 
-                        -- '//%s' -> '// DEVTODO %s'
-                        -- '#%s'  -> '# DEVTODO %s'
-                        -- '<!--%s-->' -> '<!-- DEVTODO %s-->'
+                        -- '//%s' -> '// !DEVTODO! %s'
+                        -- '#%s'  -> '# !DEVTODO! %s'
                         return (cstr:gsub('%s?%%s', ' !DEVTODO! %%s', 1))
                     end,
                 })
@@ -1094,6 +1107,11 @@ require("lazy").setup({
                 vim.api.nvim_feedkeys(esc, 'nx', false)
                 require('Comment.api').toggle.linewise('V', devtodo_config())
             end, { desc = 'Toggle DEVTODO comment' })
+
+            vim.keymap.set('n', 'gzz', function()
+                -- vim.v.count1：default 1
+                require('Comment.api').toggle.linewise.count(vim.v.count1, devtodo_config())
+            end, { desc = 'Toggle DEVTODO comment on current line' })
         end,
     },
     {
@@ -1317,6 +1335,7 @@ require("lazy").setup({
     },
     {
         'lewis6991/spaceless.nvim',
+        enabled = true,
         event = {'InsertEnter', 'BufEnter'}
     },
     {
